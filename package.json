@@ -1,0 +1,28 @@
+{
+  "name": "rewardia",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "scripts": {
+    "js:dev": "esbuild src/scripts/app.js --bundle --outfile=public/scripts/app.js --watch",
+    "js:build": "esbuild src/scripts/app.js --bundle --minify --outfile=public/scripts/app.js",
+    "css:dev": "npx @tailwindcss/cli -i src/styles/style.css -o public/styles/style.css --watch",
+    "css:build": "npx @tailwindcss/cli -i src/styles/style.css -o public/styles/style.css --minify",
+    "dev": "concurrently --names \"JS,CSS\" --prefix-colors \"bgBlue.bold,bgGreen.bold\" \"npm run js:dev\" \"npm run css:dev\"",
+    "build": "concurrently --names \"JS,CSS\" --prefix-colors \"bgBlue.bold,bgGreen.bold\" \"npm run js:build\" \"npm run css:build\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0",
+    "daisyui": "^5.0.50",
+    "esbuild": "^0.25.9"
+  },
+  "dependencies": {
+    "@tailwindcss/cli": "^4.1.12",
+    "alpinejs": "^3.14.9",
+    "braintree-web-drop-in": "^1.45.1",
+    "htmx.org": "^2.0.6",
+    "tailwindcss": "^4.1.12"
+  }
+}

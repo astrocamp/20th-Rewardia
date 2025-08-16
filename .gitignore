@@ -1,0 +1,18 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+node_modules
+public/*
+*.sqlite3
+.DS_Store
+.env
+.pg_service.conf
+.pg_db_pass

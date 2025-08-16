@@ -1,0 +1,5 @@
+[rewardia_service]
+host=localhost
+user=資料庫帳號
+dbname=rewardia_db
+port=5432
