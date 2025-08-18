@@ -33,3 +33,6 @@ sqlinstall_1:
 
 sqlinstall_2:
 	createuser -s postgres && psql -U postgres
+
+restart:
+	npm i && uv run
