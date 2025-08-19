@@ -39,28 +39,28 @@ class RewardCategory(models.Model):
         CreditCard,
         on_delete=models.CASCADE,
         related_name='reward_categories',
-        verbose_name='信用卡'
+        verbose_name='Credit Card'
     )
     category = models.CharField(
-        '消費分類',
+        'Spending Category',
         max_length=20,
         choices=Category.choices
     )
     rate = models.DecimalField(
-        '回饋率',
+        'Reward Rate',
         max_digits=4,
         decimal_places=2,
         validators=[MinValueValidator(0), MaxValueValidator(100)],
         help_text='百分比，例如 3.0 表示 3%'
     )
     reward_type = models.CharField(
-        '回饋類型',
+        'Reward Type',
         max_length=20,
         choices=RewardType.choices,
         default=RewardType.CASHBACK
     )
     points_value = models.DecimalField(
-        '點數價值',
+        'Points Value',
         max_digits=4,
         decimal_places=3,
         null=True,
@@ -69,7 +69,7 @@ class RewardCategory(models.Model):
         help_text='1點等於多少元，例如 0.5 表示 1點=0.5元'
     )
     max_spending = models.DecimalField(
-        '最高回饋消費金額',
+        'Maximum Reward Spending',
         max_digits=8,
         decimal_places=2,
         null=True,
@@ -78,23 +78,23 @@ class RewardCategory(models.Model):
         help_text='超過此金額的消費不給回饋或降級回饋'
     )
     is_rotating = models.BooleanField(
-        '季度輪替',
+        'Is Rotating',
         default=False,
         help_text='是否為季度輪替回饋'
     )
-    start_date = models.DateField('生效日期', null=True, blank=True)
-    end_date = models.DateField('結束日期', null=True, blank=True)
+    start_date = models.DateField('Start Date', null=True, blank=True)
+    end_date = models.DateField('End Date', null=True, blank=True)
     requires_activation = models.BooleanField(
-        '需要登錄',
+        'Requires Activation',
         default=False,
         help_text='是否需要事先登錄才能享有回饋'
     )
-    created_at = models.DateTimeField('建立時間', auto_now_add=True)
+    created_at = models.DateTimeField('Created At', auto_now_add=True)
 
     class Meta:
         db_table = 'reward_categories'
-        verbose_name = '回饋分類'
-        verbose_name_plural = '回饋分類'
+        verbose_name = 'Reward Category'
+        verbose_name_plural = 'Reward Categories'
         ordering = ['card', '-rate']
         indexes = [
             models.Index(fields=['card', 'category'], name='rewards_card_category_idx'),
@@ -108,7 +108,7 @@ class RewardCategory(models.Model):
     
     @property
     def effective_rate(self):
-        """有效回饋率（考慮點數價值）"""
+        #有效回饋率（考慮點數價值)
 
         # 現金回饋率
         if self.reward_type == self.RewardType.CASHBACK:
@@ -121,7 +121,7 @@ class RewardCategory(models.Model):
 
     @property
     def is_active(self):
-        """檢查回饋規則是否在有效期間內"""
+        #檢查回饋規則是否在有效期間內
         today = timezone.now().date()
         
         if self.start_date and today < self.start_date:
@@ -139,25 +139,25 @@ class MerchantReward(models.Model):
         CreditCard,
         on_delete=models.CASCADE,
         related_name='merchant_rewards',
-        verbose_name='信用卡'
+        verbose_name='Credit Card'
     )
     merchant = models.ForeignKey(
         Merchant,
         on_delete=models.CASCADE,
         related_name='reward_rules',
-        verbose_name='商家'
+        verbose_name='Merchant'
     )
     category = models.ForeignKey(
         RewardCategory,
         on_delete=models.CASCADE,
         related_name='merchant_overrides',
-        verbose_name='對應的回饋分類',
+        verbose_name='Corresponding Reward Category',
         # e.g. RewardCategory.objects.get(pk=1).merchant_overrides
         # 來看這一個reward類別有沒有可以覆蓋的rewards
         help_text='此特殊規則會覆蓋對應的分類回饋'
     )
     rate = models.DecimalField(
-        '特殊回饋率',
+        'Reward Rate',
         max_digits=4,
         decimal_places=2,
         null=True,
@@ -166,14 +166,14 @@ class MerchantReward(models.Model):
         help_text='覆蓋原分類回饋率，留空則使用分類回饋率'
     )
     reward_type = models.CharField(
-        '回饋類型',
+        'Reward Type',
         max_length=20,
         choices=RewardCategory.RewardType.choices,
         blank=True,
         help_text='留空則使用分類設定'
     )
     points_value = models.DecimalField(
-        '點數價值',
+        'Points Value',
         max_digits=4,
         decimal_places=3,
         null=True,
@@ -182,26 +182,26 @@ class MerchantReward(models.Model):
         help_text='1點等於多少元，例如 0.5 表示 1點=0.5元'
     )
     max_spending = models.DecimalField(
-        '單一商家最高回饋金額',
+        'Maximum Merchant Reward Amount',
         max_digits=8,
         decimal_places=2,
         null=True,
         blank=True,
         validators=[MinValueValidator(0)]
     )
-    start_date = models.DateField('生效日期', null=True, blank=True)
-    end_date = models.DateField('結束日期', null=True, blank=True)
+    start_date = models.DateField('Start Date', null=True, blank=True)
+    end_date = models.DateField('End Date', null=True, blank=True)
     is_promotional = models.BooleanField(
-        '促銷活動',
+        'Promotional Campaign',
         default=False,
         help_text='是否為限時促銷活動'
     )
-    created_at = models.DateTimeField('建立時間', auto_now_add=True)
+    created_at = models.DateTimeField('Created At', auto_now_add=True)
 
     class Meta:
         db_table = 'merchant_rewards'
-        verbose_name = '商家特殊回饋'
-        verbose_name_plural = '商家特殊回饋'
+        verbose_name = 'Merchant Special Reward'
+        verbose_name_plural = 'Merchant Special Rewards'
         ordering = ['card', 'merchant']
         indexes = [
             models.Index(fields=['merchant', 'card'], name='merchant_rewards_idx'),
@@ -215,7 +215,7 @@ class MerchantReward(models.Model):
     
     @property
     def effective_rate(self):
-        """有效回饋率"""
+        #有效回饋率
         rate = self.rate or self.category.rate
         reward_type = self.reward_type or self.category.reward_type
         points_value = self.points_value or self.category.points_value
@@ -231,7 +231,7 @@ class MerchantReward(models.Model):
     
     @property
     def is_active(self):
-        """檢查回饋規則是否在有效期間內"""
+        # 檢查回饋規則是否在有效期間內
         today = timezone.now().date()
         
         if self.start_date and today < self.start_date:

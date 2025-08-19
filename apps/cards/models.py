@@ -32,47 +32,47 @@ class CreditCard(models.Model):
         Bank,
         on_delete=models.CASCADE,
         related_name='credit_cards',
-        verbose_name='發卡銀行'
+        verbose_name='Issuing Bank'
     )
     annual_fee = models.DecimalField(
-        '年費',
+        'Annual Fee',
         max_digits=8,
         decimal_places=2,
         default=0,
         validators=[MinValueValidator(0)]
     )
     signup_bonus = models.IntegerField(
-        '新戶禮',
+        'Sign Up Bonus',
         default=0,
         validators=[MinValueValidator(0)],
         help_text='新戶禮金額或點數'
     )
     credit_limit_min = models.IntegerField(
-        '最低額度',
+        'Minimum Credit Limit',
         null=True,
         blank=True,
         validators=[MinValueValidator(0)]
     )
     credit_limit_max = models.IntegerField(
-        '最高額度',
+        'Maximum Credit Limit',
         null=True,
         blank=True,
         validators=[MinValueValidator(0)]
     )
     apr_min = models.DecimalField(
-        '最低利率',
+        'Minimum APR',
         max_digits=4,
         decimal_places=2,
         validators=[MinValueValidator(0), MaxValueValidator(100)]
     )
     apr_max = models.DecimalField(
-        '最高利率',
+        'Maximum APR',
         max_digits=4,
         decimal_places=2,
         validators=[MinValueValidator(0), MaxValueValidator(100)]
     )
     foreign_transaction_fee = models.DecimalField(
-        '海外交易手續費',
+        'Foreign Transaction Fee',
         max_digits=4,
         decimal_places=2,
         default=0,
@@ -80,23 +80,23 @@ class CreditCard(models.Model):
         help_text='百分比，例如 1.5 表示 1.5%'
     )
     card_network = models.CharField(
-        '卡片網路',
+        'Card Network',
         max_length=20,
         choices=CardNetwork.choices
     )
     card_type = models.CharField(
-        '卡片等級',
+        'Card Type',
         max_length=20,
         choices=CardType.choices
     )
-    is_active = models.BooleanField('是否啟用', default=True)
-    created_at = models.DateTimeField('建立時間', auto_now_add=True)
-    updated_at = models.DateTimeField('更新時間', auto_now=True)
+    is_active = models.BooleanField('Is Active', default=True)
+    created_at = models.DateTimeField('Created At', auto_now_add=True)
+    updated_at = models.DateTimeField('Updated At', auto_now=True)
 
     class Meta:
         db_table = 'credit_cards'
-        verbose_name = '信用卡'
-        verbose_name_plural = '信用卡'
+        verbose_name = 'Credit Card'
+        verbose_name_plural = 'Credit Cards'
         ordering = ['bank__name', 'name']
         indexes = [
             models.Index(fields=['bank', 'is_active'], name='cards_bank_active_idx'),
@@ -109,5 +109,4 @@ class CreditCard(models.Model):
     
     @property
     def has_annual_fee(self):
-        """是否有年費"""
         return self.annual_fee > 0
