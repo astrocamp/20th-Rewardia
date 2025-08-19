@@ -134,7 +134,7 @@ USE_TZ = True
 STATIC_URL = 'assets/'
 
 STATICFILES_DIRS = [
-    BASE_DIR / "src",
+    BASE_DIR / "public",
 ]
 
 # Default primary key field type
