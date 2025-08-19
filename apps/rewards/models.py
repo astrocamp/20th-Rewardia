@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
-from cards.models import CreditCard
-from merchants.models import Merchant
+from apps.cards.models import CreditCard
+from apps.merchants.models import Merchant
 from django.utils import timezone
 
 

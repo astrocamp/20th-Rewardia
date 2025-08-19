@@ -48,8 +48,7 @@ INSTALLED_APPS = [
     'apps.cards', 
     'apps.merchants',
     'apps.rewards',
-    'apps.users',
-    'apps.analytics',
+
 ]
 
 MIDDLEWARE = [
