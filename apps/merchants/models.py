@@ -24,30 +24,30 @@ class Merchant(models.Model):
         TRAVEL = 'TRA', '旅遊/訂房'
         OTHER = 'OTHER', '其他'
     
-    name = models.CharField('商家名稱', max_length=100)
-    domain = models.URLField('網域名稱', blank=True, help_text='用於 Chrome 擴展識別')
+    name = models.CharField('Merchant Name', max_length=100)
+    domain = models.URLField('Website URL', blank=True, help_text='用於 Chrome 擴展識別')
     category = models.CharField(
-        '主要分類', 
+        'Main Category', 
         max_length=10, 
         choices=Category.choices,
         default=Category.OTHER
     )
-    secondary_category = models.CharField('次要分類', max_length=30, blank=True)
+    secondary_category = models.CharField('Second Category', max_length=30, blank=True)
     merchant_code = models.CharField(
-        '商家代碼', 
+        'Merchant Code', 
         max_length=10, 
         unique=True, 
         blank=True,
         help_text='與銀行系統對接用'
     )
     logo_url = models.URLField('Logo URL', blank=True)
-    is_active = models.BooleanField('是否啟用', default=True)
-    created_at = models.DateTimeField('建立時間', auto_now_add=True)
+    is_active = models.BooleanField('Is Active', default=True)
+    created_at = models.DateTimeField('Created At', auto_now_add=True)
 
     class Meta:
         db_table = 'merchants'
-        verbose_name = '商家'
-        verbose_name_plural = '商家'
+        verbose_name = 'Merchant'
+        verbose_name_plural = 'Merchants'
         ordering = ['name']
         indexes = [
             models.Index(fields=['domain'], name='merchants_domain_idx'),
