@@ -44,6 +44,16 @@ class Merchant(models.Model):
     is_active = models.BooleanField('是否啟用', default=True)
     created_at = models.DateTimeField('建立時間', auto_now_add=True)
 
+    class Meta:
+        db_table = 'merchants'
+        verbose_name = '商家'
+        verbose_name_plural = '商家'
+        ordering = ['name']
+        indexes = [
+            models.Index(fields=['domain'], name='merchants_domain_idx'),
+            models.Index(fields=['category'], name='merchants_category_idx'),
+        ]
+
     def __str__(self):
         return self.name
     
