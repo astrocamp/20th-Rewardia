@@ -24,47 +24,47 @@ class OnlineTransaction(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='online_transactions',
-        verbose_name='用戶'
+        verbose_name='User'  # 用戶
     )
     merchant = models.ForeignKey(
         Merchant,
         on_delete=models.CASCADE,
         related_name='online_transactions',
-        verbose_name='購物網站'
+        verbose_name='Merchant'  # 購物網站
     )
     card = models.ForeignKey(
         CreditCard,
         on_delete=models.CASCADE,
         related_name='online_transactions',
-        verbose_name='使用信用卡'
+        verbose_name='Credit Card Used'  # 使用信用卡
     )
     
     # 交易基本資訊
     amount = models.DecimalField(
-        '交易金額',
+        'Transaction Amount',  # 交易金額
         max_digits=10,
         decimal_places=2,
         validators=[MinValueValidator(0)]
     )
     reward_earned = models.DecimalField(
-        '實際獲得回饋',
+        'Actual Reward Earned',  # 實際獲得回饋
         max_digits=8,
         decimal_places=2,
         default=0,
         validators=[MinValueValidator(0)],
         help_text='用戶實際獲得的回饋金額'
     )
-    transaction_date = models.DateTimeField('交易時間')
+    transaction_date = models.DateTimeField('Transaction Date')  # 交易時間
     
     # 線上交易特有資訊
     source = models.CharField(
-        '交易來源',
+        'Transaction Source',  # 交易來源
         max_length=10,
         choices=TransactionSource.choices,
         default=TransactionSource.CHROME_EXTENSION
     )
     payment_method = models.CharField(
-        '支付方式',
+        'Payment Method',  # 支付方式
         max_length=10,
         choices=PaymentMethod.choices,
         default=PaymentMethod.CREDIT_CARD
@@ -72,12 +72,12 @@ class OnlineTransaction(models.Model):
     
     # Chrome 擴展相關
     url = models.URLField(
-        '購物頁面 URL',
+        'Shopping Page URL',  # 購物頁面 URL
         blank=True,
         help_text='用戶購物時的頁面 URL'
     )
     page_title = models.CharField(
-        '頁面標題',
+        'Page Title',  # 頁面標題
         max_length=200,
         blank=True,
         help_text='購物頁面的標題'
@@ -85,7 +85,7 @@ class OnlineTransaction(models.Model):
     
     # 推薦系統相關
     was_recommended = models.BooleanField(
-        '系統有推薦',
+        'System Recommended',  # 系統有推薦
         default=False,
         help_text='系統是否有推薦此卡片'
     )
@@ -95,15 +95,15 @@ class OnlineTransaction(models.Model):
         null=True,
         blank=True,
         related_name='recommended_for_transactions',
-        verbose_name='系統推薦卡片'
+        verbose_name='System Recommended Card'  # 系統推薦卡片
     )
     used_recommended_card = models.BooleanField(
-        '使用推薦卡片',
+        'Used Recommended Card',  # 使用推薦卡片
         default=False,
         help_text='用戶是否使用了系統推薦的卡片'
     )
     potential_reward_missed = models.DecimalField(
-        '錯失的回饋',
+        'Potential Reward Missed',  # 錯失的回饋
         max_digits=8,
         decimal_places=2,
         default=0,
@@ -112,26 +112,26 @@ class OnlineTransaction(models.Model):
     
     # 類別標記
     category = models.CharField(
-        '消費分類',
+        'Spending Category',  # 消費分類
         max_length=20,
         blank=True,
         help_text='自動識別或手動分類的消費類型'
     )
     tags = models.JSONField(
-        '標籤',
+        'Tags',  # 標籤
         default=list,
         help_text='額外的分類標籤，如：特價、節慶促銷等'
     )
     
     # 備註
-    notes = models.TextField('備註', blank=True)
+    notes = models.TextField('Notes', blank=True)  # 備註
     
-    created_at = models.DateTimeField('記錄時間', auto_now_add=True)
+    created_at = models.DateTimeField('Record Time', auto_now_add=True)  # 記錄時間
     
     class Meta:
         db_table = 'online_transactions'
-        verbose_name = '線上交易'
-        verbose_name_plural = '線上交易'
+        verbose_name = 'Online Transaction'  # 線上交易
+        verbose_name_plural = 'Online Transactions'  # 線上交易
         ordering = ['-transaction_date']
         indexes = [
             models.Index(fields=['user', '-transaction_date'], name='online_trans_user_date_idx'),
@@ -165,31 +165,31 @@ class RewardCalculationCache(models.Model):
         'merchants.Merchant',
         on_delete=models.CASCADE,
         related_name='cached_calculations',
-        verbose_name='購物網站'
+        verbose_name='Merchant'  # 購物網站
     )
     card = models.ForeignKey(
         'cards.CreditCard',
         on_delete=models.CASCADE,
         related_name='cached_calculations',
-        verbose_name='信用卡'
+        verbose_name='Credit Card'  # 信用卡
     )
     
     # 常見的線上購物金額區間
     amount = models.DecimalField(
-        '消費金額',
+        'Spending Amount',  # 消費金額
         max_digits=10,
         decimal_places=2,
         validators=[MinValueValidator(0)],
         help_text='預計算的金額，如：100, 500, 1000, 2000, 5000'
     )
     calculated_reward = models.DecimalField(
-        '計算回饋',
+        'Calculated Reward',  # 計算回饋
         max_digits=8,
         decimal_places=2,
         validators=[MinValueValidator(0)]
     )
     reward_rate = models.DecimalField(
-        '回饋率',
+        'Reward Rate',  # 回饋率
         max_digits=4,
         decimal_places=2,
         validators=[MinValueValidator(0)],
@@ -197,28 +197,28 @@ class RewardCalculationCache(models.Model):
     )
     
     # 快取管理
-    calculation_date = models.DateTimeField('計算時間', auto_now_add=True)
+    calculation_date = models.DateTimeField('Calculation Time', auto_now_add=True)  # 計算時間
     is_valid = models.BooleanField(
-        '計算有效',
+        'Calculation Valid',  # 計算有效
         default=True,
         help_text='回饋規則變更時會標記為無效'
     )
     last_used = models.DateTimeField(
-        '最後使用時間',
+        'Last Used Time',  # 最後使用時間
         null=True,
         blank=True,
         help_text='記錄此快取最後被使用的時間'
     )
     usage_count = models.IntegerField(
-        '使用次數',
+        'Usage Count',  # 使用次數
         default=0,
         help_text='此快取被使用的總次數'
     )
     
     class Meta:
         db_table = 'reward_calculation_cache'
-        verbose_name = '回饋計算快取'
-        verbose_name_plural = '回饋計算快取'
+        verbose_name = 'Reward Calculation Cache'  # 回饋計算快取
+        verbose_name_plural = 'Reward Calculation Caches'  # 回饋計算快取
         ordering = ['-calculation_date']
         indexes = [
             models.Index(fields=['merchant', 'amount', 'is_valid'], name='cache_merchant_amount_idx'),
@@ -244,78 +244,78 @@ class UserSpendingPattern(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='spending_patterns',
-        verbose_name='用戶'
+        verbose_name='User'  # 用戶
     )
     
     # 統計時間區間
-    year = models.IntegerField('年份')
-    month = models.IntegerField('月份')
+    year = models.IntegerField('Year')  # 年份
+    month = models.IntegerField('Month')  # 月份
     
     # 線上消費統計
     total_online_spending = models.DecimalField(
-        '線上總消費',
+        'Total Online Spending',  # 線上總消費
         max_digits=10,
         decimal_places=2,
         default=0
     )
     total_rewards_earned = models.DecimalField(
-        '總回饋獲得',
+        'Total Rewards Earned',  # 總回饋獲得
         max_digits=8,
         decimal_places=2,
         default=0
     )
     total_rewards_missed = models.DecimalField(
-        '錯失回饋',
+        'Total Rewards Missed',  # 錯失回饋
         max_digits=8,
         decimal_places=2,
         default=0,
         help_text='使用推薦卡片可獲得的額外回饋'
     )
-    transaction_count = models.IntegerField('交易筆數', default=0)
+    transaction_count = models.IntegerField('Transaction Count', default=0)  # 交易筆數
     
     # Chrome 擴展使用統計
     chrome_detected_transactions = models.IntegerField(
-        'Chrome 偵測交易數',
+        'Chrome Detected Transactions',  # Chrome 偵測交易數
         default=0,
         help_text='由 Chrome 擴展自動偵測的交易數量'
     )
     recommendations_shown = models.IntegerField(
-        '推薦次數',
+        'Recommendations Shown',  # 推薦次數
         default=0,
         help_text='Chrome 擴展顯示推薦的次數'
     )
     recommendations_followed = models.IntegerField(
-        '採用推薦次數',
+        'Recommendations Followed',  # 採用推薦次數
         default=0,
         help_text='用戶採用推薦的次數'
     )
     
     # 詳細分析數據（JSON 格式）
     merchant_spending = models.JSONField(
-        '網站消費統計',
+        'Merchant Spending Statistics',  # 網站消費統計
         default=dict,
         help_text='各購物網站的消費統計：{"shopee.tw": 15000, "momo.com.tw": 8500}'
     )
     category_spending = models.JSONField(
-        '分類消費統計',
+        'Category Spending Statistics',  # 分類消費統計
         default=dict,
         help_text='各消費分類的金額統計：{"electronics": 20000, "clothing": 5000}'
     )
     card_usage = models.JSONField(
-        '卡片使用統計',
+        'Card Usage Statistics',  # 卡片使用統計
         default=dict,
         help_text='各卡片的使用統計：{"card_1": {"amount": 15000, "transactions": 25}}'
     )
     payment_methods = models.JSONField(
-        '支付方式統計',
+        'Payment Methods Statistics',  # 支付方式統計
         default=dict,
         help_text='各種支付方式的使用統計'
     )
     
     class Meta:
         db_table = 'user_spending_patterns'
-        verbose_name = '用戶消費模式'
-        verbose_name_plural = '用戶消費模式'
+        verbose_name = 'User Spending Pattern'  # 用戶消費模式
+        verbose_name_plural = 'User Spending Patterns'  # 用戶消費模式
         ordering = ['-year', '-month']
         unique_together = [['user', 'year', 'month']]
         indexes = [
@@ -354,61 +354,61 @@ class WebsiteAnalytics(models.Model):
         Merchant,
         on_delete=models.CASCADE,
         related_name='analytics',
-        verbose_name='購物網站'
+        verbose_name='Merchant'  # 購物網站
     )
     
     # 統計時間
-    date = models.DateField('統計日期')
+    date = models.DateField('Statistics Date')  # 統計日期
     
     # 網站活動統計
-    total_transactions = models.IntegerField('總交易數', default=0)
+    total_transactions = models.IntegerField('Total Transactions', default=0)  # 總交易數
     total_transaction_value = models.DecimalField(
-        '總交易金額',
+        'Total Transaction Value',  # 總交易金額
         max_digits=12,
         decimal_places=2,
         default=0
     )
-    unique_users = models.IntegerField('獨立用戶數', default=0)
+    unique_users = models.IntegerField('Unique Users', default=0)  # 獨立用戶數
     
     # Chrome 擴展相關
     chrome_extension_views = models.IntegerField(
-        '擴展顯示次數',
+        'Chrome Extension Views',  # 擴展顯示次數
         default=0,
         help_text='Chrome 擴展在此網站的顯示次數'
     )
     recommendation_clicks = models.IntegerField(
-        '推薦點擊次數',
+        'Recommendation Clicks',  # 推薦點擊次數
         default=0,
         help_text='用戶點擊推薦卡片的次數'
     )
     
     # 最受歡迎的卡片
     most_used_cards = models.JSONField(
-        '最常使用卡片',
+        'Most Used Cards',  # 最常使用卡片
         default=dict,
         help_text='在此網站最常使用的卡片統計'
     )
     
     # 平均數據
     average_transaction_value = models.DecimalField(
-        '平均交易金額',
+        'Average Transaction Value',  # 平均交易金額
         max_digits=8,
         decimal_places=2,
         default=0
     )
     average_reward_rate = models.DecimalField(
-        '平均回饋率',
+        'Average Reward Rate',  # 平均回饋率
         max_digits=4,
         decimal_places=2,
         default=0
     )
     
-    created_at = models.DateTimeField('建立時間', auto_now_add=True)
+    created_at = models.DateTimeField('Created At', auto_now_add=True)  # 建立時間
     
     class Meta:
         db_table = 'website_analytics'
-        verbose_name = '網站分析'
-        verbose_name_plural = '網站分析'
+        verbose_name = 'Website Analytics'  # 網站分析
+        verbose_name_plural = 'Website Analytics'  # 網站分析
         ordering = ['-date']
         unique_together = [['merchant', 'date']]
         indexes = [
