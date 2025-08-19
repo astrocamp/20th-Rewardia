@@ -19,18 +19,18 @@ class UserProfile(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='profile',
-        verbose_name='用戶'
+        verbose_name='User'  # 用戶
     )
     preferred_reward_type = models.CharField(
-        '偏好回饋類型',
+        'Preferred Reward Type',  # 偏好回饋類型
         max_length=20,
         choices=PreferredRewardType.choices,
         default=PreferredRewardType.CASHBACK
     )
     monthly_spending = models.DecimalField(
-        '月平均消費',
+        'Monthly Average Spending',  # 月平均消費
         max_digits=8,
-        decimal_places=2,
+        decimal_places  =2,
         null=True,
         blank=True,
         validators=[MinValueValidator(0)],
@@ -39,8 +39,8 @@ class UserProfile(models.Model):
     
     class Meta:
         db_table = 'user_profiles'
-        verbose_name = '用戶資料'
-        verbose_name_plural = '用戶資料'
+        verbose_name = 'User Profile'  # 用戶資料
+        verbose_name_plural = 'User Profiles'  # 用戶資料
     
     def __str__(self):
         return f"{self.user.username} 的資料"
@@ -75,32 +75,32 @@ class UserCard(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='user_cards',
-        verbose_name='用戶'
+        verbose_name='User'  # 用戶
     )
     card = models.ForeignKey(
         'cards.CreditCard',
         on_delete=models.CASCADE,
         related_name='users',
-        verbose_name='信用卡'
+        verbose_name='Credit Card'  # 信用卡
     )
     nickname = models.CharField(
-        '卡片暱稱',
+        'Card Nickname',  # 卡片暱稱
         max_length=50,
         blank=True,
         help_text='用戶自定義的卡片名稱'
     )
-    added_date = models.DateTimeField('新增日期', auto_now_add=True)
+    added_date = models.DateTimeField('Added Date', auto_now_add=True)  # 新增日期
     is_primary = models.BooleanField(
-        '主要卡片',
+        'Primary Card',  # 主要卡片
         default=False,
         help_text='用戶的主要推薦卡片'
     )
-    is_active = models.BooleanField('啟用狀態', default=True)
+    is_active = models.BooleanField('Active Status', default=True)  # 啟用狀態
     
     class Meta:
         db_table = 'user_cards'
-        verbose_name = '用戶持卡'
-        verbose_name_plural = '用戶持卡'
+        verbose_name = 'User Card'  # 用戶持卡
+        verbose_name_plural = 'User Cards'  # 用戶持卡
         ordering = ['-is_primary', '-added_date']
         unique_together = [['user', 'card']]
         indexes = [
@@ -135,22 +135,13 @@ class UserPreference(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='preferences',
-        verbose_name='用戶'
-    )
-    
-    # Chrome 擴展設定
-    chrome_extension_enabled = models.BooleanField('啟用 Chrome 擴展', default=True)
-    auto_recommendation = models.BooleanField('自動推薦卡片', default=True)
-    show_all_cards = models.BooleanField(
-        '顯示所有卡片比較',
-        default=False,
-        help_text='是否顯示非持有卡片的回饋比較'
+        verbose_name='User'  # 用戶
     )
     
     class Meta:
         db_table = 'user_preferences'
-        verbose_name = '用戶偏好'
-        verbose_name_plural = '用戶偏好'
+        verbose_name = 'User Preference'  # 用戶偏好
+        verbose_name_plural = 'User Preferences'  # 用戶偏好
     
     def __str__(self):
         return f"{self.user.username} 的偏好設定"
@@ -159,6 +150,6 @@ class UserPreference(models.Model):
 # 自動創建 Preference 的信號
 @receiver(post_save, sender=User)
 def create_user_preference(sender, instance, created, **kwargs):
-    #當創建新用戶時，自動創建對應的偏好設定
+    #當創建新用戶時，自動創建對應的偏好設定¶
     if created:
         UserPreference.objects.create(user=instance)
