@@ -42,11 +42,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 # ------------------------------
     "debug_toolbar",
-    
-# ------------------------------ 
+
+# ------------------------------
+    'apps.banks',
+    'apps.cards', 
+    'apps.merchants',
+    'apps.rewards',
     'apps.users',
     'apps.analytics',
-
 ]
 
 MIDDLEWARE = [
