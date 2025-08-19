@@ -92,3 +92,22 @@ class CreditCard(models.Model):
     is_active = models.BooleanField('是否啟用', default=True)
     created_at = models.DateTimeField('建立時間', auto_now_add=True)
     updated_at = models.DateTimeField('更新時間', auto_now=True)
+
+    class Meta:
+        db_table = 'credit_cards'
+        verbose_name = '信用卡'
+        verbose_name_plural = '信用卡'
+        ordering = ['bank__name', 'name']
+        indexes = [
+            models.Index(fields=['bank', 'is_active'], name='cards_bank_active_idx'),
+            models.Index(fields=['card_network'], name='cards_network_idx'),
+            models.Index(fields=['card_type'], name='cards_type_idx'),
+        ]
+
+    def __str__(self):
+        return f"{self.bank.name} {self.name}"
+    
+    @property
+    def has_annual_fee(self):
+        """是否有年費"""
+        return self.annual_fee > 0
