@@ -6,7 +6,7 @@ from django.dispatch import receiver
 
 
 class UserProfile(models.Model):
-    #用戶資料擴展#
+    #用戶資料擴展
     
     # 偏好回饋類型
     class PreferredRewardType(models.TextChoices):
@@ -47,7 +47,7 @@ class UserProfile(models.Model):
     
     @property
     def display_name(self):
-        #顯示名稱#
+        # 顯示名稱
         if self.user.first_name and self.user.last_name:
             return f"{self.user.first_name} {self.user.last_name}"
         return self.user.username

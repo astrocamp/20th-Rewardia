@@ -7,7 +7,7 @@ from cards.models import CreditCard
 
 
 class OnlineTransaction(models.Model):
-    #線上交易記錄 - 專注於網路購物和數位支付#
+    #線上交易記錄 - 專注於網路購物和數位支付
     
     # 交易來源
     class TransactionSource(models.TextChoices):
@@ -162,13 +162,13 @@ class RewardCalculationCache(models.Model):
     #回饋計算快取 - 針對線上購物優化
     
     merchant = models.ForeignKey(
-        'merchants.Merchant',
+        Merchant,
         on_delete=models.CASCADE,
         related_name='cached_calculations',
         verbose_name='Merchant'  # 購物網站
     )
     card = models.ForeignKey(
-        'cards.CreditCard',
+        CreditCard,
         on_delete=models.CASCADE,
         related_name='cached_calculations',
         verbose_name='Credit Card'  # 信用卡
