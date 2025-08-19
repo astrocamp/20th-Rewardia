@@ -13,7 +13,14 @@
     
     {% include 'shared/navbar.html'%}
 
-    {% block content %}{% endblock %}
-    
+    {% include 'layouts/header.html' %}
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    {% include 'layouts/footer.html' %}
+
 </body>
 </html>
