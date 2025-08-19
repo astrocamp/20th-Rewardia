@@ -6,12 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rewardia</title>
     <link rel="stylesheet" href="{% static 'styles/style.css' %}">
-    <script type="modle" src="{% static 'scripts/app.css' %}"></script>
+    <script type="modle" src="{% static 'scripts/app.js' %}"></script>
 </head>
 <body>
-    {% include 'shared/navbar.html'%}
 
-    {% block content %}{% endblock %}
-    
+    {% include 'layouts/header.html' %}
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    {% include 'layouts/footer.html' %}
+
 </body>
 </html>
