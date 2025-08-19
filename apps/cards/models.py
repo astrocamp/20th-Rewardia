@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
-from banks.models import Bank
+from apps.banks.models import Bank
 
 # Create your models here.
 class CreditCard(models.Model):
