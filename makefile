@@ -36,3 +36,6 @@ sqlinstall_2:
 
 restart:
 	npm i && uv run
+
+ins_spacy:
+	uv run pip install https://github.com/explosion/spacy-models/releases/download/zh_core_web_md-3.7.0/zh_core_web_md-3.7.0-py3-none-any.whl
