@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'apps.rewards',
 
 # ------------------------------
-    "apps.nlp_validation"
+    # "apps.nlp_validation"
 
 ]
 
