@@ -1,14 +1,89 @@
-<header class="main-header">
-    <div class="logo">REWARDIA</div>
-    <nav class="main-nav">
-        <ul>
-            <li><a href="#" class="active">下載專區</a></li>
-            <li><a href="#">儲值兌換</a></li>
-            <li><a href="#">關於功能</a></li>
-            <li><a href="#">會員專區</a></li>
-        </ul>
-    </nav>
-    <div class="header-actions">
-        <a href="#" class="login-btn">登入</a>
+<header class="fixed-header bg-white border-b border-gray-200 shadow-sm">
+  <!-- Top Banner -->
+  <div class="top-banner-container">
+    <div id="top-banner" class="bg-gray-900 text-white py-3 sm:py-4 transition-transform duration-300">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- 手機：左右兩欄（icon / 按鈕+關閉）; sm+：三欄（左空白 / 中內容 / 右X） -->
+        <div class="grid grid-cols-[auto_auto] justify-between items-center sm:grid-cols-[1fr_auto_1fr]">
+
+          <!-- 中間內容（在 sm+ 置中；手機只顯示 icon，文字隱藏） -->
+          <div class="flex items-center gap-3 sm:gap-4 sm:justify-center sm:col-start-2">
+            <!-- 圓形 icon：手機保留 -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 shrink-0" viewBox="0 0 256 256" fill="white" aria-hidden="true">
+              <g transform="scale(5.12,5.12)">
+                <path d="M25,2c-12.6907,0 -23,10.3093 -23,23c0,12.69071 10.3093,23 23,23c12.69071,0 23,-10.30929 23,-23c0,-12.6907 -10.30929,-23 -23,-23zM25,4c7.98798,0 14.92565,4.44503 18.47656,11h-18.47656c-0.03784,-0.00019 -0.07566,0.00176 -0.11328,0.00586c-5.14785,0.05824 -9.37505,4.02951 -9.83984,9.07227l-7.01172,-11.42773c3.81644,-5.2367 9.97965,-8.65039 16.96484,-8.65039zM6.82422,14.50195l9.65234,15.72852c0.03315,0.05638 0.07174,0.10936 0.11523,0.1582c0.00065,0.0013 0.0013,0.00261 0.00195,0.00391c1.78145,2.76595 4.88117,4.60742 8.40625,4.60742c1.41306,0 2.75633,-0.29827 3.97656,-0.83008l-6.65625,11.6543c-10.34035,-1.31441 -18.32031,-10.12311 -18.32031,-20.82422c0,-3.83026 1.03757,-7.40847 2.82422,-10.49805zM25,17c4.43012,0 8,3.56988 8,8c0,1.42117 -0.37032,2.75159 -1.01562,3.90625c-0.00065,0.00065 -0.0013,0.0013 -0.00195,0.00195c-0.01238,0.01913 -0.02411,0.03867 -0.03516,0.05859c-1.37555,2.41054 -3.96378,4.0332 -6.94727,4.0332c-4.43012,0 -8,-3.56988 -8,-8c0,-4.43012 3.56988,-8 8,-8zM30.97266,17h13.44922c1.01492,2.46534 1.57813,5.16577 1.57813,8c0,11.60982 -9.39018,21 -21,21c-0.15783,0 -0.31371,-0.00827 -0.4707,-0.01172l9.1543,-16.0293c0.02207,-0.03774 0.04165,-0.07689 0.05859,-0.11719c0.79908,-1.43612 1.25781,-3.08613 1.25781,-4.8418c0,-3.27139 -1.58894,-6.17407 -4.02734,-8z"/>
+              </g>
+            </svg>
+
+            <!-- 文字：手機隱藏，sm+ 顯示 -->
+            <div class="hidden sm:block leading-tight">
+              <p class="font-bold">取得 Rewardia 的 Chrome 回小幫手</p>
+              <p class="text-sm text-gray-300">使用 Rewardia 優惠比價小幫手，不錯過任何優惠回饋！</p>
+            </div>
+
+            <!-- 白色按鈕：手機/桌機都顯示 -->
+            <a href="#"
+               class="ml-2 sm:ml-6 bg-white text-gray-900 px-4 sm:px-6 py-2 rounded-full font-bold text-sm hover:bg-gray-100 transition-colors whitespace-nowrap shrink-0">
+              免費新增至 Chrome
+            </a>
+          </div>
+
+          <!-- 右側關閉：手機 & 桌機都顯示，靠最右 -->
+          <button class="banner-close-btn justify-self-end p-1 inline-flex" aria-label="關閉">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
     </div>
+  </div>
+
+  <!-- Main Header -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-20">
+      <!-- Logo -->
+      <div class="flex-shrink-0">
+        <h1 class="text-2xl font-bold text-black uppercase tracking-wider">Rewardia</h1>
+      </div>
+
+      <!-- 桌機導覽 -->
+      <nav class="hidden md:flex space-x-8">
+        <a href="#" class="text-gray-700 hover:text-gray-900 font-medium">下載專區</a>
+        <a href="#" class="text-gray-700 hover:text-gray-900 font-medium">優惠試算</a>
+        <a href="#" class="text-gray-700 hover:text-gray-900 font-medium">關於功能</a>
+        <a href="#" class="text-gray-700 hover:text-gray-900 font-medium">我的訂閱</a>
+        <a href="#" class="text-gray-700 hover:text-gray-900 font-medium">會員專區</a>
+      </nav>
+
+      <!-- 右側：登入 & 漢堡（手機顯示） -->
+      <div class="flex items-center space-x-3">
+        <!-- 登入按鈕（手機/桌機都保留） -->
+        <button class="btn-primary px-6 py-2 rounded-lg">
+          登入
+        </button>
+
+        <!-- 漢堡按鈕：僅手機顯示 -->
+        <button id="menu-toggle"
+                class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100"
+                aria-controls="mobile-menu" aria-expanded="false" aria-label="打開主選單">
+          <!-- 三條線 icon -->
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M4 6h16M4 12h16M4 18h16" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- 行動選單（預設隱藏） -->
+    <div id="mobile-menu" class="md:hidden hidden border-t border-gray-200 pt-3 pb-4">
+      <nav class="flex flex-col space-y-2">
+        <a href="#" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">下載專區</a>
+        <a href="#" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">優惠試算</a>
+        <a href="#" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">關於功能</a>
+        <a href="#" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">我的訂閱</a>
+        <a href="#" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">會員專區</a>
+      </nav>
+    </div>
+  </div>
 </header>
