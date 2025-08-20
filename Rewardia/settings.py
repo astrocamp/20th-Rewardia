@@ -40,12 +40,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'pages',
 # ------------------------------
     "debug_toolbar",
 
 # ------------------------------
+    'apps.pages',
     'apps.banks',
+    'apps.users',
+    'apps.analytics',
     'apps.cards', 
     'apps.merchants',
     'apps.rewards',
