@@ -1,30 +1,63 @@
-<footer class="main-footer">
-    <div class="footer-container">
-        <div class="footer-brand">
-            <h3>REWARDIA</h3>
-            <p>一張卡，寫下你的每一天</p>
-            <div class="social-icons">
-                <a href="#">FB</a>
-                <a href="#">IG</a>
-            </div>
-            <p class="copyright">&copy; 2025</p>
+<footer class="bg-gray-900 text-white py-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- 桌機：左一 320px / 左二 220px / 左三 吃滿剩餘 -->
+    <div class="grid grid-cols-1 lg:grid-cols-[320px_220px_minmax(0,1fr)] gap-12 items-start">
+      
+      <!-- 左一：品牌（約 320px） -->
+      <div class="space-y-6">
+        <h3 class="text-4xl font-bold uppercase tracking-wider">Rewardia</h3>
+        <p class="text-gray-300 text-lg">一張卡，省下你的每一塊</p>
+        <div class="flex items-center gap-4">
+          <a href="#" aria-label="Instagram" class="text-white hover:text-gray-300 transition-colors">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5" stroke-width="2"/>
+              <circle cx="12" cy="12" r="3.5" stroke-width="2"/>
+              <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/>
+            </svg>
+          </a>
+          <a href="#" aria-label="GitHub" class="text-white hover:text-gray-300 transition-colors">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 .5a12 12 0 0 0-3.79 23.4c.6.11.82-.26.82-.58v-2.1c-3.34.73-4.04-1.61-4.04-1.61-.55-1.4-1.35-1.77-1.35-1.77-1.1-.75.08-.73.08-.73 1.22.09 1.86 1.26 1.86 1.26 1.08 1.85 2.82 1.31 3.5 1 .11-.79.42-1.31.77-1.61-2.66-.3-5.46-1.33-5.46-5.93 0-1.31.47-2.38 1.25-3.22-.13-.31-.54-1.57.12-3.28 0 0 1.02-.33 3.34 1.23a11.6 11.6 0 0 1 6.08 0c2.32-1.56 3.34-1.23 3.34-1.23.66 1.71.25 2.97.12 3.28.78.84 1.25 1.91 1.25 3.22 0 4.61-2.8 5.63-5.47 5.93.43.37.81 1.09.81 2.21v3.27c0 .32.21.7.83.58A12 12 0 0 0 12 .5z"/>
+            </svg>
+          </a>
         </div>
-        <div class="footer-links">
-            <div class="link-column">
-                <h4>關於我們</h4>
-                <ul>
-                    <li><a href="#">隱私權條款</a></li>
-                    <li><a href="#">合作夥伴</a></li>
-                    <li><a href="#">公告內容</a></li>
-                </ul>
-            </div>
-            <div class="link-column">
-                <h4>訂閱我們</h4>
-                <form class="subscribe-form">
-                    <input type="email" placeholder="輸入您的信箱，不錯過任何優惠通知">
-                    <button type="submit">發送</button>
-                </form>
-            </div>
-        </div>
+        <p class="text-gray-400 text-sm">&copy; 2025</p>
+      </div>
+
+      <!-- 左二：聯絡（約 220px，置左對齊） -->
+      <div>
+        <h4 class="text-lg font-semibold mb-4">聯絡我們</h4>
+        <ul class="space-y-2 text-gray-300">
+          <li><a href="#" class="hover:text-white transition-colors">隱私權政策</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">服務條款</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">客服與回饋</a></li>
+        </ul>
+      </div>
+
+      <!-- 左三：訂閱我們 -->
+      <div>
+        <h4 class="text-lg font-semibold mb-4">訂閱我們</h4>
+        <form class="space-y-3" action="#" method="post" novalidate>
+          <label for="subscribe-email" class="sr-only">Email 訂閱</label>
+          <div class="flex items-stretch gap-0 flex-nowrap w-full">
+            <input
+              id="subscribe-email"
+              type="email"
+              placeholder="輸入您的信箱，不錯過任何更新優惠通知"
+              class="flex-grow min-w-[250px] px-4 py-3 bg-gray-800 text-white placeholder-gray-400 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label="訂閱電子報 Email"
+              required
+            />
+            <button
+              type="submit"
+              class="px-6 py-3 bg-white text-gray-900 font-medium rounded-r-lg hover:bg-gray-100 transition-colors shrink-0 whitespace-nowrap"
+            >
+              訂閱
+            </button>
+          </div>
+        </form>
+      </div>
+
     </div>
+  </div>
 </footer>
