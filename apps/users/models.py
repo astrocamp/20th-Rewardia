@@ -95,7 +95,7 @@ class UserCard(models.Model):
         default=False,
         help_text='用戶的主要推薦卡片'
     )
-    is_active = models.BooleanField('Active Status', default=True)  # 啟用狀態
+    is_active = models.BooleanField('is_active', default=True)  # 啟用狀態
     
     class Meta:
         db_table = 'user_cards'
