@@ -16,6 +16,3 @@ public/*
 .env
 .pg_service.conf
 .pg_db_pass
-
-apps/analytics
-apps/users
