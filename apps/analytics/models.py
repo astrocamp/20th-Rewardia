@@ -2,8 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from django.utils import timezone
-from merchants.models import Merchant
-from cards.models import CreditCard
+from apps.merchants.models import Merchant
+from apps.cards.models import CreditCard
 
 
 class OnlineTransaction(models.Model):
