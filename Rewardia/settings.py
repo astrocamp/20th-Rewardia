@@ -52,6 +52,9 @@ INSTALLED_APPS = [
     'apps.merchants',
     'apps.rewards',
 
+# ------------------------------
+    "apps.nlp_validation"
+
 ]
 
 MIDDLEWARE = [
