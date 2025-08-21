@@ -17,7 +17,7 @@ class CrawledData(models.Model):
         verbose_name='Issuing Bank'
     )
     content = models.TextField('Crawled Content',null=False)
-    url = models.CharField('Crawled Website',null=False)
+    url = models.URLField('Crawled Website',null=False)
     created_at = models.DateTimeField('Created At', auto_now_add=True)
 
     class Meta:
