@@ -1,14 +1,15 @@
 # apps/nlp_validation/test_basic.py
 import spacy
+import re
 
 def test_spacy_installation():
     """測試 spaCy 是否正確安裝"""
     try:
         nlp = spacy.load("zh_core_web_md")
-        print("✅ spaCy 中文模型載入成功")
+        print(" spaCy 中文模型載入成功")
         return True
     except OSError:
-        print("❌ spaCy 中文模型未安裝")
+        print(" spaCy 中文模型未安裝")
         return False
 
 def test_basic_text_analysis():
@@ -121,12 +122,11 @@ contactless
     
     doc = nlp(test_text)
     
-    print("\n📊 實體識別結果：")
+    print("\n 實體識別結果：")
     for ent in doc.ents:
         print(f"  {ent.text} -> {ent.label_}")
     
-    print("\n🔍 找到的數字：")
-    import re
+    print("\n 找到的數字：")
     numbers = re.findall(r'(\d+(?:\.\d+)?)\s*%', test_text)
     print(f"  回饋率: {numbers}")
     
@@ -134,9 +134,9 @@ contactless
     print(f"  費用: {fees}")
 
 if __name__ == "__main__":
-    print("🚀 開始 Day 1 基本功能測試\n")
+    print(" 開始 Day 1 基本功能測試\n")
     
     if test_spacy_installation():
         test_basic_text_analysis()
     
-    print("\n✅ Day 1 測試完成！")
+    print("\n Day 1 測試完成！")
