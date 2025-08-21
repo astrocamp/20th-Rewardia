@@ -4,7 +4,7 @@ from apps.cards.models import CreditCard
 
 # Create your models here.
 class CrawledData(models.Model):
-    name = models.ForeignKey(
+    card = models.ForeignKey(
         CreditCard,
         on_delete=models.CASCADE,
         related_name='crawled_data',
