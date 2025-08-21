@@ -10,12 +10,6 @@ class CrawledData(models.Model):
         related_name='crawled_data',
         verbose_name='Credit Card'
     )
-    bank = models.ForeignKey(
-        Bank,
-        on_delete=models.CASCADE,
-        related_name='credit_cards_crawled_data',
-        verbose_name='Issuing Bank'
-    )
     content = models.TextField('Crawled Content',null=False)
     url = models.URLField('Crawled Website',null=False)
     created_at = models.DateTimeField('Created At', auto_now_add=True)

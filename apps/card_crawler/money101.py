@@ -51,7 +51,7 @@ for card in card_names:
 
         cards_dict.append(card_dict)
 
-        time.sleep(0.5)
+        time.sleep(1)
 
     # 幾個常見的錯誤，個別做except
     except requests.exceptions.HTTPError as e:
