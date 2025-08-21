@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class OutputTextConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
+class CardCrawlerConfig(AppConfig):
+    default_auto_field = 'django.db.smodels.BigAutoField'
     name = 'apps.card_crawler'
