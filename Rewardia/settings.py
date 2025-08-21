@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     'apps.card_crawler'
 
 # ------------------------------
-    "apps.nlp_validation"
+    'apps.nlp_validation'
 
 ]
 
