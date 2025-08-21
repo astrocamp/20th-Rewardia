@@ -102,4 +102,169 @@
 
 
 
+/* ===== 新增樣式：calculator 專用與 UI 元件四狀態 ===== */
+@layer components {
+    /* ========== Calculator 頁面布局 ========== */
+    .calculator-page {
+        @apply bg-white;
+        margin-top: 80px; /* Header 高度（預設無 Banner） */
+        padding-bottom: 80px; /* Footer 間距 */
+    }
+    /* 若 Top Banner 顯示（且未被 hidden），則補足 Header + Banner 總高 */
+    body:has(#top-banner):not(:has(#top-banner.hidden)) .calculator-page {
+        margin-top: 40px;
+    }
+    
+    .calculator-container {
+        @apply mx-auto max-w-[1360px] px-5 md:px-8;
+    }
+
+    /* ========== 標題樣式 ========== */
+    .calculator-title {
+        @apply text-[36px] leading-[0.98] font-bold text-black mb-6;
+        margin-top: 5px; /* 與 header 的間距 */
+    }
+
+    /* ========== 結果卡樣式 ========== */
+    .result-card {
+        @apply relative w-full rounded-lg overflow-hidden mb-6 pt-4;
+    }
+    
+    .result-card-bg {
+        @apply relative flex items-center justify-between px-6 md:px-8 h-[117px] rounded-lg;
+        background: #193966;
+    }
+    
+    .result-content {
+        @apply relative z-10 flex items-center justify-between w-full;
+    }
+    
+    .result-label {
+        @apply text-white text-2xl font-normal;
+    }
+    
+    .result-value {
+        @apply text-white text-[32px] font-bold;
+        text-align: center;
+        flex: 1;
+    }
+    
+
+
+    /* ========== 表單卡片樣式 ========== */
+    .form-card {
+        @apply bg-white rounded-lg overflow-hidden;
+    }
+    
+    .form-card-bg {
+        @apply bg-[#F9F9F9] rounded-lg p-5 md:p-6;
+    }
+
+    /* ========== 表單標題列 ========== */
+    .form-header {
+        @apply flex items-center justify-between pb-2 border-b border-gray-300;
+    }
+    
+    .form-title {
+        @apply text-[24px] leading-[1.21] font-bold text-[#5D6970];
+    }
+    
+    .clear-btn {
+        @apply bg-gray-900 text-white text-sm h-[38px] px-5 rounded-lg font-medium transition-colors duration-200;
+    }
+    .clear-btn:hover { @apply bg-gray-800; }
+    .clear-btn:active { @apply bg-gray-700; }
+    .clear-btn:disabled { @apply bg-gray-700 text-gray-300 cursor-not-allowed opacity-70; }
+
+    /* ========== 表單欄位 ========== */
+    .form-fields {
+        @apply grid grid-cols-1 md:grid-cols-2 gap-5;
+        margin-top: 40px; /* 與標題的間距 */
+    }
+    
+    .field-group {
+        @apply relative;
+        margin-bottom: 20px; /* 欄位間距 */
+    }
+    
+    .field-group.field-full {
+        @apply md:col-span-2;
+    }
+    
+    .field-label {
+        @apply block text-[18px] text-[#111827] mb-2 font-normal;
+    }
+    
+    /* 必填標記顏色 */
+    .field-label {
+        color: #111827;
+    }
+    .field-label::before {
+        content: '* ';
+        color: #FF1F1F;
+    }
+    
+    .select-wrapper {
+        @apply relative;
+    }
+
+    /* ========== 按鈕元件（四狀態）：預設/hover/active/disabled ========== */
+
+    .ui-btn {
+        @apply inline-flex items-center justify-center rounded-lg h-12 px-6 font-medium transition-colors duration-200 select-none;
+        width: 132px; /* 按照 Figma 設計 */
+    }
+    
+    .ui-btn-primary {
+        @apply bg-[#2060B9] text-white;
+    }
+    .ui-btn-primary:hover { @apply bg-[#1c55a4]; }
+    .ui-btn-primary:active { @apply bg-[#184a90]; }
+    .ui-btn-primary:disabled { @apply bg-[#9BB6DD] cursor-not-allowed opacity-70; }
+
+    .ui-btn-secondary {
+        @apply bg-gray-200 text-gray-900;
+    }
+    .ui-btn-secondary:hover { @apply bg-gray-300; }
+    .ui-btn-secondary:active { @apply bg-gray-400; }
+    .ui-btn-secondary:disabled { @apply bg-gray-200 text-gray-400 cursor-not-allowed opacity-70; }
+
+    /* ========== 輸入/下拉元件（四狀態）：預設/hover/focus/disabled/error ========== */
+    .ui-input,
+    .ui-select {
+        @apply w-full h-12 rounded-lg bg-white border border-gray-300 px-4 text-gray-900 transition-colors duration-200;
+        border-color: #D1D5DB; /* 按照 Figma 設計 */
+    }
+    
+    /* 統一 placeholder 顏色為灰色 */
+    .ui-input::placeholder,
+    .ui-select::placeholder {
+        color: #111827;
+    }
+    .ui-input:hover,
+    .ui-select:hover { @apply border-gray-400; }
+    .ui-input:focus,
+    .ui-select:focus { @apply outline-none ring-2 ring-blue-500 border-blue-500; }
+    .ui-input:disabled,
+    .ui-select:disabled { @apply bg-gray-100 text-gray-400 cursor-not-allowed; }
+    .ui-input.ui-error,
+    .ui-select.ui-error { @apply border-red-500 ring-2 ring-red-200; }
+
+    /* ========== 說明區塊 ========== */
+    .disclaimer-section {
+        @apply mt-6 rounded-lg bg-gray-200 p-5;
+        background-color: #E5E7EB; /* 按照 Figma 設計 */
+    }
+    
+    .disclaimer-list {
+        @apply text-[#5D6970] text-base leading-6 list-disc pl-5;
+    }
+
+    /* ========== 動作按鈕區 ========== */
+    .action-buttons {
+        @apply mt-8 flex items-center justify-center gap-4;
+    }
+}
+
+
 

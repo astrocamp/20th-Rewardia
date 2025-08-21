@@ -4,4 +4,6 @@ def download(request):
 
     return render(request, "pages/download.html")
 
-# Create your views here.
+def calculator(request):
+
+    return render(request, "pages/calculator.html")
