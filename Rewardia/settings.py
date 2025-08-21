@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     'apps.cards', 
     'apps.merchants',
     'apps.rewards',
-    'apps.output_text'
+    'apps.card_crawler'
 
 # ------------------------------
     "apps.nlp_validation"
