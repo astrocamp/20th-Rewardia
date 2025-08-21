@@ -17,3 +17,4 @@ public/*
 .env
 .pg_service.conf
 .pg_db_pass
+uv.lock
