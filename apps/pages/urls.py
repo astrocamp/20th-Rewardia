@@ -6,4 +6,5 @@ from . import views
 app_name = "pages"
 urlpatterns = [
     path('', views.download, name="download"),
+    path('calculator/', views.calculator, name="calculator"),
 ] + debug_toolbar_urls()
