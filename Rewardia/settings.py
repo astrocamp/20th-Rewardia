@@ -51,10 +51,10 @@ INSTALLED_APPS = [
     'apps.cards', 
     'apps.merchants',
     'apps.rewards',
-    'apps.card_crawler'
 
 # ------------------------------
-    'apps.nlp_validation'
+    'apps.nlp_validation',
+    'apps.card_crawler',
 
 ]
 
