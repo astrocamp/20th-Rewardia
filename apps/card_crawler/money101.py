@@ -3,11 +3,12 @@ import requests
 import time
 
 # money101 74張精選的網站
-url = "https://www.money101.com.tw/%E4%BF%A1%E7%94%A8%E5%8D%A1/%E5%85%A8%E9%83%A8"
+main_page_url = "https://www.money101.com.tw/信用卡/全部"
+card_base_url = "https://www.money101.com.tw/信用卡/產品/"
 
 try:
     # request會等待10秒的時間
-    page = requests.get(url,timeout=10)
+    page = requests.get(main_page_url,timeout=10)
     # 出現4XX或5XX的錯誤時
     page.raise_for_status()
 except requests.exceptions.RequestException as error:
@@ -29,7 +30,7 @@ failed_cards = []
 
 for card in card_names:
     # 信用卡名字接在後面就是該卡片的頁面
-    url = "https://www.money101.com.tw/信用卡/產品/" + f"{card}"
+    url = card_base_url + f"{card}"
 
     try:
         page = requests.get(url,timeout=10)
