@@ -9,6 +9,86 @@
     --a: 217 91% 60%; 
 }
 
+/* ===== 新增樣式：新增卡片頁面專用 ===== */
+@layer components {
+    /* ========== 新增卡片容器 ========== */
+    .add-card-container {
+        @apply bg-white rounded-lg overflow-hidden;
+    }
+    
+    .add-card-bg {
+        @apply bg-[#F9F9F9] rounded-lg;
+        padding: 25px 20px 40px 20px; /* 按照 Figma 設計 */
+        min-height: 807px;
+    }
+
+    /* ========== 新增卡片標題列 ========== */
+    .add-card-header {
+        @apply border-b border-gray-300;
+        padding-bottom: 29px; /* 標題到分隔線的距離 */
+    }
+    
+    .add-card-title {
+        @apply text-[24px] leading-[1.21] font-bold text-[#5D6970];
+    }
+
+    /* ========== 新增卡片表單欄位 ========== */
+    .add-card-fields {
+        @apply space-y-5;
+        margin-top: 40px; /* 分隔線到表單的間距 */
+    }
+    
+    /* ========== 文字區域樣式 ========== */
+    .ui-textarea {
+        @apply w-full rounded-lg bg-white border border-gray-300 px-4 py-3 text-gray-900 transition-colors duration-200 resize-none;
+        border-color: #D1D5DB; /* 按照 Figma 設計 */
+        height: 211px; /* 按照 Figma 設計 */
+    }
+    
+    .ui-textarea::placeholder {
+        color: #949AA6; /* 按照 Figma 設計 */
+    }
+    .ui-textarea:hover { @apply border-gray-400; }
+    .ui-textarea:focus { @apply outline-none ring-2 ring-blue-500 border-blue-500; }
+    .ui-textarea:disabled { @apply bg-gray-100 text-gray-400 cursor-not-allowed; }
+    .ui-textarea.ui-error { @apply border-red-500 ring-2 ring-red-200; }
+
+    /* ========== 新增卡片動作按鈕區 ========== */
+    .add-card-actions {
+        @apply flex items-center justify-center gap-6;
+        margin-top: 40px; /* 按照 Figma 設計，底部按鈕的位置 */
+    }
+
+    /* ========== 下拉選單箭頭 ========== */
+    .select-arrow {
+        @apply absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none;
+    }
+    
+    .select-arrow::after {
+        content: '';
+        @apply w-0 h-0;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-top: 4px solid #6B7280;
+    }
+
+    /* ========== 下拉選單樣式調整 ========== */
+    .ui-select {
+        @apply appearance-none;
+        padding-right: 2.5rem; /* 為箭頭留空間 */
+    }
+
+    /* 選中選項的文字顏色 */
+    .ui-select option {
+        color: #111827;
+    }
+
+    /* placeholder 選項（disabled）的顏色 */
+    .ui-select option:disabled {
+        color: #949AA6;
+    }
+}
+
 @layer components {
 
     /* ========== Button 樣式 ========== */
@@ -495,7 +575,7 @@
     /* 統一 placeholder 顏色為灰色 */
     .ui-input::placeholder,
     .ui-select::placeholder {
-        color: #111827;
+        color: #949AA6; /* 改成灰色，與 textarea 一致 */
     }
     .ui-input:hover,
     .ui-select:hover { @apply border-gray-400; }

@@ -7,3 +7,7 @@ def download(request):
 def calculator(request):
 
     return render(request, "pages/calculator.html")
+
+def card_new(request):
+
+    return render(request, "pages/card_new.html")

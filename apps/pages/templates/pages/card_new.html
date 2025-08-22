@@ -1,0 +1,76 @@
+{% extends 'layouts/default.html' %}
+
+{% block title %}新增卡片 - Rewardia{% endblock %}
+
+{% block content %}
+<section class="calculator-page">
+    <div class="calculator-container">
+        <!-- 區塊標題：新增卡片 -->
+        <h2 class="calculator-title">新增卡片</h2>
+
+        <!-- 主要內容卡片 -->
+        <div class="add-card-container">
+            <div class="add-card-bg">
+                <!-- 標題列 -->
+                <div class="add-card-header">
+                    <h3 class="add-card-title">我的卡片</h3>
+                </div>
+
+                <!-- 表單欄位 -->
+                <form id="addCardForm">
+                    <div class="add-card-fields">
+                        <!-- 發卡銀行 -->
+                        <div class="field-group">
+                            <label for="bankSelect" class="field-label required">發卡銀行</label>
+                            <div class="select-wrapper">
+                                <select id="bankSelect" class="ui-select" aria-label="選擇發卡銀行" required>     
+                                    <option value="" selected disabled>選擇發卡銀行</option>
+                                    <option>台新銀行</option>
+                                    <option>國泰世華</option>
+                                    <option>玉山銀行</option>
+                                    <option>中國信託</option>
+                                    <option>富邦銀行</option>
+                                </select>
+                                <div class="select-arrow" aria-hidden="true"></div>
+                            </div>
+                        </div>
+
+                        <!-- 卡片 -->
+                        <div class="field-group">
+                            <label for="cardSelect" class="field-label required">卡片</label>
+                            <div class="select-wrapper">
+                                <select id="cardSelect" class="ui-select" aria-label="選擇卡片" required>
+                                    <option value="" selected disabled>選擇卡片</option>
+                                    <option>現金回饋卡</option>
+                                    <option>御璽卡</option>
+                                    <option>U Bear卡</option>
+                                    <option>momo卡</option>
+                                </select>
+                                <div class="select-arrow" aria-hidden="true"></div>
+                            </div>
+                        </div>
+
+                        <!-- 到期（MM/YY） -->
+                        <div class="field-group">
+                            <label for="expiryInput" class="field-label">到期（MM/YY）</label>
+                            <input id="expiryInput" type="text" placeholder="請輸入到期日" class="ui-input" aria-label="到期日期" maxlength="5" />
+                        </div>
+
+                        <!-- 備註 -->
+                        <div class="field-group field-full">
+                            <label for="noteTextarea" class="field-label">備註</label>
+                            <textarea id="noteTextarea" placeholder="請輸入備註" class="ui-textarea" aria-label="備註" rows="8"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 動作按鈕 -->
+                    <div class="add-card-actions">
+                        <button type="button" class="ui-btn ui-btn-secondary">取消</button>
+                        <button type="submit" class="ui-btn ui-btn-primary">新增卡片</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
