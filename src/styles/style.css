@@ -27,6 +27,31 @@
     .btn-white-outline {
         @apply bg-white border border-black text-black hover:bg-gray-100 transition-colors duration-200;
     }
+    
+    /* ========== Download Page Button樣式 ========== */
+    .download-btn-primary {
+        @apply bg-[#2060B9] hover:bg-blue-700 text-white px-6 py-5 text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer;
+        width: 280px;
+        height: 64px;
+    }
+    
+    .download-btn-secondary {
+        @apply bg-[#111827] hover:bg-gray-800 text-white px-6 py-5 text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer;
+        width: 280px;
+        height: 64px;
+    }
+    
+    .download-btn-chrome {
+        @apply bg-[#111827] hover:bg-gray-800 text-white px-6 py-5 text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer;
+        width: 280px;
+        height: 64px;
+    }
+    
+    .download-btn-app {
+        @apply bg-[#111827] hover:bg-gray-800 text-white px-6 py-5 text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer;
+        width: 280px;
+        height: 64px;
+    }
 
 
 
@@ -88,6 +113,8 @@
     body .main-container .main-content.banner-hidden {
         margin-top: 80px; /* 只有 Header */
     }
+
+    
 }
 
 
