@@ -110,8 +110,7 @@
         margin-top: 80px; /* Header 高度（預設無 Banner） */
         padding-bottom: 80px; /* Footer 間距 */
     }
-    /* 若 Top Banner 顯示（且未被 hidden），則補足 Header + Banner 總高 */
-    body:has(#top-banner):not(:has(#top-banner.hidden)) .calculator-page {
+    body.banner-visible .calculator-page {
         margin-top: 40px;
     }
     
@@ -191,18 +190,16 @@
         @apply md:col-span-2;
     }
     
-    .field-label {
+        .field-label {
         @apply block text-[18px] text-[#111827] mb-2 font-normal;
     }
-    
-    /* 必填標記顏色 */
-    .field-label {
-        color: #111827;
-    }
-    .field-label::before {
+
+    /* 只給需要必填的加 .required */
+    .field-label.required::before {
         content: '* ';
         color: #FF1F1F;
     }
+
     
     .select-wrapper {
         @apply relative;
