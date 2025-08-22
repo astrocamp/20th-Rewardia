@@ -10,7 +10,7 @@ class CrawledData(models.Model):
         verbose_name='Credit Card'
     )
     content = models.TextField('Crawled Content',null=False)
-    url = models.URLField('Crawled Website',null=False)
+    url = models.URLField('Crawled Website')
     created_at = models.DateTimeField('Created At', auto_now_add=True)
 
     class Meta:
@@ -19,4 +19,4 @@ class CrawledData(models.Model):
         verbose_name_plural = 'Crawled Cards'
 
     def __str__(self):
-        return self.name
+        return self.card.name
