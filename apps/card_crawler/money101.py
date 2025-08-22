@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
 import time
+import random
 
 # money101 74張精選的網站
 main_page_url = "https://www.money101.com.tw/信用卡/全部"
@@ -51,7 +52,8 @@ for card in card_names:
 
         cards_dict.append(card_dict)
 
-        time.sleep(1)
+        sleep_time = (random.randint(7,14))/10
+        time.sleep(sleep_time)
 
     # 幾個常見的錯誤，個別做except
     except requests.exceptions.HTTPError as e:
