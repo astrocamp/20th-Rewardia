@@ -28,32 +28,266 @@
         @apply bg-white border border-black text-black hover:bg-gray-100 transition-colors duration-200;
     }
     
+
+    
     /* ========== Download Page Button樣式 ========== */
     .download-btn-primary {
-        @apply bg-[#2060B9] hover:bg-blue-700 text-white px-6 py-5 text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer;
-        width: 280px;
-        height: 64px;
+        @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-[#2060B9] hover:bg-blue-700;
+        width: 100%;
+        min-height: 3rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+        max-width: 16rem;
+    }
+    
+    .download-btn-primary:hover {
+        transform: translateY(-0.125rem);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
     }
     
     .download-btn-secondary {
-        @apply bg-[#111827] hover:bg-gray-800 text-white px-6 py-5 text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer;
-        width: 280px;
-        height: 64px;
+        @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-[#111827] hover:bg-gray-800;
+        width: 100%;
+        min-height: 3rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+        max-width: 16rem;
+    }
+    
+    .download-btn-secondary:hover {
+        transform: translateY(-0.125rem);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
     }
     
     .download-btn-chrome {
-        @apply bg-[#111827] hover:bg-gray-800 text-white px-6 py-5 text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer;
-        width: 280px;
-        height: 64px;
+        @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-[#111827] hover:bg-gray-800;
+        width: 100%;
+        min-height: 3rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+        max-width: 17.5rem;
+    }
+    
+    .download-btn-chrome:hover {
+        transform: translateY(-0.125rem);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
     }
     
     .download-btn-app {
-        @apply bg-[#111827] hover:bg-gray-800 text-white px-6 py-5 text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer;
-        width: 280px;
-        height: 64px;
+        @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-[#111827] hover:bg-gray-800;
+        width: 100%;
+        min-height: 3rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+        max-width: 17.5rem;
+    }
+    
+    .download-btn-app:hover {
+        transform: translateY(-0.125rem);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    /* ========== Download Page Banner 按鈕樣式 ========== */
+    .download-btn-banner {
+        max-width: 15rem !important;
+        min-width: 15rem;
+    }
+
+    /* ========== Download Page 特定樣式 ========== */
+
+    .download-banner {
+        background: linear-gradient(135deg, rgba(32, 96, 185, 0.9) 0%, rgba(17, 24, 39, 0.9) 100%);
+    }
+    
+    /* Download Page 橫幅背景遮罩效果 */
+    .download-banner::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(32, 96, 185, 0.1) 0%, rgba(17, 24, 39, 0.1) 100%);
+        z-index: 1;
+    }
+    
+    /* Download Page 橫幅內容區域樣式 */
+    .download-banner-content {
+        position: relative;
+        z-index: 2;
+        max-width: 50%;
+        padding-right: 2rem;
+    }
+    
+    /* Download Page 簡化的區塊樣式 - 無hover、陰影、邊線 */
+    .download-section-simple {
+        @apply bg-white rounded-2xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8;
+        transition: all 0.3s ease;
+    }
+    
+    /* Download Page 簡化的圖片樣式 - 無hover效果 */
+    .download-image-simple {
+        @apply rounded-lg overflow-hidden;
+    }
+    
+    /* Download Page 簡化的功能卡片樣式 - 無hover、陰影效果 */
+    .download-feature-card-simple {
+        @apply bg-white rounded-lg overflow-hidden;
+        border: 1px solid #f3f4f6;
+    }
+    
+    /* Download Page 簡化的功能圖片樣式 */
+    .download-feature-image-simple {
+        @apply w-full bg-gradient-to-br from-blue-50 to-indigo-100;
+        height: 12rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
     }
 
 
+    /* Download Page 手機版響應式樣式 (≤640px) */
+    @media (max-width: 640px) {
+        .download-btn-primary,
+        .download-btn-secondary,
+        .download-btn-chrome,
+        .download-btn-app {
+            max-width: none;
+            min-height: 2.75rem;
+            font-size: 0.875rem;
+            padding: 0.75rem 1rem;
+        }
+        
+        .download-btn-banner {
+            max-width: none !important;
+            min-width: auto;
+        }
+        
+        .download-banner-content {
+            max-width: 100%;
+            padding-right: 0;
+        }
+        
+        .download-section-simple {
+            @apply p-4;
+            margin-bottom: 1.5rem;
+        }
+        
+        .download-section-simple .flex {
+            @apply flex-col gap-4;
+        }
+        
+        .download-section-simple .flex-shrink-0 {
+            @apply w-full;
+        }
+        
+        .download-section-simple .w-\[279px\] {
+            @apply w-full;
+        }
+        
+        .download-feature-image-simple {
+            height: 10rem;
+        }
+        
+        .download-banner h1 {
+            @apply text-2xl;
+            line-height: 1.2;
+        }
+        
+        .download-section-simple h3 {
+            @apply text-xl;
+        }
+        
+        .download-section-simple p {
+            @apply text-sm;
+        }
+    }
+    
+    /* Download Page 平板版響應式樣式 (641px-768px) */
+    @media (min-width: 641px) and (max-width: 768px) {
+        .download-btn-banner {
+            max-width: 12rem !important;
+            min-width: 12rem;
+        }
+        
+        .download-banner-content {
+            max-width: 60%;
+            padding-right: 1.5rem;
+        }
+        
+        .download-section-simple .flex {
+            @apply flex-col gap-6;
+        }
+        
+        .download-feature-image-simple {
+            height: 11rem;
+        }
+    }
+    
+    /* Download Page 中等桌面版響應式樣式 (769px-1024px) */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .download-btn-banner {
+            max-width: 13rem !important;
+            min-width: 13rem;
+        }
+        
+        .download-banner-content {
+            max-width: 55%;
+            padding-right: 1.5rem;
+        }
+        
+        .download-feature-image-simple {
+            height: 12rem;
+        }
+    }
+    
+    /* Download Page 大桌面版響應式樣式 (≥1025px) */
+    @media (min-width: 1025px) {
+        .download-btn-banner {
+            max-width: 15rem !important;
+            min-width: 15rem;
+        }
+        
+        .download-banner-content {
+            max-width: 50%;
+            padding-right: 2rem;
+        }
+        
+        .download-feature-image-simple {
+            height: 16rem;
+        }
+    }
+
+    /* ========== Download Page 動畫效果 ========== */
+    /* Download Page 淡入上升動畫關鍵幀 */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(1.875rem);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Download Page 淡入上升動畫基礎效果 */
+    .animate-fade-in-up {
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    /* Download Page 淡入上升動畫延遲0.2秒 */
+    .animate-fade-in-up-delay-1 {
+        animation: fadeInUp 0.6s ease-out 0.2s both;
+    }
+    
+    /* Download Page 淡入上升動畫延遲0.4秒 */
+    .animate-fade-in-up-delay-2 {
+        animation: fadeInUp 0.6s ease-out 0.4s both;
+    }
+    
+    /* Download Page 淡入上升動畫延遲0.6秒 */
+    .animate-fade-in-up-delay-3 {
+        animation: fadeInUp 0.6s ease-out 0.6s both;
+    }
 
     /* ========== Card 樣式 ========== */
     .card {
@@ -89,7 +323,7 @@
         transition: color 0.2s ease;
     }
     .top-banner-container #top-banner .banner-close-btn:hover {
-        color: #d1d5db; /* hover: text-gray-300 */
+        color: #d1d5db;
     }
 
     /* ========== Header ========== */
@@ -102,19 +336,17 @@
     }
 
     body .header-container .fixed-header.with-banner {
-        top: 64px; /* Banner 高度 */
+        top: 64px;
     }
 
     /* ========== Main Content ========== */
     body .main-container .main-content {
-        margin-top: 144px; /* Header (80px) + Banner (64px) */
+        margin-top: 144px;
     }
 
     body .main-container .main-content.banner-hidden {
-        margin-top: 80px; /* 只有 Header */
+        margin-top: 80px;
     }
-
-    
 }
 
 
