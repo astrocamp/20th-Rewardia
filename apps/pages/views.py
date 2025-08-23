@@ -11,3 +11,9 @@ def calculator(request):
 def card_new(request):
 
     return render(request, "pages/card_new.html")
+
+def faq(request):
+
+    return render(request, "pages/faq.html")
+
+# Create your views here.

@@ -39,4 +39,6 @@ restart:
 	npm i; uv run (for windows 電腦用--因為無法使用原提供的restart指令)
 
 ins_spacy:
-	uv pip install pip && uv pip install https://github.com/explosion/spacy-models/releases/download/zh_core_web_md-3.7.0/zh_core_web_md-3.7.0-py3-none-any.whl
+	uv run pip install https://github.com/explosion/spacy-models/releases/download/zh_core_web_md-3.7.0/zh_core_web_md-3.7.0-py3-none-any.whl
+
+	

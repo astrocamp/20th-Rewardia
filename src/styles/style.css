@@ -32,28 +32,40 @@
     
 
     
-    /* ========== Download Page Button樣式 ========== */
+    /* ========== fqa與 download共用樣式 ========== */
+    /* fqa與 download共用 */
     .download-btn-primary {
         @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-[#2060B9] hover:bg-blue-700;
         width: 100%;
         min-height: 3rem;
         box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
         max-width: 16rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
     }
     
+    /* fqa與 download共用 */
     .download-btn-primary:hover {
         transform: translateY(-0.125rem);
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
     }
     
+    /* fqa與 download共用 */
     .download-btn-secondary {
-        @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-[#111827] hover:bg-gray-800;
+        @apply text-black px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-white hover:bg-gray-100;
         width: 100%;
         min-height: 3rem;
         box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
         max-width: 16rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
     }
     
+    /* fqa與 download共用 */
     .download-btn-secondary:hover {
         transform: translateY(-0.125rem);
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
@@ -85,11 +97,14 @@
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
     }
 
-    /* ========== Download Page Banner 按鈕樣式 ========== */
+    /* fqa與 download共用 */
     .download-btn-banner {
         max-width: 15rem !important;
         min-width: 15rem;
     }
+
+
+
 
     /* ========== Download Page 特定樣式 ========== */
 
@@ -117,24 +132,24 @@
         padding-right: 2rem;
     }
     
-    /* Download Page 簡化的區塊樣式 - 無hover、陰影、邊線 */
+    /* Download Page 區塊樣式 */
     .download-section-simple {
         @apply bg-white rounded-2xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8;
         transition: all 0.3s ease;
     }
     
-    /* Download Page 簡化的圖片樣式 - 無hover效果 */
+    /* Download Page 圖片樣式 */
     .download-image-simple {
         @apply rounded-lg overflow-hidden;
     }
     
-    /* Download Page 簡化的功能卡片樣式 - 無hover、陰影效果 */
+    /* Download Page 功能卡片樣式 */
     .download-feature-card-simple {
         @apply bg-white rounded-lg overflow-hidden;
         border: 1px solid #f3f4f6;
     }
     
-    /* Download Page 簡化的功能圖片樣式 */
+    /* Download Page 功能圖片樣式 */
     .download-feature-image-simple {
         @apply w-full bg-gradient-to-br from-blue-50 to-indigo-100;
         height: 12rem;
@@ -258,8 +273,7 @@
         }
     }
 
-    /* ========== Download Page 動畫效果 ========== */
-    /* Download Page 淡入上升動畫關鍵幀 */
+    /* fqa與 download共用 */
     @keyframes fadeInUp {
         from {
             opacity: 0;
@@ -270,40 +284,247 @@
             transform: translateY(0);
         }
     }
-    
-    /* Download Page 淡入上升動畫基礎效果 */
+
+    /* fqa與 download共用 */
     .animate-fade-in-up {
         animation: fadeInUp 0.6s ease-out;
     }
-    
-    /* Download Page 淡入上升動畫延遲0.2秒 */
+
+    /* fqa與 download共用 */
     .animate-fade-in-up-delay-1 {
         animation: fadeInUp 0.6s ease-out 0.2s both;
     }
-    
-    /* Download Page 淡入上升動畫延遲0.4秒 */
+
+    /* fqa與 download共用 */
     .animate-fade-in-up-delay-2 {
         animation: fadeInUp 0.6s ease-out 0.4s both;
     }
-    
-    /* Download Page 淡入上升動畫延遲0.6秒 */
+
+    /* fqa與 download共用 */
     .animate-fade-in-up-delay-3 {
         animation: fadeInUp 0.6s ease-out 0.6s both;
     }
 
-    /* ========== Card 樣式 ========== */
-    .card {
-        @apply bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-200;
+
+
+
+
+/* ========== FQA Page 專用樣式 ========== */
+    
+    /* FQA 功能卡片樣式 */
+    .fqa-feature-card {
+        @apply bg-[#E5E7EB] rounded-lg relative overflow-hidden;
+        min-height: 327px;
     }
     
-    /* ========== Page Title 樣式 ========== */
-    .page-title {
-        @apply text-4xl font-bold text-black mb-2;
+    /* FQA 功能卡片圖片區域 */
+    .fqa-feature-bg {
+        @apply w-full h-[320px] bg-[#E5E7EB] rounded-t-lg;
+    }
+    
+    /* FQA 功能卡片圖片預留空間 */
+    .fqa-feature-image-placeholder {
+        @apply w-full h-full bg-gray-200 rounded-t-lg;
+        /* 預留圖片空間，可以後續替換為實際圖片 */
+    }
+    
+    /* FQA 功能卡片數字樣式 */
+    .fqa-feature-number {
+        @apply w-12 h-12 bg-[#2060B9] text-white rounded-full flex items-center justify-center text-3xl font-bold;
+        font-family: 'Kulim Park', sans-serif;
+        line-height: 0.98;
+        margin-right: 1rem;
+    }
+    
+    /* FQA 功能卡片內容樣式 */
+    .fqa-feature-content {
+        @apply bg-white flex flex-row items-start;
+        padding-top: 1rem;
+        padding-left: 0;
+        padding-right: 1.5rem;
+        padding-bottom: 1.5rem;
+    }
+    
+    /* FQA 功能卡片標題樣式 */
+    .fqa-feature-title {
+        @apply text-xl sm:text-2xl lg:text-3xl font-bold text-black;
+        font-family: 'Kulim Park', sans-serif;
+        line-height: 1.15;
+        text-align: left;
+    }
+    
+    /* FQA 分類標題樣式 */
+    .fqa-category-title {
+        @apply text-2xl font-bold text-[#5D6970] mb-6;
+        font-family: 'Inter', sans-serif;
+        line-height: 1.21;
+        background: none;
+        padding: 0;
+        cursor: default;
+    }
+    
+    /* FQA Q&A 列表樣式 */
+    .fqa-qa-list {
+        @apply space-y-4;
+    }
+    
+
+    
+    /* FQA Q&A 項目樣式 */
+    .fqa-qa-item {
+        @apply bg-white rounded-lg border border-[#D1D5DB] overflow-hidden;
+        min-height: 60px;
+    }
+    
+    /* FQA 問題樣式 */
+    .fqa-question {
+        @apply flex items-center justify-between p-4 transition-colors duration-200;
+        min-height: 60px;
+        cursor: default;
+    }
+    
+    .fqa-question-text {
+        @apply text-lg font-bold text-[#111827] flex-1 pr-4;
+        font-family: 'Inter', sans-serif;
+        line-height: 1.21;
+        cursor: default;
+    }
+    
+    /* FQA 切換按鈕樣式 */
+    .fqa-toggle-btn {
+        @apply w-16 h-16 bg-white flex items-center justify-center transition-all duration-200 cursor-pointer;
+        border: none;
+        outline: none;
+        cursor: pointer;
+    }
+    
+    .fqa-toggle-btn:hover {
+        @apply bg-gray-50;
+    }
+    
+    /* FQA 箭頭圖標樣式 */
+    .fqa-arrow-icon {
+        @apply w-5 h-5 text-black transition-transform duration-200;
+    }
+    
+    /* FQA 答案樣式 */
+    .fqa-answer {
+        @apply p-4 border-t border-[#D1D5DB] bg-white;
+        min-height: 20px;
+    }
+    
+    .fqa-answer.hidden {
+        @apply hidden;
+    }
+    
+    .fqa-answer-text {
+        @apply text-lg text-[#111827] leading-relaxed;
+        font-family: 'Inter', sans-serif;
+        line-height: 1.5;
     }
 
-    .page-title-underline {
-        @apply w-24 h-0.5 bg-blue-600;
+    /* ========== 響應式設計 ========== */
+    
+    @media (max-width: 640px) {
+        /* fqa與 download共用 */
+        .download-btn-banner {
+            max-width: 100% !important;
+            min-width: auto;
+        }
+        
+        .fqa-feature-card {
+            min-height: 280px;
+        }
+        
+        .fqa-feature-bg {
+            height: 200px;
+        }
+        
+        .fqa-feature-content {
+            @apply bg-white flex flex-row items-start;
+            padding-top: 0.75rem;
+            padding-left: 0;
+            padding-right: 1rem;
+            padding-bottom: 1rem;
+        }
+        
+        .fqa-feature-number {
+            @apply w-10 h-10 text-2xl;
+            min-width: 2.5rem;
+            min-height: 2.5rem;
+            margin-right: 0.75rem;
+        }
+        
+        .fqa-question {
+            @apply p-4;
+            min-height: 50px;
+        }
+        
+        .fqa-toggle-btn {
+            @apply w-14 h-14;
+        }
+        
+        .fqa-answer {
+            @apply p-4;
+            min-height: 15px;
+        }
     }
+    
+    @media (min-width: 641px) and (max-width: 1024px) {
+        .fqa-feature-card {
+            min-height: 300px;
+        }
+        
+        .fqa-feature-bg {
+            height: 220px;
+        }
+        
+        .fqa-feature-content {
+            @apply p-5 pt-4 bg-white flex flex-row items-center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+        
+        .fqa-feature-number {
+            @apply w-11 h-11 text-2xl;
+            min-width: 2.75rem;
+            min-height: 2.75rem;
+            margin-right: 1rem;
+        }
+    }
+    
+    @media (min-width: 1025px) {
+        .fqa-feature-card {
+            min-height: auto;
+            height: auto;
+        }
+        
+        .fqa-feature-bg {
+            height: auto;
+            aspect-ratio: 1.5 / 1;
+        }
+        
+        .fqa-feature-content {
+            @apply p-6 pt-4 bg-white flex flex-row items-center;
+            padding-left: 0;
+        }
+        
+        .fqa-feature-number {
+            @apply w-12 h-12 text-3xl;
+            min-width: 3rem;
+            min-height: 3rem;
+            margin-right: 1rem;
+        }
+    }
+
+
+
+
+
+
+
+
+
 
     /* ========== Layout 基本設定 ========== */
     body.layout-fixed {
