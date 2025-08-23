@@ -1,0 +1,255 @@
+{% extends 'layouts/default.html' %}
+
+{% block title %}關於功能 - Rewardia{% endblock %}
+
+{% block content %}
+        <!-- 主要橫幅區域 -->
+        <section class="relative mx-4 sm:mx-6 lg:mx-10 mt-42 sm:mt-46 lg:mt-46 mb-4 sm:mb-6 lg:mb-8 overflow-hidden">
+            <!-- 頁面標題 - 在 banner 圖上方 -->
+            <div class="mb-6 sm:mb-8 lg:mb-10">
+                <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black">關於功能</h2>
+            </div>
+            
+            <!-- Banner 圖區域 -->
+            <div class="relative h-[300px] sm:h-[350px] lg:h-[400px] overflow-hidden rounded-lg">
+        <!-- 背景圖片 -->
+        <div class="absolute inset-0">
+            <img src="https://github.com/astrocamp/20th-Rewardia/blob/pic/img/about-index.png?raw=true" 
+                alt="Rewardia Background" 
+                class="w-full h-full object-cover object-center">
+        </div>
+        
+        <!-- 內容區域 - 限制在左半邊 -->
+        <div class="relative z-10 flex items-center h-full">
+            <div class="text-white px-4 sm:px-8 lg:px-12 animate-fade-in-up-delay-1 w-full lg:w-1/2">
+                <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 lg:mb-8 leading-tight tracking-wide">
+                    每次購物都能獲得現金回饋
+                </h1>
+                <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 lg:gap-6">
+                    <a href="#" id="chrome-download" class="download-btn-primary download-btn-banner">
+                        免費新增至 Chrome
+                    </a>
+                                         <a href="#" id="app-download" class="download-btn-secondary download-btn-banner">
+                         新增到桌面應用
+                     </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 功能特色區塊 -->
+<section class="mx-4 sm:mx-6 lg:mx-10 my-8 sm:my-12 lg:my-16">
+    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-8 sm:mb-12 lg:mb-15 text-center animate-fade-in-up-delay-2" style="font-family: 'Kulim Park', sans-serif; line-height: 0.98;">
+        Rewardia 優惠計算回饋小幫手的 3 種方式
+    </h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 animate-fade-in-up-delay-3 lg:gap-16 lg:px-16">
+        <!-- 功能卡片 1 -->
+        <div class="fqa-feature-card">
+            <div class="fqa-feature-bg">
+                <!-- 預留圖片空間 -->
+                <div class="fqa-feature-image-placeholder"></div>
+            </div>
+            <div class="fqa-feature-content">
+                <div class="fqa-feature-number">1</div>
+                <h3 class="fqa-feature-title">
+                    即時現金回饋通知
+                </h3>
+            </div>
+        </div>
+        
+        <!-- 功能卡片 2 -->
+        <div class="fqa-feature-card">
+            <div class="fqa-feature-bg">
+                <!-- 預留圖片空間 -->
+                <div class="fqa-feature-image-placeholder"></div>
+            </div>
+            <div class="fqa-feature-content">
+                <div class="fqa-feature-number">2</div>
+                <h3 class="fqa-feature-title">
+                    即時現金回饋通知
+                </h3>
+            </div>
+        </div>
+        
+        <!-- 功能卡片 3 -->
+        <div class="fqa-feature-card">
+            <div class="fqa-feature-bg">
+                <!-- 預留圖片空間 -->
+                <div class="fqa-feature-image-placeholder"></div>
+            </div>
+            <div class="fqa-feature-content">
+                <div class="fqa-feature-number">3</div>
+                <h3 class="fqa-feature-title">
+                    即時現金回饋通知
+                </h3>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Q&A 常見問題區塊 -->
+<section class="mx-4 sm:mx-6 lg:mx-10 my-8 sm:my-12 lg:my-16">
+    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-8 sm:mb-12 text-left animate-fade-in-up-delay-3" style="font-family: 'Kulim Park', sans-serif; line-height: 0.98;">Q&A</h2>
+    
+    <div class="bg-gray-50 rounded-lg p-5 sm:p-6 lg:p-8">
+        <!-- 隱私權相關分類 -->
+        <div class="mb-8">
+            <div class="fqa-category-title">
+                隱私權相關
+            </div>
+            
+            <div class="fqa-qa-list">
+                <!-- Q&A 項目 1 -->
+                <div class="fqa-qa-item">
+                    <div class="fqa-question">
+                        <span class="fqa-question-text">Q1. 什麼是冠狀病毒？冠狀病毒屬會造成什麼樣的人類疾病？</span>
+                        <button class="fqa-toggle-btn" onclick="toggleFQA(this)">
+                            <svg class="fqa-arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="fqa-answer hidden">
+                        <p class="fqa-answer-text">
+                            冠狀病毒（Coronavirus [CoV]）為具外套膜（envelope）的病毒，在電子顯微鏡下可看到類似皇冠的突起因此得名。人類感染冠狀病毒以呼吸道症狀為主，包括鼻塞、流鼻水、咳嗽、發燒等一般上呼吸道感染症狀，但嚴重急性呼吸道症候群冠狀病毒（SARS-CoV）、中東呼吸症候群冠狀病毒（MERS-CoV）與新型冠狀病毒（SARS-CoV-2）感染後比一般人類冠狀病毒症狀嚴重，部分個案可能出現嚴重的肺炎與呼吸衰竭等。
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Q&A 項目 2 -->
+                <div class="fqa-qa-item">
+                    <div class="fqa-question">
+                        <span class="fqa-question-text">Q2. 新型冠狀病毒(COVID-19)是什麼？是怎麼被發現的？</span>
+                        <button class="fqa-toggle-btn" onclick="toggleFQA(this)">
+                            <svg class="fqa-arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="fqa-answer hidden">
+                        <p class="fqa-answer-text">
+                            新型冠狀病毒（COVID-19）是一種新發現的冠狀病毒，於2019年底在中國武漢首次被發現。這種病毒具有高度傳染性，主要通過飛沫傳播，可引起發燒、咳嗽、呼吸困難等症狀，嚴重時可能導致肺炎、急性呼吸窘迫症候群等併發症。
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Q&A 項目 3 -->
+                <div class="fqa-qa-item">
+                    <div class="fqa-question">
+                        <span class="fqa-question-text">Q3. 如何預防冠狀病毒感染？</span>
+                        <button class="fqa-toggle-btn" onclick="toggleFQA(this)">
+                            <svg class="fqa-arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="fqa-answer hidden">
+                        <p class="fqa-answer-text">
+                            預防冠狀病毒感染的方法包括：經常洗手、戴口罩、保持社交距離、避免觸摸臉部、定期消毒常用物品表面、保持良好通風、增強免疫力等。如果出現症狀，應立即就醫並進行隔離。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 保密相關分類 -->
+        <div>
+            <div class="fqa-category-title">
+                保密相關
+            </div>
+            
+            <div class="fqa-qa-list">
+                <!-- Q&A 項目 1 -->
+                <div class="fqa-qa-item">
+                    <div class="fqa-question">
+                        <span class="fqa-question-text">Q1. Rewardia 如何保護用戶的個人資料？</span>
+                        <button class="fqa-toggle-btn" onclick="toggleFQA(this)">
+                            <svg class="fqa-arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="fqa-answer hidden">
+                        <p class="fqa-answer-text">
+                            Rewardia 採用業界最高標準的資料加密技術，所有用戶資料都經過 AES-256 加密處理。我們嚴格遵守 GDPR 和台灣個人資料保護法，絕不會將您的個人資料出售或分享給第三方。所有資料傳輸都使用 HTTPS 安全協議，確保您的隱私安全。
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Q&A 項目 2 -->
+                <div class="fqa-qa-item">
+                    <div class="fqa-question">
+                        <span class="fqa-question-text">Q2. 信用卡資訊是否會被儲存？</span>
+                        <button class="fqa-toggle-btn" onclick="toggleFQA(this)">
+                            <svg class="fqa-arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="fqa-answer hidden">
+                        <p class="fqa-answer-text">
+                            為了您的安全，Rewardia 絕不會儲存您的完整信用卡資訊。我們只會記錄必要的卡片類型、回饋率等公開資訊，用於優惠計算和推薦。所有敏感資訊都經過加密處理，並定期進行安全審查。
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Q&A 項目 3 -->
+                <div class="fqa-qa-item">
+                    <div class="fqa-question">
+                        <span class="fqa-question-text">Q3. 如何刪除我的帳戶和資料？</span>
+                        <button class="fqa-toggle-btn" onclick="toggleFQA(this)">
+                            <svg class="fqa-arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="fqa-answer hidden">
+                        <p class="fqa-answer-text">
+                            您可以在帳戶設定中選擇刪除帳戶，我們會在30天內完全刪除您的所有資料。如果您需要立即刪除，也可以聯繫客服團隊，我們會協助您完成帳戶刪除程序。刪除後無法復原，請謹慎考慮。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- JavaScript 功能 -->
+<script>
+function toggleFQA(button) {
+    const answer = button.closest('.fqa-qa-item').querySelector('.fqa-answer');
+    const arrow = button.querySelector('.fqa-arrow-icon');
+    
+    // 先關閉所有其他已展開的答案
+    const allAnswers = document.querySelectorAll('.fqa-answer:not(.hidden)');
+    const allArrows = document.querySelectorAll('.fqa-arrow-icon');
+    
+    allAnswers.forEach((ans, index) => {
+        if (ans !== answer) {
+            ans.classList.add('hidden');
+            allArrows[index].style.transform = 'rotate(0deg)';
+        }
+    });
+    
+    // 切換當前答案
+    if (answer.classList.contains('hidden')) {
+        answer.classList.remove('hidden');
+        arrow.style.transform = 'rotate(180deg)';
+    } else {
+        answer.classList.add('hidden');
+        arrow.style.transform = 'rotate(0deg)';
+    }
+}
+
+// 初始化功能
+document.addEventListener('DOMContentLoaded', function() {
+    // 關閉所有已展開的答案
+    const allAnswers = document.querySelectorAll('.fqa-answer');
+    const allArrows = document.querySelectorAll('.fqa-arrow-icon');
+    allAnswers.forEach(ans => ans.classList.add('hidden'));
+    allArrows.forEach(arrow => arrow.style.transform = 'rotate(0deg)');
+});
+</script>
+{% endblock %}
