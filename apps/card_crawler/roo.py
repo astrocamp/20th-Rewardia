@@ -48,15 +48,14 @@ def get_card_info(url):
             })
         except WebDriverException as error:
             # 找不到卡的新增一個找不到的資訊
-            content_arr.append(
-                {
+            error_data = {
                 "card":"Card not found.",
                 "url":f"{url}",
                 "error":f"{error}"
-            })
+            }
+            content_arr.append(error_data)
             print(f"Error fetching card: {error}")
-            # 在頁面中找不到卡名，終止這次的函式
-            exit()
+            return error_data
 
 
         try:
@@ -86,15 +85,16 @@ def get_card_info(url):
                 # 排出空白的
                 if len(content.text)>1:
                     content_arr.append(content.text)
+
+            # 成功的話，才會回傳值
+            return content_arr
         except WebDriverException as error:
             print(f"Error finding content: {error}")
-
-        return content_arr
 
     except WebDriverException as error:
         print(f"Card not found: {error}")
         # 找不到卡，就終止這次的函式
-        exit()
+        return error
 
 failed_cards = []
 all_cards_data = []
@@ -106,7 +106,7 @@ for i, card_url in enumerate(card_urls):
         # 將資料存到這個串列
         all_cards_data.append(card_data)
         print(card_data)
-        print(f"Processing {card_data[0]["card"]} finished")
+        print(f"Processing {card_data[0]['card']} finished")
         time.sleep(sleep_time)
   
     except WebDriverException as error:
@@ -117,4 +117,5 @@ for i, card_url in enumerate(card_urls):
 print(f"Successfully processed: {len(all_cards_data)} cards")
 print(f"Failed: {len(failed_cards)} cards")
 
+# 關閉查找
 driver.quit()
