@@ -11,12 +11,12 @@
     </div>
     
     <!-- Banner 圖區域 -->
-    <div class="relative h-[500px] overflow-hidden rounded-lg download-banner">
+    <div class="relative h-[300px] sm:h-[350px] lg:h-[400px] overflow-hidden rounded-lg">
         <!-- 背景圖片 -->
         <div class="absolute inset-0">
             <img src="https://github.com/astrocamp/20th-Rewardia/blob/pic/img/download-index.png?raw=true" 
-                 alt="Rewardia Background" 
-                 class="w-full h-full object-cover object-center">
+                alt="Rewardia Background" 
+                class="w-full h-full object-cover object-[75%_9%]">
         </div>
         
         <!-- 內容區域 - 限制在左半邊 -->
@@ -26,12 +26,12 @@
                     每次購物都能獲得現金回饋
                 </h1>
                 <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 lg:gap-6">
-                    <button class="download-btn-primary download-btn-banner">
+                    <a href="#" id="chrome-download" class="download-btn-primary download-btn-banner">
                         免費新增至 Chrome
-                    </button>
-                    <button class="download-btn-secondary download-btn-banner">
+                    </a>
+                    <a href="#" id="app-download" class="download-btn-secondary download-btn-banner">
                         新增到桌面應用
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
@@ -49,8 +49,8 @@
             <div class="flex-shrink-0 w-full lg:w-auto">
                 <div class="w-full sm:w-[279px] h-[253px] bg-gray-200 rounded-lg overflow-hidden download-image-simple">
                     <img src="https://github.com/astrocamp/20th-Rewardia/blob/pic/img/download-chrome.jpg?raw=true" 
-                         alt="Chrome 擴充插件" 
-                         class="w-full h-full object-cover object-center">
+                        alt="Chrome 擴充插件" 
+                        class="w-full h-full object-cover object-center">
                 </div>
             </div>
             <!-- 右側文字區域 -->
@@ -73,8 +73,8 @@
             <div class="flex-shrink-0 w-full lg:w-auto">
                 <div class="w-full sm:w-[279px] h-[253px] bg-gray-200 rounded-lg overflow-hidden download-image-simple">
                     <img src="https://github.com/astrocamp/20th-Rewardia/blob/pic/img/download-app.jpg?raw=true" 
-                         alt="APP 應用" 
-                         class="w-full h-full object-cover object-center">
+                        alt="APP 應用" 
+                        class="w-full h-full object-cover object-center">
                 </div>
             </div>
             <!-- 右側文字區域 -->
@@ -156,5 +156,8 @@
         </div>
     </div>
 </section>
+
+
+
 
 {% endblock %}
