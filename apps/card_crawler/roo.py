@@ -1,8 +1,10 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import random
-from selenium.common.exceptions import WebDriverException, ElementNotVisibleException
+from selenium.common.exceptions import WebDriverException, TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.relative_locator import locate_with
 import time
 
@@ -13,6 +15,7 @@ sleep_time = (random.randint(7,14))/10
 
 try:
     driver.get(main_url_page)
+    # 在尋找物件前要等多久
     driver.implicitly_wait(2)
 except WebDriverException as error:
     print(f"Error fetching main page: {error}")
@@ -67,8 +70,11 @@ def get_card_info(url):
 
             # perform會執行click的動作
             action.perform()
-            # 休息1秒讓資訊有時間顯示
-            time.sleep(1)
+            try:
+                # 比較節省時間的等待方式，如果元素在5秒內還沒出現就會回傳錯誤
+                WebDriverWait(driver,5).until(EC.visibility_of_all_elements_located((By.CLASS_NAME, "answer")))
+            except TimeoutException:
+                print("Error fetching elements")
         except WebDriverException as error:
             print(f"Error fetching button: {error}")
 
@@ -80,7 +86,6 @@ def get_card_info(url):
                 # 排出空白的
                 if len(content.text)>1:
                     content_arr.append(content.text)
-            print(f"Processing {card_name.text} finished")
         except WebDriverException as error:
             print(f"Error finding content: {error}")
 
@@ -101,6 +106,7 @@ for i, card_url in enumerate(card_urls):
         # 將資料存到這個串列
         all_cards_data.append(card_data)
         print(card_data)
+        print(f"Processing {card_data[0]["card"]} finished")
         time.sleep(sleep_time)
   
     except WebDriverException as error:
