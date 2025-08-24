@@ -40,6 +40,61 @@ class ValidationResult(models.Model):
         ERROR = 'ERROR', '錯誤'
         INFO = 'INFO', '資訊'
     
+    # 驗證規則關聯
+    rule = models.ForeignKey(
+        ValidationRule,
+        on_delete=models.CASCADE,
+        related_name='results',
+        verbose_name='Validation Rule',
+        help_text='驗證規則'
+    )
+    
+    # 直接關聯到核心業務模型 
+    bank = models.ForeignKey(
+        'banks.Bank',
+        on_delete=models.CASCADE,
+        null=True, blank=True,
+        related_name='validation_results',
+        verbose_name='Bank',
+        help_text='關聯銀行'
+    )
+    card = models.ForeignKey(
+        'cards.CreditCard',
+        on_delete=models.CASCADE,
+        null=True, blank=True,
+        related_name='validation_results',
+        verbose_name='Credit Card',
+        help_text='關聯信用卡'
+    )
+    merchant = models.ForeignKey(
+        'merchants.Merchant',
+        on_delete=models.CASCADE,
+        null=True, blank=True,
+        related_name='validation_results',
+        verbose_name='Merchant',
+        help_text='關聯商家'
+    )
+    reward_category = models.ForeignKey(
+        'rewards.RewardCategory',
+        on_delete=models.CASCADE,
+        null=True, blank=True,
+        related_name='validation_results',
+        verbose_name='Reward Category',
+        help_text='關聯回饋分類'
+    )
+    
+    # 用於其他模型
+    content_type = models.ForeignKey(
+        ContentType,
+        on_delete=models.CASCADE,
+        null=True, blank=True,
+        verbose_name='Content Type',
+        help_text='內容類型 (備用)'
+    )
+    object_id = models.PositiveIntegerField('Object ID', null=True, blank=True, help_text='物件ID (備用)')
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+
     # 驗證狀態
     status = models.CharField(
         'Status',
@@ -91,6 +146,18 @@ class ValidationResult(models.Model):
     created_at = models.DateTimeField('Created At', auto_now_add=True, help_text='建立時間')
     started_at = models.DateTimeField('Started At', null=True, blank=True, help_text='開始時間')
     completed_at = models.DateTimeField('Completed At', null=True, blank=True, help_text='完成時間')
+
+    # 關聯到處理會話 
+    session = models.ForeignKey(
+        'ValidationSession',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='results',
+        verbose_name='Validation Session',
+        help_text='驗證會話'
+    )
+    
 
     class Meta:
         db_table = 'nlp_validation_results'
