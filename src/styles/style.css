@@ -816,3 +816,108 @@
 
 
 
+
+
+/* ===== 新增樣式：register.html 專用樣式 ===== */
+@layer components {
+    /* 註冊頁面輸入框樣式 */
+    .register-input {
+        @apply w-full h-12 px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors;
+    }
+    
+    /* 密碼切換按鈕樣式 */
+    .password-toggle-btn {
+        @apply absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-gray-700;
+    }
+    
+    /* 註冊頁面勾選框樣式 */
+    .register-checkbox {
+        @apply mt-1 w-6 h-6 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2;
+    }
+    
+    /* 主要註冊按鈕樣式 */
+    .register-btn-primary {
+        @apply w-full h-16 bg-gray-900 text-white text-lg font-medium rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors;
+    }
+    
+    /* Google 註冊按鈕樣式 */
+    .register-btn-google {
+        @apply w-full h-16 bg-gray-200 text-gray-900 text-lg font-medium rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors flex items-center justify-center space-x-3;
+        /* 確保連結樣式不會影響按鈕外觀 */
+        text-decoration: none;
+        display: inline-flex;
+        cursor: pointer;
+    }
+    
+    /* Google 按鈕 hover 和 focus 狀態 */
+    .register-btn-google:hover {
+        @apply bg-gray-300;
+    }
+    
+    .register-btn-google:focus {
+        @apply outline-none ring-2 ring-gray-400 ring-offset-2;
+    }
+    
+    /* 確保連結內的文字不會有下劃線 */
+    .register-btn-google span {
+        text-decoration: none;
+    }
+    
+    /* 欄位標籤樣式 */
+    .register-label {
+        @apply block text-lg text-gray-700 font-normal;
+    }
+    
+    /* 欄位容器樣式 */
+    .register-field-container {
+        @apply space-y-2;
+    }
+    
+    /* 相對定位容器樣式 */
+    .register-relative-container {
+        @apply relative;
+    }
+    
+    /* 服務條款連結樣式 */
+    .register-link {
+        @apply text-blue-600 hover:text-blue-800 font-medium underline;
+    }
+    
+    /* 分隔線容器樣式 */
+    .register-divider-container {
+        @apply relative py-4;
+    }
+    
+    /* 分隔線樣式 */
+    .register-divider-line {
+        @apply absolute inset-0 flex items-center;
+    }
+    
+    /* 分隔線樣式 */
+    .register-divider {
+        @apply w-full border-t border-gray-300;
+    }
+    
+    /* 分隔線文字容器 */
+    .register-divider-text-container {
+        @apply relative flex justify-center text-lg;
+    }
+    
+    /* 分隔線文字 */
+    .register-divider-text {
+        @apply px-4 bg-white text-gray-700 font-normal;
+    }
+    
+    /* 登入連結容器 */
+    .register-login-container {
+        @apply text-center pt-4;
+    }
+    
+    /* 登入連結文字 */
+    .register-login-text {
+        @apply text-lg text-gray-700 font-normal;
+    }
+}
+
+
+

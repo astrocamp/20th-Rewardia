@@ -16,4 +16,8 @@ def faq(request):
 
     return render(request, "pages/faq.html")
 
+def register(request):
+
+    return render(request, "pages/register.html")
+
 # Create your views here.
