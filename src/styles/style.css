@@ -550,6 +550,8 @@
 
 
 
+
+
 /* ===== 新增樣式：calculator 專用與 UI 元件四狀態 ===== */
 @layer components {
     /* ========== Calculator 頁面布局 ========== */
@@ -918,6 +920,3 @@
         @apply text-lg text-gray-700 font-normal;
     }
 }
-
-
-
