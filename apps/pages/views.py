@@ -12,7 +12,3 @@ def card_new(request):
 
     return render(request, "pages/card_new.html")
 
-
-def member_zone(request):
-
-    return render(request, "pages/member_zone.html")
