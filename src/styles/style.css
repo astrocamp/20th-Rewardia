@@ -934,7 +934,10 @@
         @apply text-2xl text-[#949AA6] font-normal;
     }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> d522aba (會員專區html切版#37)
     /* ========== 會員專區 RWD 調整 ========== */
     @media (max-width: 640px) {
         .member-section-header {
@@ -1072,4 +1075,7 @@
         @apply text-lg text-gray-700 font-normal;
     }
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> d522aba (會員專區html切版#37)
