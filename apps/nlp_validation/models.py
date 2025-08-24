@@ -7,14 +7,14 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 
 
 class ValidationRule(models.Model):
-    """NLP 驗證規則 """
+    """NLP 驗證規則定義 """
     
     # 基本資訊
     name = models.CharField('Rule Name', max_length=100, help_text='規則名稱')
     description = models.TextField('Description', blank=True, help_text='規則描述')
     is_active = models.BooleanField('Is Active', default=True, help_text='啟用狀態')
     created_at = models.DateTimeField('Created At', auto_now_add=True, help_text='建立時間')
-
+    
     class Meta:
         db_table = 'nlp_validation_rules'
         verbose_name = 'NLP 驗證規則'
@@ -93,8 +93,7 @@ class ValidationResult(models.Model):
     )
     object_id = models.PositiveIntegerField('Object ID', null=True, blank=True, help_text='物件ID (備用)')
     content_object = GenericForeignKey('content_type', 'object_id')
-
-
+    
     # 驗證狀態
     status = models.CharField(
         'Status',
@@ -146,7 +145,7 @@ class ValidationResult(models.Model):
     created_at = models.DateTimeField('Created At', auto_now_add=True, help_text='建立時間')
     started_at = models.DateTimeField('Started At', null=True, blank=True, help_text='開始時間')
     completed_at = models.DateTimeField('Completed At', null=True, blank=True, help_text='完成時間')
-
+    
     # 關聯到處理會話 
     session = models.ForeignKey(
         'ValidationSession',
@@ -158,7 +157,6 @@ class ValidationResult(models.Model):
         help_text='驗證會話'
     )
     
-
     class Meta:
         db_table = 'nlp_validation_results'
         verbose_name = 'NLP 驗證結果'
@@ -186,6 +184,77 @@ class ValidationResult(models.Model):
         }
         icon = status_icon.get(self.result_type, '❓')
         return f"{icon} {self.rule.name} - {self.get_result_type_display()}"
+    
+    @property
+    def duration(self):
+        """計算驗證時間"""
+        if self.started_at and self.completed_at:
+            return self.completed_at - self.started_at
+        return None
+    
+    @property
+    def is_completed(self):
+        """檢查是否完成"""
+        return self.status in [self.Status.COMPLETED, self.Status.FAILED]
+    
+    @property
+    def target_object_str(self):
+        """取得目標物件的字串表示"""
+        # 優先使用直接關聯
+        if self.card:
+            return f"信用卡: {self.card}"
+        elif self.bank:
+            return f"銀行: {self.bank}"
+        elif self.merchant:
+            return f"商家: {self.merchant}"
+        elif self.reward_category:
+            return f"回饋分類: {self.reward_category}"
+        # 備用 GenericFK
+        elif self.content_object:
+            return str(self.content_object)
+        else:
+            return f"未知物件 #{self.object_id}"
+    
+    @property 
+    def target_model_name(self):
+        """取得目標模型名稱"""
+        if self.card:
+            return 'CreditCard'
+        elif self.bank:
+            return 'Bank'
+        elif self.merchant:
+            return 'Merchant'
+        elif self.reward_category:
+            return 'RewardCategory'
+        elif self.content_type:
+            return self.content_type.model
+        else:
+            return 'Unknown'
+    
+    def mark_started(self):
+        """標記執行"""
+        self.status = self.Status.RUNNING
+        self.started_at = timezone.now()
+        self.save(update_fields=['status', 'started_at'])
+    
+    def mark_completed(self, result_type, passed=False, score=None, message='', details=None):
+        """標記完成並設定結果"""
+        self.status = self.Status.COMPLETED
+        self.result_type = result_type
+        self.passed = passed
+        self.score = score
+        self.message = message
+        self.details = details or {}
+        self.completed_at = timezone.now()
+        self.save()
+    
+    def mark_failed(self, error_message):
+        """標記執行失敗"""
+        self.status = self.Status.FAILED
+        self.result_type = self.ResultType.ERROR
+        self.message = error_message
+        self.completed_at = timezone.now()
+        self.save()
 
 
 class ValidationSession(models.Model):
@@ -229,7 +298,17 @@ class ValidationSession(models.Model):
     # 時間記錄
     started_at = models.DateTimeField('Started At', auto_now_add=True, help_text='開始時間')
     completed_at = models.DateTimeField('Completed At', null=True, blank=True, help_text='完成時間')
-
+    
+    # 觸發者
+    triggered_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name='Triggered By',
+        help_text='觸發者'
+    )
+    
     class Meta:
         db_table = 'nlp_validation_sessions'
         verbose_name = 'NLP 驗證會話'
@@ -242,3 +321,40 @@ class ValidationSession(models.Model):
     
     def __str__(self):
         return f"驗證會話 {self.session_id} ({self.get_session_type_display()})"
+    
+    @property
+    def progress_percentage(self):
+        """計算進度百分比"""
+        if self.total_items == 0:
+            return 0
+        return round(((self.completed_items + self.failed_items) / self.total_items) * 100, 1)
+    
+    @property
+    def is_completed(self):
+        """檢查是否已完成"""
+        return self.status in [self.Status.COMPLETED, self.Status.FAILED, self.Status.CANCELLED]
+    
+    @property
+    def duration(self):
+        """計算會話持續時間"""
+        end_time = self.completed_at or timezone.now()
+        return end_time - self.started_at
+    
+    def mark_completed(self):
+        """標記會話完成"""
+        self.status = self.Status.COMPLETED
+        self.completed_at = timezone.now()
+        self.save(update_fields=['status', 'completed_at'])
+    
+    def mark_failed(self, error_message=''):
+        """標記會話失敗"""
+        self.status = self.Status.FAILED
+        self.completed_at = timezone.now()
+        self.save(update_fields=['status', 'completed_at'])
+    
+    def update_progress(self):
+        """更新進度統計"""
+        results = self.results.all()
+        self.completed_items = results.filter(status=ValidationResult.Status.COMPLETED).count()
+        self.failed_items = results.filter(status=ValidationResult.Status.FAILED).count()
+        self.save(update_fields=['completed_items', 'failed_items'])
