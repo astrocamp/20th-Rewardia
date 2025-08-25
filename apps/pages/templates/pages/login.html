@@ -3,128 +3,31 @@
 {% block title %}登入 - Rewardia{% endblock %}
 
 {% block content %}
-<!-- 登入頁面容器 -->
-<div class="min-h-screen bg-gray-50 pt-12 pb-24">
-  <div class="max-w-lg mx-auto px-4 sm:px-6 lg:px-8">
-    <!-- 登入卡片 -->
-    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-      <!-- 頁面標題 -->
-      <div class="px-10 pt-10 pb-8">
-        <h1 class="text-4xl font-bold text-black font-['Kulim_Park'] leading-tight">
-          登入
-        </h1>
-      </div>
+{% include 'components/auth-shared.html' with component="page-container" title="登入" %}
 
-      <!-- 登入表單 -->
-      <div class="px-10 pb-10">
-        <!-- 主要登入表單 -->
-        <form class="space-y-5" x-data="loginForm" @submit.prevent="submitForm()">
-          <!-- 電子郵件欄位 -->
-          <div class="register-field-container">
-            <label for="email" class="register-label">
-              電子郵件
-            </label>
-            <div class="register-relative-container">
-              <input 
-                type="email" 
-                id="email" 
-                name="email"
-                placeholder="請輸入您的電子郵件"
-                class="register-input"
-                required
-              >
-            </div>
-          </div>
+<!-- 主要登入表單 -->
+<form class="space-y-5" x-data="loginForm" @submit.prevent="submitForm()">
+  <!-- 電子郵件欄位 -->
+  {% include 'components/auth-shared.html' with component="input-field" field_type="email" field_id="email" field_name="email" label_text="電子郵件" placeholder="請輸入您的電子郵件" required=True %}
 
-          <!-- 密碼欄位 -->
-          <div class="register-field-container">
-            <label for="password" class="register-label">
-              密碼
-            </label>
-            <div class="register-relative-container">
-              <input 
-                :type="passwordVisible ? 'text' : 'password'"
-                id="password" 
-                name="password"
-                placeholder="請輸入您的密碼"
-                class="register-input pr-12"
-                required
-              >
-              <!-- 眼睛圖標 -->
-              <button 
-                type="button" 
-                class="password-toggle-btn"
-                @click="togglePassword()"
-              >
-                {% include 'components/icons/icon.html' with name="eye" class="w-6 h-6" %}
-              </button>
-            </div>
-          </div>
+  <!-- 密碼欄位 -->
+  {% include 'components/auth-shared.html' with component="input-field" field_type="password" field_id="password" field_name="password" label_text="密碼" placeholder="請輸入您的密碼" required=True has_toggle=True alpine_type="passwordVisible ? 'text' : 'password'" toggle_action="togglePassword()" %}
 
-          <!-- 記住我和忘記密碼 -->
-          <div class="flex items-center justify-between pt-2">
-            <div class="flex items-center">
-              <input 
-                type="checkbox" 
-                id="remember-me" 
-                name="remember-me"
-                class="register-checkbox"
-              >
-              <label for="remember-me" class="ml-2 text-lg text-gray-700 font-normal">
-                記住我
-              </label>
-            </div>
+  <!-- 記住我和忘記密碼 -->
+  {% include 'components/auth-shared.html' with component="remember-me-checkbox" %}
 
-            <div class="text-sm">
-              <a href="#" class="register-link">
-                忘記密碼？
-              </a>
-            </div>
-          </div>
+  <!-- 主要登入按鈕 -->
+  {% include 'components/auth-shared.html' with component="primary-button" button_text="登入" %}
+</form>
 
-          <!-- 主要登入按鈕 -->
-          <button 
-            type="submit" 
-            class="register-btn-primary"
-          >
-            登入
-          </button>
-        </form>
+<!-- 分隔線 -->
+{% include 'components/auth-shared.html' with component="divider" %}
 
-        <!-- 分隔線 -->
-        <div class="register-divider-container">
-          <div class="register-divider-line">
-            <div class="register-divider"></div>
-          </div>
-          <div class="register-divider-text-container">
-            <span class="register-divider-text">或</span>
-          </div>
-        </div>
+<!-- Google 登入按鈕 -->
+{% include 'components/auth-shared.html' with component="google-button" action="登入" button_id="google-login" aria_label="使用 Google 帳號登入" %}
 
-        <!-- Google 登入按鈕 -->
-        <a 
-          href="#" 
-          id="google-login"
-          class="register-btn-google"
-          role="button"
-          aria-label="使用 Google 帳號登入"
-        >
-          {% include 'components/icons/icon.html' with name="google" class="w-6 h-6" %}
-          <span>使用 Google 帳號登入</span>
-        </a>
+<!-- 註冊連結 -->
+{% include 'components/auth-shared.html' with component="bottom-link" prefix_text="還沒有帳戶？" link_text="立即註冊" link_url="pages:register" %}
 
-        <!-- 註冊連結 -->
-        <div class="register-login-container">
-          <p class="register-login-text">
-            還沒有帳戶？
-            <a href="{% url 'pages:register' %}" class="register-link">
-              立即註冊
-            </a>
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
+{% include 'components/auth-shared.html' with component="page-container-end" %}
 {% endblock %}
