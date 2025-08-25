@@ -6,11 +6,10 @@
 {% include 'components/auth-shared.html' with component="page-container" title="登入" %}
 
 <!-- 主要登入表單 -->
-<form class="space-y-5" 
+<form class="space-y-3" 
       x-data="loginForm" 
-      hx-post="{% url 'pages:login' %}"
-      hx-target="#login-response"
-      hx-indicator="#login-spinner">
+      method="post"
+      action="{% url 'pages:login' %}">
   {% csrf_token %}
   <!-- 電子郵件欄位 -->
   {% include 'components/auth-shared.html' with component="input-field" field_type="email" field_id="email" field_name="email" label_text="電子郵件" placeholder="請輸入您的電子郵件" required="true" %}
@@ -24,19 +23,6 @@
   <!-- 主要登入按鈕 -->
   {% include 'components/auth-shared.html' with component="primary-button" button_text="登入" %}
 </form>
-
-<!-- HTMX 響應容器 -->
-<div id="login-response" class="mt-4"></div>
-<!-- HTMX 載入指示器 -->
-<div id="login-spinner" class="htmx-indicator mt-4">
-  <div class="flex items-center justify-center">
-    <svg class="animate-spin h-5 w-5 text-blue-500" viewBox="0 0 24 24">
-      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
-      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-    </svg>
-    <span class="ml-2 text-gray-600">登入中...</span>
-  </div>
-</div>
 
 <!-- 分隔線 -->
 {% include 'components/auth-shared.html' with component="divider" %}
