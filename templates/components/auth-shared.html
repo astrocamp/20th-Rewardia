@@ -1,0 +1,179 @@
+<!-- 認證頁面共用組件集合 -->
+
+<!-- 分隔線組件 -->
+{% comment %}
+使用方式: {% include 'components/auth-shared.html' with component="divider" %}
+{% endcomment %}
+{% if component == "divider" %}
+<div class="register-divider-container">
+  <div class="register-divider-line">
+    <div class="register-divider"></div>
+  </div>
+  <div class="register-divider-text-container">
+    <span class="register-divider-text">或</span>
+  </div>
+</div>
+{% endif %}
+
+<!-- Google 認證按鈕組件 -->
+{% comment %}
+使用方式: 
+{% include 'components/auth-shared.html' with component="google-button" action="登入" button_id="google-login" aria_label="使用 Google 帳號登入" %}
+{% include 'components/auth-shared.html' with component="google-button" action="註冊" button_id="google-register" aria_label="使用 Google 帳號註冊" %}
+{% endcomment %}
+{% if component == "google-button" %}
+<a 
+  href="#" 
+  id="{{ button_id|default:'google-auth' }}"
+  class="register-btn-google"
+  role="button"
+  aria-label="{{ aria_label|default:'使用 Google 帳號認證' }}"
+>
+  {% include 'components/icons/icon.html' with name="google" class="w-6 h-6" %}
+  <span>使用 Google 帳號{{ action|default:'認證' }}</span>
+</a>
+{% endif %}
+
+<!-- 底部連結組件 -->
+{% comment %}
+使用方式:
+{% include 'components/auth-shared.html' with component="bottom-link" prefix_text="還沒有帳戶？" link_text="立即註冊" link_url="pages:register" %}
+{% include 'components/auth-shared.html' with component="bottom-link" prefix_text="已經有帳號？" link_text="登入" link_url="pages:login" suffix_text="去" %}
+{% endcomment %}
+{% if component == "bottom-link" %}
+<div class="register-login-container">
+  <p class="register-login-text">
+    {{ prefix_text|default:"" }}
+    <a href="{% url link_url %}" class="register-link">
+      {{ link_text }}
+    </a>
+    {{ suffix_text|default:"" }}
+  </p>
+</div>
+{% endif %}
+
+<!-- 表單欄位組件 -->
+{% comment %}
+使用方式:
+{% include 'components/auth-shared.html' with component="input-field" field_type="email" field_id="email" field_name="email" label_text="電子郵件" placeholder="請輸入您的電子郵件" required=True %}
+{% include 'components/auth-shared.html' with component="input-field" field_type="password" field_id="password" field_name="password" label_text="密碼" placeholder="請輸入您的密碼" required=True has_toggle=True alpine_type="passwordVisible ? 'text' : 'password'" toggle_action="togglePassword()" %}
+{% endcomment %}
+{% if component == "input-field" %}
+<div class="register-field-container">
+  <label for="{{ field_id }}" class="register-label">
+    {{ label_text }}
+  </label>
+  <div class="register-relative-container">
+    <input 
+      {% if alpine_type %}:type="{{ alpine_type }}"{% else %}type="{{ field_type|default:'text' }}"{% endif %}
+      id="{{ field_id }}"
+      name="{{ field_name }}"
+      placeholder="{{ placeholder }}"
+      class="register-input{% if has_toggle %} pr-12{% endif %}"
+      {% if required %}required{% endif %}
+    >
+    {% if has_toggle %}
+    <button 
+      type="button" 
+      class="password-toggle-btn"
+      @click="{{ toggle_action }}"
+    >
+      {% include 'components/icons/icon.html' with name="eye" class="w-6 h-6" %}
+    </button>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+<!-- 認證頁面外層容器組件 -->
+{% comment %}
+使用方式:
+{% include 'components/auth-shared.html' with component="page-container" title="登入" %}
+  <!-- 表單內容 -->
+{% include 'components/auth-shared.html' with component="page-container-end" %}
+{% endcomment %}
+{% if component == "page-container" %}
+<div class="min-h-screen bg-gray-50 pt-12 pb-24">
+  <div class="max-w-lg mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+      <!-- 頁面標題 -->
+      <div class="px-10 pt-10 pb-8">
+        <h1 class="text-4xl font-bold text-black font-['Kulim_Park'] leading-tight">
+          {{ title }}
+        </h1>
+      </div>
+      <!-- 表單容器開始 -->
+      <div class="px-10 pb-10">
+{% endif %}
+
+{% if component == "page-container-end" %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- 記住我勾選框組件 -->
+{% comment %}
+使用方式:
+{% include 'components/auth-shared.html' with component="remember-me-checkbox" %}
+{% endcomment %}
+{% if component == "remember-me-checkbox" %}
+<div class="flex items-center justify-between pt-2">
+  <div class="flex items-center">
+    <input 
+      type="checkbox" 
+      id="remember-me" 
+      name="remember-me"
+      class="register-checkbox"
+    >
+    <label for="remember-me" class="ml-2 text-lg text-gray-700 font-normal">
+      記住我
+    </label>
+  </div>
+  <div class="text-sm">
+    <a href="#" class="register-link">
+      忘記密碼？
+    </a>
+  </div>
+</div>
+{% endif %}
+
+<!-- 服務條款勾選框組件 -->
+{% comment %}
+使用方式:
+{% include 'components/auth-shared.html' with component="terms-checkbox" %}
+  我同意網站<a href="#" class="register-link">服務條款</a>及<a href="#" class="register-link">隱私權政策</a>
+{% include 'components/auth-shared.html' with component="terms-checkbox-end" %}
+{% endcomment %}
+{% if component == "terms-checkbox" %}
+<div class="flex items-start space-x-3 pt-2">
+  <input 
+    type="checkbox" 
+    id="terms" 
+    name="terms"
+    class="register-checkbox"
+    required
+  >
+  <label for="terms" class="text-lg text-gray-700 font-normal leading-relaxed">
+{% endif %}
+
+{% if component == "terms-checkbox-end" %}
+  </label>
+</div>
+{% endif %}
+
+<!-- 主要按鈕組件 -->
+{% comment %}
+使用方式:
+{% include 'components/auth-shared.html' with component="primary-button" button_text="登入" %}
+{% include 'components/auth-shared.html' with component="primary-button" button_text="建立帳號" %}
+{% endcomment %}
+{% if component == "primary-button" %}
+<button 
+  type="submit" 
+  class="register-btn-primary"
+>
+  {{ button_text|default:"提交" }}
+</button>
+{% endif %}
