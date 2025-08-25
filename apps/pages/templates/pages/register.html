@@ -21,16 +21,25 @@
   {% include 'components/auth-shared.html' with component="input-field" field_type="password" field_id="confirm-password" field_name="password2" label_text="確認密碼" placeholder="請再次輸入您的密碼" required="true" has_toggle="true" alpine_type="confirmPasswordVisible ? 'text' : 'password'" toggle_action="togglePassword('password_confirm')" aria_visible_var="confirmPasswordVisible" %}
 
   <!-- 服務條款勾選框 -->
-  {% include 'components/auth-shared.html' with component="terms-checkbox" %}
-  我同意網站
-  <a href="#" id="service-terms" class="register-link">
-    服務條款
-  </a>
-  及
-  <a href="#" id="privacy-policy" class="register-link">
-    隱私權政策
-  </a>
-  {% include 'components/auth-shared.html' with component="terms-checkbox-end" %}
+  <div class="flex items-start space-x-3">
+    <input 
+      type="checkbox" 
+      id="terms" 
+      name="terms"
+      class="register-checkbox"
+      required
+    >
+    <label for="terms" class="text-lg text-gray-700 font-normal leading-relaxed">
+      我同意網站
+      <a href="#" id="service-terms" class="register-link">
+        服務條款
+      </a>
+      及
+      <a href="#" id="privacy-policy" class="register-link">
+        隱私權政策
+      </a>
+    </label>
+  </div>
 
   <!-- 主要註冊按鈕 -->
   {% include 'components/auth-shared.html' with component="primary-button" button_text="建立帳號" %}
