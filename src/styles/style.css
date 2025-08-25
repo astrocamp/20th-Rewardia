@@ -46,13 +46,13 @@
     text-decoration: none;
   }
   
-  /* fqa與 download共用 */
+  /* faq與 download共用 */
   .download-btn-primary:hover {
     transform: translateY(-0.125rem);
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
   }
   
-  /* fqa與 download共用 */
+  /* faq與 download共用 */
   .download-btn-secondary {
     @apply text-black px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-white hover:bg-gray-100;
     width: 100%;
@@ -65,7 +65,7 @@
     text-decoration: none;
   }
   
-  /* fqa與 download共用 */
+  /* faq與 download共用 */
   .download-btn-secondary:hover {
     transform: translateY(-0.125rem);
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
@@ -97,7 +97,7 @@
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
   }
 
-  /* fqa與 download共用 */
+  /* faq與 download共用 */
   .download-btn-banner {
     max-width: 15rem !important;
     min-width: 15rem;
@@ -275,35 +275,35 @@
 
 
 
-/* ========== FQA Page 專用樣式 ========== */
+  /* ========== FAQ Page 專用樣式 ========== */
   
-  /* FQA 功能卡片樣式 */
-  .fqa-feature-card {
+  /* FAQ 功能卡片樣式 */
+  .faq-feature-card {
     @apply bg-[#E5E7EB] rounded-lg relative overflow-hidden;
     min-height: 327px;
   }
   
-  /* FQA 功能卡片圖片區域 */
-  .fqa-feature-bg {
+  /* FAQ 功能卡片圖片區域 */
+  .faq-feature-bg {
     @apply w-full h-[320px] bg-[#E5E7EB] rounded-t-lg;
   }
   
-  /* FQA 功能卡片圖片預留空間 */
-  .fqa-feature-image-placeholder {
+  /* FAQ 功能卡片圖片預留空間 */
+  .faq-feature-image-placeholder {
     @apply w-full h-full bg-gray-200 rounded-t-lg;
     /* 預留圖片空間，可以後續替換為實際圖片 */
   }
   
-  /* FQA 功能卡片數字樣式 */
-  .fqa-feature-number {
+  /* FAQ 功能卡片數字樣式 */
+  .faq-feature-number {
     @apply w-12 h-12 bg-[#2060B9] text-white rounded-full flex items-center justify-center text-3xl font-bold;
     font-family: 'Kulim Park', sans-serif;
     line-height: 0.98;
     margin-right: 1rem;
   }
   
-  /* FQA 功能卡片內容樣式 */
-  .fqa-feature-content {
+  /* FAQ 功能卡片內容樣式 */
+  .faq-feature-content {
     @apply bg-white flex flex-row items-start;
     padding-top: 1rem;
     padding-left: 0;
@@ -311,16 +311,16 @@
     padding-bottom: 1.5rem;
   }
   
-  /* FQA 功能卡片標題樣式 */
-  .fqa-feature-title {
+  /* FAQ 功能卡片標題樣式 */
+  .faq-feature-title {
     @apply text-xl sm:text-2xl lg:text-3xl font-bold text-black;
     font-family: 'Kulim Park', sans-serif;
     line-height: 1.15;
     text-align: left;
   }
   
-  /* FQA 分類標題樣式 */
-  .fqa-category-title {
+  /* FAQ 分類標題樣式 */
+  .faq-category-title {
     @apply text-2xl font-bold text-[#5D6970] mb-6;
     font-family: 'Inter', sans-serif;
     line-height: 1.21;
@@ -329,61 +329,61 @@
     cursor: default;
   }
   
-  /* FQA Q&A 列表樣式 */
-  .fqa-qa-list {
+  /* FAQ Q&A 列表樣式 */
+  .faq-qa-list {
     @apply space-y-4;
   }
   
 
   
-  /* FQA Q&A 項目樣式 */
-  .fqa-qa-item {
+  /* FAQ Q&A 項目樣式 */
+  .faq-qa-item {
     @apply bg-white rounded-lg border border-[#D1D5DB] overflow-hidden;
     min-height: 60px;
   }
   
-  /* FQA 問題樣式 */
-  .fqa-question {
+  /* FAQ 問題樣式 */
+  .faq-question {
     @apply flex items-center justify-between p-4 transition-colors duration-200;
     min-height: 60px;
     cursor: default;
   }
   
-  .fqa-question-text {
+  .faq-question-text {
     @apply text-lg font-bold text-[#111827] flex-1 pr-4;
     font-family: 'Inter', sans-serif;
     line-height: 1.21;
     cursor: default;
   }
   
-  /* FQA 切換按鈕樣式 */
-  .fqa-toggle-btn {
+  /* FAQ 切換按鈕樣式 */
+  .faq-toggle-btn {
     @apply w-16 h-16 bg-white flex items-center justify-center transition-all duration-200 cursor-pointer;
     border: none;
     outline: none;
     cursor: pointer;
   }
   
-  .fqa-toggle-btn:hover {
+  .faq-toggle-btn:hover {
     @apply bg-gray-50;
   }
   
-  /* FQA 箭頭圖標樣式 */
-  .fqa-arrow-icon {
+  /* FAQ 箭頭圖標樣式 */
+  .faq-arrow-icon {
     @apply w-5 h-5 text-black transition-transform duration-200;
   }
   
-  /* FQA 答案樣式 */
-  .fqa-answer {
+  /* FAQ 答案樣式 */
+  .faq-answer {
     @apply p-4 border-t border-[#D1D5DB] bg-white;
     min-height: 20px;
   }
   
-  .fqa-answer.hidden {
+  .faq-answer.hidden {
     @apply hidden;
   }
   
-  .fqa-answer-text {
+  .faq-answer-text {
     @apply text-lg text-[#111827] leading-relaxed;
     font-family: 'Inter', sans-serif;
     line-height: 1.5;
@@ -392,21 +392,21 @@
   /* ========== 響應式設計 ========== */
   
   @media (max-width: 640px) {
-    /* fqa與 download共用 */
-    .download-btn-banner {
+      /* faq與 download共用 */
+  .download-btn-banner {
       max-width: 100% !important;
       min-width: auto;
     }
     
-    .fqa-feature-card {
+    .faq-feature-card {
       min-height: 280px;
     }
     
-    .fqa-feature-bg {
+    .faq-feature-bg {
       height: 200px;
     }
     
-    .fqa-feature-content {
+    .faq-feature-content {
       @apply bg-white flex flex-row items-start;
       padding-top: 0.75rem;
       padding-left: 0;
@@ -414,44 +414,44 @@
       padding-bottom: 1rem;
     }
     
-    .fqa-feature-number {
+    .faq-feature-number {
       @apply w-10 h-10 text-2xl;
       min-width: 2.5rem;
       min-height: 2.5rem;
       margin-right: 0.75rem;
     }
     
-    .fqa-question {
+    .faq-question {
       @apply p-4;
       min-height: 50px;
     }
     
-    .fqa-toggle-btn {
+    .faq-toggle-btn {
       @apply w-14 h-14;
     }
     
-    .fqa-answer {
+    .faq-answer {
       @apply p-4;
       min-height: 15px;
     }
   }
   
   @media (min-width: 641px) and (max-width: 1024px) {
-    .fqa-feature-card {
+    .faq-feature-card {
       min-height: 300px;
     }
     
-    .fqa-feature-bg {
+    .faq-feature-bg {
       height: 220px;
     }
     
-    .fqa-feature-content {
+    .faq-feature-content {
       @apply p-5 pt-4 bg-white flex flex-row items-center;
       padding-left: 0;
       padding-right: 0;
     }
     
-    .fqa-feature-number {
+    .faq-feature-number {
       @apply w-11 h-11 text-2xl;
       min-width: 2.75rem;
       min-height: 2.75rem;
@@ -460,22 +460,22 @@
   }
   
   @media (min-width: 1025px) {
-    .fqa-feature-card {
+    .faq-feature-card {
       min-height: auto;
       height: auto;
     }
     
-    .fqa-feature-bg {
+    .faq-feature-bg {
       height: auto;
       aspect-ratio: 1.5 / 1;
     }
     
-    .fqa-feature-content {
+    .faq-feature-content {
       @apply p-6 pt-4 bg-white flex flex-row items-center;
       padding-left: 0;
     }
     
-    .fqa-feature-number {
+    .faq-feature-number {
       @apply w-12 h-12 text-3xl;
       min-width: 3rem;
       min-height: 3rem;
