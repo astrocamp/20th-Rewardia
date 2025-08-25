@@ -4,6 +4,9 @@ import re
 
 
 class Command(BaseCommand):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.loaded_models = {}
 
     def handle(self, *args, **options):
 
@@ -24,6 +27,8 @@ class Command(BaseCommand):
     def _check_and_test_spacy(self):
         """檢查 spaCy 模型並測試基本功能"""
 
+        success = True
+
         models_to_check = [
             ("zh_core_web_md", "中文模型"),
             ("en_core_web_md", "英文模型"),
@@ -31,7 +36,7 @@ class Command(BaseCommand):
 
         for model_name, display_name in models_to_check:
             try:
-                nlp = spacy.load(model_name)
+                self.loaded_models[model_name] = spacy.load(model_name)
                 self.stdout.write(f"   {display_name} ({model_name}) 載入成功")
 
             except OSError:
@@ -43,13 +48,13 @@ class Command(BaseCommand):
                         f"      請執行: python -m spacy download {model_name}"
                     )
                 )
-                return False
+                success = False
 
             except Exception as e:
                 self.stdout.write(
                     self.style.ERROR(f"   {display_name} 載入失敗: {str(e)}")
                 )
-                return False
+                success = False
 
         # 測試基本 NLP 功能
         self.stdout.write(" 測試基本 NLP 功能...")
@@ -59,9 +64,15 @@ class Command(BaseCommand):
             test_text = "滙豐銀行匯鑽卡一般消費1%回饋，海外消費2.8%回饋，momo購物5.3%現金回饋，年費NT$2,000"
 
             # spaCy 處理
-            nlp = spacy.load("zh_core_web_md")
-            doc = nlp(test_text)
-            entities_count = len(doc.ents)
+            nlp = self.loaded_models.get("zh_core_web_md")
+            if not nlp:
+                self.stdout.write(
+                    self.style.ERROR("中文模型未成功載入，無法進行測試。")
+                )
+                success = False
+            else:
+                doc = nlp(test_text)
+                entities_count = len(doc.ents)
 
             # 文字規則測試
 
@@ -76,11 +87,12 @@ class Command(BaseCommand):
             # 基本驗證
             if len(percentages) >= 2:
                 self.stdout.write("   回饋率識別正常")
-                return True
             else:
                 self.stdout.write(self.style.WARNING("  ️ 回饋率識別可能有問題"))
-                return False
+                success = False
 
         except Exception as e:
             self.stdout.write(self.style.ERROR(f"   NLP 測試失敗: {str(e)}"))
-            return False
+            success = False
+
+        return success
