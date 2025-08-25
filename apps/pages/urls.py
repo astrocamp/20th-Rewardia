@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from apps.users.views import member_zone
+
 
 
 app_name = "pages"
