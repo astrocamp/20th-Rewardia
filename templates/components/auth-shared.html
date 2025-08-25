@@ -79,12 +79,6 @@
       placeholder="{{ placeholder }}"
       class="register-input{% if has_toggle == 'true' %} pr-12{% endif %}"
       {% if required == 'true' %}required{% endif %}
-      {% if field_type == 'email' %}
-      hx-post="/api/validate-email"
-      hx-trigger="blur"
-      hx-target="#{{ field_id }}-validation"
-      hx-indicator="#{{ field_id }}-spinner"
-      {% endif %}
     >
     {% if has_toggle == 'true' %}
     <button 
@@ -96,12 +90,6 @@
       {% include 'components/icons/icon.html' with name="eye" class="w-6 h-6" %}
     </button>
     {% endif %}
-  </div>
-  <!-- HTMX 驗證消息容器 -->
-  <div id="{{ field_id }}-validation" class="mt-1 text-sm"></div>
-  <!-- HTMX 載入指示器 -->
-  <div id="{{ field_id }}-spinner" class="htmx-indicator mt-1">
-    <span class="text-sm text-gray-500">驗證中...</span>
   </div>
 </div>
 {% endif %}
@@ -140,7 +128,7 @@
 {% include 'components/auth-shared.html' with component="remember-me-checkbox" %}
 {% endcomment %}
 {% if component == "remember-me-checkbox" %}
-<div class="flex items-center justify-between pt-2">
+<div class="flex items-center justify-between py-3">
   <div class="flex items-center">
     <input 
       type="checkbox" 
@@ -168,7 +156,7 @@
 {% include 'components/auth-shared.html' with component="terms-checkbox-end" %}
 {% endcomment %}
 {% if component == "terms-checkbox" %}
-<div class="flex items-start space-x-3 pt-2">
+<div class="flex items-start space-x-3">
   <input 
     type="checkbox" 
     id="terms" 

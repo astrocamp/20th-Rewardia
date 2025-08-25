@@ -22,7 +22,7 @@
     "@tailwindcss/cli": "^4.1.12",
     "alpinejs": "^3.14.9",
     "braintree-web-drop-in": "^1.45.1",
-    "htmx.org": "^2.0.6",
+
     "tailwindcss": "^4.1.12"
   }
 }

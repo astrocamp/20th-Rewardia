@@ -35,7 +35,6 @@ Alpine.data('registerForm', () => ({
     }
   },
   
-  // 表單提交由 HTMX 處理，此函數已不需要
 }));
 
 // 登入頁面的 Alpine.js 功能
@@ -45,8 +44,6 @@ Alpine.data('loginForm', () => ({
   togglePassword() {
     this.passwordVisible = !this.passwordVisible;
   },
-  
-  // 表單提交由 HTMX 處理，此函數已不需要
 }));
 
 Alpine.start();
