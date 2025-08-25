@@ -42,4 +42,18 @@ Alpine.data('registerForm', () => ({
     }
 }));
 
+// 登入頁面的 Alpine.js 功能
+Alpine.data('loginForm', () => ({
+    passwordVisible: false,
+    
+    togglePassword() {
+        this.passwordVisible = !this.passwordVisible;
+    },
+    
+    submitForm() {
+        // 登入表單提交邏輯
+        console.log('登入表單提交');
+    }
+}));
+
 Alpine.start();
