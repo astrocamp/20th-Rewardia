@@ -1,0 +1,41 @@
+{% extends 'layouts/default.html' %}
+
+{% block title %}圖示組件簡單測試 - Rewardia{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 pt-12 pb-24">
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h1 class="text-3xl font-bold text-black mb-8">🎨 圖示組件簡單測試</h1>
+    
+    <!-- 基本圖示測試 -->
+    <div class="bg-white rounded-lg shadow-lg p-6 space-y-4">
+      <h2 class="text-xl font-bold text-gray-900">基本圖示</h2>
+      
+      <div class="flex items-center space-x-4">
+        <span>眼睛圖示:</span>
+        {% include 'components/icons/icon.html' with name="eye" %}
+      </div>
+      
+      <div class="flex items-center space-x-4">
+        <span>燈泡圖示:</span>
+        {% include 'components/icons/icon.html' with name="lightbulb" %}
+      </div>
+      
+      <div class="flex items-center space-x-4">
+        <span>時鐘圖示:</span>
+        {% include 'components/icons/icon.html' with name="clock" %}
+      </div>
+      
+      <div class="flex items-center space-x-4">
+        <span>箭頭圖示:</span>
+        {% include 'components/icons/icon.html' with name="arrow-down" %}
+      </div>
+      
+      <div class="flex items-center space-x-4">
+        <span>Google圖示:</span>
+        {% include 'components/icons/icon.html' with name="google" %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
