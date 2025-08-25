@@ -127,21 +127,4 @@
   </div>
 </div>
 
-<!-- Alpine.js 腳本 -->
-<script>
-document.addEventListener('alpine:init', () => {
-  Alpine.data('loginForm', () => ({
-    passwordVisible: false,
-    
-    togglePassword() {
-      this.passwordVisible = !this.passwordVisible;
-    },
-    
-    submitForm() {
-      // 登入表單提交邏輯
-      console.log('登入表單提交');
-    }
-  }));
-});
-</script>
 {% endblock %}
