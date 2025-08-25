@@ -53,15 +53,7 @@
         <a href="{% url 'pages:calculator' %}" class="text-gray-700 hover:text-gray-900 font-medium">優惠試算</a>
         <a href="{% url 'pages:faq' %}" class="text-gray-700 hover:text-gray-900 font-medium">關於功能</a>
         <a href="#" class="text-gray-700 hover:text-gray-900 font-medium">我的訂閱</a>
-<<<<<<< HEAD
-<<<<<<< HEAD
-        <a href="{% url 'users:member_zone' %}" class="text-gray-700 hover:text-gray-900 font-medium">會員專區</a>
-=======
         <a href="{% url 'pages:member_zone' %}" class="text-gray-700 hover:text-gray-900 font-medium">會員專區</a>
->>>>>>> d522aba (會員專區html切版#37)
-=======
-        <a href="{% url 'users:member_zone' %}" class="text-gray-700 hover:text-gray-900 font-medium">會員專區</a>
->>>>>>> b849f01 (fix:會員專區html切版-修改pr#37)
       </nav>
 
       <!-- 右側：登入/登出 & 漢堡（手機顯示） -->
@@ -129,50 +121,8 @@
         <a href="{% url 'pages:calculator' %}" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">優惠試算</a>
         <a href="#" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">關於功能</a>
         <a href="#" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">我的訂閱</a>
-<<<<<<< HEAD
-<<<<<<< HEAD
-        <a href="{% url 'users:member_zone' %}" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">會員專區</a>
-=======
         <a href="{% url 'pages:member_zone' %}" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">會員專區</a>
->>>>>>> d522aba (會員專區html切版#37)
-=======
-        <a href="{% url 'users:member_zone' %}" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">會員專區</a>
->>>>>>> b849f01 (fix:會員專區html切版-修改pr#37)
       </nav>
     </div>
   </div>
 </header>
-
-
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const menuToggle = document.getElementById('menu-toggle');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const topBanner = document.getElementById('top-banner');
-    const closeBannerBtn = topBanner.querySelector('.banner-close-btn');
-    const fixedHeader = document.querySelector('.fixed-header');
-    const mainContent = document.querySelector('.main-content');
-
-    // 漢堡選單
-    menuToggle.addEventListener('click', function () {
-      const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
-      menuToggle.setAttribute('aria-expanded', !isExpanded);
-      mobileMenu.classList.toggle('hidden');
-    });
-
-    // 關閉上方橫幅
-    closeBannerBtn.addEventListener('click', function () {
-      topBanner.style.transform = 'translateY(-100%)';
-      topBanner.style.transition = 'transform 0.3s ease-out';
-      
-      // 延遲移除元素，讓動畫效果完整
-      setTimeout(() => {
-        topBanner.remove();
-        // 更新 Header 和 Main Content 的位置
-        fixedHeader.classList.remove('with-banner');
-        mainContent.classList.add('banner-hidden');
-      }, 300);
-    });
-  });
-</script>
