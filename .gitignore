@@ -18,4 +18,10 @@ public/*
 .pg_service.conf
 .pg_db_pass
 uv.lock
+<<<<<<< HEAD
 .vscode/
+=======
+
+..pg_db_pass
+..pg_service.conf
+>>>>>>> 8d1c73d (feat: 新增存取至DB的函式)

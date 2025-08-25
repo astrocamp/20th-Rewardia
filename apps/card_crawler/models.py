@@ -10,7 +10,8 @@ class CrawledData(models.Model):
         verbose_name='Credit Card'
     )
     content = models.TextField('Crawled Content',null=False)
-    url = models.URLField('Crawled Website')
+    url = models.URLField('Crawled Website',null=False)
+    url_domain = models.URLField('Crawled Main Source', default=)
     created_at = models.DateTimeField('Created At', auto_now_add=True)
 
     class Meta:
