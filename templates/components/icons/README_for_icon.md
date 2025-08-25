@@ -40,6 +40,15 @@ templates/components/icons/icon.html
 
 <!-- 即時優惠提醒 -->
 {% include 'components/icons/icon.html' with name="clock" size="w-8 h-8" class="text-green-600" %}
+
+<!-- 智慧推薦系統 (下載頁面) -->
+{% include 'components/icons/icon.html' with name="smart-recommend" size="w-8 h-8" class="text-blue-600" %}
+
+<!-- 即時優惠提醒 (下載頁面) -->
+{% include 'components/icons/icon.html' with name="real-time-offer" size="w-8 h-8" class="text-green-600" %}
+
+<!-- 消費分析報告 (下載頁面) -->
+{% include 'components/icons/icon.html' with name="consumption-analysis" size="w-8 h-8" class="text-purple-600" %}
 ```
 
 ### 3. 導航圖示
@@ -49,11 +58,14 @@ templates/components/icons/icon.html
 
 <!-- FAQ收合箭頭 -->
 {% include 'components/icons/icon.html' with name="arrow-up" class="faq-arrow-icon" %}
+
+<!-- FAQ箭頭 (展開/收合) -->
+{% include 'components/icons/icon.html' with name="faq-arrow" class="faq-arrow-icon" %}
 ```
 
 ### 4. 社交媒體圖示
 ```html
-<!-- Google登入 -->
+<!-- Google登入/註冊 -->
 {% include 'components/icons/icon.html' with name="google" %}
 ```
 
@@ -75,6 +87,9 @@ templates/components/icons/icon.html
 
 <!-- 超大圖示 -->
 {% include 'components/icons/icon.html' with name="eye" size="w-12 h-12" %}
+
+<!-- 響應式尺寸 -->
+{% include 'components/icons/icon.html' with name="smart-recommend" size="w-6 h-6 sm:w-8 sm:h-8" %}
 ```
 
 ## 🎨 樣式參數
@@ -89,6 +104,11 @@ templates/components/icons/icon.html
 
 <!-- 懸停效果 -->
 {% include 'components/icons/icon.html' with name="eye" class="text-gray-600 hover:text-blue-600" %}
+
+<!-- 特定顏色主題 -->
+{% include 'components/icons/icon.html' with name="smart-recommend" class="text-blue-600" %}
+{% include 'components/icons/icon.html' with name="real-time-offer" class="text-green-600" %}
+{% include 'components/icons/icon.html' with name="consumption-analysis" class="text-purple-600" %}
 ```
 
 ### 額外樣式
@@ -101,6 +121,9 @@ templates/components/icons/icon.html
 
 <!-- 動畫效果 -->
 {% include 'components/icons/icon.html' with name="arrow-down" class="transition-transform duration-200" %}
+
+<!-- FAQ 箭頭樣式 -->
+{% include 'components/icons/icon.html' with name="faq-arrow" class="faq-arrow-icon" %}
 ```
 
 ## 🔄 替換範例
@@ -129,25 +152,55 @@ templates/components/icons/icon.html
 | `arrow-down` | 向下箭頭 | FAQ組件 | `w-6 h-6`, `stroke="currentColor"` |
 | `arrow-up` | 向上箭頭 | FAQ組件 | `w-6 h-6`, `stroke="currentColor"` |
 | `google` | Google圖示 | 認證組件 | `w-6 h-6`, 多色填充 |
+| `faq-arrow` | FAQ箭頭 | FAQ組件 | `w-6 h-6`, `stroke="currentColor"` |
+| `smart-recommend` | 智慧推薦系統 | 下載頁面 | `w-6 h-6`, `stroke="currentColor"` |
+| `real-time-offer` | 即時優惠提醒 | 下載頁面 | `w-6 h-6`, `stroke="currentColor"` |
+| `consumption-analysis` | 消費分析報告 | 下載頁面 | `w-6 h-6`, `stroke="currentColor"` |
+
+## 🆕 新增圖示說明
+
+### FAQ 箭頭 (`faq-arrow`)
+- **用途**: FAQ 展開/收合指示
+- **樣式**: 向下箭頭，支援旋轉動畫
+- **使用**: `{% include 'components/icons/icon.html' with name="faq-arrow" class="faq-arrow-icon" %}`
+
+### 智慧推薦系統 (`smart-recommend`)
+- **用途**: 下載頁面功能卡片
+- **樣式**: 燈泡圖示，藍色主題
+- **使用**: `{% include 'components/icons/icon.html' with name="smart-recommend" size="w-6 h-6 sm:w-8 sm:h-8" class="text-blue-600" %}`
+
+### 即時優惠提醒 (`real-time-offer`)
+- **用途**: 下載頁面功能卡片
+- **樣式**: 時鐘圖示，綠色主題
+- **使用**: `{% include 'components/icons/icon.html' with name="real-time-offer" size="w-6 h-6 sm:w-8 sm:h-8" class="text-green-600" %}`
+
+### 消費分析報告 (`consumption-analysis`)
+- **用途**: 下載頁面功能卡片
+- **樣式**: 燈泡圖示，紫色主題
+- **使用**: `{% include 'components/icons/icon.html' with name="consumption-analysis" size="w-6 h-6 sm:w-8 sm:h-8" class="text-purple-600" %}`
 
 ## ⚠️ 注意事項
 
 1. **圖示名稱**: 必須完全匹配，區分大小寫
-2. **尺寸參數**: 使用 Tailwind CSS 的尺寸類別
-3. **樣式參數**: 可以組合多個 CSS 類別
-4. **預設值**: 如果參數未提供，會使用預設值
-5. **錯誤處理**: 未知圖示名稱會顯示預設佔位符
+2. **尺寸參數**: 支援 Tailwind CSS 的尺寸類別
+3. **樣式覆蓋**: 使用 `class` 參數可覆蓋預設樣式
+4. **響應式設計**: 支援 `sm:`, `md:`, `lg:` 等響應式前綴
+5. **動畫支援**: FAQ 箭頭支援 Alpine.js 旋轉動畫
 
-## 🆕 添加新圖示
+## 🔧 維護說明
 
-要添加新圖示，請在 `icon.html` 檔案中添加新的 `elif` 條件：
+### 添加新圖示
+1. 在 `icon.html` 中添加新的 `{% elif name == "新圖示名稱" %}` 區塊
+2. 更新註解中的支援圖示列表
+3. 更新 README 文件
+4. 測試新圖示的顯示效果
 
-```html
-{% elif name == "new-icon" %}
-  <svg class="icon {{ size|default:'w-6 h-6' }} {{ class|default:'' }}" 
-       viewBox="0 0 24 24" 
-       fill="none" 
-       stroke="currentColor">
-    <!-- SVG 路徑 -->
-  </svg>
-```
+### 修改現有圖示
+1. 直接修改 `icon.html` 中的 SVG 路徑
+2. 保持 `name` 參數不變，確保向後兼容
+3. 測試修改後的圖示效果
+
+### 樣式調整
+1. 使用 `class` 參數傳遞自定義樣式
+2. 支援 Tailwind CSS 的所有樣式類別
+3. 可組合多個樣式類別
