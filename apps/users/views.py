@@ -16,4 +16,4 @@ def member_zone(request):
         user_cards = request.user.user_cards.select_related('card', 'card__bank').all()
         context['user_cards'] = user_cards
     
-    return render(request, 'pages/member_zone.html', context)
+    return render(request, 'users/member_zone.html', context)

@@ -12,3 +12,4 @@ def card_new(request):
 
     return render(request, "pages/card_new.html")
 
+
