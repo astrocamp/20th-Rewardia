@@ -6,18 +6,23 @@
 {% include 'components/auth-shared.html' with component="page-container" title="註冊" %}
 
 <!-- 主要註冊表單 -->
-<form class="space-y-5" x-data="registerForm" @submit.prevent="submitForm()">
+<form class="space-y-5" 
+      x-data="registerForm" 
+      hx-post="{% url 'pages:register' %}"
+      hx-target="#register-response"
+      hx-indicator="#register-spinner">
+  {% csrf_token %}
   <!-- 帳號欄位 -->
-  {% include 'components/auth-shared.html' with component="input-field" field_type="text" field_id="username" field_name="username" label_text="帳號" placeholder="請輸入您的帳號" required=True %}
+  {% include 'components/auth-shared.html' with component="input-field" field_type="text" field_id="username" field_name="username" label_text="帳號" placeholder="請輸入您的帳號" required="true" %}
 
   <!-- 電子郵件欄位 -->
-  {% include 'components/auth-shared.html' with component="input-field" field_type="email" field_id="email" field_name="email" label_text="電子郵件" placeholder="請輸入您的電子郵件" required=True %}
+  {% include 'components/auth-shared.html' with component="input-field" field_type="email" field_id="email" field_name="email" label_text="電子郵件" placeholder="請輸入您的電子郵件" required="true" %}
 
   <!-- 密碼欄位 -->
-  {% include 'components/auth-shared.html' with component="input-field" field_type="password" field_id="password" field_name="password1" label_text="密碼" placeholder="請輸入您的密碼" required=True has_toggle=True alpine_type="passwordVisible ? 'text' : 'password'" toggle_action="togglePassword('password')" %}
+  {% include 'components/auth-shared.html' with component="input-field" field_type="password" field_id="password" field_name="password1" label_text="密碼" placeholder="請輸入您的密碼" required="true" has_toggle="true" alpine_type="passwordVisible ? 'text' : 'password'" toggle_action="togglePassword('password')" %}
 
   <!-- 確認密碼欄位 -->
-  {% include 'components/auth-shared.html' with component="input-field" field_type="password" field_id="confirm-password" field_name="password2" label_text="確認密碼" placeholder="請再次輸入您的密碼" required=True has_toggle=True alpine_type="confirmPasswordVisible ? 'text' : 'password'" toggle_action="togglePassword('password_confirm')" %}
+  {% include 'components/auth-shared.html' with component="input-field" field_type="password" field_id="confirm-password" field_name="password2" label_text="確認密碼" placeholder="請再次輸入您的密碼" required="true" has_toggle="true" alpine_type="confirmPasswordVisible ? 'text' : 'password'" toggle_action="togglePassword('password_confirm')" aria_visible_var="confirmPasswordVisible" %}
 
   <!-- 服務條款勾選框 -->
   {% include 'components/auth-shared.html' with component="terms-checkbox" %}
@@ -34,6 +39,19 @@
   <!-- 主要註冊按鈕 -->
   {% include 'components/auth-shared.html' with component="primary-button" button_text="建立帳號" %}
 </form>
+
+<!-- HTMX 響應容器 -->
+<div id="register-response" class="mt-4"></div>
+<!-- HTMX 載入指示器 -->
+<div id="register-spinner" class="htmx-indicator mt-4">
+  <div class="flex items-center justify-center">
+    <svg class="animate-spin h-5 w-5 text-blue-500" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    <span class="ml-2 text-gray-600">註冊中...</span>
+  </div>
+</div>
 
 <!-- 分隔線 -->
 {% include 'components/auth-shared.html' with component="divider" %}
