@@ -11,27 +11,29 @@
     </div>
     
     <!-- Banner 圖區域 -->
-    <div class="relative h-[500px] overflow-hidden rounded-lg download-banner">
+    <div class="relative h-[300px] sm:h-[350px] lg:h-[400px] overflow-hidden rounded-lg">
         <!-- 背景圖片 -->
         <div class="absolute inset-0">
-            <img src="https://github.com/astrocamp/20th-Rewardia/blob/pic/img/download-index.png?raw=true" loading="eager" 
-                 alt="Rewardia Background" 
-                 class="w-full h-full object-cover object-center">
+
+            <img src="https://github.com/astrocamp/20th-Rewardia/blob/pic/img/download-index.png?raw=true" loading="eager"
+                alt="Rewardia Background" 
+                class="w-full h-full object-cover object-[75%_9%]">
+
         </div>
         
         <!-- 內容區域 - 限制在左半邊 -->
         <div class="relative z-10 flex items-center h-full download-banner-content">
-            <div class="text-white px-4 sm:px-8 lg:px-12 animate-fade-in-up-delay-1">
+            <div class="text-white px-4 sm:px-8 lg:px-12">
                 <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 lg:mb-8 leading-tight tracking-wide">
                     每次購物都能獲得現金回饋
                 </h1>
                 <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 lg:gap-6">
-                    <button class="download-btn-primary download-btn-banner">
+                    <a href="#" id="chrome-download" class="download-btn-primary download-btn-banner">
                         免費新增至 Chrome
-                    </button>
-                    <button class="download-btn-secondary download-btn-banner">
+                    </a>
+                    <a href="#" id="app-download" class="download-btn-secondary download-btn-banner">
                         新增到桌面應用
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
@@ -40,17 +42,17 @@
 
 <!-- 關於 Rewardia 區塊 -->
 <section class="mx-4 sm:mx-6 lg:mx-10 my-8 sm:my-12 lg:my-16">
-    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-8 sm:mb-12 lg:mb-15 text-left animate-fade-in-up-delay-2" style="font-family: 'Kulim Park', sans-serif; line-height: 0.98;">關於 Rewardia</h2>
+    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-8 sm:mb-12 lg:mb-15 text-left" style="font-family: 'Kulim Park', sans-serif; line-height: 0.98;">關於 Rewardia</h2>
     
     <!-- Chrome 擴充插件 -->
-    <div class="download-section-simple animate-fade-in-up-delay-2">
+    <div class="download-section-simple">
         <div class="flex flex-col lg:flex-row items-start lg:items-center gap-6 sm:gap-8">
             <!-- 左側圖片區域 -->
             <div class="flex-shrink-0 w-full lg:w-auto">
                 <div class="w-full sm:w-[279px] h-[253px] bg-gray-200 rounded-lg overflow-hidden download-image-simple">
                     <img src="https://github.com/astrocamp/20th-Rewardia/blob/pic/img/download-chrome.jpg?raw=true" 
-                         alt="Chrome 擴充插件" 
-                         class="w-full h-full object-cover object-center">
+                        alt="Chrome 擴充插件" 
+                        class="w-full h-full object-cover object-center">
                 </div>
             </div>
             <!-- 右側文字區域 -->
@@ -67,14 +69,14 @@
     </div>
     
     <!-- APP 應用 -->
-    <div class="download-section-simple animate-fade-in-up-delay-3">
+    <div class="download-section-simple">
         <div class="flex flex-col lg:flex-row items-start lg:items-center gap-6 sm:gap-8">
             <!-- 左側圖片區域 -->
             <div class="flex-shrink-0 w-full lg:w-auto">
                 <div class="w-full sm:w-[279px] h-[253px] bg-gray-200 rounded-lg overflow-hidden download-image-simple">
                     <img src="https://github.com/astrocamp/20th-Rewardia/blob/pic/img/download-app.jpg?raw=true" 
-                         alt="APP 應用" 
-                         class="w-full h-full object-cover object-center">
+                        alt="APP 應用" 
+                        class="w-full h-full object-cover object-center">
                 </div>
             </div>
             <!-- 右側文字區域 -->
@@ -93,10 +95,10 @@
 
 <!-- 下載說明區塊 -->
 <section class="mx-4 sm:mx-6 lg:mx-10 my-8 sm:my-12 lg:my-16">
-    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-8 sm:mb-12 text-left animate-fade-in-up-delay-3">下載說明</h2>
+    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-8 sm:mb-12 text-left">下載說明</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
         <!-- 說明卡片 1 -->
-        <div class="download-feature-card-simple animate-fade-in-up-delay-1">
+        <div class="download-feature-card-simple">
             <div class="download-feature-image-simple">
                 <div class="text-center p-4 sm:p-6">
                     <div class="w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
@@ -116,7 +118,7 @@
         </div>
         
         <!-- 說明卡片 2 -->
-        <div class="download-feature-card-simple animate-fade-in-up-delay-2">
+        <div class="download-feature-card-simple">
             <div class="download-feature-image-simple">
                 <div class="text-center p-4 sm:p-6">
                     <div class="w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
@@ -136,7 +138,7 @@
         </div>
         
         <!-- 說明卡片 3 -->
-        <div class="download-feature-card-simple animate-fade-in-up-delay-3 sm:col-span-2 lg:col-span-1">
+        <div class="download-feature-card-simple sm:col-span-2 lg:col-span-1">
             <div class="download-feature-image-simple">
                 <div class="text-center p-4 sm:p-6">
                     <div class="w-12 h-12 sm:w-16 sm:h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
@@ -156,5 +158,4 @@
         </div>
     </div>
 </section>
-
 {% endblock %}
