@@ -21,3 +21,4 @@ def register(request):
     return render(request, "pages/register.html")
 
 # Create your views here.
+
