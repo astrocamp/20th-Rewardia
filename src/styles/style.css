@@ -4,534 +4,489 @@
 
 
 :root {
-    --p: 0 0% 0%; 
-    --s: 0 0% 100%; 
-    --a: 217 91% 60%; 
+  --p: 0 0% 0%; 
+  --s: 0 0% 100%; 
+  --a: 217 91% 60%; 
 }
 
 
 
 @layer components {
 
-    /* ========== Button 樣式 ========== */
-    .btn-primary {
-        @apply bg-black text-white border-black hover:bg-gray-800 transition-colors duration-200;
-    }
-    
-    .btn-outline {
-        @apply border-black text-black hover:bg-black hover:text-white transition-colors duration-200;
-    }
-    
-    .btn-blue {
-        @apply bg-blue-600 text-white border-blue-600 hover:bg-blue-700 transition-colors duration-200;
-    }
-    
-    .btn-white-outline {
-        @apply bg-white border border-black text-black hover:bg-gray-100 transition-colors duration-200;
-    }
-    
+  /* ========== Button 樣式 ========== */
+  .btn-primary {
+    @apply bg-black text-white border-black hover:bg-gray-800 transition-colors duration-200;
+  }
+  
+  .btn-outline {
+    @apply border-black text-black hover:bg-black hover:text-white transition-colors duration-200;
+  }
+  
+  .btn-blue {
+    @apply bg-blue-600 text-white border-blue-600 hover:bg-blue-700 transition-colors duration-200;
+  }
+  
+  .btn-white-outline {
+    @apply bg-white border border-black text-black hover:bg-gray-100 transition-colors duration-200;
+  }
+  
+}
+  
+  /* ========== faq與 download共用樣式 ========== */
+  /* faq與 download共用 */
+  .download-btn-primary {
+    @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-[#2060B9] hover:bg-blue-700;
+    width: 100%;
+    min-height: 3rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+    max-width: 16rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+  }
+  
+  /* fqa與 download共用 */
+  .download-btn-primary:hover {
+    transform: translateY(-0.125rem);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  }
+  
+  /* fqa與 download共用 */
+  .download-btn-secondary {
+    @apply text-black px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-white hover:bg-gray-100;
+    width: 100%;
+    min-height: 3rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+    max-width: 16rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+  }
+  
+  /* fqa與 download共用 */
+  .download-btn-secondary:hover {
+    transform: translateY(-0.125rem);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  }
+  
+  .download-btn-chrome {
+    @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-[#111827] hover:bg-gray-800;
+    width: 100%;
+    min-height: 3rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+    max-width: 17.5rem;
+  }
+  
+  .download-btn-chrome:hover {
+    transform: translateY(-0.125rem);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  }
+  
+  .download-btn-app {
+    @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-[#111827] hover:bg-gray-800;
+    width: 100%;
+    min-height: 3rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+    max-width: 17.5rem;
+  }
+  
+  .download-btn-app:hover {
+    transform: translateY(-0.125rem);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  }
 
-    
-    /* ========== fqa與 download共用樣式 ========== */
-    /* fqa與 download共用 */
-    .download-btn-primary {
-        @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-[#2060B9] hover:bg-blue-700;
-        width: 100%;
-        min-height: 3rem;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
-        max-width: 16rem;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-    }
-    
-    /* fqa與 download共用 */
-    .download-btn-primary:hover {
-        transform: translateY(-0.125rem);
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    }
-    
-    /* fqa與 download共用 */
-    .download-btn-secondary {
-        @apply text-black px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-white hover:bg-gray-100;
-        width: 100%;
-        min-height: 3rem;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
-        max-width: 16rem;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-    }
-    
-    /* fqa與 download共用 */
-    .download-btn-secondary:hover {
-        transform: translateY(-0.125rem);
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    }
-    
-    .download-btn-chrome {
-        @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-[#111827] hover:bg-gray-800;
-        width: 100%;
-        min-height: 3rem;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
-        max-width: 17.5rem;
-    }
-    
-    .download-btn-chrome:hover {
-        transform: translateY(-0.125rem);
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    }
-    
+  /* fqa與 download共用 */
+  .download-btn-banner {
+    max-width: 15rem !important;
+    min-width: 15rem;
+  }
+
+
+
+
+  /* ========== Download Page 特定樣式 ========== */
+
+  .download-banner {
+    background: linear-gradient(135deg, rgba(32, 96, 185, 0.9) 0%, rgba(17, 24, 39, 0.9) 100%);
+  }
+  
+  /* Download Page 橫幅背景遮罩效果 */
+  .download-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(32, 96, 185, 0.1) 0%, rgba(17, 24, 39, 0.1) 100%);
+    z-index: 1;
+  }
+  
+  /* Download Page 橫幅內容區域樣式 */
+  .download-banner-content {
+    position: relative;
+    z-index: 2;
+    max-width: 50%;
+    padding-right: 2rem;
+  }
+  
+  /* Download Page 區塊樣式 */
+  .download-section-simple {
+    @apply bg-white rounded-2xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8;
+    transition: all 0.3s ease;
+  }
+  
+  /* Download Page 圖片樣式 */
+  .download-image-simple {
+    @apply rounded-lg overflow-hidden;
+  }
+  
+  /* Download Page 功能卡片樣式 */
+  .download-feature-card-simple {
+    @apply bg-white rounded-lg overflow-hidden;
+    border: 1px solid #f3f4f6;
+  }
+  
+  /* Download Page 功能圖片樣式 */
+  .download-feature-image-simple {
+    @apply w-full bg-gradient-to-br from-blue-50 to-indigo-100;
+    height: 12rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+
+  /* Download Page 手機版響應式樣式 (≤640px) */
+  @media (max-width: 640px) {
+    .download-btn-primary,
+    .download-btn-secondary,
+    .download-btn-chrome,
     .download-btn-app {
-        @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-[#111827] hover:bg-gray-800;
-        width: 100%;
-        min-height: 3rem;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
-        max-width: 17.5rem;
+      max-width: none;
+      min-height: 2.75rem;
+      font-size: 0.875rem;
+      padding: 0.75rem 1rem;
     }
     
-    .download-btn-app:hover {
-        transform: translateY(-0.125rem);
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    }
-
-    /* fqa與 download共用 */
     .download-btn-banner {
-        max-width: 15rem !important;
-        min-width: 15rem;
-    }
-
-
-
-
-    /* ========== Download Page 特定樣式 ========== */
-
-    .download-banner {
-        background: linear-gradient(135deg, rgba(32, 96, 185, 0.9) 0%, rgba(17, 24, 39, 0.9) 100%);
+      max-width: none !important;
+      min-width: auto;
     }
     
-    /* Download Page 橫幅背景遮罩效果 */
-    .download-banner::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, rgba(32, 96, 185, 0.1) 0%, rgba(17, 24, 39, 0.1) 100%);
-        z-index: 1;
-    }
-    
-    /* Download Page 橫幅內容區域樣式 */
     .download-banner-content {
-        position: relative;
-        z-index: 2;
-        max-width: 50%;
-        padding-right: 2rem;
+      max-width: 100%;
+      padding-right: 0;
     }
     
-    /* Download Page 區塊樣式 */
     .download-section-simple {
-        @apply bg-white rounded-2xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8;
-        transition: all 0.3s ease;
+      @apply p-4;
+      margin-bottom: 1.5rem;
     }
     
-    /* Download Page 圖片樣式 */
-    .download-image-simple {
-        @apply rounded-lg overflow-hidden;
+    .download-section-simple .flex {
+      @apply flex-col gap-4;
     }
     
-    /* Download Page 功能卡片樣式 */
-    .download-feature-card-simple {
-        @apply bg-white rounded-lg overflow-hidden;
-        border: 1px solid #f3f4f6;
+    .download-section-simple .flex-shrink-0 {
+      @apply w-full;
     }
     
-    /* Download Page 功能圖片樣式 */
+    .download-section-simple .w-\[279px\] {
+      @apply w-full;
+    }
+    
     .download-feature-image-simple {
-        @apply w-full bg-gradient-to-br from-blue-50 to-indigo-100;
-        height: 12rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        overflow: hidden;
-    }
-
-
-    /* Download Page 手機版響應式樣式 (≤640px) */
-    @media (max-width: 640px) {
-        .download-btn-primary,
-        .download-btn-secondary,
-        .download-btn-chrome,
-        .download-btn-app {
-            max-width: none;
-            min-height: 2.75rem;
-            font-size: 0.875rem;
-            padding: 0.75rem 1rem;
-        }
-        
-        .download-btn-banner {
-            max-width: none !important;
-            min-width: auto;
-        }
-        
-        .download-banner-content {
-            max-width: 100%;
-            padding-right: 0;
-        }
-        
-        .download-section-simple {
-            @apply p-4;
-            margin-bottom: 1.5rem;
-        }
-        
-        .download-section-simple .flex {
-            @apply flex-col gap-4;
-        }
-        
-        .download-section-simple .flex-shrink-0 {
-            @apply w-full;
-        }
-        
-        .download-section-simple .w-\[279px\] {
-            @apply w-full;
-        }
-        
-        .download-feature-image-simple {
-            height: 10rem;
-        }
-        
-        .download-banner h1 {
-            @apply text-2xl;
-            line-height: 1.2;
-        }
-        
-        .download-section-simple h3 {
-            @apply text-xl;
-        }
-        
-        .download-section-simple p {
-            @apply text-sm;
-        }
+      height: 10rem;
     }
     
-    /* Download Page 平板版響應式樣式 (641px-768px) */
-    @media (min-width: 641px) and (max-width: 768px) {
-        .download-btn-banner {
-            max-width: 12rem !important;
-            min-width: 12rem;
-        }
-        
-        .download-banner-content {
-            max-width: 60%;
-            padding-right: 1.5rem;
-        }
-        
-        .download-section-simple .flex {
-            @apply flex-col gap-6;
-        }
-        
-        .download-feature-image-simple {
-            height: 11rem;
-        }
+    .download-banner h1 {
+      @apply text-2xl;
+      line-height: 1.2;
     }
     
-    /* Download Page 中等桌面版響應式樣式 (769px-1024px) */
-    @media (min-width: 769px) and (max-width: 1024px) {
-        .download-btn-banner {
-            max-width: 13rem !important;
-            min-width: 13rem;
-        }
-        
-        .download-banner-content {
-            max-width: 55%;
-            padding-right: 1.5rem;
-        }
-        
-        .download-feature-image-simple {
-            height: 12rem;
-        }
+    .download-section-simple h3 {
+      @apply text-xl;
     }
     
-    /* Download Page 大桌面版響應式樣式 (≥1025px) */
-    @media (min-width: 1025px) {
-        .download-btn-banner {
-            max-width: 15rem !important;
-            min-width: 15rem;
-        }
-        
-        .download-banner-content {
-            max-width: 50%;
-            padding-right: 2rem;
-        }
-        
-        .download-feature-image-simple {
-            height: 16rem;
-        }
+    .download-section-simple p {
+      @apply text-sm;
     }
+  }
+  
+  /* Download Page 平板版響應式樣式 (641px-768px) */
+  @media (min-width: 641px) and (max-width: 768px) {
+    .download-btn-banner {
+      max-width: 12rem !important;
+      min-width: 12rem;
+    }
+    
+    .download-banner-content {
+      max-width: 60%;
+      padding-right: 1.5rem;
+    }
+    
+    .download-section-simple .flex {
+      @apply flex-col gap-6;
+    }
+    
+    .download-feature-image-simple {
+      height: 11rem;
+    }
+  }
+  
+  /* Download Page 中等桌面版響應式樣式 (769px-1024px) */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .download-btn-banner {
+      max-width: 13rem !important;
+      min-width: 13rem;
+    }
+    
+    .download-banner-content {
+      max-width: 55%;
+      padding-right: 1.5rem;
+    }
+    
+    .download-feature-image-simple {
+      height: 12rem;
+    }
+  }
+  
+  /* Download Page 大桌面版響應式樣式 (≥1025px) */
+  @media (min-width: 1025px) {
+    .download-btn-banner {
+      max-width: 15rem !important;
+      min-width: 15rem;
+    }
+    
+    .download-banner-content {
+      max-width: 50%;
+      padding-right: 2rem;
+    }
+    
+    .download-feature-image-simple {
+      height: 16rem;
+    }
+  }
 
 
 
 /* ========== FQA Page 專用樣式 ========== */
+  
+  /* FQA 功能卡片樣式 */
+  .fqa-feature-card {
+    @apply bg-[#E5E7EB] rounded-lg relative overflow-hidden;
+    min-height: 327px;
+  }
+  
+  /* FQA 功能卡片圖片區域 */
+  .fqa-feature-bg {
+    @apply w-full h-[320px] bg-[#E5E7EB] rounded-t-lg;
+  }
+  
+  /* FQA 功能卡片圖片預留空間 */
+  .fqa-feature-image-placeholder {
+    @apply w-full h-full bg-gray-200 rounded-t-lg;
+    /* 預留圖片空間，可以後續替換為實際圖片 */
+  }
+  
+  /* FQA 功能卡片數字樣式 */
+  .fqa-feature-number {
+    @apply w-12 h-12 bg-[#2060B9] text-white rounded-full flex items-center justify-center text-3xl font-bold;
+    font-family: 'Kulim Park', sans-serif;
+    line-height: 0.98;
+    margin-right: 1rem;
+  }
+  
+  /* FQA 功能卡片內容樣式 */
+  .fqa-feature-content {
+    @apply bg-white flex flex-row items-start;
+    padding-top: 1rem;
+    padding-left: 0;
+    padding-right: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+  
+  /* FQA 功能卡片標題樣式 */
+  .fqa-feature-title {
+    @apply text-xl sm:text-2xl lg:text-3xl font-bold text-black;
+    font-family: 'Kulim Park', sans-serif;
+    line-height: 1.15;
+    text-align: left;
+  }
+  
+  /* FQA 分類標題樣式 */
+  .fqa-category-title {
+    @apply text-2xl font-bold text-[#5D6970] mb-6;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.21;
+    background: none;
+    padding: 0;
+    cursor: default;
+  }
+  
+  /* FQA Q&A 列表樣式 */
+  .fqa-qa-list {
+    @apply space-y-4;
+  }
+  
+
+  
+  /* FQA Q&A 項目樣式 */
+  .fqa-qa-item {
+    @apply bg-white rounded-lg border border-[#D1D5DB] overflow-hidden;
+    min-height: 60px;
+  }
+  
+  /* FQA 問題樣式 */
+  .fqa-question {
+    @apply flex items-center justify-between p-4 transition-colors duration-200;
+    min-height: 60px;
+    cursor: default;
+  }
+  
+  .fqa-question-text {
+    @apply text-lg font-bold text-[#111827] flex-1 pr-4;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.21;
+    cursor: default;
+  }
+  
+  /* FQA 切換按鈕樣式 */
+  .fqa-toggle-btn {
+    @apply w-16 h-16 bg-white flex items-center justify-center transition-all duration-200 cursor-pointer;
+    border: none;
+    outline: none;
+    cursor: pointer;
+  }
+  
+  .fqa-toggle-btn:hover {
+    @apply bg-gray-50;
+  }
+  
+  /* FQA 箭頭圖標樣式 */
+  .fqa-arrow-icon {
+    @apply w-5 h-5 text-black transition-transform duration-200;
+  }
+  
+  /* FQA 答案樣式 */
+  .fqa-answer {
+    @apply p-4 border-t border-[#D1D5DB] bg-white;
+    min-height: 20px;
+  }
+  
+  .fqa-answer.hidden {
+    @apply hidden;
+  }
+  
+  .fqa-answer-text {
+    @apply text-lg text-[#111827] leading-relaxed;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.5;
+  }
+
+  /* ========== 響應式設計 ========== */
+  
+  @media (max-width: 640px) {
+    /* fqa與 download共用 */
+    .download-btn-banner {
+      max-width: 100% !important;
+      min-width: auto;
+    }
     
-    /* FQA 功能卡片樣式 */
     .fqa-feature-card {
-        @apply bg-[#E5E7EB] rounded-lg relative overflow-hidden;
-        min-height: 327px;
+      min-height: 280px;
     }
     
-    /* FQA 功能卡片圖片區域 */
     .fqa-feature-bg {
-        @apply w-full h-[320px] bg-[#E5E7EB] rounded-t-lg;
+      height: 200px;
     }
     
-    /* FQA 功能卡片圖片預留空間 */
-    .fqa-feature-image-placeholder {
-        @apply w-full h-full bg-gray-200 rounded-t-lg;
-        /* 預留圖片空間，可以後續替換為實際圖片 */
-    }
-    
-    /* FQA 功能卡片數字樣式 */
-    .fqa-feature-number {
-        @apply w-12 h-12 bg-[#2060B9] text-white rounded-full flex items-center justify-center text-3xl font-bold;
-        font-family: 'Kulim Park', sans-serif;
-        line-height: 0.98;
-        margin-right: 1rem;
-    }
-    
-    /* FQA 功能卡片內容樣式 */
     .fqa-feature-content {
-        @apply bg-white flex flex-row items-start;
-        padding-top: 1rem;
-        padding-left: 0;
-        padding-right: 1.5rem;
-        padding-bottom: 1.5rem;
+      @apply bg-white flex flex-row items-start;
+      padding-top: 0.75rem;
+      padding-left: 0;
+      padding-right: 1rem;
+      padding-bottom: 1rem;
     }
     
-    /* FQA 功能卡片標題樣式 */
-    .fqa-feature-title {
-        @apply text-xl sm:text-2xl lg:text-3xl font-bold text-black;
-        font-family: 'Kulim Park', sans-serif;
-        line-height: 1.15;
-        text-align: left;
+    .fqa-feature-number {
+      @apply w-10 h-10 text-2xl;
+      min-width: 2.5rem;
+      min-height: 2.5rem;
+      margin-right: 0.75rem;
     }
     
-    /* FQA 分類標題樣式 */
-    .fqa-category-title {
-        @apply text-2xl font-bold text-[#5D6970] mb-6;
-        font-family: 'Inter', sans-serif;
-        line-height: 1.21;
-        background: none;
-        padding: 0;
-        cursor: default;
-    }
-    
-    /* FQA Q&A 列表樣式 */
-    .fqa-qa-list {
-        @apply space-y-4;
-    }
-    
-
-    
-    /* FQA Q&A 項目樣式 */
-    .fqa-qa-item {
-        @apply bg-white rounded-lg border border-[#D1D5DB] overflow-hidden;
-        min-height: 60px;
-    }
-    
-    /* FQA 問題樣式 */
     .fqa-question {
-        @apply flex items-center justify-between p-4 transition-colors duration-200;
-        min-height: 60px;
-        cursor: default;
+      @apply p-4;
+      min-height: 50px;
     }
     
-    .fqa-question-text {
-        @apply text-lg font-bold text-[#111827] flex-1 pr-4;
-        font-family: 'Inter', sans-serif;
-        line-height: 1.21;
-        cursor: default;
-    }
-    
-    /* FQA 切換按鈕樣式 */
     .fqa-toggle-btn {
-        @apply w-16 h-16 bg-white flex items-center justify-center transition-all duration-200 cursor-pointer;
-        border: none;
-        outline: none;
-        cursor: pointer;
+      @apply w-14 h-14;
     }
     
-    .fqa-toggle-btn:hover {
-        @apply bg-gray-50;
-    }
-    
-    /* FQA 箭頭圖標樣式 */
-    .fqa-arrow-icon {
-        @apply w-5 h-5 text-black transition-transform duration-200;
-    }
-    
-    /* FQA 答案樣式 */
     .fqa-answer {
-        @apply p-4 border-t border-[#D1D5DB] bg-white;
-        min-height: 20px;
+      @apply p-4;
+      min-height: 15px;
+    }
+  }
+  
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .fqa-feature-card {
+      min-height: 300px;
     }
     
-    .fqa-answer.hidden {
-        @apply hidden;
+    .fqa-feature-bg {
+      height: 220px;
     }
     
-    .fqa-answer-text {
-        @apply text-lg text-[#111827] leading-relaxed;
-        font-family: 'Inter', sans-serif;
-        line-height: 1.5;
-    }
-
-    /* ========== 響應式設計 ========== */
-    
-    @media (max-width: 640px) {
-        /* fqa與 download共用 */
-        .download-btn-banner {
-            max-width: 100% !important;
-            min-width: auto;
-        }
-        
-        .fqa-feature-card {
-            min-height: 280px;
-        }
-        
-        .fqa-feature-bg {
-            height: 200px;
-        }
-        
-        .fqa-feature-content {
-            @apply bg-white flex flex-row items-start;
-            padding-top: 0.75rem;
-            padding-left: 0;
-            padding-right: 1rem;
-            padding-bottom: 1rem;
-        }
-        
-        .fqa-feature-number {
-            @apply w-10 h-10 text-2xl;
-            min-width: 2.5rem;
-            min-height: 2.5rem;
-            margin-right: 0.75rem;
-        }
-        
-        .fqa-question {
-            @apply p-4;
-            min-height: 50px;
-        }
-        
-        .fqa-toggle-btn {
-            @apply w-14 h-14;
-        }
-        
-        .fqa-answer {
-            @apply p-4;
-            min-height: 15px;
-        }
+    .fqa-feature-content {
+      @apply p-5 pt-4 bg-white flex flex-row items-center;
+      padding-left: 0;
+      padding-right: 0;
     }
     
-    @media (min-width: 641px) and (max-width: 1024px) {
-        .fqa-feature-card {
-            min-height: 300px;
-        }
-        
-        .fqa-feature-bg {
-            height: 220px;
-        }
-        
-        .fqa-feature-content {
-            @apply p-5 pt-4 bg-white flex flex-row items-center;
-            padding-left: 0;
-            padding-right: 0;
-        }
-        
-        .fqa-feature-number {
-            @apply w-11 h-11 text-2xl;
-            min-width: 2.75rem;
-            min-height: 2.75rem;
-            margin-right: 1rem;
-        }
+    .fqa-feature-number {
+      @apply w-11 h-11 text-2xl;
+      min-width: 2.75rem;
+      min-height: 2.75rem;
+      margin-right: 1rem;
+    }
+  }
+  
+  @media (min-width: 1025px) {
+    .fqa-feature-card {
+      min-height: auto;
+      height: auto;
     }
     
-    @media (min-width: 1025px) {
-        .fqa-feature-card {
-            min-height: auto;
-            height: auto;
-        }
-        
-        .fqa-feature-bg {
-            height: auto;
-            aspect-ratio: 1.5 / 1;
-        }
-        
-        .fqa-feature-content {
-            @apply p-6 pt-4 bg-white flex flex-row items-center;
-            padding-left: 0;
-        }
-        
-        .fqa-feature-number {
-            @apply w-12 h-12 text-3xl;
-            min-width: 3rem;
-            min-height: 3rem;
-            margin-right: 1rem;
-        }
+    .fqa-feature-bg {
+      height: auto;
+      aspect-ratio: 1.5 / 1;
     }
-
-
-
-
-
-
-
-
-
-
-    /* ========== Layout 基本設定 ========== */
-    body.layout-fixed {
-        margin: 0;
-        padding: 0;
+    
+    .fqa-feature-content {
+      @apply p-6 pt-4 bg-white flex flex-row items-center;
+      padding-left: 0;
     }
+    
+    .fqa-feature-number {
+      @apply w-12 h-12 text-3xl;
+      min-width: 3rem;
+      min-height: 3rem;
+      margin-right: 1rem;
+    }
+  }
 
-    /* ========== Top Banner ========== */
-    body .top-banner-container #top-banner {
-        position: sticky;
-        top: 0;
-        z-index: 50;
-        margin-bottom: 0;
-    }
 
-    /* Banner 關閉按鈕 */
-    .top-banner-container #top-banner .banner-close-btn {
-        cursor: pointer;
-        transition: color 0.2s ease;
-    }
-    .top-banner-container #top-banner .banner-close-btn:hover {
-        color: #d1d5db;
-    }
 
-    /* ========== Header ========== */
-    body .header-container .fixed-header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 40;
-    }
 
-    body .header-container .fixed-header.with-banner {
-        top: 64px;
-    }
 
-    /* ========== Main Content ========== */
-    body .main-container .main-content {
-        margin-top: 144px;
-    }
 
     body .main-container .main-content.banner-hidden {
         margin-top: 80px;
@@ -554,11 +509,11 @@
         @apply mx-auto max-w-[1360px] px-5 md:px-8;
     }
 
-    /* ========== 標題樣式 ========== */
-    .calculator-title {
-        @apply text-[36px] leading-[0.98] font-bold text-black mb-6;
-        margin-top: 5px; /* 與 header 的間距 */
-    }
+  /* ========== 標題樣式 ========== */
+  .calculator-title {
+    @apply text-[36px] leading-[0.98] font-bold text-black mb-6;
+    margin-top: 5px; /* 與 header 的間距 */
+  }
 
     /* ========== 結果卡樣式 ========== */
     .result-card {
@@ -584,117 +539,117 @@
         flex: 1;
     }
 
-    /* ========== 表單卡片樣式 ========== */
-    .form-card {
-        @apply bg-white rounded-lg overflow-hidden;
-    }
-    
-    .form-card-bg {
-        @apply bg-[#F9F9F9] rounded-lg p-5 md:p-6;
-    }
+  /* ========== 表單卡片樣式 ========== */
+  .form-card {
+    @apply bg-white rounded-lg overflow-hidden;
+  }
+  
+  .form-card-bg {
+    @apply bg-[#F9F9F9] rounded-lg p-5 md:p-6;
+  }
 
-    /* ========== 表單標題列 ========== */
-    .form-header {
-        @apply flex items-center justify-between pb-2 border-b border-gray-300;
-    }
-    
-    .form-title {
-        @apply text-[24px] leading-[1.21] font-bold text-[#5D6970];
-    }
-    
-    .clear-btn {
-        @apply bg-gray-900 text-white text-sm h-[38px] px-5 rounded-lg font-medium transition-colors duration-200;
-    }
-    .clear-btn:hover { @apply bg-gray-800; }
-    .clear-btn:active { @apply bg-gray-700; }
-    .clear-btn:disabled { @apply bg-gray-700 text-gray-300 cursor-not-allowed opacity-70; }
+  /* ========== 表單標題列 ========== */
+  .form-header {
+    @apply flex items-center justify-between pb-2 border-b border-gray-300;
+  }
+  
+  .form-title {
+    @apply text-[24px] leading-[1.21] font-bold text-[#5D6970];
+  }
+  
+  .clear-btn {
+    @apply bg-gray-900 text-white text-sm h-[38px] px-5 rounded-lg font-medium transition-colors duration-200;
+  }
+  .clear-btn:hover { @apply bg-gray-800; }
+  .clear-btn:active { @apply bg-gray-700; }
+  .clear-btn:disabled { @apply bg-gray-700 text-gray-300 cursor-not-allowed opacity-70; }
 
-    /* ========== 表單欄位 ========== */
-    .form-fields {
-        @apply grid grid-cols-1 md:grid-cols-2 gap-5;
-        margin-top: 40px; /* 與標題的間距 */
-    }
-    
-    .field-group {
-        @apply relative;
-        margin-bottom: 20px; /* 欄位間距 */
-    }
-    
-    .field-group.field-full {
-        @apply md:col-span-2;
-    }
-    
-        .field-label {
-        @apply block text-[18px] text-[#111827] mb-2 font-normal;
-    }
+  /* ========== 表單欄位 ========== */
+  .form-fields {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-5;
+    margin-top: 40px; /* 與標題的間距 */
+  }
+  
+  .field-group {
+    @apply relative;
+    margin-bottom: 20px; /* 欄位間距 */
+  }
+  
+  .field-group.field-full {
+    @apply md:col-span-2;
+  }
+  
+    .field-label {
+    @apply block text-[18px] text-[#111827] mb-2 font-normal;
+  }
 
-    /* 只給需要必填的加 .required */
-    .field-label.required::before {
-        content: '* ';
-        color: #FF1F1F;
-    }
+  /* 只給需要必填的加 .required */
+  .field-label.required::before {
+    content: '* ';
+    color: #FF1F1F;
+  }
 
-    
-    .select-wrapper {
-        @apply relative;
-    }
+  
+  .select-wrapper {
+    @apply relative;
+  }
 
-    /* ========== 按鈕元件（四狀態）：預設/hover/active/disabled ========== */
+  /* ========== 按鈕元件（四狀態）：預設/hover/active/disabled ========== */
 
-    .ui-btn {
-        @apply inline-flex items-center justify-center rounded-lg h-12 px-6 font-medium transition-colors duration-200 select-none;
-        width: 132px; /* 按照 Figma 設計 */
-    }
-    
-    .ui-btn-primary {
-        @apply bg-[#2060B9] text-white;
-    }
-    .ui-btn-primary:hover { @apply bg-[#1c55a4]; }
-    .ui-btn-primary:active { @apply bg-[#184a90]; }
-    .ui-btn-primary:disabled { @apply bg-[#9BB6DD] cursor-not-allowed opacity-70; }
+  .ui-btn {
+    @apply inline-flex items-center justify-center rounded-lg h-12 px-6 font-medium transition-colors duration-200 select-none;
+    width: 132px; /* 按照 Figma 設計 */
+  }
+  
+  .ui-btn-primary {
+    @apply bg-[#2060B9] text-white;
+  }
+  .ui-btn-primary:hover { @apply bg-[#1c55a4]; }
+  .ui-btn-primary:active { @apply bg-[#184a90]; }
+  .ui-btn-primary:disabled { @apply bg-[#9BB6DD] cursor-not-allowed opacity-70; }
 
-    .ui-btn-secondary {
-        @apply bg-gray-200 text-gray-900;
-    }
-    .ui-btn-secondary:hover { @apply bg-gray-300; }
-    .ui-btn-secondary:active { @apply bg-gray-400; }
-    .ui-btn-secondary:disabled { @apply bg-gray-200 text-gray-400 cursor-not-allowed opacity-70; }
+  .ui-btn-secondary {
+    @apply bg-gray-200 text-gray-900;
+  }
+  .ui-btn-secondary:hover { @apply bg-gray-300; }
+  .ui-btn-secondary:active { @apply bg-gray-400; }
+  .ui-btn-secondary:disabled { @apply bg-gray-200 text-gray-400 cursor-not-allowed opacity-70; }
 
-    /* ========== 輸入/下拉元件（四狀態）：預設/hover/focus/disabled/error ========== */
-    .ui-input,
-    .ui-select {
-        @apply w-full h-12 rounded-lg bg-white border border-gray-300 px-4 text-gray-900 transition-colors duration-200;
-        border-color: #D1D5DB; /* 按照 Figma 設計 */
-    }
-    
-    /* 統一 placeholder 顏色為灰色 */
-    .ui-input::placeholder,
-    .ui-select::placeholder {
-        color: #949AA6; /* 改成灰色，與 textarea 一致 */
-    }
-    .ui-input:hover,
-    .ui-select:hover { @apply border-gray-400; }
-    .ui-input:focus,
-    .ui-select:focus { @apply outline-none ring-2 ring-blue-500 border-blue-500; }
-    .ui-input:disabled,
-    .ui-select:disabled { @apply bg-gray-100 text-gray-400 cursor-not-allowed; }
-    .ui-input.ui-error,
-    .ui-select.ui-error { @apply border-red-500 ring-2 ring-red-200; }
+  /* ========== 輸入/下拉元件（四狀態）：預設/hover/focus/disabled/error ========== */
+  .ui-input,
+  .ui-select {
+    @apply w-full h-12 rounded-lg bg-white border border-gray-300 px-4 text-gray-900 transition-colors duration-200;
+    border-color: #D1D5DB; /* 按照 Figma 設計 */
+  }
+  
+  /* 統一 placeholder 顏色為灰色 */
+  .ui-input::placeholder,
+  .ui-select::placeholder {
+    color: #949AA6; /* 改成灰色，與 textarea 一致 */
+  }
+  .ui-input:hover,
+  .ui-select:hover { @apply border-gray-400; }
+  .ui-input:focus,
+  .ui-select:focus { @apply outline-none ring-2 ring-blue-500 border-blue-500; }
+  .ui-input:disabled,
+  .ui-select:disabled { @apply bg-gray-100 text-gray-400 cursor-not-allowed; }
+  .ui-input.ui-error,
+  .ui-select.ui-error { @apply border-red-500 ring-2 ring-red-200; }
 
-    /* ========== 說明區塊 ========== */
-    .disclaimer-section {
-        @apply mt-6 rounded-lg bg-gray-200 p-5;
-        background-color: #E5E7EB; /* 按照 Figma 設計 */
-    }
-    
-    .disclaimer-list {
-        @apply text-[#5D6970] text-base leading-6 list-disc pl-5;
-    }
+  /* ========== 說明區塊 ========== */
+  .disclaimer-section {
+    @apply mt-6 rounded-lg bg-gray-200 p-5;
+    background-color: #E5E7EB; /* 按照 Figma 設計 */
+  }
+  
+  .disclaimer-list {
+    @apply text-[#5D6970] text-base leading-6 list-disc pl-5;
+  }
 
-    /* ========== 動作按鈕區 ========== */
-    .action-buttons {
-        @apply mt-8 flex items-center justify-center gap-4;
-    }
+  /* ========== 動作按鈕區 ========== */
+  .action-buttons {
+    @apply mt-8 flex items-center justify-center gap-4;
+  }
 
 
     /* ===== 新增卡片頁面專用樣式 ===== */
@@ -704,101 +659,26 @@
     }
     
     .add-card-bg {
-        @apply bg-[#F9F9F9] rounded-lg;
-        padding: 25px 20px 40px 20px; /* 按照 Figma 設計 */
-        min-height: 807px; /* 桌機版保持 Figma 設計 */
-    }
-
-    /* ========== 新增卡片標題列 ========== */
-    .add-card-header {
-        @apply border-b border-gray-300;
-        padding-bottom: 29px; /* 標題到分隔線的距離 */
+      min-height: auto;
+      padding: 20px 15px 30px 15px;
     }
     
-    .add-card-title {
-        @apply text-[24px] leading-[1.21] font-bold text-[#5D6970];
-    }
-
-    /* ========== 新增卡片表單欄位 ========== */
-    .add-card-fields {
-        @apply space-y-5;
-        margin-top: 40px; /* 分隔線到表單的間距 */
-    }
-    
-    /* ========== 文字區域樣式 ========== */
-    .ui-textarea {
-        @apply w-full rounded-lg bg-white border border-gray-300 px-4 py-3 text-gray-900 transition-colors duration-200 resize-none;
-        border-color: #D1D5DB; /* 按照 Figma 設計 */
-        height: 211px; /* 按照 Figma 設計 */
-    }
-    
-    .ui-textarea::placeholder {
-        color: #949AA6; /* 按照 Figma 設計 */
-    }
-    .ui-textarea:hover { @apply border-gray-400; }
-    .ui-textarea:focus { @apply outline-none ring-2 ring-blue-500 border-blue-500; }
-    .ui-textarea:disabled { @apply bg-gray-100 text-gray-400 cursor-not-allowed; }
-    .ui-textarea.ui-error { @apply border-red-500 ring-2 ring-red-200; }
-
-    /* ========== 新增卡片動作按鈕區 ========== */
     .add-card-actions {
-        @apply flex items-center justify-center gap-6;
-        margin-top: 40px; /* 按照 Figma 設計，底部按鈕的位置 */
+      margin-top: 30px;
     }
-
-    /* ========== 下拉選單箭頭 ========== */
-    .select-arrow {
-        @apply absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none;
-    }
-    
-    .select-arrow::after {
-        content: '';
-        @apply w-0 h-0;
-        border-left: 4px solid transparent;
-        border-right: 4px solid transparent;
-        border-top: 4px solid #6B7280;
-    }
-
-    /* ========== 下拉選單樣式調整 ========== */
-    .ui-select {
-        @apply appearance-none;
-        padding-right: 2.5rem; /* 為箭頭留空間 */
-    }
-
-    /* 選中選項的文字顏色 */
-    .ui-select option {
-        color: #111827;
-    }
-
-    /* placeholder 選項（disabled）的顏色 */
-    .ui-select option:disabled {
-        color: #949AA6;
-    }
-
-    /* ========== 新增卡片頁面 RWD 調整 ========== */
-    /* 手機版調整 */
-    @media (max-width: 640px) {
-        .add-card-bg {
-            min-height: auto;
-            padding: 20px 15px 30px 15px;
-        }
-        
-        .add-card-actions {
-            margin-top: 30px;
-        }
+  }
+  
+  /* 平板版調整 */
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .add-card-bg {
+      min-height: 70vh;
+      padding: 22px 18px 35px 18px;
     }
     
-    /* 平板版調整 */
-    @media (min-width: 641px) and (max-width: 1024px) {
-        .add-card-bg {
-            min-height: 70vh;
-            padding: 22px 18px 35px 18px;
-        }
-        
-        .add-card-actions {
-            margin-top: 35px;
-        }
+    .add-card-actions {
+      margin-top: 35px;
     }
+  }
 
     /* ========== 會員專區頁面樣式 ========== */
 
@@ -934,148 +814,141 @@
         @apply text-2xl text-[#949AA6] font-normal;
     }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> d522aba (會員專區html切版#37)
     /* ========== 會員專區 RWD 調整 ========== */
-    @media (max-width: 640px) {
-        .member-section-header {
-            @apply flex-col gap-4 items-start;
-        }
-        
-        .member-card-item {
-            @apply flex-col gap-4 text-center;
-            min-height: auto;
-        }
-        
-        .member-card-image {
-            @apply mx-auto;
-        }
-        
-        .member-card-actions {
-            @apply justify-center;
-        }
-        
-        .member-info-grid {
-            @apply grid-cols-1 gap-4;
-        }
-        
-        .member-cards-list {
-            @apply space-y-4;
-        }
-    }
+  @media (max-width: 640px) {
+      .member-section-header {
+          @apply flex-col gap-4 items-start;
+      }
+      
+      .member-card-item {
+          @apply flex-col gap-4 text-center;
+          min-height: auto;
+      }
+      
+      .member-card-image {
+          @apply mx-auto;
+      }
+      
+      .member-card-actions {
+          @apply justify-center;
+      }
+      
+      .member-info-grid {
+          @apply grid-cols-1 gap-4;
+      }
+      
+      .member-cards-list {
+          @apply space-y-4;
+      }
+  }
 
-    @media (min-width: 641px) and (max-width: 1024px) {
-        .member-cards-list {
-            @apply space-y-4;
-        }
-    }
-}
+  @media (min-width: 641px) and (max-width: 1024px) {
+      .member-cards-list {
+          @apply space-y-4;
+      }
+  }
+
+
 
 
 
 /* ===== 新增樣式：register.html 專用樣式 ===== */
 @layer components {
-    /* 註冊頁面輸入框樣式 */
-    .register-input {
-        @apply w-full h-12 px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors;
-    }
-    
-    /* 密碼切換按鈕樣式 */
-    .password-toggle-btn {
-        @apply absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-gray-700;
-    }
-    
-    /* 註冊頁面勾選框樣式 */
-    .register-checkbox {
-        @apply mt-1 w-6 h-6 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2;
-    }
-    
-    /* 主要註冊按鈕樣式 */
-    .register-btn-primary {
-        @apply w-full h-16 bg-gray-900 text-white text-lg font-medium rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors;
-    }
-    
-    /* Google 註冊按鈕樣式 */
-    .register-btn-google {
-        @apply w-full h-16 bg-gray-200 text-gray-900 text-lg font-medium rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors flex items-center justify-center space-x-3;
-        /* 確保連結樣式不會影響按鈕外觀 */
-        text-decoration: none;
-        display: inline-flex;
-        cursor: pointer;
-    }
-    
-    /* Google 按鈕 hover 和 focus 狀態 */
-    .register-btn-google:hover {
-        @apply bg-gray-300;
-    }
-    
-    .register-btn-google:focus {
-        @apply outline-none ring-2 ring-gray-400 ring-offset-2;
-    }
-    
-    /* 確保連結內的文字不會有下劃線 */
-    .register-btn-google span {
-        text-decoration: none;
-    }
-    
-    /* 欄位標籤樣式 */
-    .register-label {
-        @apply block text-lg text-gray-700 font-normal;
-    }
-    
-    /* 欄位容器樣式 */
-    .register-field-container {
-        @apply space-y-2;
-    }
-    
-    /* 相對定位容器樣式 */
-    .register-relative-container {
-        @apply relative;
-    }
-    
-    /* 服務條款連結樣式 */
-    .register-link {
-        @apply text-blue-600 hover:text-blue-800 font-medium underline;
-    }
-    
-    /* 分隔線容器樣式 */
-    .register-divider-container {
-        @apply relative py-4;
-    }
-    
-    /* 分隔線樣式 */
-    .register-divider-line {
-        @apply absolute inset-0 flex items-center;
-    }
-    
-    /* 分隔線樣式 */
-    .register-divider {
-        @apply w-full border-t border-gray-300;
-    }
-    
-    /* 分隔線文字容器 */
-    .register-divider-text-container {
-        @apply relative flex justify-center text-lg;
-    }
-    
-    /* 分隔線文字 */
-    .register-divider-text {
-        @apply px-4 bg-white text-gray-700 font-normal;
-    }
-    
-    /* 登入連結容器 */
-    .register-login-container {
-        @apply text-center pt-4;
-    }
-    
-    /* 登入連結文字 */
-    .register-login-text {
-        @apply text-lg text-gray-700 font-normal;
-    }
+  /* 註冊頁面輸入框樣式 */
+  .register-input {
+    @apply w-full h-12 px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors;
+  }
+  
+  /* 密碼切換按鈕樣式 */
+  .password-toggle-btn {
+    @apply absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-gray-700;
+  }
+  
+  /* 註冊頁面勾選框樣式 */
+  .register-checkbox {
+    @apply mt-1 w-6 h-6 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2;
+  }
+  
+  /* 主要註冊按鈕樣式 */
+  .register-btn-primary {
+    @apply w-full h-16 bg-gray-900 text-white text-lg font-medium rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors;
+  }
+  
+  /* Google 註冊按鈕樣式 */
+  .register-btn-google {
+    @apply w-full h-16 bg-gray-200 text-gray-900 text-lg font-medium rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors flex items-center justify-center space-x-3;
+    /* 確保連結樣式不會影響按鈕外觀 */
+    text-decoration: none;
+    display: inline-flex;
+    cursor: pointer;
+  }
+  
+  /* Google 按鈕 hover 和 focus 狀態 */
+  .register-btn-google:hover {
+    @apply bg-gray-300;
+  }
+  
+  .register-btn-google:focus {
+    @apply outline-none ring-2 ring-gray-400 ring-offset-2;
+  }
+  
+  /* 確保連結內的文字不會有下劃線 */
+  .register-btn-google span {
+    text-decoration: none;
+  }
+  
+  /* 欄位標籤樣式 */
+  .register-label {
+    @apply block text-lg text-gray-700 font-normal;
+  }
+  
+  /* 欄位容器樣式 */
+  .register-field-container {
+    @apply space-y-2;
+  }
+  
+  /* 相對定位容器樣式 */
+  .register-relative-container {
+    @apply relative;
+  }
+  
+  /* 服務條款連結樣式 */
+  .register-link {
+    @apply text-blue-600 hover:text-blue-800 font-medium underline;
+  }
+  
+  /* 分隔線容器樣式 */
+  .register-divider-container {
+    @apply relative py-4;
+  }
+  
+  /* 分隔線樣式 */
+  .register-divider-line {
+    @apply absolute inset-0 flex items-center;
+  }
+  
+  /* 分隔線樣式 */
+  .register-divider {
+    @apply w-full border-t border-gray-300;
+  }
+  
+  /* 分隔線文字容器 */
+  .register-divider-text-container {
+    @apply relative flex justify-center text-lg;
+  }
+  
+  /* 分隔線文字 */
+  .register-divider-text {
+    @apply px-4 bg-white text-gray-700 font-normal;
+  }
+  
+  /* 登入連結容器 */
+  .register-login-container {
+    @apply text-center pt-4;
+  }
+  
+  /* 登入連結文字 */
+  .register-login-text {
+    @apply text-lg text-gray-700 font-normal;
+  }
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> d522aba (會員專區html切版#37)
