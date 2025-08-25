@@ -52,6 +52,8 @@ for card in card_names:
 
         cards_dict.append(card_dict)
 
+        print(card_dict)
+
         sleep_time = (random.randint(7,14))/10
         time.sleep(sleep_time)
 

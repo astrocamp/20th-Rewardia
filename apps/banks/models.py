@@ -6,8 +6,8 @@ from django.db import models
 class Bank(models.Model):
     name = models.CharField('Bank Name', max_length=50)
     code = models.CharField('Bank Code', max_length=10, unique=True)
-    logo_url = models.URLField('Logo URL', blank=True)
-    website_url = models.URLField('URL', blank=True)
+    logo_url = models.URLField('Logo URL', null=True)
+    website_url = models.URLField('URL', null=True)
     is_active = models.BooleanField('Is Active', default=True)
     created_at = models.DateTimeField('Created At', auto_now_add=True)
 
