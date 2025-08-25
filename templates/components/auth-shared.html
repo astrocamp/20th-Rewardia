@@ -29,7 +29,7 @@
   role="button"
   aria-label="{{ aria_label|default:'使用 Google 帳號認證' }}"
 >
-  {% include 'components/icons/icon.html' with name="google" class="w-6 h-6" %}
+  {% include 'components/icon.html' with name="google" class="w-6 h-6" %}
   <span>使用 Google 帳號{{ action|default:'認證' }}</span>
 </a>
 {% endif %}
@@ -87,7 +87,12 @@
       @click="{{ toggle_action }}"
       :aria-label="{{ aria_visible_var|default:'passwordVisible' }} ? '隱藏{{ label_text }}' : '顯示{{ label_text }}'"
     >
-      {% include 'components/icons/icon.html' with name="eye" class="w-6 h-6" %}
+      <div x-show="!{{ aria_visible_var|default:'passwordVisible' }}">
+        {% include 'components/icon.html' with name="eye" class="w-6 h-6" %}
+      </div>
+      <div x-show="{{ aria_visible_var|default:'passwordVisible' }}">
+        {% include 'components/icon.html' with name="eye-off" class="w-6 h-6" %}
+      </div>
     </button>
     {% endif %}
   </div>

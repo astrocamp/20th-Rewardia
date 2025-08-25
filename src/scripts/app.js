@@ -1,6 +1,7 @@
 import Alpine from "alpinejs";
 import "htmx.org";
 
+
 window.Alpine = Alpine;
 
 // FAQ 頁面的 Alpine.js 功能
