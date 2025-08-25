@@ -8,6 +8,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.relative_locator import locate_with
 from urllib.parse import urlparse
 import time
+from models import CrawledData
+from apps.cards.models import CreditCard
 
 # 把整個爬蟲包成一個function
 def crawl_roo_cards():
@@ -126,6 +128,11 @@ def crawl_roo_cards():
         # 關閉查找
         print("Closing webdriver.")
         driver.quit()
+
+# 範例，把資料存到資料庫，還無法正式存，因為credit card db還沒見起來
+def save_data(data):
+    card = CreditCard.objects.get(name=data["name"])
+    CrawledData.objects.create(card=card, url=data["url"], content=data["content"])
 
 # 把整個爬蟲包成一個function
 # 加這個讓它需要時可以方便import整個function到其他檔案
