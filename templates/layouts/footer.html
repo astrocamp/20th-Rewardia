@@ -61,3 +61,20 @@
     </div>
   </div>
 </footer>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const subscribeForm = document.querySelector('form[novalidate]');
+    
+    subscribeForm.addEventListener('submit', function (event) {
+      const emailInput = document.getElementById('subscribe-email');
+      
+      if (!emailInput.checkValidity()) {
+        event.preventDefault();
+        // 可以在這裡添加更詳細的錯誤提示
+        alert('請輸入有效的 Email 地址。');
+      }
+    });
+  });
+</script>

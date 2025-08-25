@@ -2,24 +2,25 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rewardia</title>
-    {%load static%}
-    <link rel="stylesheet" href="{% static 'styles/style.css' %}">
-    <script type="module" src="{% static 'scripts/app.js' %}"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rewardia</title>
+  {%load static%}
+  {%load static%}
+  <link rel="stylesheet" href="{% static 'styles/style.css' %}">
+  <script type="module" src="{% static 'scripts/app.js' %}"></script>
 </head>
 <body>
-    
-    
-    {% include 'layouts/header.html' %}
+  
+  
+  {% include 'layouts/header.html' %}
 
-    <main>
-        {% block content %}
-        {% endblock %}
-    </main>
+  <main>
+    {% block content %}
+    {% endblock %}
+  </main>
 
-    {% include 'layouts/footer.html' %}
+  {% include 'layouts/footer.html' %}
 
 </body>
 </html>

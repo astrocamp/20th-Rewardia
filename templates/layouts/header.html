@@ -143,3 +143,36 @@
   </div>
 </header>
 
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const topBanner = document.getElementById('top-banner');
+    const closeBannerBtn = topBanner.querySelector('.banner-close-btn');
+    const fixedHeader = document.querySelector('.fixed-header');
+    const mainContent = document.querySelector('.main-content');
+
+    // 漢堡選單
+    menuToggle.addEventListener('click', function () {
+      const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
+      menuToggle.setAttribute('aria-expanded', !isExpanded);
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    // 關閉上方橫幅
+    closeBannerBtn.addEventListener('click', function () {
+      topBanner.style.transform = 'translateY(-100%)';
+      topBanner.style.transition = 'transform 0.3s ease-out';
+      
+      // 延遲移除元素，讓動畫效果完整
+      setTimeout(() => {
+        topBanner.remove();
+        // 更新 Header 和 Main Content 的位置
+        fixedHeader.classList.remove('with-banner');
+        mainContent.classList.add('banner-hidden');
+      }, 300);
+    });
+  });
+</script>

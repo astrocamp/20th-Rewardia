@@ -1,26 +1,26 @@
 <!-- FAQ 完整項目組件（問題 + 答案） -->
-<div class="fqa-qa-item">
-    <!-- 問題部分 -->
-    <div class="fqa-question">
-        <span class="fqa-question-text">{{ question_text }}</span>
-        <button class="fqa-toggle-btn" @click="toggleItem('{{ item_id }}')">
-            <svg class="fqa-arrow-icon" :class="{ 'rotate-180': isOpen('{{ item_id }}') }" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-        </button>
-    </div>
-    
-    <!-- 答案部分 -->
-    <div class="fqa-answer" 
-        x-show="isOpen('{{ item_id }}')" 
-        x-transition:enter="transition ease-out duration-200" 
-        x-transition:enter-start="opacity-0 transform -translate-y-2" 
-        x-transition:enter-end="opacity-100 transform translate-y-0" 
-        x-transition:leave="transition ease-in duration-150" 
-        x-transition:leave-start="opacity-100 transform translate-y-0" 
-        x-transition:leave-end="opacity-0 transform -translate-y-2">
-        <p class="fqa-answer-text">
-            {{ answer_text }}
-        </p>
-    </div>
+<div class="faq-qa-item">
+  <!-- 問題部分 -->
+  <div class="faq-question">
+    <span class="faq-question-text">{{ question_text }}</span>
+    <button class="faq-toggle-btn" @click="toggleItem('{{ item_id }}')">
+      <svg class="faq-arrow-icon" :class="{ 'rotate-180': isOpen('{{ item_id }}') }" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+  
+  <!-- 答案部分 -->
+  <div class="faq-answer" 
+    x-show="isOpen('{{ item_id }}')" 
+    x-transition:enter="transition ease-out duration-200" 
+    x-transition:enter-start="opacity-0 transform -translate-y-2" 
+    x-transition:enter-end="opacity-100 transform translate-y-0" 
+    x-transition:leave="transition ease-in duration-150" 
+    x-transition:leave-start="opacity-100 transform translate-y-0" 
+    x-transition:leave-end="opacity-0 transform -translate-y-2">
+    <p class="faq-answer-text">
+      {{ answer_text }}
+    </p>
+  </div>
 </div>
