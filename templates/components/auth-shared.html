@@ -55,8 +55,16 @@
 <!-- 表單欄位組件 -->
 {% comment %}
 使用方式:
-{% include 'components/auth-shared.html' with component="input-field" field_type="email" field_id="email" field_name="email" label_text="電子郵件" placeholder="請輸入您的電子郵件" required=True %}
-{% include 'components/auth-shared.html' with component="input-field" field_type="password" field_id="password" field_name="password" label_text="密碼" placeholder="請輸入您的密碼" required=True has_toggle=True alpine_type="passwordVisible ? 'text' : 'password'" toggle_action="togglePassword()" %}
+{% include 'components/auth-shared.html' with component="input-field" field_type="email" field_id="email" field_name="email" label_text="電子郵件" placeholder="請輸入您的電子郵件" required="true" %}
+
+<!-- 登入頁面密碼欄位（不帶參數） -->
+{% include 'components/auth-shared.html' with component="input-field" field_type="password" field_id="password" field_name="password" label_text="密碼" placeholder="請輸入您的密碼" required="true" has_toggle="true" alpine_type="passwordVisible ? 'text' : 'password'" toggle_action="togglePassword()" %}
+
+<!-- 註冊頁面密碼欄位（帶參數） -->
+{% include 'components/auth-shared.html' with component="input-field" field_type="password" field_id="password" field_name="password1" label_text="密碼" placeholder="請輸入您的密碼" required="true" has_toggle="true" alpine_type="passwordVisible ? 'text' : 'password'" toggle_action="togglePassword('password')" %}
+
+<!-- 註冊頁面確認密碼欄位（帶參數） -->
+{% include 'components/auth-shared.html' with component="input-field" field_type="password" field_id="confirm-password" field_name="password2" label_text="確認密碼" placeholder="請再次輸入您的密碼" required="true" has_toggle="true" alpine_type="confirmPasswordVisible ? 'text' : 'password'" toggle_action="togglePassword('password_confirm')" aria_visible_var="confirmPasswordVisible" %}
 {% endcomment %}
 {% if component == "input-field" %}
 <div class="register-field-container">
@@ -69,18 +77,31 @@
       id="{{ field_id }}"
       name="{{ field_name }}"
       placeholder="{{ placeholder }}"
-      class="register-input{% if has_toggle %} pr-12{% endif %}"
-      {% if required %}required{% endif %}
+      class="register-input{% if has_toggle == 'true' %} pr-12{% endif %}"
+      {% if required == 'true' %}required{% endif %}
+      {% if field_type == 'email' %}
+      hx-post="/api/validate-email"
+      hx-trigger="blur"
+      hx-target="#{{ field_id }}-validation"
+      hx-indicator="#{{ field_id }}-spinner"
+      {% endif %}
     >
-    {% if has_toggle %}
+    {% if has_toggle == 'true' %}
     <button 
       type="button" 
       class="password-toggle-btn"
       @click="{{ toggle_action }}"
+      :aria-label="{{ aria_visible_var|default:'passwordVisible' }} ? '隱藏{{ label_text }}' : '顯示{{ label_text }}'"
     >
       {% include 'components/icons/icon.html' with name="eye" class="w-6 h-6" %}
     </button>
     {% endif %}
+  </div>
+  <!-- HTMX 驗證消息容器 -->
+  <div id="{{ field_id }}-validation" class="mt-1 text-sm"></div>
+  <!-- HTMX 載入指示器 -->
+  <div id="{{ field_id }}-spinner" class="htmx-indicator mt-1">
+    <span class="text-sm text-gray-500">驗證中...</span>
   </div>
 </div>
 {% endif %}
@@ -123,11 +144,11 @@
   <div class="flex items-center">
     <input 
       type="checkbox" 
-      id="remember-me" 
-      name="remember-me"
+      id="remember_me" 
+      name="remember_me"
       class="register-checkbox"
     >
-    <label for="remember-me" class="ml-2 text-lg text-gray-700 font-normal">
+    <label for="remember_me" class="ml-2 text-lg text-gray-700 font-normal">
       記住我
     </label>
   </div>
