@@ -11,7 +11,6 @@ import time
 from apps.card_crawler.models import CrawledData
 from apps.cards.models import CreditCard
 from apps.banks.models import Bank
-import datetime
 
 
 # 範例，把資料存到資料庫，還無法正式存，因為credit card db還沒見起來
@@ -72,16 +71,14 @@ def crawl_roo_cards():
                 driver.get(url)
 
                 try:
-                    # 找到卡的名字
-                    card_name = " ".join(
-                        driver.find_element(
-                            By.CSS_SELECTOR, 'h1[data-testid="product-title"]'
-                        )
-                        .text.strip()
-                        .split(" ")[1:]
-                    )
-                    # 發現銀行就在卡名裡：「中國信託 LINE Pay 信用卡」
-                    bank_name = card_name.split(" ")[0]
+                    # 找到卡的名字：中國信託 LINE Pay 信用卡
+                    card_full_name = driver.find_element(
+                        By.CSS_SELECTOR, 'h1[data-testid="product-title"]'
+                    ).text.strip()
+                    # 卡名去掉銀行名：LINE Pay 信用卡
+                    card_name = " ".join(card_full_name.split(" ")[1:])
+                    # 發現銀行就在卡名裡：中國信託
+                    bank_name = card_full_name.split(" ")[0]
 
                 except WebDriverException as error:
                     # 找不到卡，就回傳這個字典
