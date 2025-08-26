@@ -4,7 +4,9 @@
   <div class="faq-question">
     <span class="faq-question-text">{{ question_text }}</span>
     <button class="faq-toggle-btn" @click="toggleItem('{{ item_id }}')">
-      {% include 'components/icon.html' with name="faq-arrow" class="faq-arrow-icon" %}
+      <svg class="faq-arrow-icon" :class="{ 'rotate-180': isOpen('{{ item_id }}') }" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
     </button>
   </div>
   
