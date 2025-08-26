@@ -83,50 +83,28 @@ class UserCard(models.Model):
         related_name='users',
         verbose_name='Credit Card'  # 信用卡
     )
-    nickname = models.CharField(
-        'Card Nickname',  # 卡片暱稱
-        max_length=50,
-        blank=True,
-        help_text='用戶自定義的卡片名稱'
-    )
+  
+    
     added_date = models.DateTimeField('Added Date', auto_now_add=True)  # 新增日期
-    is_primary = models.BooleanField(
-        'Primary Card',  # 主要卡片
-        default=False,
-        help_text='用戶的主要推薦卡片'
-    )
     is_active = models.BooleanField('Is Active', default=True)  # 啟用狀態
     
     class Meta:
         db_table = 'user_cards'
         verbose_name = 'User Card'  # 用戶持卡
         verbose_name_plural = 'User Cards'  # 用戶持卡
-        ordering = ['-is_primary', '-added_date']
+        ordering = ['-added_date']
         unique_together = [['user', 'card']]
         indexes = [
-            models.Index(fields=['user', 'is_primary'], name='user_cards_primary_idx'),
             models.Index(fields=['user', 'is_active'], name='user_cards_active_idx'),
         ]
     
     def __str__(self):
-        display_name = self.nickname or self.card.name
-        return f"{self.user.username} - {display_name}"
+        return f"{self.user.username} - {self.card.name}"
     
     @property
     def display_name(self):
-        #  顯示名稱（優先使用暱稱）
-        return self.nickname or self.card.name
-    
-    def save(self, *args, **kwargs):
-        # 保存時確保只有一張主要卡片
-        if self.is_primary:
-            # 將同用戶的其他卡片設為非主要
-            UserCard.objects.filter(
-                user=self.user, 
-                is_primary=True
-            ).exclude(pk=self.pk).update(is_primary=False)
-        
-        super().save(*args, **kwargs)
+        #  顯示名稱
+        return self.card.name
 
 
 class UserPreference(models.Model):
@@ -136,6 +114,13 @@ class UserPreference(models.Model):
         on_delete=models.CASCADE,
         related_name='preferences',
         verbose_name='User'  # 用戶
+    )
+
+    favorite_cards = models.ManyToManyField(
+        'cards.CreditCard',
+        blank=True,
+        related_name='favorited_by_users',
+        verbose_name='收藏的信用卡'
     )
     
     class Meta:
@@ -153,3 +138,5 @@ def create_user_preference(sender, instance, created, **kwargs):
     #當創建新用戶時，自動創建對應的偏好設定¶
     if created:
         UserPreference.objects.create(user=instance)
+
+
