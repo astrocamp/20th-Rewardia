@@ -35,25 +35,42 @@
       </div>
 
       <!-- 左三：訂閱我們 -->
-      <div>
+      <div x-data="subscribeForm">
         <h4 class="text-lg font-semibold mb-4">訂閱我們</h4>
-        <form class="space-y-3" action="#" method="post" novalidate>
+        <form class="space-y-3" @submit.prevent="submitForm()">
+          {% csrf_token %}
           <label for="subscribe-email" class="sr-only">Email 訂閱</label>
           <div class="flex items-stretch gap-0 flex-nowrap w-full">
             <input
               id="subscribe-email"
               type="email"
+              x-model="email"
               placeholder="輸入您的信箱，不錯過任何更新優惠通知"
               class="flex-grow min-w-[250px] px-4 py-3 bg-gray-800 text-white placeholder-gray-400 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              :class="{ 'ring-red-500 ring-2': message && messageType === 'error' }"
               aria-label="訂閱電子報 Email"
-              required
+              :disabled="isSubmitting"
             />
             <button
               type="submit"
-              class="px-6 py-3 bg-white text-gray-900 font-medium rounded-r-lg hover:bg-gray-100 transition-colors shrink-0 whitespace-nowrap"
+              class="px-6 py-3 bg-white text-gray-900 font-medium rounded-r-lg hover:bg-gray-100 transition-colors shrink-0 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+              :disabled="isSubmitting"
             >
-              訂閱
+              <span x-show="!isSubmitting">訂閱</span>
+              <span x-show="isSubmitting">訂閱中...</span>
             </button>
+          </div>
+          
+          <!-- 訊息顯示區域 -->
+          <div x-show="message" x-transition class="mt-2">
+            <p 
+              class="text-sm px-2"
+              :class="{
+                'text-green-400': messageType === 'success',
+                'text-red-400': messageType === 'error'
+              }"
+              x-text="message"
+            ></p>
           </div>
         </form>
       </div>
@@ -62,19 +79,3 @@
   </div>
 </footer>
 
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const subscribeForm = document.querySelector('form[novalidate]');
-    
-    subscribeForm.addEventListener('submit', function (event) {
-      const emailInput = document.getElementById('subscribe-email');
-      
-      if (!emailInput.checkValidity()) {
-        event.preventDefault();
-        // 可以在這裡添加更詳細的錯誤提示
-        alert('請輸入有效的 Email 地址。');
-      }
-    });
-  });
-</script>
