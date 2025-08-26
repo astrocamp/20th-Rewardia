@@ -11,6 +11,14 @@ import time
 from models import CrawledData
 from apps.cards.models import CreditCard
 
+# 範例，把資料存到資料庫，還無法正式存，因為credit card db還沒見起來
+# 這個函式也不一定放這
+def save_data(data):
+    card = CreditCard.objects.get(name=data["name"])
+    # 用逗點把資料串起來
+    content = ','.join(data["content"])
+    CrawledData.objects.create(card=card, url=data["url"], url_domain=data["url_domain"], content=content)
+
 # 把整個爬蟲包成一個function
 def crawl_roo_cards():
     driver = webdriver.Chrome()
@@ -94,9 +102,12 @@ def crawl_roo_cards():
                         # 排出空白的
                         if len(content.text)>1:
                             crawled_data["content"].append(content.text)
-
+                    
+                    # 把爬到的資料存進資料庫
+                    save_data(crawled_data)
                     # 成功的話，才會回傳值
                     return crawled_data
+                
                 except WebDriverException as error:
                     print(f"Error finding content: {error}")
 
@@ -111,9 +122,8 @@ def crawl_roo_cards():
             try:
                 # 找尋每張卡頁面的資料
                 card_data = get_card_info(card_url)
-                # 將資料存到這個串列
-                print(card_data)
                 time.sleep(sleep_time)
+                return card_data
         
             except WebDriverException as error:
                 failed_cards.append(card_url)
@@ -129,11 +139,7 @@ def crawl_roo_cards():
         print("Closing webdriver.")
         driver.quit()
 
-# 範例，把資料存到資料庫，還無法正式存，因為credit card db還沒見起來
-# 要不要順便透過這個把credit card的db建起來？
-def save_data(data):
-    card = CreditCard.objects.get(name=data["name"])
-    CrawledData.objects.create(card=card, url=data["url"], url_domain=data["url_domain"], content=data["content"])
+
 
 # 把整個爬蟲包成一個function
 # 加這個讓它需要時可以方便import整個function到其他檔案
