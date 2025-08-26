@@ -1,7 +1,7 @@
 import spacy
 import re
 import logging
-from fuzzywuzzy import fuzz
+# from fuzzywuzzy import fuzz
 
 
 class TextProcessor:
@@ -49,6 +49,35 @@ class TextProcessor:
 
         return sentences
 
+    def filter_relevant_content(self, text):
+        # 精簡內容
+        keywords = [
+            "回饋",
+            "現金",
+            "點數",
+            "%",
+            "趴",
+            "消費",
+            "刷卡",
+            "海外",
+            "國外",
+            "境外",
+            "國內",
+            "加油",
+            "餐廳",
+            "網購",
+            "momo",
+            "蝦皮",
+            "pchome",
+            "uber",
+            "netflix",
+            "上限",
+            "年費",
+        ]
+
+        relevant_sentences = self.extract_sentences_with_keywords(text, keywords)
+        return " ".join(relevant_sentences)
+
 
 class EntityExtractor:
     # 關鍵字
@@ -64,6 +93,16 @@ class EntityExtractor:
             "mobile_payment": ["行動支付", "手機支付", "數位支付", "電子支付"],
             "department_store": ["百貨", "百貨公司", "購物中心", "商場"],
             "convenience_store": ["便利商店", "7-11", "全家", "萊爾富", "OK"],
+        }
+
+        self.category_mapping = {
+            "foreign_transaction": ["國外", "海外", "境外", "國際", "外幣", "外國"],
+            "ecommerce_shopping": ["網購", "線上購物", "電商", "網路消費", "網路購物"],
+            "mobile_payment": ["行動支付", "手機支付", "數位支付", "電子支付"],
+            "gas_station": ["加油", "加油站"],
+            "restaurant": ["餐廳", "餐飲", "用餐"],
+            "department_store": ["百貨", "百貨公司", "購物中心"],
+            "convenience_store": ["便利商店", "便利店"],
         }
 
         # 商家
@@ -82,7 +121,7 @@ class EntityExtractor:
     def extract_reward_rates(self, text):
         # 回饋資訊
         results = []
-
+        seen_rates = set()
         # 回饋率
         patterns = [
             r"(\d+\.?\d*)%.*?回饋",
@@ -90,92 +129,87 @@ class EntityExtractor:
             r"享.*?(\d+\.?\d*)%",
             r"(\d+\.?\d*)趴",
             r"百分之(\d+\.?\d*)",
+            r"消費.*?(\d+\.?\d*)%",
+            r"為(\d+\.?\d*)%.*?回饋",
+            r"(\d+\.?\d*)%現金",
+            r"(\d+\.?\d*)%回",
         ]
 
         for pattern in patterns:
             matches = re.finditer(pattern, text)
             for match in matches:
                 rate = float(match.group(1))
-                context = text[max(0, match.start() - 50) : match.end() + 50]
-
-                results.append(
-                    {
-                        "rate": rate,
-                        "context": context.strip(),
-                        "pattern_used": pattern,
-                        "position": match.span(),
-                    }
-                )
+                if rate not in seen_rates:
+                    seen_rates.add(rate)
+                    context = text[max(0, match.start() - 50) : match.end() + 50]
+                    results.append(
+                        {
+                            "rate": rate,
+                            "context": context.strip(),
+                        }
+                    )
 
         return results
 
     def extract_merchants(self, text):
         # 商家資訊
-        results = []
+        found_merchants = []
 
         for merchant_key, patterns in self.merchant_patterns.items():
+            merchant_found = False
             for pattern in patterns:
                 if pattern.lower() in text.lower():
-                    context_match = re.search(
-                        f".{{0,50}}{re.escape(pattern)}.{{0,50}}", text, re.IGNORECASE
-                    )
-                    if context_match:
-                        found_text = context_match.group(0).strip()
-                        results.append(
-                            {
-                                "merchant_key": merchant_key,
-                                "merchant_pattern": pattern,
-                                "context": found_text,
-                                "confidence": fuzz.ratio(
-                                    pattern.lower(), found_text.lower()
-                                ),
-                            }
-                        )
+                    merchant_found = True
+                    break
+            if merchant_found:
+                found_merchants.append(merchant_key)
 
-        return results
+        return found_merchants
 
-    def extract_conditions_and_limits(self, text):
+    def extract_categories(self, text: str) -> list[str]:
+        # 消費分類
+        found_categories = []
+
+        for category_key, keywords in self.category_mapping.items():
+            found = False
+            for keyword in keywords:
+                if keyword in text:
+                    found = True
+                break
+        if found:
+            found_categories.append(category_key)
+
+        return found_categories
+
+    def extract_limits(self, text):
         # 限制
-        results = []
-
-        limit_patterns = [
-            r"上限.*?(\d+(?:,\d+)?).*?元",
-            r"最高.*?(\d+(?:,\d+)?).*?元",
-            r"不超過.*?(\d+(?:,\d+)?).*?元",
-            r"(\d+(?:,\d+)?).*?元.*?上限",
+        patterns = [
+            r"上限.*?(\d+(?:,\d+)?)",
+            r"最高.*?(\d+(?:,\d+)?)",
+            r"不超過.*?(\d+(?:,\d+)?)",
         ]
 
-        for pattern in limit_patterns:
-            matches = re.finditer(pattern, text)
+        amounts = []
+
+        for pattern in patterns:
+            matches = re.findall(pattern, text)
             for match in matches:
-                amount = match.group(1).replace(",", "")
-                context = text[max(0, match.start() - 30) : match.end() + 30]
-                results.append(
-                    {
-                        "type": "spending_limit",
-                        "amount": int(amount),
-                        "context": context.strip(),
-                        "pattern_used": pattern,
-                    }
-                )
+                amount = int(match.replace(",", ""))
+                amounts.append(amount)
 
-        time_patterns = [
-            r"(\d{4})年(\d{1,2})月.*?前",
-            r"活動期間.*?(\d{4}/\d{1,2}/\d{1,2}).*?(\d{4}/\d{1,2}/\d{1,2})",
-            r"限時.*?(\d+)個月",
-        ]
+        return amounts
 
-        for pattern in time_patterns:
-            matches = re.finditer(pattern, text)
-            for match in matches:
-                context = text[max(0, match.start() - 30) : match.end() + 30]
-                results.append(
-                    {
-                        "type": "time_limit",
-                        "time_info": match.groups(),
-                        "context": context.strip(),
-                        "pattern_used": pattern,
-                    }
-                )
+    def extract_all_info(self, raw_text):
+        # 回收
+        relevant_text = self.processor.filter_relevant_content(raw_text)
+        normalized_text = self.processor.normalize_text(relevant_text)
 
-        return results
+        return {
+            "reward_rates": self.extract_reward_rates(normalized_text),
+            "merchants": self.extract_merchants(normalized_text),
+            "categories": self.extract_categories(normalized_text),
+            "spending_limits": self.extract_limits(normalized_text),
+            "processed_text": relevant_text[:500] + "..."
+            if len(relevant_text) > 500
+            else relevant_text,
+        }
