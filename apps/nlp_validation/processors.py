@@ -11,7 +11,7 @@ class TextProcessor:
             logging.error("無法載入 zh_core_web_md 模型")
             raise
 
-    def clean_Space(self, content):
+    def clean_space(self, content):
         clean_text = re.sub(r"\s+", " ", content)
         return clean_text.strip()
 
@@ -36,14 +36,7 @@ class TextProcessor:
 
         for sent in doc.sents:
             sent_text = sent.text.strip()
-            contains_keyword = False
-
-            for keyword in keywords:
-                if keyword in sent_text:
-                    contains_keyword = True
-                    break
-
-            if contains_keyword:
+            if any(keyword in sent_text for keyword in keywords):
                 sentences.append(sent_text)
 
         return sentences
@@ -83,23 +76,13 @@ class EntityExtractor:
         self.processor = TextProcessor()
 
         # 同義詞
-        self.synonym_mapping = {
+        self.category_mapping = {
             "foreign_transaction": ["國外", "海外", "境外", "國際", "外幣", "外國"],
             "domestic_transaction": ["國內", "本土", "台灣", "境內", "台灣境內"],
             "ecommerce_shopping": ["網購", "線上購物", "電商", "網路消費", "網路購物"],
             "mobile_payment": ["行動支付", "手機支付", "數位支付", "電子支付"],
             "department_store": ["百貨", "百貨公司", "購物中心", "商場"],
             "convenience_store": ["便利商店", "7-11", "全家", "萊爾富", "OK"],
-        }
-
-        self.category_mapping = {
-            "foreign_transaction": ["國外", "海外", "境外", "國際", "外幣", "外國"],
-            "ecommerce_shopping": ["網購", "線上購物", "電商", "網路消費", "網路購物"],
-            "mobile_payment": ["行動支付", "手機支付", "數位支付", "電子支付"],
-            "gas_station": ["加油", "加油站"],
-            "restaurant": ["餐廳", "餐飲", "用餐"],
-            "department_store": ["百貨", "百貨公司", "購物中心"],
-            "convenience_store": ["便利商店", "便利店"],
         }
 
         # 商家
@@ -153,12 +136,7 @@ class EntityExtractor:
         found_merchants = []
 
         for merchant_key, patterns in self.merchant_patterns.items():
-            merchant_found = False
-            for pattern in patterns:
-                if pattern.lower() in text.lower():
-                    merchant_found = True
-                    break
-            if merchant_found:
+            if any(pattern.lower() in text.lower() for pattern in patterns):
                 found_merchants.append(merchant_key)
 
         return found_merchants
@@ -168,13 +146,8 @@ class EntityExtractor:
         found_categories = []
 
         for category_key, keywords in self.category_mapping.items():
-            found = False
-            for keyword in keywords:
-                if keyword in text:
-                    found = True
-                break
-        if found:
-            found_categories.append(category_key)
+            if any(keyword in text for keyword in keywords):
+                found_categories.append(category_key)
 
         return found_categories
 
