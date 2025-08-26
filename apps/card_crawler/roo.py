@@ -97,7 +97,7 @@ def crawl_roo_cards():
                     # 點選這些button，讓他們展開，因為資訊隱藏在裡面
                     for button in buttons:
                         driver.execute_script(
-                            "arguments[0].scrollIntoView(true);", button
+                            "arguments[0].scrollIntoView({block: 'center'});", button
                         )
                         action.move_to_element(button).click(on_element=button)
 
