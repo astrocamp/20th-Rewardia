@@ -1,0 +1,64 @@
+@layer components {
+  /* ========== General Button Styles ========== */
+  .btn-primary {
+    @apply bg-black text-white border-black hover:bg-gray-800 transition-colors duration-200;
+  }
+  
+  .btn-outline {
+    @apply border-black text-black hover:bg-black hover:text-white transition-colors duration-200;
+  }
+  
+  .btn-blue {
+    @apply bg-primary text-white border-primary hover:bg-blue-700 transition-colors duration-200;
+  }
+  
+  .btn-white-outline {
+    @apply bg-white border border-black text-black hover:bg-gray-100 transition-colors duration-200;
+  }
+
+  /* ========== UI Button (4-state) ========== */
+  .ui-btn {
+    @apply inline-flex items-center justify-center rounded-lg h-12 px-6 font-medium transition-colors duration-200 select-none;
+    width: 132px; /* As per Figma design */
+  }
+  
+  .ui-btn-primary {
+    @apply bg-primary text-white;
+  }
+  .ui-btn-primary:hover { @apply bg-[#1c55a4]; } /* A bit darker than primary */
+  .ui-btn-primary:active { @apply bg-[#184a90]; } /* Even darker */
+  .ui-btn-primary:disabled { @apply bg-[#9BB6DD] cursor-not-allowed opacity-70; }
+
+  .ui-btn-secondary {
+    @apply bg-gray-200 text-gray-900;
+  }
+  .ui-btn-secondary:hover { @apply bg-gray-300; }
+  .ui-btn-secondary:active { @apply bg-gray-400; }
+  .ui-btn-secondary:disabled { @apply bg-gray-200 text-gray-400 cursor-not-allowed opacity-70; }
+
+  /* ========== Small UI Buttons ========== */
+  .ui-btn-small {
+    @apply inline-flex items-center justify-center rounded-lg h-10 px-5 font-normal text-base transition-colors duration-200;
+    width: 72px;
+  }
+
+  .ui-btn-small-dark {
+    @apply bg-[#111827] text-white;
+  }
+  .ui-btn-small-dark:hover { @apply bg-gray-700; }
+  .ui-btn-small-dark:active { @apply bg-gray-600; }
+
+  .ui-btn-small-gray {
+    @apply bg-gray-200 text-[#111827];
+  }
+  .ui-btn-small-gray:hover { @apply bg-gray-300; }
+  .ui-btn-small-gray:active { @apply bg-gray-400; }
+
+  /* ========== Special Buttons ========== */
+  .clear-btn {
+    @apply bg-gray-900 text-white text-sm h-[38px] px-5 rounded-lg font-medium transition-colors duration-200;
+  }
+  .clear-btn:hover { @apply bg-gray-800; }
+  .clear-btn:active { @apply bg-gray-700; }
+  .clear-btn:disabled { @apply bg-gray-700 text-gray-300 cursor-not-allowed opacity-70; }
+}

@@ -1,0 +1,53 @@
+@layer components {
+  /* ========== Input/Select (4-state) ========== */
+  .ui-input,
+  .ui-select {
+    @apply w-full h-12 rounded-lg bg-white border border-gray-300 px-4 text-gray-900 transition-colors duration-200;
+    border-color: #D1D5DB; /* As per Figma */
+  }
+  
+  .ui-input::placeholder,
+  .ui-select::placeholder {
+    color: #949AA6;
+  }
+  
+  .ui-input:hover,
+  .ui-select:hover { @apply border-gray-400; }
+  
+  .ui-input:focus,
+  .ui-select:focus { @apply outline-none ring-2 ring-blue-500 border-blue-500; }
+  
+  .ui-input:disabled,
+  .ui-select:disabled { @apply bg-gray-100 text-gray-400 cursor-not-allowed; }
+  
+  .ui-input.ui-error,
+  .ui-select.ui-error { @apply border-red-500 ring-2 ring-red-200; }
+
+  /* ========== Form Layout ========== */
+  .form-fields {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-5;
+    margin-top: 40px; /* Spacing from title */
+  }
+  
+  .field-group {
+    @apply relative;
+    margin-bottom: 20px; /* Spacing between fields */
+  }
+  
+  .field-group.field-full {
+    @apply md:col-span-2;
+  }
+  
+  .field-label {
+    @apply block text-[18px] text-[#111827] mb-2 font-normal;
+  }
+
+  .field-label.required::before {
+    content: '* ';
+    color: #FF1F1F;
+  }
+  
+  .select-wrapper {
+    @apply relative;
+  }
+}
