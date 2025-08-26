@@ -1,0 +1,78 @@
+@layer components {
+  /* ========== Calculator Page Layout ========== */
+  .calculator-page {
+      @apply bg-white;
+      margin-top: 80px; /* Header height (default without Banner) */
+      padding-bottom: 80px; /* Footer spacing */
+  }
+  body.banner-visible .calculator-page {
+      margin-top: 40px;
+  }
+  
+  .calculator-container {
+      @apply mx-auto max-w-[1360px] px-5 md:px-8;
+  }
+
+  /* ========== Title Style ========== */
+  .calculator-title {
+    @apply text-[36px] leading-[0.98] font-bold text-black mb-6;
+    margin-top: 5px; /* Spacing from header */
+  }
+
+  /* ========== Result Card ========== */
+  .result-card {
+      @apply relative w-full rounded-lg overflow-hidden mb-6 pt-4;
+  }
+  
+  .result-card-bg {
+      @apply relative flex items-center justify-between px-6 md:px-8 h-[117px] rounded-lg;
+      background: #193966; /* Using custom color, can be aliased in config */
+  }
+  
+  .result-content {
+      @apply relative z-10 flex items-center justify-between w-full;
+  }
+  
+  .result-label {
+      @apply text-white text-2xl font-normal;
+  }
+  
+  .result-value {
+      @apply text-white text-[32px] font-bold;
+      text-align: center;
+      flex: 1;
+  }
+
+  /* ========== Form Card ========== */
+  .form-card {
+    @apply bg-white rounded-lg overflow-hidden;
+  }
+  
+  .form-card-bg {
+    @apply bg-light-gray rounded-lg p-5 md:p-6;
+  }
+
+  /* ========== Form Header ========== */
+  .form-header {
+    @apply flex items-center justify-between pb-2 border-b border-gray-300;
+  }
+  
+  .form-title {
+    @apply text-[24px] leading-[1.21] font-bold text-muted;
+  }
+
+  /* ========== Disclaimer Section ========== */
+  .disclaimer-section {
+    @apply mt-6 rounded-lg bg-gray-200 p-5;
+    background-color: #E5E7EB; /* As per Figma */
+  }
+  
+  .disclaimer-list {
+    @apply text-muted text-base leading-6 list-disc pl-5;
+  }
+
+  /* ========== Action Buttons ========== */
+  .action-buttons {
+    @apply mt-8 flex items-center justify-center gap-4;
+  }
+}

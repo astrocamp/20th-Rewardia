@@ -1,0 +1,147 @@
+@layer components {
+  /* ========== Member Zone Page Layout ========== */
+  .member-guest-content {
+    @apply flex flex-col items-center justify-center text-center;
+    min-height: 500px;
+    gap: 2rem;
+  }
+
+  .member-guest-image {
+    @apply w-full max-w-sm;
+  }
+
+  .member-guest-text {
+    @apply space-y-6;
+  }
+
+  .member-guest-message {
+    @apply text-xl text-gray-700 font-medium;
+  }
+
+  .member-guest-btn {
+    @apply mx-auto block;
+  }
+
+  /* ========== Member Section ========== */
+  .member-section {
+    @apply mb-8;
+  }
+
+  .member-section-bg {
+    @apply bg-light-gray rounded-lg p-5 md:p-6;
+  }
+
+  .member-section-header {
+    @apply flex items-center justify-between pb-5 border-b border-gray-300;
+  }
+
+  .member-section-title {
+    @apply text-2xl font-bold text-muted;
+  }
+
+  /* ========== Member Info ========== */
+  .member-info-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+    margin-top: 2.5rem;
+  }
+
+  .member-info-item {
+    @apply flex flex-col gap-2;
+  }
+
+  .member-info-label {
+    @apply text-lg font-bold text-[#111827];
+  }
+
+  .member-info-value {
+    @apply text-base text-[#111827];
+  }
+
+  .member-info-empty {
+    @apply text-[#111827] opacity-70;
+  }
+
+  /* ========== Member Cards ========== */
+  .member-cards-list {
+    @apply space-y-6;
+    margin-top: 2.5rem;
+  }
+
+  .member-card-item {
+    @apply bg-white border border-gray-300 rounded-lg p-6 flex items-center gap-6;
+    min-height: 125px;
+  }
+
+  .member-card-image {
+    @apply flex-shrink-0 w-[114px] h-[65px] bg-gray-200 rounded flex items-center justify-center relative;
+  }
+
+  .member-card-image-placeholder {
+    @apply absolute inset-0 bg-gray-200 rounded;
+  }
+
+  .member-card-info {
+    @apply flex-1;
+  }
+
+  .member-card-name {
+    @apply text-2xl font-bold text-[#111827] mb-1;
+  }
+
+  .member-card-bank {
+    @apply text-base text-[#111827];
+  }
+
+  .member-card-actions {
+    @apply flex gap-3;
+  }
+
+  /* ========== Empty State ========== */
+  .member-empty-content {
+    @apply flex flex-col items-center justify-center text-center;
+    margin-top: 2.5rem;
+    min-height: 270px;
+  }
+
+  .member-empty-icon {
+    @apply mb-6;
+  }
+
+  .member-empty-text {
+    @apply text-2xl text-[#949AA6] font-normal;
+  }
+
+  /* ========== Responsive Styles for Member Zone ========== */
+  @media (max-width: 640px) {
+    .member-section-header {
+      @apply flex-col gap-4 items-start;
+    }
+    
+    .member-card-item {
+      @apply flex-col gap-4 text-center;
+      min-height: auto;
+    }
+    
+    .member-card-image {
+      @apply mx-auto;
+    }
+    
+    .member-card-actions {
+      @apply justify-center;
+    }
+    
+    .member-info-grid {
+      @apply grid-cols-1 gap-4;
+    }
+    
+    .member-cards-list {
+      @apply space-y-4;
+    }
+  }
+
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .member-cards-list {
+      @apply space-y-4;
+    }
+  }
+}

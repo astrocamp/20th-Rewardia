@@ -1,0 +1,83 @@
+@layer components {
+  /* ========== Register Page Specific Styles ========== */
+  .register-input {
+    @apply w-full h-12 px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors;
+  }
+  
+  .password-toggle-btn {
+    @apply absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-gray-700;
+  }
+  
+  .register-checkbox {
+    @apply mt-1 w-6 h-6 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2;
+  }
+  
+  .register-btn-primary {
+    @apply w-full h-16 bg-gray-900 text-white text-lg font-medium rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors;
+  }
+  
+  .register-btn-google {
+    @apply w-full h-16 bg-gray-200 text-gray-900 text-lg font-medium rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors flex items-center justify-center space-x-3;
+    text-decoration: none;
+    display: inline-flex;
+    cursor: pointer;
+  }
+  
+  .register-btn-google:hover {
+    @apply bg-gray-300;
+  }
+  
+  .register-btn-google:focus {
+    @apply outline-none ring-2 ring-gray-400 ring-offset-2;
+  }
+  
+  .register-btn-google span {
+    text-decoration: none;
+  }
+  
+  .register-label {
+    @apply block text-lg text-gray-700 font-normal;
+  }
+  
+  .register-field-container {
+    @apply space-y-2;
+  }
+  
+  .register-relative-container {
+    @apply relative;
+  }
+  
+  .register-link {
+    @apply text-blue-600 hover:text-blue-800 font-medium underline;
+  }
+  
+  /* ========== Divider ========== */
+  .register-divider-container {
+    @apply relative py-4;
+  }
+  
+  .register-divider-line {
+    @apply absolute inset-0 flex items-center;
+  }
+  
+  .register-divider {
+    @apply w-full border-t border-gray-300;
+  }
+  
+  .register-divider-text-container {
+    @apply relative flex justify-center text-lg;
+  }
+  
+  .register-divider-text {
+    @apply px-4 bg-white text-gray-700 font-normal;
+  }
+  
+  /* ========== Login Link ========== */
+  .register-login-container {
+    @apply text-center pt-4;
+  }
+  
+  .register-login-text {
+    @apply text-lg text-gray-700 font-normal;
+  }
+}
