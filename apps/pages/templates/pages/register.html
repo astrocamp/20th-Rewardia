@@ -11,14 +11,17 @@
       method="post"
       action="{% url 'pages:register' %}">
   {% csrf_token %}
-  <!-- 電子郵件欄位 -->
-  {% include 'components/auth-shared.html' with component="input-field" field_type="email" field_id="email" field_name="email" label_text="電子郵件" placeholder="請輸入您的電子郵件" required="true" %}
+  <!-- 帳號欄位 -->
+  {% include 'components/auth-shared.html' with component="input-field" field_type="text" field_id="username" field_name="username" label_text="帳號" placeholder="請輸入您的帳號" required="true" %}
 
   <!-- 密碼欄位 -->
   {% include 'components/auth-shared.html' with component="input-field" field_type="password" field_id="password" field_name="password1" label_text="密碼" placeholder="請輸入您的密碼" required="true" has_toggle="true" alpine_type="passwordVisible ? 'text' : 'password'" toggle_action="togglePassword('password')" %}
 
   <!-- 確認密碼欄位 -->
   {% include 'components/auth-shared.html' with component="input-field" field_type="password" field_id="confirm-password" field_name="password2" label_text="確認密碼" placeholder="請再次輸入您的密碼" required="true" has_toggle="true" alpine_type="confirmPasswordVisible ? 'text' : 'password'" toggle_action="togglePassword('password_confirm')" aria_visible_var="confirmPasswordVisible" %}
+
+  <!-- 電子郵件欄位 -->
+  {% include 'components/auth-shared.html' with component="input-field" field_type="email" field_id="email" field_name="email" label_text="電子郵件" placeholder="請輸入您的電子郵件" required="true" %}
 
   <!-- 服務條款勾選框 -->
   <div class="flex items-start space-x-3">

@@ -55,6 +55,11 @@
 <!-- 表單欄位組件 -->
 {% comment %}
 使用方式:
+
+<!-- 帳號欄位 -->
+{% include 'components/auth-shared.html' with component="input-field" field_type="text" field_id="username" field_name="username" label_text="帳號" placeholder="請輸入您的帳號" required="true" %}
+
+<!-- 電子郵件欄位 -->
 {% include 'components/auth-shared.html' with component="input-field" field_type="email" field_id="email" field_name="email" label_text="電子郵件" placeholder="請輸入您的電子郵件" required="true" %}
 
 <!-- 登入頁面密碼欄位（不帶參數） -->

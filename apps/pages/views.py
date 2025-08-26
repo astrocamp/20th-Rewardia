@@ -21,3 +21,7 @@ def register(request):
 
 def login(request):
   return render(request, "pages/login.html")
+
+# def card_new(request):
+#   return render(request, "pages/card_new.html")
+
