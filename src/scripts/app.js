@@ -5,7 +5,7 @@ import "htmx.org";
 window.Alpine = Alpine;
 
 // FAQ 頁面的 Alpine.js 功能
-Alpine.data('faqAccordion', () => ({
+Alpine.data('faq_accordion', () => ({
   openItem: null,
   
   toggleItem(itemId) {
@@ -22,7 +22,7 @@ Alpine.data('faqAccordion', () => ({
 }));
 
 // 註冊頁面的 Alpine.js 功能
-Alpine.data('registerForm', () => ({
+Alpine.data('register_form', () => ({
   // 密碼顯示狀態追蹤
   passwordVisible: false,
   confirmPasswordVisible: false,
@@ -39,7 +39,7 @@ Alpine.data('registerForm', () => ({
 }));
 
 // 登入頁面的 Alpine.js 功能
-Alpine.data('loginForm', () => ({
+Alpine.data('login_form', () => ({
   passwordVisible: false,
   
   togglePassword() {
@@ -48,7 +48,7 @@ Alpine.data('loginForm', () => ({
 }));
 
 // 訂閱表單的 Alpine.js 功能
-Alpine.data('subscribeForm', () => ({
+Alpine.data('subscribe_form', () => ({
   email: '',
   isSubmitting: false,
   message: '',

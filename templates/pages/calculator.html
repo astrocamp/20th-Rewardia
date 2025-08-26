@@ -14,12 +14,12 @@
       <div class="result-card-bg">
         <div class="result-content">
           <p class="result-label">計算結果</p>
-          <p class="result-value" id="resultValue">2000</p>
+          <p class="result-value" id="result_value">2000</p>
           
         </div>
       </div>
     </div>
-    <form id="calcForm">
+    <form id="calc_form">
       {% csrf_token %}
       <!-- 表單卡片 -->
       <div class="form-card">
@@ -34,9 +34,9 @@
           <div class="form-fields">
             <!-- 銀行 -->
             <div class="field-group">
-              <label for="bankSelect" class="field-label required">銀行</label>
+              <label for="bank_select" class="field-label required">銀行</label>
               <div class="select-wrapper">
-                <select id="bankSelect" class="ui-select" aria-label="選擇銀行">     
+                <select id="bank_select" class="ui-select" aria-label="選擇銀行">     
                   <option value="" selected disabled>請選擇銀行</option>
                   <option>台新銀行</option>
                   <option>國泰世華</option>
@@ -49,9 +49,9 @@
 
             <!-- 電商通路 -->
             <div class="field-group">
-              <label for="channelSelect" class="field-label required">電商通路</label>
+              <label for="channel_select" class="field-label required">電商通路</label>
               <div class="select-wrapper">
-                <select id="channelSelect" class="ui-select" aria-label="選擇電商通路">
+                <select id="channel_select" class="ui-select" aria-label="選擇電商通路">
                   <option value="" selected disabled>請選擇消費通路</option>
                   <option>momo購物網</option>
                   <option>蝦皮購物</option>
@@ -64,9 +64,9 @@
 
             <!-- 是否是海外消費 -->
             <div class="field-group">
-              <label for="overseasSelect" class="field-label required">是否是海外消費</label>
+              <label for="overseas_select" class="field-label required">是否是海外消費</label>
               <div class="select-wrapper">
-                <select id="overseasSelect" class="ui-select" aria-label="是否為海外消費">
+                <select id="overseas_select" class="ui-select" aria-label="是否為海外消費">
                   <option value="" selected disabled>請選擇是否是海外消費</option>
                   <option>是</option>
                   <option>否</option>
@@ -78,9 +78,9 @@
 
             <!-- 付款方式 -->
             <div class="field-group">
-              <label for="paymentSelect" class="field-label required">付款方式</label>
+              <label for="payment_select" class="field-label required">付款方式</label>
               <div class="select-wrapper">
-                <select id="paymentSelect" class="ui-select" aria-label="選擇付款方式">
+                <select id="payment_select" class="ui-select" aria-label="選擇付款方式">
                   <option value="" selected disabled>請選擇付款方式</option>
                   <option>信用卡</option>
                   <option>數位錢包</option>
@@ -93,9 +93,9 @@
 
             <!-- 卡片 -->
             <div class="field-group">
-              <label for="cardSelect" class="field-label required">卡片</label>
+              <label for="card_select" class="field-label required">卡片</label>
               <div class="select-wrapper">
-                <select id="cardSelect" class="ui-select" aria-label="選擇卡片">
+                <select id="card_select" class="ui-select" aria-label="選擇卡片">
                   <option value="" selected disabled>請選擇卡片</option>
                 </select>
                 <div class="select-arrow" aria-hidden="true">
@@ -105,8 +105,8 @@
 
             <!-- 消費金額 -->
             <div class="field-group field-full">
-              <label for="amountInput" class="field-label required">消費金額</label>
-              <input id="amountInput" type="number" inputmode="decimal" placeholder="請輸入消費金額" class="ui-input" aria-label="消費金額" />
+              <label for="amount_input" class="field-label required">消費金額</label>
+              <input id="amount_input" type="number" inputmode="decimal" placeholder="請輸入消費金額" class="ui-input" aria-label="消費金額" />
             </div>
           </div>
 
@@ -122,7 +122,7 @@
 
           <!-- 動作按鈕 -->
           <div class="action-buttons">
-            <button id="calcBtn" type="button" class="ui-btn ui-btn-primary">進行試算</button>
+            <button id="calc_btn" type="button" class="ui-btn ui-btn-primary">進行試算</button>
             <button type="reset" class="ui-btn ui-btn-secondary">取消</button>
           </div>
         </div>
