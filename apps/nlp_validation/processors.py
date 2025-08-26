@@ -1,7 +1,6 @@
 import spacy
 import re
 import logging
-# from fuzzywuzzy import fuzz
 
 
 class TextProcessor:
@@ -63,8 +62,6 @@ class TextProcessor:
             "國外",
             "境外",
             "國內",
-            "加油",
-            "餐廳",
             "網購",
             "momo",
             "蝦皮",
