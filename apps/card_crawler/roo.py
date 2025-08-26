@@ -106,7 +106,6 @@ def crawl_roo_cards():
                     # 把爬到的資料存進資料庫
                     save_data(crawled_data)
                     # 成功的話，才會回傳值
-                    return crawled_data
                 
                 except WebDriverException as error:
                     print(f"Error finding content: {error}")

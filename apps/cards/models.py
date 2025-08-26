@@ -1,5 +1,4 @@
 from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
 from apps.banks.models import Bank
 
 # Create your models here.
@@ -38,55 +37,35 @@ class CreditCard(models.Model):
         'Annual Fee',
         max_digits=8,
         decimal_places=2,
-        default=0,
-        validators=[MinValueValidator(0)]
+        blank=True,
+        null=True,
     )
     signup_bonus = models.IntegerField(
         'Sign Up Bonus',
-        default=0,
-        validators=[MinValueValidator(0)],
+        blank=True,
+        null=True,
         help_text='新戶禮金額或點數'
-    )
-    credit_limit_min = models.IntegerField(
-        'Minimum Credit Limit',
-        null=True,
-        blank=True,
-        validators=[MinValueValidator(0)]
-    )
-    credit_limit_max = models.IntegerField(
-        'Maximum Credit Limit',
-        null=True,
-        blank=True,
-        validators=[MinValueValidator(0)]
-    )
-    apr_min = models.DecimalField(
-        'Minimum APR',
-        max_digits=4,
-        decimal_places=2,
-        validators=[MinValueValidator(0), MaxValueValidator(100)]
-    )
-    apr_max = models.DecimalField(
-        'Maximum APR',
-        max_digits=4,
-        decimal_places=2,
-        validators=[MinValueValidator(0), MaxValueValidator(100)]
     )
     foreign_transaction_fee = models.DecimalField(
         'Foreign Transaction Fee',
         max_digits=4,
         decimal_places=2,
-        default=0,
-        validators=[MinValueValidator(0), MaxValueValidator(100)],
+        blank=True,
+        null=True,
         help_text='百分比，例如 1.5 表示 1.5%'
     )
     card_network = models.CharField(
         'Card Network',
         max_length=20,
+        blank=True,
+        null=True,
         choices=CardNetwork.choices
     )
     card_type = models.CharField(
         'Card Type',
         max_length=20,
+        blank=True,
+        null=True,
         choices=CardType.choices
     )
     is_active = models.BooleanField('Is Active', default=True)
