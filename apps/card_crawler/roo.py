@@ -11,6 +11,7 @@ import time
 from apps.card_crawler.models import CrawledData
 from apps.cards.models import CreditCard
 from apps.banks.models import Bank
+import datetime
 
 
 # 範例，把資料存到資料庫，還無法正式存，因為credit card db還沒見起來
@@ -29,12 +30,15 @@ def save_data(data):
 
     # 用逗點把爬到的資料接起來
     content = ",".join(data["content"])
+
     # 這裡是存到爬到的資料的資料庫
-    CrawledData.objects.create(
+    crawled_card, created = CrawledData.objects.update_or_create(
         card=card,
         url=data["url"],
         url_domain=data["url_domain"],
-        content=content,
+        defaults={
+            "content": content,
+        },
     )
 
 
@@ -69,9 +73,13 @@ def crawl_roo_cards():
 
                 try:
                     # 找到卡的名字
-                    card_name = driver.find_element(
-                        By.CSS_SELECTOR, 'h1[data-testid="product-title"]'
-                    ).text.strip()
+                    card_name = " ".join(
+                        driver.find_element(
+                            By.CSS_SELECTOR, 'h1[data-testid="product-title"]'
+                        )
+                        .text.strip()
+                        .split(" ")[1:]
+                    )
                     # 發現銀行就在卡名裡：「中國信託 LINE Pay 信用卡」
                     bank_name = card_name.split(" ")[0]
 
