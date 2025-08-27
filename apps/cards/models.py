@@ -33,16 +33,16 @@ class CreditCard(models.Model):
         related_name="credit_cards",
         verbose_name="Issuing Bank",
     )
-    annual_fee = models.DecimalField(
-        "Annual Fee",
-        max_digits=8,
-        decimal_places=2,
-        blank=True,
-        null=True,
-    )
-    signup_bonus = models.IntegerField(
-        "Sign Up Bonus", blank=True, null=True, help_text="新戶禮金額或點數"
-    )
+    # annual_fee = models.DecimalField(
+    #     "Annual Fee",
+    #     max_digits=8,
+    #     decimal_places=2,
+    #     blank=True,
+    #     null=True,
+    # )
+    # signup_bonus = models.IntegerField(
+    #     "Sign Up Bonus", blank=True, null=True, help_text="新戶禮金額或點數"
+    # )
     foreign_transaction_fee = models.DecimalField(
         "Foreign Transaction Fee",
         max_digits=4,
