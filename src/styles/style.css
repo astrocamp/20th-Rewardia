@@ -5,11 +5,11 @@
 /* Import component styles */
 @import "./components/buttons.css";
 @import "./components/forms.css";
-@import "./components/pages/calculator.css";
-@import "./components/pages/download.css";
-@import "./components/pages/faq.css";
-@import "./components/pages/member-zone.css";
-@import "./components/pages/register.css";
+@import "./pages/calculator.css";
+@import "./pages/download.css";
+@import "./pages/faq.css";
+@import "./pages/member-zone.css";
+@import "./pages/register.css";
 
 @layer base {
   :root {
