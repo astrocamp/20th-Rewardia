@@ -92,6 +92,7 @@ def crawl_roo_cards():
                         "url": f"{url}",
                         "error": f"{error}",
                     }
+                    failed_cards.append(error_data.url)
                     print(f"Error fetching card: {error}")
                     return error_data
 
@@ -122,8 +123,10 @@ def crawl_roo_cards():
                         )
                     except TimeoutException:
                         print("Error fetching elements")
+                        failed_cards.append(url)
                 except WebDriverException as error:
                     print(f"Error fetching button: {error}")
+                    failed_cards.append(url)
 
                 # 找到navbar和footer之間的所有h4, h5, li, p的元素
                 try:
@@ -151,9 +154,11 @@ def crawl_roo_cards():
 
                 except WebDriverException as error:
                     print(f"Error finding content: {error}")
+                    failed_cards.append(url)
 
             except WebDriverException as error:
                 print(f"Card not found: {error}")
+                failed_cards.append(url)
                 # 找不到卡，就終止這次的函式
                 return error
 
@@ -165,11 +170,13 @@ def crawl_roo_cards():
                 success_urls.append(processed_url)
 
             except WebDriverException as error:
-                failed_cards.append(card_url)
                 print(f"Error fetching page {card_url}: {error}")
+                failed_cards.append(card_url)
 
         # 排除成功的url，並將沒有被找到的url，設is_active=False
         handle_missing_urls(success_urls)
+        print(f"Failed or with error: {failed_cards}")
+        print(f"Success: {success_urls}")
 
     finally:
         # 關閉查找
