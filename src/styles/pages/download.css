@@ -4,80 +4,53 @@
   /* ========== Download Page Buttons ========== */
   .download-btn-primary {
     @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-primary hover:bg-blue-700;
-    width: 100%;
-    min-height: 3rem;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
-    max-width: 16rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
+    @apply w-full min-h-12 shadow-sm max-w-64 inline-flex items-center justify-center no-underline;
   }
   
   .download-btn-primary:hover {
-    transform: translateY(-0.125rem);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    @apply -translate-y-0.5 shadow-lg;
   }
   
   .download-btn-secondary {
-    @apply text-black px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-white hover:bg-gray-100;
-    width: 100%;
-    min-height: 3rem;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
-    max-width: 16rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
+    @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-gray-800 hover:bg-gray-700;
+    @apply w-full min-h-12 shadow-sm max-w-64 inline-flex items-center justify-center no-underline;
   }
   
   .download-btn-secondary:hover {
-    transform: translateY(-0.125rem);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    @apply -translate-y-0.5 shadow-lg;
   }
   
   .download-btn-chrome {
-    @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-[#111827] hover:bg-gray-800;
-    width: 100%;
-    min-height: 3rem;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+    @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-dark-gray hover:bg-gray-800;
+    @apply w-full min-h-12 shadow-sm inline-flex items-center justify-center no-underline;
     max-width: 17.5rem;
   }
   
   .download-btn-chrome:hover {
-    transform: translateY(-0.125rem);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    @apply -translate-y-0.5 shadow-lg;
   }
   
   .download-btn-app {
-    @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-[#111827] hover:bg-gray-800;
-    width: 100%;
-    min-height: 3rem;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+    @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-dark-gray hover:bg-gray-800;
+    @apply w-full min-h-12 shadow-sm inline-flex items-center justify-center no-underline;
     max-width: 17.5rem;
   }
   
   .download-btn-app:hover {
-    transform: translateY(-0.125rem);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    @apply -translate-y-0.5 shadow-lg;
   }
 
   .download-btn-banner {
-    max-width: 15rem !important;
-    min-width: 15rem;
+    @apply max-w-60 min-w-60;
   }
 
   /* ========== Download Page Layout ========== */
   .download-banner-content {
-    position: relative;
-    z-index: 2;
-    max-width: 50%;
-    padding-right: 2rem;
+    @apply relative z-[2] max-w-[50%] pr-8;
   }
   
   .download-section-simple {
-    @apply bg-white rounded-2xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8;
-    transition: all 0.3s ease;
+    @apply bg-white rounded-2xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 transition-all duration-300 ease-in-out;
   }
   
   .download-image-simple {
@@ -85,18 +58,11 @@
   }
   
   .download-feature-card-simple {
-    @apply bg-white rounded-lg overflow-hidden;
-    border: 1px solid #f3f4f6;
+    @apply bg-white rounded-lg overflow-hidden border border-gray-100;
   }
   
   .download-feature-image-simple {
-    @apply w-full bg-gradient-to-br from-blue-50 to-indigo-100;
-    height: 12rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
+    @apply w-full bg-gradient-to-br from-blue-50 to-indigo-100 h-48 flex items-center justify-center relative overflow-hidden;
   }
 
   /* ========== Responsive Styles for Download Page ========== */
@@ -105,25 +71,20 @@
     .download-btn-secondary,
     .download-btn-chrome,
     .download-btn-app {
-      max-width: none;
-      min-height: 2.75rem;
-      font-size: 0.875rem;
-      padding: 0.75rem 1rem;
+      @apply max-w-none min-h-11 text-sm p-3;
     }
     
     .download-btn-banner {
-      max-width: none !important;
-      min-width: auto;
+      @apply max-w-none min-w-0;
     }
     
     .download-banner-content {
-      max-width: 100%;
-      padding-right: 0;
+      @apply max-w-full pr-0;
     }
     
     .download-section-simple {
       @apply p-4;
-      margin-bottom: 1.5rem;
+      @apply mb-6;
     }
     
     .download-section-simple .flex {
@@ -139,19 +100,17 @@
     }
     
     .download-feature-image-simple {
-      height: 10rem;
+      @apply h-40;
     }
   }
 
   @media (min-width: 641px) and (max-width: 768px) {
     .download-btn-banner {
-      max-width: 12rem !important;
-      min-width: 12rem;
+      @apply max-w-48 min-w-48;
     }
     
     .download-banner-content {
-      max-width: 60%;
-      padding-right: 1.5rem;
+      @apply max-w-[60%] pr-6;
     }
     
     .download-section-simple .flex {
@@ -159,39 +118,35 @@
     }
     
     .download-feature-image-simple {
-      height: 11rem;
+      @apply h-44;
     }
   }
 
   @media (min-width: 769px) and (max-width: 1024px) {
     .download-btn-banner {
-      max-width: 13rem !important;
-      min-width: 13rem;
+      @apply max-w-52 min-w-52;
     }
     
     .download-banner-content {
-      max-width: 55%;
-      padding-right: 1.5rem;
+      @apply max-w-[55%] pr-6;
     }
     
     .download-feature-image-simple {
-      height: 12rem;
+      @apply h-48;
     }
   }
 
   @media (min-width: 1025px) {
     .download-btn-banner {
-      max-width: 15rem !important;
-      min-width: 15rem;
+      @apply max-w-60 min-w-60;
     }
     
     .download-banner-content {
-      max-width: 50%;
-      padding-right: 2rem;
+      @apply max-w-[50%] pr-8;
     }
     
     .download-feature-image-simple {
-      height: 16rem;
+      @apply h-64;
     }
   }
 }

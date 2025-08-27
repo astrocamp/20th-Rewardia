@@ -4,7 +4,7 @@
   /* ========== Input/Select (4-state) ========== */
   .ui-input,
   .ui-select {
-    @apply w-full h-12 rounded-lg bg-white border border-gray-300 px-4 text-gray-900 transition-colors duration-200;
+    @apply w-full h-12 rounded-lg bg-white border px-4 text-gray-900 transition-colors duration-200;
     border-color: #D1D5DB; /* As per Figma */
   }
   
@@ -27,13 +27,11 @@
 
   /* ========== Form Layout ========== */
   .form-fields {
-    @apply grid grid-cols-1 md:grid-cols-2 gap-5;
-    margin-top: 40px; /* Spacing from title */
+    @apply grid grid-cols-1 md:grid-cols-2 gap-5 mt-10;
   }
   
   .field-group {
-    @apply relative;
-    margin-bottom: 20px; /* Spacing between fields */
+    @apply relative mb-5;
   }
   
   .field-group.field-full {
@@ -41,12 +39,12 @@
   }
   
   .field-label {
-    @apply block text-[18px] text-[#111827] mb-2 font-normal;
+    @apply block text-lg text-gray-900 mb-2 font-normal;
   }
 
   .field-label.required::before {
+    @apply text-error-red;
     content: '* ';
-    color: #FF1F1F;
   }
   
   .select-wrapper {

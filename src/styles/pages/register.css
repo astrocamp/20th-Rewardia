@@ -19,10 +19,7 @@
   }
   
   .register-btn-google {
-    @apply w-full h-16 bg-gray-200 text-gray-900 text-lg font-medium rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors flex items-center justify-center space-x-3;
-    text-decoration: none;
-    display: inline-flex;
-    cursor: pointer;
+    @apply w-full h-16 bg-gray-200 text-gray-900 text-lg font-medium rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors flex items-center justify-center space-x-3 no-underline cursor-pointer;
   }
   
   .register-btn-google:hover {
@@ -34,7 +31,7 @@
   }
   
   .register-btn-google span {
-    text-decoration: none;
+    @apply no-underline;
   }
   
   .register-label {
