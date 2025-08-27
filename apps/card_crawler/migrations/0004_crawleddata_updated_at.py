@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('card_crawler', '0003_crawleddata_url_domain_alter_crawleddata_url'),
+        ("card_crawler", "0003_crawleddata_url_domain_alter_crawleddata_url"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='crawleddata',
-            name='updated_at',
-            field=models.DateTimeField(auto_now=True, verbose_name='Updated At'),
+            model_name="crawleddata",
+            name="updated_at",
+            field=models.DateTimeField(auto_now=True, verbose_name="Updated At"),
         ),
     ]
