@@ -1,3 +1,5 @@
+/* Primarily corresponds to: templates/users/member_zone.html */
+
 @layer components {
   /* ========== Member Zone Page Layout ========== */
   .member-guest-content {

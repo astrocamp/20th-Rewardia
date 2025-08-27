@@ -1,3 +1,5 @@
+/* Primarily corresponds to: templates/users/register.html, templates/users/login.html, templates/components/auth-shared.html */
+
 @layer components {
   /* ========== Register Page Specific Styles ========== */
   .register-input {

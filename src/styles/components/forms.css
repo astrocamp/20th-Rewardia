@@ -1,3 +1,5 @@
+/* Global form styles, used in pages with forms. */
+
 @layer components {
   /* ========== Input/Select (4-state) ========== */
   .ui-input,

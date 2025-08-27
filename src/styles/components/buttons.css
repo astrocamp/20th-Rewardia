@@ -1,3 +1,5 @@
+/* Global button styles, used across multiple pages. */
+
 @layer components {
   /* ========== General Button Styles ========== */
   .btn-primary {

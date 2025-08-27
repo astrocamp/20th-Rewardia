@@ -24,7 +24,4 @@
     display: none !important; 
   }
 
-  body .main-container .main-content.banner-hidden {
-    margin-top: 80px;
-  }
 }
