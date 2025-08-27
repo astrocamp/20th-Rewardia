@@ -46,7 +46,7 @@ def handle_missing_urls(urls):
 def crawl_roo_cards():
     driver = webdriver.Chrome()
     failed_cards = []
-    success_urls = []
+    processed_urls = set()
     main_url_page = "https://roo.cash/creditcard/"
     sleep_time = random.uniform(7, 14)
 
@@ -66,6 +66,7 @@ def crawl_roo_cards():
             categories_urls = [
                 category.get_attribute("href") for category in categories
             ]
+            print(categories_urls)
         except WebDriverException as error:
             print(f"Error fetching element: {error}")
 
@@ -80,12 +81,17 @@ def crawl_roo_cards():
                         By.CSS_SELECTOR, 'h1[data-testid="product-title"]'
                     ).text.strip()
                     # 發現銀行就在卡名裡：中國信託
-                    bank_name = re.findall(
-                        r"(滙豐|中國信託|國泰|玉山|台新|富邦|第一|合庫|兆豐|永豐|遠東|凱基|聯邦|星展|樂天|彰化|華南|新光)",
+                    bank_matches = re.findall(
+                        r"(滙豐|中國信託|國泰|玉山|台新|富邦|第一|合作金庫|兆豐|永豐|遠東|凱基|聯邦|星展|樂天|彰化|華南|新光|上海商銀|美國運通|渣打|陽信|LINE Bank|將來|元大|台中商銀|王道|王道)",
                         card_name,
                     )
+                    if bank_matches:
+                        bank_name = bank_matches[0]
+                    else:
+                        bank_name = "無"
+                        print(f"Bank not found in {card_name}.")
 
-                except WebDriverException as error:
+                except Exception as error:
                     # 找不到卡，就回傳這個字典
                     error_data = {
                         "card": "Card not found.",
@@ -162,8 +168,8 @@ def crawl_roo_cards():
                 # 找不到卡，就終止這次的函式
                 return error
 
-        # 先進到每一個類別的分頁
-        for category_url in categories_urls:
+        # 先進到每一個類別的分頁，跳過第一個，因為第一個是2025年精選，那些一定分散在各個類別裡
+        for category_url in categories_urls[1:]:
             driver.get(category_url)
             driver.implicitly_wait(2)
             card_names = driver.find_elements(
@@ -173,22 +179,22 @@ def crawl_roo_cards():
             for card_url in card_urls:
                 try:
                     # 找尋每張卡頁面的資料
-                    processed_url = get_card_info(card_url)
+                    get_card_info(card_url)
                     time.sleep(sleep_time)
-                    success_urls.append(processed_url)
+                    processed_urls.add(card_url)
 
                 except WebDriverException as error:
                     print(f"Error fetching page {card_url}: {error}")
                     failed_cards.append(card_url)
 
         # 排除成功的url，並將沒有被找到的url，設is_active=False
-        handle_missing_urls(success_urls)
-        print(f"Failed or with error: {failed_cards}")
-        print(f"Success: {success_urls}")
+        handle_missing_urls(processed_urls)
 
     finally:
         # 關閉查找
         print("Closing webdriver.")
+        print(f"Failed or with error: {failed_cards}")
+        print(f"Processed {len(processed_urls)} cards.")
         driver.quit()
 
 
