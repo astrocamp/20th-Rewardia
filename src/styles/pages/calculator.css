@@ -15,7 +15,7 @@
 
   /* ========== Title Style ========== */
   .calculator-title {
-    @apply text-4xl leading-[0.98] font-bold text-black mb-6 mt-1;
+    @apply text-4xl leading-tight-custom font-bold text-black mb-6 mt-1;
   }
 
   /* ========== Result Card ========== */
@@ -55,7 +55,7 @@
   }
   
   .form-title {
-    @apply text-2xl leading-[1.21] font-bold text-muted;
+    @apply text-2xl leading-relaxed-custom font-bold text-muted;
   }
 
   /* ========== Disclaimer Section ========== */

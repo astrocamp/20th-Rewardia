@@ -15,7 +15,7 @@
   }
   
   .faq-feature-number {
-    @apply w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center text-3xl font-bold font-kulim-park leading-[0.98] mr-4;
+    @apply w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center text-3xl font-bold font-kulim-park leading-tight-custom mr-4;
   }
   
   .faq-feature-content {
@@ -23,11 +23,11 @@
   }
   
   .faq-feature-title {
-    @apply text-xl sm:text-2xl lg:text-3xl font-bold text-black font-kulim-park leading-[1.15] text-left;
+    @apply text-xl sm:text-2xl lg:text-3xl font-bold text-black font-kulim-park leading-normal-custom text-left;
   }
   
   .faq-category-title {
-    @apply text-2xl font-bold text-muted mb-6 font-inter leading-[1.21] bg-transparent p-0 cursor-default;
+    @apply text-2xl font-bold text-muted mb-6 font-inter leading-relaxed-custom bg-transparent p-0 cursor-default;
   }
   
   .faq-qa-list {
@@ -43,7 +43,7 @@
   }
   
   .faq-question-text {
-    @apply text-lg font-bold text-dark-gray flex-1 pr-4 font-inter leading-[1.21] cursor-default;
+    @apply text-lg font-bold text-dark-gray flex-1 pr-4 font-inter leading-relaxed-custom cursor-default;
   }
   
   .faq-toggle-btn {

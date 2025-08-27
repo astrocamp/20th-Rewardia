@@ -25,6 +25,11 @@ module.exports = {
         'kulim-park': ['"Kulim Park"', 'sans-serif'],
         'inter': ['"Inter"', 'sans-serif'],
       },
+      lineHeight: {
+        'tight-custom': '0.98',  // 自定義緊密行高，用於 Kulim Park 字體標題
+        'normal-custom': '1.15', // 自定義標準行高，用於功能標題
+        'relaxed-custom': '1.21', // 自定義放鬆行高，用於分類標題和表單
+      },
     },
   },
   plugins: [
