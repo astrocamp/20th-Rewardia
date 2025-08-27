@@ -20,16 +20,15 @@
 
   /* ========== UI Button (4-state) ========== */
   .ui-btn {
-    @apply inline-flex items-center justify-center rounded-lg h-12 px-6 font-medium transition-colors duration-200 select-none;
-    width: 132px; /* As per Figma design */
+    @apply inline-flex items-center justify-center rounded-lg h-12 px-6 font-medium transition-colors duration-200 select-none w-[132px];
   }
   
   .ui-btn-primary {
     @apply bg-primary text-white;
   }
-  .ui-btn-primary:hover { @apply bg-[#1c55a4]; } /* A bit darker than primary */
-  .ui-btn-primary:active { @apply bg-[#184a90]; } /* Even darker */
-  .ui-btn-primary:disabled { @apply bg-[#9BB6DD] cursor-not-allowed opacity-70; }
+  .ui-btn-primary:hover { @apply bg-primary-hover; }
+  .ui-btn-primary:active { @apply bg-primary-active; }
+  .ui-btn-primary:disabled { @apply bg-primary-disabled cursor-not-allowed opacity-70; }
 
   .ui-btn-secondary {
     @apply bg-gray-200 text-gray-900;
@@ -40,18 +39,17 @@
 
   /* ========== Small UI Buttons ========== */
   .ui-btn-small {
-    @apply inline-flex items-center justify-center rounded-lg h-10 px-5 font-normal text-base transition-colors duration-200;
-    width: 72px;
+    @apply inline-flex items-center justify-center rounded-lg h-10 px-5 font-normal text-base transition-colors duration-200 w-[72px];
   }
 
   .ui-btn-small-dark {
-    @apply bg-[#111827] text-white;
+    @apply bg-dark-gray text-white;
   }
   .ui-btn-small-dark:hover { @apply bg-gray-700; }
   .ui-btn-small-dark:active { @apply bg-gray-600; }
 
   .ui-btn-small-gray {
-    @apply bg-gray-200 text-[#111827];
+    @apply bg-gray-200 text-dark-gray;
   }
   .ui-btn-small-gray:hover { @apply bg-gray-300; }
   .ui-btn-small-gray:active { @apply bg-gray-400; }

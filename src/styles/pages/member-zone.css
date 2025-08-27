@@ -3,9 +3,7 @@
 @layer components {
   /* ========== Member Zone Page Layout ========== */
   .member-guest-content {
-    @apply flex flex-col items-center justify-center text-center;
-    min-height: 500px;
-    gap: 2rem;
+    @apply flex flex-col items-center justify-center text-center min-h-[500px] gap-8;
   }
 
   .member-guest-image {
@@ -43,8 +41,7 @@
 
   /* ========== Member Info ========== */
   .member-info-grid {
-    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
-    margin-top: 2.5rem;
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6 mt-10;
   }
 
   .member-info-item {
@@ -52,26 +49,24 @@
   }
 
   .member-info-label {
-    @apply text-lg font-bold text-[#111827];
+    @apply text-lg font-bold text-dark-gray;
   }
 
   .member-info-value {
-    @apply text-base text-[#111827];
+    @apply text-base text-dark-gray;
   }
 
   .member-info-empty {
-    @apply text-[#111827] opacity-70;
+    @apply text-dark-gray opacity-70;
   }
 
   /* ========== Member Cards ========== */
   .member-cards-list {
-    @apply space-y-6;
-    margin-top: 2.5rem;
+    @apply space-y-6 mt-10;
   }
 
   .member-card-item {
-    @apply bg-white border border-gray-300 rounded-lg p-6 flex items-center gap-6;
-    min-height: 125px;
+    @apply bg-white border border-gray-300 rounded-lg p-6 flex items-center gap-6 min-h-[125px];
   }
 
   .member-card-image {
@@ -87,11 +82,11 @@
   }
 
   .member-card-name {
-    @apply text-2xl font-bold text-[#111827] mb-1;
+    @apply text-2xl font-bold text-dark-gray mb-1;
   }
 
   .member-card-bank {
-    @apply text-base text-[#111827];
+    @apply text-base text-dark-gray;
   }
 
   .member-card-actions {
@@ -100,9 +95,7 @@
 
   /* ========== Empty State ========== */
   .member-empty-content {
-    @apply flex flex-col items-center justify-center text-center;
-    margin-top: 2.5rem;
-    min-height: 270px;
+    @apply flex flex-col items-center justify-center text-center mt-10 min-h-[270px];
   }
 
   .member-empty-icon {
@@ -110,7 +103,7 @@
   }
 
   .member-empty-text {
-    @apply text-2xl text-[#949AA6] font-normal;
+    @apply text-2xl text-placeholder-gray font-normal;
   }
 
   /* ========== Responsive Styles for Member Zone ========== */
