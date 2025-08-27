@@ -5,23 +5,115 @@
 {% block content %}
 {% include 'components/auth-shared.html' with component="page-container" title="註冊" %}
 
+<!-- 錯誤提示區域 -->
+<div id="error-alerts" class="space-y-2 mb-4"></div>
+
+<!-- 成功提示區域 -->
+<div id="success-alerts" class="space-y-2 mb-4"></div>
+
 <!-- 主要註冊表單 -->
 <form class="space-y-3" 
       x-data="register_form" 
-      method="post"
-      action="{% url 'pages:register' %}">
+      @submit.prevent="submitForm()">
   {% csrf_token %}
+  
   <!-- 帳號欄位 -->
-  {% include 'components/auth-shared.html' with component="input-field" field_type="text" field_id="username" field_name="username" label_text="帳號" placeholder="請輸入您的帳號" required="true" %}
+  <div class="register-field-container">
+    <label for="username" class="register-label">帳號</label>
+    <div class="register-relative-container">
+      <input 
+        type="text"
+        id="username"
+        name="username"
+        placeholder="請輸入您的帳號"
+        class="register-input"
+        :class="{'input-error': errors.username}"
+        x-model="formData.username"
+        @blur="validateField('username')"
+        required>
+    </div>
+    <div x-show="errors.username" class="text-error text-sm mt-1" x-text="errors.username"></div>
+  </div>
 
   <!-- 密碼欄位 -->
-  {% include 'components/auth-shared.html' with component="input-field" field_type="password" field_id="password" field_name="password1" label_text="密碼" placeholder="請輸入您的密碼" required="true" has_toggle="true" alpine_type="passwordVisible ? 'text' : 'password'" toggle_action="togglePassword('password')" %}
+  <div class="register-field-container">
+    <label for="password" class="register-label">密碼</label>
+    <div class="register-relative-container">
+      <input 
+        :type="showPassword ? 'text' : 'password'"
+        id="password"
+        name="password1"
+        placeholder="請輸入您的密碼"
+        class="register-input pr-12"
+        :class="{'input-error': errors.password}"
+        x-model="formData.password"
+        @blur="validateField('password')"
+        required>
+      <button 
+        type="button" 
+        class="password-toggle-btn"
+        @click="showPassword = !showPassword"
+        :aria-label="showPassword ? '隱藏密碼' : '顯示密碼'"
+      >
+        <div x-show="!showPassword">
+          {% include 'components/icon.html' with name="eye" class="w-6 h-6" %}
+        </div>
+        <div x-show="showPassword">
+          {% include 'components/icon.html' with name="eye-off" class="w-6 h-6" %}
+        </div>
+      </button>
+    </div>
+    <div x-show="errors.password" class="text-error text-sm mt-1" x-text="errors.password"></div>
+  </div>
 
   <!-- 確認密碼欄位 -->
-  {% include 'components/auth-shared.html' with component="input-field" field_type="password" field_id="confirm-password" field_name="password2" label_text="確認密碼" placeholder="請再次輸入您的密碼" required="true" has_toggle="true" alpine_type="confirmPasswordVisible ? 'text' : 'password'" toggle_action="togglePassword('password_confirm')" aria_visible_var="confirmPasswordVisible" %}
+  <div class="register-field-container">
+    <label for="confirm-password" class="register-label">確認密碼</label>
+    <div class="register-relative-container">
+      <input 
+        :type="showConfirmPassword ? 'text' : 'password'"
+        id="confirm-password"
+        name="password2"
+        placeholder="請再次輸入您的密碼"
+        class="register-input pr-12"
+        :class="{'input-error': errors.confirm_password}"
+        x-model="formData.confirm_password"
+        @blur="validateField('confirm_password')"
+        required>
+      <button 
+        type="button" 
+        class="password-toggle-btn"
+        @click="showConfirmPassword = !showConfirmPassword"
+        :aria-label="showConfirmPassword ? '隱藏確認密碼' : '顯示確認密碼'"
+      >
+        <div x-show="!showConfirmPassword">
+          {% include 'components/icon.html' with name="eye" class="w-6 h-6" %}
+        </div>
+        <div x-show="showConfirmPassword">
+          {% include 'components/icon.html' with name="eye-off" class="w-6 h-6" %}
+        </div>
+      </button>
+    </div>
+    <div x-show="errors.confirm_password" class="text-error text-sm mt-1" x-text="errors.confirm_password"></div>
+  </div>
 
   <!-- 電子郵件欄位 -->
-  {% include 'components/auth-shared.html' with component="input-field" field_type="email" field_id="email" field_name="email" label_text="電子郵件" placeholder="請輸入您的電子郵件" required="true" %}
+  <div class="register-field-container">
+    <label for="email" class="register-label">電子郵件</label>
+    <div class="register-relative-container">
+      <input 
+        type="email"
+        id="email"
+        name="email"
+        placeholder="請輸入您的電子郵件"
+        class="register-input"
+        :class="{'input-error': errors.email}"
+        x-model="formData.email"
+        @blur="validateField('email')"
+        required>
+    </div>
+    <div x-show="errors.email" class="text-error text-sm mt-1" x-text="errors.email"></div>
+  </div>
 
   <!-- 服務條款勾選框 -->
   <div class="flex items-start space-x-3">
@@ -30,6 +122,9 @@
       id="terms" 
       name="terms"
       class="register-checkbox"
+      :class="{'checkbox-error': errors.agree_terms}"
+      x-model="formData.agree_terms"
+      @change="validateField('agree_terms')"
       required
     >
     <label for="terms" class="text-lg text-gray-700 font-normal leading-relaxed">
@@ -43,9 +138,18 @@
       </a>
     </label>
   </div>
+  <div x-show="errors.agree_terms" class="text-error text-sm mt-1" x-text="errors.agree_terms"></div>
 
   <!-- 主要註冊按鈕 -->
-  {% include 'components/auth-shared.html' with component="primary-button" button_text="建立帳號" %}
+  <button 
+    type="submit" 
+    class="register-btn-primary"
+    :class="{'loading': isSubmitting}"
+    :disabled="isSubmitting"
+  >
+    <span x-show="!isSubmitting">建立帳號</span>
+    <span x-show="isSubmitting">處理中...</span>
+  </button>
 </form>
 
 <!-- 分隔線 -->
@@ -57,5 +161,6 @@
 <!-- 登入連結 -->
 {% include 'components/auth-shared.html' with component="bottom-link" prefix_text="已經有帳號？" link_text="登入" link_url="pages:login" suffix_text="去" %}
 
-{% include 'components/auth-shared.html' with component="page-container-end" %}
+  </div>
+</div>
 {% endblock %}
