@@ -37,4 +37,9 @@
     @apply hover:bg-gray-700 rounded transition-colors duration-200;
   }
 
+  /* ========== Custom spacing fix ========== */
+  .banner-spacing {
+    margin-top: 5rem; /* 80px - 標準橫幅上邊距，用於 download.html 和 faq.html */
+  }
+
 }
