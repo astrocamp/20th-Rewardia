@@ -29,7 +29,6 @@ def save_data(data):
     crawled_card, created = CrawledData.objects.update_or_create(
         card=card,
         url=data["url"],
-        url_domain=data["url_domain"],
         defaults={
             "content": content,
         },

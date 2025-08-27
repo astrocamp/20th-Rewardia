@@ -4,20 +4,17 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('card_crawler', '0002_rename_name_crawleddata_card_remove_crawleddata_bank_and_more'),
+        (
+            "card_crawler",
+            "0002_rename_name_crawleddata_card_remove_crawleddata_bank_and_more",
+        ),
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='crawleddata',
-            name='url_domain',
-            field=models.URLField(default=None, verbose_name='Crawled Main Source'),
-        ),
         migrations.AlterField(
-            model_name='crawleddata',
-            name='url',
-            field=models.URLField(default=None, verbose_name='Crawled Website'),
+            model_name="crawleddata",
+            name="url",
+            field=models.URLField(default=None, verbose_name="Crawled Website"),
         ),
     ]
