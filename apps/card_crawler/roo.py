@@ -11,26 +11,21 @@ import time
 from apps.card_crawler.models import CrawledData
 from apps.cards.models import CreditCard
 from apps.banks.models import Bank
+import re
 
 
-# 範例，把資料存到資料庫，還無法正式存，因為credit card db還沒見起來
-# 這個函式到時候會放到command的資料夾裡
 def save_data(data):
-    # 先找銀行，如果銀行沒有在db，那就創建銀行
     bank, created = Bank.objects.get_or_create(
         name=data["bank"],
     )
 
-    # 如果這張卡沒有在db，那就會在cards創建一張
     card, created = CreditCard.objects.get_or_create(
         name=data["card"],
         bank=bank,
     )
 
-    # 用逗點把爬到的資料接起來
     content = ",".join(data["content"])
 
-    # 這裡是存到爬到的資料的資料庫
     crawled_card, created = CrawledData.objects.update_or_create(
         card=card,
         url=data["url"],
@@ -72,13 +67,14 @@ def crawl_roo_cards():
 
                 try:
                     # 找到卡的名字：中國信託 LINE Pay 信用卡
-                    card_full_name = driver.find_element(
+                    card_name = driver.find_element(
                         By.CSS_SELECTOR, 'h1[data-testid="product-title"]'
                     ).text.strip()
-                    # 卡名去掉銀行名：LINE Pay 信用卡
-                    card_name = " ".join(card_full_name.split(" ")[1:])
                     # 發現銀行就在卡名裡：中國信託
-                    bank_name = card_full_name.split(" ")[0]
+                    bank_name = re.findall(
+                        r"(滙豐|中國信託|國泰|玉山|台新|富邦|第一|合庫|兆豐|永豐|遠東|凱基|聯邦|星展|樂天|彰化|華南|新光)",
+                        card_name,
+                    )
 
                 except WebDriverException as error:
                     # 找不到卡，就回傳這個字典
@@ -127,7 +123,6 @@ def crawl_roo_cards():
                         "card": card_name,
                         "bank": bank_name,
                         "url": url,
-                        "url_domain": f"{urlparse(url).netloc}",
                         "content": [],
                     }
 
