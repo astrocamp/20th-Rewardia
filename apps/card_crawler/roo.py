@@ -45,14 +45,12 @@ def handle_missing_urls(urls):
 # 把整個爬蟲包成一個function
 def crawl_roo_cards():
     driver = webdriver.Chrome()
-
     failed_cards = []
     success_urls = []
+    main_url_page = "https://roo.cash/creditcard/"
+    sleep_time = random.uniform(7, 14)
 
     try:
-        main_url_page = "https://roo.cash/creditcard/"
-        sleep_time = random.uniform(7, 14)
-
         try:
             driver.get(main_url_page)
             # 在尋找物件前要等多久
@@ -62,10 +60,12 @@ def crawl_roo_cards():
             driver.quit()
 
         try:
-            card_names = driver.find_elements(
-                By.CSS_SELECTOR, "a[data-testid='product-detail']"
+            categories = driver.find_elements(
+                By.CSS_SELECTOR, "a[type='button'][rel='opener']"
             )
-            card_urls = [card.get_attribute("href") for card in card_names]
+            categories_urls = [
+                category.get_attribute("href") for category in categories
+            ]
         except WebDriverException as error:
             print(f"Error fetching element: {error}")
 
@@ -162,16 +162,24 @@ def crawl_roo_cards():
                 # 找不到卡，就終止這次的函式
                 return error
 
-        for card_url in card_urls:
-            try:
-                # 找尋每張卡頁面的資料
-                processed_url = get_card_info(card_url)
-                time.sleep(sleep_time)
-                success_urls.append(processed_url)
+        # 先進到每一個類別的分頁
+        for category_url in categories_urls:
+            driver.get(category_url)
+            driver.implicitly_wait(2)
+            card_names = driver.find_elements(
+                By.CSS_SELECTOR, "a[data-testid='product-detail']"
+            )
+            card_urls = [card.get_attribute("href") for card in card_names]
+            for card_url in card_urls:
+                try:
+                    # 找尋每張卡頁面的資料
+                    processed_url = get_card_info(card_url)
+                    time.sleep(sleep_time)
+                    success_urls.append(processed_url)
 
-            except WebDriverException as error:
-                print(f"Error fetching page {card_url}: {error}")
-                failed_cards.append(card_url)
+                except WebDriverException as error:
+                    print(f"Error fetching page {card_url}: {error}")
+                    failed_cards.append(card_url)
 
         # 排除成功的url，並將沒有被找到的url，設is_active=False
         handle_missing_urls(success_urls)
