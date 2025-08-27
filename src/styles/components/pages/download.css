@@ -1,3 +1,5 @@
+/* Primarily corresponds to: templates/pages/download.html */
+
 @layer components {
   /* ========== Download Page Buttons ========== */
   .download-btn-primary {
