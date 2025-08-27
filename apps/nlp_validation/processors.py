@@ -83,15 +83,34 @@ class EntityExtractor:
             "mobile_payment": ["行動支付", "手機支付", "數位支付", "電子支付"],
             "department_store": ["百貨", "百貨公司", "購物中心", "商場"],
             "convenience_store": ["便利商店", "7-11", "全家", "萊爾富", "OK"],
-            "momo": ["momo", "富邦momo", "momo購物", "momo網"],
-            "pchome": ["pchome", "pc home", "露天", "pc商店街", "pchome24h"],
-            "shopee": ["蝦皮", "shopee", "蝦皮購物"],
-            "yahoo": ["yahoo", "奇摩", "yahoo購物"],
-            "uber": ["uber", "uber eats", "ubereats"],
-            "foodpanda": ["foodpanda", "熊貓", "panda"],
-            "netflix": ["netflix", "網飛"],
-            "spotify": ["spotify"],
-            "coupang": ["coupang", "酷彭"],
+            "e_commerce": [
+                "momo",
+                "富邦momo",
+                "momo購物",
+                "momo網",
+                "pchome",
+                "pc home",
+                "露天",
+                "pc商店街",
+                "pchome24h",
+                "蝦皮",
+                "shopee",
+                "蝦皮購物",
+                "yahoo",
+                "奇摩",
+                "yahoo購物",
+                "uber",
+                "uber eats",
+                "ubereats",
+                "foodpanda",
+                "熊貓",
+                "panda",
+                "netflix",
+                "網飛",
+                "spotify",
+                "coupang",
+                "酷彭",
+            ],
         }
 
         # 電商
@@ -109,9 +128,10 @@ class EntityExtractor:
 
     def identify_category_from_context(self, context):
         # 用前後文分類類別
+        context_lower = context.lower()
         for category, keywords in self.category_mapping.items():
             for keyword in keywords:
-                if keyword in context:
+                if keyword.lower() in context_lower:
                     return category
 
         return None
@@ -137,8 +157,6 @@ class EntityExtractor:
             r"(\d+\.?\d*)%.*?回饋",
             r"回饋.*?(\d+\.?\d*)%",
             r"享.*?(\d+\.?\d*)%",
-            r"(\d+\.?\d*)趴",
-            r"百分之(\d+\.?\d*)",
             r"消費.*?(\d+\.?\d*)%",
             r"為(\d+\.?\d*)%.*?回饋",
             r"(\d+\.?\d*)%現金",
@@ -152,7 +170,7 @@ class EntityExtractor:
                 if not (0 < rate <= 20):
                     continue
 
-                context = text[max(0, match.start() - 0) : match.end()].strip()
+                context = text[max(0, match.start() - 10) : match.end()].strip()
 
                 category = self.identify_category_from_context(context)
                 merchant = self.identify_merchant_from_context(context)
@@ -185,9 +203,10 @@ class EntityExtractor:
     def extract_categories(self, text):
         # 消費分類
         found_categories = []
+        text_lower = text.lower()
 
         for category_key, keywords in self.category_mapping.items():
-            if any(keyword in text for keyword in keywords):
+            if any(keyword.lower() in text_lower for keyword in keywords):
                 found_categories.append(category_key)
 
         return found_categories
