@@ -7,11 +7,11 @@
 
   <div class="calculator-container">
     <!-- 區塊標題：新增卡片 -->
-        {% if user_card %}
-            <h2 class="calculator-title">編輯卡片</h2>
-        {% else %}
-            <h2 class="calculator-title">新增卡片</h2>
-        {% endif %}
+    {% if is_edit_mode %}
+        <h2 class="calculator-title">編輯卡片</h2>
+    {% else %}
+        <h2 class="calculator-title">新增卡片</h2>
+    {% endif %}
 
     <!-- 主要內容卡片 -->
     <div class="add-card-container">
@@ -20,7 +20,11 @@
         <div class="add-card-header">
           <h3 class="add-card-title">我的卡片</h3>
                 <!-- 表單欄位 -->
-                <form method="POST" action="{% url 'users:card_create' %}">
+            {% if user_card %}
+            <form method="POST" action="{% url 'users:card_edit' user_card.id %}">
+            {% else %}
+            <form method="POST" action="{% url 'users:card_new' %}">
+            {% endif %}
                     {% csrf_token %}
                     <div class="add-card-fields">
                         <!-- 發卡銀行 -->
@@ -57,9 +61,9 @@
                     <div class="add-card-actions">
                         <a href="{% url 'users:member_zone' %}" class="ui-btn ui-btn-secondary">取消</a>
                         {% if user_card %}
-                            <button type="submit">更新卡片</button>  <!-- 編輯模式 -->
+                            <button type="submit" class="ui-btn ui-btn-primary">更新卡片</button>
                         {% else %}
-                            <button type="submit">新增卡片</button>  <!-- 新增模式 -->
+                            <button type="submit" class="ui-btn ui-btn-primary">新增卡片</button>
                         {% endif %}
                     </div>
                 </form>

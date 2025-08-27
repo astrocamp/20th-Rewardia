@@ -1,0 +1,58 @@
+{% extends 'layouts/default.html' %}
+
+{% block title %}刪除卡片 - Rewardia{% endblock %}
+
+{% block content %}
+<section class="calculator-page">
+  <div class="calculator-container">
+    <!-- 區塊標題：刪除卡片 -->
+    <h2 class="calculator-title">刪除卡片</h2>
+
+    <!-- 主要內容卡片 -->
+    <div class="add-card-container">
+      <div class="add-card-bg">
+        <!-- 標題列 -->
+        <div class="add-card-header">
+          <h3 class="add-card-title">確認刪除</h3>
+          
+          <p style="margin: 16px 0; color: #6b7280; text-align: center;">
+            您即將刪除以下卡片：
+          </p>
+
+          <!-- 卡片資訊 -->
+          <div style="background-color: #f9fafb; border-radius: 8px; padding: 20px; margin: 20px 0;">
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <svg style="width: 40px; height: 40px; color: #6b7280;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+              </svg>
+              <div>
+                <h4 style="margin: 0; font-size: 18px; font-weight: 600; color: #1f2937;">
+                  {{ user_card.card.name }}
+                </h4>
+                <p style="margin: 4px 0 0 0; color: #6b7280;">
+                  {{ user_card.card.bank.name }}
+                </p>
+                <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 14px;">
+                  新增日期：{{ user_card.added_date|date:"Y年n月j日" }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 確認表單 -->
+          <form method="POST">
+            {% csrf_token %}
+            <div class="add-card-actions">
+              <a href="{% url 'users:member_zone' %}" class="ui-btn ui-btn-secondary">取消</a>
+              <button type="submit" class="ui-btn" style="background-color: #dc2626; color: white;">
+                確認刪除
+              </button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -66,7 +66,7 @@
             </svg>
             <h3 class="member-section-title">我的卡片</h3>
           </div>
-          <a href="{% url 'pages:card_new' %}" class="ui-btn ui-btn-primary">+ 新增卡片</a>
+          <a href="{% url 'users:card_new' %}" class="ui-btn ui-btn-primary">+ 新增卡片</a>
         </div>
 
         {% if user_cards %}
@@ -79,8 +79,8 @@
               <p class="member-card-bank">{{ user_card.card.bank.name }}</p>
             </div>
             <div class="member-card-actions">
-              <button class="ui-btn-small ui-btn-small-dark">編輯</button>
-              <button class="ui-btn-small ui-btn-small-gray">刪除</button>
+              <a href="{% url 'users:card_edit' user_card.id %}" class="ui-btn-small ui-btn-small-dark">編輯</a>
+              <a href="{% url 'users:card_delete' user_card.id %}" class="ui-btn-small ui-btn-small-gray">刪除</a>
             </div>
           </div>
           {% endfor %}
