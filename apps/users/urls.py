@@ -5,4 +5,5 @@ app_name = "users"
 
 urlpatterns = [
     path('member/', views.member_zone, name='member_zone'),
+    path('register/', views.register, name='register'),
 ]
