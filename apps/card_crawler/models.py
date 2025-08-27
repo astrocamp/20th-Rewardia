@@ -15,7 +15,7 @@ class CrawledData(models.Model):
     is_active = models.BooleanField("Is Active", default=True)
     created_at = models.DateTimeField("Created At", auto_now_add=True)
     updated_at = models.DateTimeField("Updated At", auto_now=True)
-    deleted_at = models.DateTimeField("Deleted At", auto_now=True)
+    deleted_at = models.DateTimeField("Deleted At", blank=True, null=True)
 
     class Meta:
         db_table = "crawler_data"

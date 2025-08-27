@@ -6,12 +6,12 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.relative_locator import locate_with
-from urllib.parse import urlparse
 import time
 from apps.card_crawler.models import CrawledData
 from apps.cards.models import CreditCard
 from apps.banks.models import Bank
 import re
+import datetime
 
 
 def save_data(data):
@@ -27,17 +27,27 @@ def save_data(data):
     content = ",".join(data["content"])
 
     crawled_card, created = CrawledData.objects.update_or_create(
-        card=card,
         url=data["url"],
         defaults={
+            "card": card,
             "content": content,
         },
+    )
+
+
+# 將不存在於roo.cash且存在於我們db的url，設為刪除狀態
+def handle_missing_urls(urls):
+    CrawledData.objects.filter(is_active=True).exclude(url__in=urls).update(
+        is_active=False, deleted_at=datetime.now()
     )
 
 
 # 把整個爬蟲包成一個function
 def crawl_roo_cards():
     driver = webdriver.Chrome()
+
+    failed_cards = []
+    success_urls = []
 
     try:
         main_url_page = "https://roo.cash/creditcard/"
@@ -147,20 +157,19 @@ def crawl_roo_cards():
                 # 找不到卡，就終止這次的函式
                 return error
 
-        failed_cards = []
-
-        for i, card_url in enumerate(card_urls):
+        for card_url in card_urls:
             try:
                 # 找尋每張卡頁面的資料
-                get_card_info(card_url)
+                processed_url = get_card_info(card_url)
                 time.sleep(sleep_time)
+                success_urls.append(processed_url)
 
             except WebDriverException as error:
                 failed_cards.append(card_url)
                 print(f"Error fetching page {card_url}: {error}")
 
-        # print(f"Successfully processed: {len(all_cards_data)} cards")
-        print(f"Failed: {len(failed_cards)} cards")
+        # 排除成功的url，並將沒有被找到的url，設is_active=False
+        handle_missing_urls(success_urls)
 
     finally:
         # 關閉查找
