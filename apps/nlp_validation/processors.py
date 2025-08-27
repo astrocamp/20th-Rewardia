@@ -75,7 +75,7 @@ class EntityExtractor:
     def __init__(self):
         self.processor = TextProcessor()
 
-        # 同義詞
+        # 同義詞/回饋類別
         self.category_mapping = {
             "foreign_transaction": ["國外", "海外", "境外", "國際", "外幣", "外國"],
             "domestic_transaction": ["國內", "本土", "台灣", "境內", "台灣境內"],
@@ -83,9 +83,18 @@ class EntityExtractor:
             "mobile_payment": ["行動支付", "手機支付", "數位支付", "電子支付"],
             "department_store": ["百貨", "百貨公司", "購物中心", "商場"],
             "convenience_store": ["便利商店", "7-11", "全家", "萊爾富", "OK"],
+            "momo": ["momo", "富邦momo", "momo購物", "momo網"],
+            "pchome": ["pchome", "pc home", "露天", "pc商店街", "pchome24h"],
+            "shopee": ["蝦皮", "shopee", "蝦皮購物"],
+            "yahoo": ["yahoo", "奇摩", "yahoo購物"],
+            "uber": ["uber", "uber eats", "ubereats"],
+            "foodpanda": ["foodpanda", "熊貓", "panda"],
+            "netflix": ["netflix", "網飛"],
+            "spotify": ["spotify"],
+            "coupang": ["coupang", "酷彭"],
         }
 
-        # 商家
+        # 電商
         self.merchant_patterns = {
             "momo": ["momo", "富邦momo", "momo購物", "momo網"],
             "pchome": ["pchome", "pc home", "露天", "pc商店街", "pchome24h"],
@@ -98,10 +107,31 @@ class EntityExtractor:
             "coupang": ["coupang", "酷彭"],
         }
 
+    def identify_category_from_context(self, context):
+        # 用前後文分類類別
+        for category, keywords in self.category_mapping.items():
+            for keyword in keywords:
+                if keyword in context:
+                    return category
+
+        return None
+
+    def identify_merchant_from_context(self, context):
+        # 用前後文分類電商
+        context_lower = context.lower()
+        for merchant, patterns in self.merchant_patterns.items():
+            for pattern in patterns:
+                if pattern.lower() in context_lower:
+                    return merchant
+        return None
+
     def extract_reward_rates(self, text):
+        # 資訊處裡
+        text = re.sub(r"(\d+\.?\d*)\s*\n\s*%", r"\1%", text)
+        text = re.sub(r"(\d+\.?\d*)\s{2,}%", r"\1%", text)
         # 回饋資訊
         results = []
-        seen_rates = set()
+        seen_combinations = set()
         # 回饋率
         patterns = [
             r"(\d+\.?\d*)%.*?回饋",
@@ -119,13 +149,24 @@ class EntityExtractor:
             matches = re.finditer(pattern, text)
             for match in matches:
                 rate = float(match.group(1))
-                if rate not in seen_rates:
-                    seen_rates.add(rate)
-                    context = text[max(0, match.start() - 50) : match.end() + 50]
+                if not (0 < rate <= 20):
+                    continue
+
+                context = text[max(0, match.start() - 0) : match.end()].strip()
+
+                category = self.identify_category_from_context(context)
+                merchant = self.identify_merchant_from_context(context)
+
+                combination_key = (rate, category, merchant)
+                if combination_key not in seen_combinations:
+                    seen_combinations.add(combination_key)
+
                     results.append(
                         {
                             "rate": rate,
-                            "context": context.strip(),
+                            "context": context,
+                            "category": category,
+                            "merchant": merchant,
                         }
                     )
 
@@ -141,7 +182,7 @@ class EntityExtractor:
 
         return found_merchants
 
-    def extract_categories(self, text: str) -> list[str]:
+    def extract_categories(self, text):
         # 消費分類
         found_categories = []
 
