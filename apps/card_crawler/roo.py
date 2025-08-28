@@ -16,7 +16,7 @@ from datetime import datetime
 failed_cards = []
 processed_urls = set()
 # 仿效真人操作瀏覽器，隨機從0.7-1.4秒之間，挑選暫停秒數
-sleep_time = random.uniform(7, 14)
+sleep_time = random.uniform(0.7, 1.4)
 
 
 def save_data(data):
@@ -63,7 +63,6 @@ def get_card_info(url):
             find_card_error = create_error_data(url, error, card_name)
             failed_cards.append(find_card_error)
             print(f"Error fetching card: {error}")
-            return find_card_error
 
         try:
             # 找到navbar和footer之間的所有button
@@ -137,10 +136,9 @@ def get_card_info(url):
         webpage_error = create_error_data(url, error)
         failed_cards.append(webpage_error)
         # 找不到卡，就終止這次的函式
-        return webpage_error
 
     finally:
-        print(f"{card_name} finished.")
+        print("Finished.")
         driver.quit()
 
 
