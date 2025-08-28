@@ -4,12 +4,6 @@ from apps.cards.models import CreditCard
 
 # Create your models here.
 class CrawledData(models.Model):
-    card = models.ForeignKey(
-        CreditCard,
-        on_delete=models.CASCADE,
-        related_name="crawled_data",
-        verbose_name="Credit Card",
-    )
     content = models.TextField("Crawled Content", null=False)
     url = models.URLField("Crawled Website", default=None)
     is_active = models.BooleanField("Is Active", default=True)
