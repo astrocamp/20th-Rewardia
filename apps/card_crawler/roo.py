@@ -73,7 +73,7 @@ def get_card_info(url):
         except WebDriverException as error:
             # 找不到卡，就回傳這個字典
             error_data = {
-                "card": "Card not found.",
+                "card": f"{card_name}" | "Card not found.",
                 "url": f"{url}",
                 "error": f"{error}",
             }
@@ -106,10 +106,10 @@ def get_card_info(url):
                 )
             except TimeoutException:
                 print("Error fetching elements")
-                failed_cards.append(url)
+                failed_cards.append(error_data)
         except WebDriverException as error:
             print(f"Error fetching button: {error}")
-            failed_cards.append(url)
+            failed_cards.append(error_data)
 
         try:
             # 將抓取到的資料整理成字典
@@ -138,11 +138,11 @@ def get_card_info(url):
 
         except WebDriverException as error:
             print(f"Error finding content: {error}")
-            failed_cards.append(url)
+            failed_cards.append(error_data)
 
     except WebDriverException as error:
         print(f"Card not found: {error}")
-        failed_cards.append(url)
+        failed_cards.append(error_data)
         # 找不到卡，就終止這次的函式
         return error
 
@@ -204,8 +204,13 @@ def crawl_roo_cards(cat_urls):
                     processed_urls.add(card_url)
 
                 except WebDriverException as error:
+                    error_data = {
+                        "card": "Card not found.",
+                        "url": f"{card_url}",
+                        "error": f"{error}",
+                    }
                     print(f"Error fetching page {card_url}: {error}")
-                    failed_cards.append(card_url)
+                    failed_cards.append(error_data)
 
         # 排除成功的url，並將沒有被找到的url，設is_active=False
         handle_missing_urls(processed_urls)
