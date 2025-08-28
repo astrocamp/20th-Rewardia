@@ -8,10 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.relative_locator import locate_with
 import time
 from apps.card_crawler.models import CrawledData
-from apps.cards.models import CreditCard
-from apps.banks.models import Bank
-import re
-import datetime
+from datetime import datetime
 
 failed_cards = []
 processed_urls = set()
@@ -20,15 +17,6 @@ sleep_time = random.uniform(7, 14)
 
 
 def save_data(data):
-    # bank, created = Bank.objects.get_or_create(
-    #     name=data["bank"],
-    # )
-
-    # card, created = CreditCard.objects.get_or_create(
-    #     name=data["card"],
-    #     bank=bank,
-    # )
-
     content = ",".join(data["content"])
 
     crawled_card, created = CrawledData.objects.update_or_create(
@@ -46,6 +34,14 @@ def handle_missing_urls(urls):
     )
 
 
+def create_error_data(url, error, card_name=None):
+    return {
+        "url": url,
+        "error": error,
+        "card_name": card_name if card_name else "Card not found.",
+    }
+
+
 # 抓一張卡的function
 def get_card_info(url):
     try:
@@ -58,27 +54,13 @@ def get_card_info(url):
             card_name = driver.find_element(
                 By.CSS_SELECTOR, 'h1[data-testid="product-title"]'
             ).text.strip()
-            # 發現銀行就在卡名裡：中國信託
-            bank_matches = re.findall(
-                r"(滙豐|中國信託|國泰|玉山|台新|富邦|第一|合庫|兆豐|永豐|遠東|凱基|聯邦|星展|樂天|彰化|華南|新光|上海商銀|美國運通|渣打|陽信|LINE Bank|將來|元大|台中|王道)",
-                card_name,
-            )
-            if bank_matches:
-                bank_name = bank_matches[0]
-            else:
-                bank_name = "無"
-                print(f"Bank not found in {card_name}.")
 
         except WebDriverException as error:
             # 找不到卡，就回傳這個字典
-            error_data = {
-                "card": f"{card_name}" | "Card not found.",
-                "url": f"{url}",
-                "error": f"{error}",
-            }
-            failed_cards.append(error_data)
+            find_card_error = create_error_data(url, error, card_name)
+            failed_cards.append(find_card_error)
             print(f"Error fetching card: {error}")
-            return error_data
+            return find_card_error
 
         try:
             # 找到navbar和footer之間的所有button
@@ -103,18 +85,18 @@ def get_card_info(url):
                 WebDriverWait(driver, 5).until(
                     EC.visibility_of_all_elements_located((By.CLASS_NAME, "answer"))
                 )
-            except TimeoutException:
+            except TimeoutException as error:
                 print("Error fetching elements")
-                failed_cards.append(error_data)
+                answer_error = create_error_data(url, error, card_name=card_name)
+                failed_cards.append(answer_error)
         except WebDriverException as error:
             print(f"Error fetching button: {error}")
-            failed_cards.append(error_data)
+            button_error = create_error_data(url, error, card_name=card_name)
+            failed_cards.append(button_error)
 
         try:
             # 將抓取到的資料整理成字典
             crawled_data = {
-                "card": card_name,
-                "bank": bank_name,
                 "url": url,
                 "content": [],
             }
@@ -137,13 +119,15 @@ def get_card_info(url):
 
         except WebDriverException as error:
             print(f"Error finding content: {error}")
-            failed_cards.append(error_data)
+            tags_error = create_error_data(url, error, card_name=card_name)
+            failed_cards.append(tags_error)
 
     except WebDriverException as error:
         print(f"Card not found: {error}")
-        failed_cards.append(error_data)
+        webpage_error = create_error_data(url, error, card_name=card_name)
+        failed_cards.append(webpage_error)
         # 找不到卡，就終止這次的函式
-        return error
+        return webpage_error
 
     finally:
         print(f"{card_name} finished.")
@@ -187,6 +171,7 @@ def crawl_roo_urls():
 def crawl_roo_cards(cat_urls):
     try:
         driver = webdriver.Chrome()
+
         # 先進到每一個類別的分頁，跳過第一個，因為第一個是2025年精選，那些一定分散在各個類別裡
         for url in cat_urls[1:]:
             driver.get(url)
@@ -195,21 +180,11 @@ def crawl_roo_cards(cat_urls):
                 By.CSS_SELECTOR, "a[data-testid='product-detail']"
             )
             card_urls = [card.get_attribute("href") for card in card_names]
-            for card_url in card_urls:
-                try:
-                    # 找尋每張卡頁面的資料
-                    get_card_info(card_url)
-                    time.sleep(sleep_time)
-                    processed_urls.add(card_url)
 
-                except WebDriverException as error:
-                    error_data = {
-                        "card": "Card not found.",
-                        "url": f"{card_url}",
-                        "error": f"{error}",
-                    }
-                    print(f"Error fetching page {card_url}: {error}")
-                    failed_cards.append(error_data)
+            for card_url in card_urls:
+                get_card_info(card_url)
+                time.sleep(sleep_time)
+                processed_urls.add(card_url)
 
         # 排除成功的url，並將沒有被找到的url，設is_active=False
         handle_missing_urls(processed_urls)
