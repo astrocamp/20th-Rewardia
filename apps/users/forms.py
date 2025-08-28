@@ -70,7 +70,7 @@ class UserRegistrationForm(forms.Form):
             raise ValidationError('帳號只能包含英文字母和數字，不能有空格或特殊字元')
         
         if not UserRegistrationService.check_username_availability(username):
-            raise ValidationError('此帳號已被使用，請選擇其他帳號')
+            raise ValidationError('此帳號已被使用，請選擇其他帳號', code='username_in_use')
         
         return username
     
@@ -79,7 +79,7 @@ class UserRegistrationForm(forms.Form):
         email = self.cleaned_data.get('email')
         
         if not UserRegistrationService.check_email_availability(email):
-            raise ValidationError('此電子信箱已被使用，請使用其他信箱')
+            raise ValidationError('此電子信箱已被使用，請使用其他信箱', code='email_in_use')
         
         return email
     
@@ -104,9 +104,8 @@ class UserRegistrationForm(forms.Form):
         password = cleaned_data.get('password')
         confirm_password = cleaned_data.get('confirm_password')
         
-        if password and confirm_password:
-            if password != confirm_password:
-                raise ValidationError('兩次輸入的密碼不一致，請重新確認')
+        if password and confirm_password and password != confirm_password:
+            self.add_error('confirm_password', '兩次輸入的密碼不一致，請重新確認')
         
         return cleaned_data
 

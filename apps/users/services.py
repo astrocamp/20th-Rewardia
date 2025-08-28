@@ -1,5 +1,9 @@
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.db import IntegrityError
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class UserRegistrationService:
@@ -17,7 +21,8 @@ class UserRegistrationService:
         try:
             user = form.save()
             return True, user, None
-        except Exception as e:
+        except IntegrityError as e:
+            logger.error(f"Database integrity error during user registration: {e}")
             return False, None, 'database_error'
     
     @staticmethod
@@ -42,19 +47,20 @@ class UserRegistrationService:
         """處理表單驗證錯誤"""
         for field, errors in form.errors.items():
             for error in errors:
-                if '帳號已被使用' in str(error):
-                    messages.error(request, f'此帳號已被註冊，請選擇其他帳號或嘗試登入。')
-                elif '電子信箱已被使用' in str(error):
-                    messages.error(request, f'此電子信箱已被註冊，請使用其他信箱或嘗試登入。')
+                error_code = getattr(error, 'code', None)
+                if error_code == 'username_in_use':
+                    messages.error(request, '此帳號已被註冊，請選擇其他帳號或嘗試登入。')
+                elif error_code == 'email_in_use':
+                    messages.error(request, '此電子信箱已被註冊，請使用其他信箱或嘗試登入。')
                 else:
                     messages.error(request, error)
     
     @staticmethod
     def check_username_availability(username):
-        """檢查帳號是否可用"""
-        return not User.objects.filter(username=username).exists()
+        """檢查帳號是否可用（不區分大小寫）"""
+        return not User.objects.filter(username__iexact=username).exists()
     
     @staticmethod
     def check_email_availability(email):
-        """檢查 email 是否可用"""
-        return not User.objects.filter(email=email).exists()
+        """檢查 email 是否可用（不區分大小寫）"""
+        return not User.objects.filter(email__iexact=email).exists()
