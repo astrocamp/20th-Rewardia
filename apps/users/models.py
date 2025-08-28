@@ -33,11 +33,7 @@ class UserCard(models.Model):
         default=False,
         help_text="用戶的主要推薦卡片",
     )
-    is_favorite = models.BooleanField(
-        "Favorite Card",  # 收藏卡片
-        default=False,
-        help_text="用戶收藏的卡片",
-    )
+
     is_active = models.BooleanField("Is Active", default=True)  # 啟用狀態
 
     class Meta:
