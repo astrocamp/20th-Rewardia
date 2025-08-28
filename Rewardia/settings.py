@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'apps.cards', 
     'apps.merchants',
     'apps.rewards',
+    'apps.sessions',
 
 # ------------------------------
     'apps.nlp_validation',

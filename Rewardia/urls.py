@@ -22,4 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include("apps.pages.urls")),
     path('users/', include('apps.users.urls')),
+    path('sessions/', include('apps.sessions.urls')),
 ] + debug_toolbar_urls()
