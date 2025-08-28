@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
+
 from pathlib import Path
 from dotenv import load_dotenv
 from django.contrib.messages import constants as messages
@@ -23,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-rjptsy-s2@ssc(j4jj0=8+tykyt^^r&dfxx^z#%%1t_psw++=!'
+SECRET_KEY = "django-insecure-rjptsy-s2@ssc(j4jj0=8+tykyt^^r&dfxx^z#%%1t_psw++=!"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -35,21 +36,22 @@ LOGIN_URL = "/admin/login/"
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-# ------------------------------
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    # ------------------------------
     "debug_toolbar",
+<<<<<<< HEAD
 
 # ------------------------------
     'apps.pages',
     'apps.banks',
     'apps.users',
     'apps.analytics',
-    'apps.cards', 
+    'apps.cards',
     'apps.merchants',
     'apps.rewards',
     'apps.sessions',
@@ -58,37 +60,50 @@ INSTALLED_APPS = [
     'apps.nlp_validation',
     'apps.card_crawler',
 
+=======
+    # ------------------------------
+    "apps.pages",
+    "apps.banks",
+    "apps.users",
+    "apps.analytics",
+    "apps.cards",
+    "apps.merchants",
+    "apps.rewards",
+    # ------------------------------
+    "apps.nlp_validation",
+    "apps.card_crawler",
+>>>>>>> 000d016 (feat: 暫存會員專區html  CRUD pr#52)
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
-ROOT_URLCONF = 'Rewardia.urls'
+ROOT_URLCONF = "Rewardia.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": ["templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'Rewardia.wsgi.application'
+WSGI_APPLICATION = "Rewardia.wsgi.application"
 
 
 # Database
@@ -100,7 +115,7 @@ DATABASES = {
         "OPTIONS": {
             "service": "rewardia_service",
             "passfile": ".pg_db_pass",
-        }
+        },
     }
 }
 
@@ -110,16 +125,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -127,7 +142,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "Asia/Taipei"
 
@@ -139,7 +154,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'assets/'
+STATIC_URL = "assets/"
 
 STATICFILES_DIRS = [
     BASE_DIR / "public",
@@ -148,15 +163,18 @@ STATICFILES_DIRS = [
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 INTERNAL_IPS = [
     "127.0.0.1",
     "localhost",
 ]
 
-# 自訂 alert 類別(目前用於register.html)
+
 MESSAGE_TAGS = {
-    messages.SUCCESS: 'alert-success',
-    messages.ERROR: 'alert-error',
+    messages.DEBUG: "tw-toast tw-info",
+    messages.INFO: "tw-toast tw-info",
+    messages.SUCCESS: "tw-toast tw-success",
+    messages.WARNING: "tw-toast tw-warn",
+    messages.ERROR: "tw-toast tw-error",
 }

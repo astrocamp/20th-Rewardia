@@ -17,16 +17,15 @@ def member_zone(request):
     context = {}
 
     if request.user.is_authenticated:
-        user_cards = request.user.user_cards.select_related("card", "card__bank").all()
-        context["user_cards"] = user_cards
+        # 獲取用戶的卡片資料
+        user_cards = request.user.user_cards.select_related('card', 'card__bank').all()
+        context['user_cards'] = user_cards
 
-        # 新增這行：獲取收藏的卡片
-        favorite_cards = request.user.preferences.favorite_cards.select_related(
-            "bank"
-        ).all()
-        context["favorite_cards"] = favorite_cards
+        # 暫時移除收藏卡片功能，避免錯誤
+        # favorite_cards = request.user.preferences.favorite_cards.select_related('bank').all()
+        # context['favorite_cards'] = favorite_cards
 
-    return render(request, "users/member_zone.html", context)
+    return render(request, 'users/member_zone.html', context)
 
 
 def register(request):
@@ -56,7 +55,7 @@ def card_create(request):
     if request.method == "GET":
         # 用戶想看申請表 - 準備銀行和卡片資料
 def card_form(request, card_id=None):
-    """萬能卡片表單：處理新增和編輯"""
+
 
     # 判斷是新增還是編輯模式
     if card_id:
@@ -68,20 +67,35 @@ def card_form(request, card_id=None):
 
     if request.method == 'GET':
         # 顯示表單頁面
-        banks = Bank.objects.filter(is_active=True)
-        cards = CreditCard.objects.filter(is_active=True).select_related("bank")
+        banks = Bank.objects.filter(is_active=True).only('id', 'name', 'code')
+
+        # 決定要篩選哪個銀行的卡片
+        selected_bank_id = None
+
+        # 編輯模式：不篩選，載入所有卡片
+        cards = CreditCard.objects.filter(is_active=True).select_related('bank').only('id', 'name', 'bank__id', 'bank__name')
 
         context = {
             "banks": banks,
             "cards": cards,
             'banks': banks,
             'cards': cards,
+            'selected_bank_id': selected_bank_id,  # 傳給模板
             'user_card': user_card,
             'is_edit_mode': is_edit_mode,
         }
-        return render(request, "pages/card_new.html", context)
 
-    elif request.method == "POST":
+        # 編輯模式時，確保當前卡片在選項中
+        if is_edit_mode and user_card:
+            # 如果篩選後的卡片中沒有當前編輯的卡片，就加入
+            if not cards.filter(id=user_card.card.id).exists():
+                # 取消篩選，顯示所有卡片
+                cards = CreditCard.objects.filter(is_active=True).select_related('bank').only('id', 'name', 'bank__id', 'bank__name')
+                context['cards'] = cards
+                context['selected_bank_id'] = None
+        return render(request, 'pages/card_new.html', context)
+
+    elif request.method == 'POST':
         # 取得表單資料
         bank_id = request.POST.get('bank_id')
         card_id_from_form = request.POST.get('card_id')
@@ -159,7 +173,9 @@ def card_form(request, card_id=None):
 
                 UserCard.objects.create(
                     user=request.user,
-                    card=selected_card
+                    card=selected_card,
+                    nickname='',
+                    is_primary=False
                 )
                 messages.success(request, f'成功新增 {selected_card.bank.name} {selected_card.name}！')
 
