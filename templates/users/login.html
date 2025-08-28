@@ -5,6 +5,17 @@
 {% block content %}
 {% include 'components/auth-shared.html' with component="page-container" title="登入" %}
 
+<!-- Django Messages 顯示區域 -->
+{% if messages %}
+  <div class="space-y-2 mb-4">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        <span>{{ message }}</span>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
 <!-- 主要登入表單 -->
 <form class="space-y-3" 
       x-data="login_form" 

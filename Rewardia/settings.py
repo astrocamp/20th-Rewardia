@@ -152,3 +152,10 @@ INTERNAL_IPS = [
     "127.0.0.1",
     "localhost",
 ]
+
+# 自訂 alert 類別(目前用於register.html)
+from django.contrib.messages import constants as messages
+MESSAGE_TAGS = {
+    messages.SUCCESS: 'alert-success',
+    messages.ERROR: 'alert-error',
+}

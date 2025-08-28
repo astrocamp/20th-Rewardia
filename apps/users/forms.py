@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 import re
+from .services import UserRegistrationService
 
 
 class UserRegistrationForm(forms.Form):
@@ -62,56 +63,36 @@ class UserRegistrationForm(forms.Form):
     )
     
     def clean_username(self):
-        """驗證帳號格式"""
+        """驗證帳號格式和唯一性"""
         username = self.cleaned_data.get('username')
         
-        if not username:
-            raise ValidationError('帳號為必填項目')
-        
-        # 檢查是否只包含數字和英文大小寫，不能有空格
         if not re.match(r'^[a-zA-Z0-9]+$', username):
             raise ValidationError('帳號只能包含英文字母和數字，不能有空格或特殊字元')
         
-        # 檢查帳號是否已存在
-        if User.objects.filter(username=username).exists():
+        if not UserRegistrationService.check_username_availability(username):
             raise ValidationError('此帳號已被使用，請選擇其他帳號')
         
         return username
     
     def clean_email(self):
-        """驗證電子信箱格式和唯一性"""
+        """驗證電子信箱唯一性"""
         email = self.cleaned_data.get('email')
         
-        if not email:
-            raise ValidationError('電子信箱為必填項目')
-        
-        # Django EmailField 已經處理基本格式驗證
-        # 檢查信箱是否已存在
-        if User.objects.filter(email=email).exists():
+        if not UserRegistrationService.check_email_availability(email):
             raise ValidationError('此電子信箱已被使用，請使用其他信箱')
         
         return email
     
     def clean_password(self):
-        """驗證密碼格式"""
+        """驗證密碼格式和強度"""
         password = self.cleaned_data.get('password')
         
-        if not password:
-            raise ValidationError('密碼為必填項目')
-        
-        # 檢查密碼長度
-        if len(password) < 8 or len(password) > 20:
-            raise ValidationError('密碼長度必須在 8-20 個字元之間')
-        
-        # 檢查是否只包含數字和英文大小寫，不能有空格
         if not re.match(r'^[a-zA-Z0-9]+$', password):
             raise ValidationError('密碼只能包含英文字母和數字，不能有空格或特殊字元')
         
-        # 檢查是否包含至少一個大寫字母
         if not re.search(r'[A-Z]', password):
             raise ValidationError('密碼必須包含至少一個英文大寫字母')
         
-        # 檢查是否包含至少一個小寫字母
         if not re.search(r'[a-z]', password):
             raise ValidationError('密碼必須包含至少一個英文小寫字母')
         
@@ -123,9 +104,20 @@ class UserRegistrationForm(forms.Form):
         password = cleaned_data.get('password')
         confirm_password = cleaned_data.get('confirm_password')
         
-        # 檢查密碼確認是否一致
         if password and confirm_password:
             if password != confirm_password:
                 raise ValidationError('兩次輸入的密碼不一致，請重新確認')
         
         return cleaned_data
+
+    def save(self):
+        """創建新用戶並返回用戶對象"""
+        if not self.is_valid():
+            raise ValueError("表單驗證失敗，無法保存用戶")
+        
+        user = User.objects.create_user(
+            username=self.cleaned_data['username'],
+            email=self.cleaned_data['email'],
+            password=self.cleaned_data['password']
+        )
+        return user
