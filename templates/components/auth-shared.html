@@ -37,7 +37,7 @@
 <!-- 底部連結組件 -->
 {% comment %}
 使用方式:
-{% include 'components/auth-shared.html' with component="bottom-link" prefix_text="還沒有帳戶？" link_text="立即註冊" link_url="pages:register" %}
+{% include 'components/auth-shared.html' with component="bottom-link" prefix_text="還沒有帳戶？" link_text="立即註冊" link_url="users:register" %}
 {% include 'components/auth-shared.html' with component="bottom-link" prefix_text="已經有帳號？" link_text="登入" link_url="pages:login" suffix_text="去" %}
 {% endcomment %}
 {% if component == "bottom-link" %}
@@ -132,31 +132,7 @@
 </div>
 {% endif %}
 
-<!-- 記住我勾選框組件 -->
-{% comment %}
-使用方式:
-{% include 'components/auth-shared.html' with component="remember-me-checkbox" %}
-{% endcomment %}
-{% if component == "remember-me-checkbox" %}
-<div class="flex items-center justify-between py-3">
-  <div class="flex items-center">
-    <input 
-      type="checkbox" 
-      id="remember_me" 
-      name="remember_me"
-      class="register-checkbox"
-    >
-    <label for="remember_me" class="ml-2 text-lg text-gray-700 font-normal">
-      記住我
-    </label>
-  </div>
-  <div class="text-sm">
-    <a href="#" class="register-link">
-      忘記密碼？
-    </a>
-  </div>
-</div>
-{% endif %}
+
 
 <!-- 服務條款勾選框組件 -->
 {% comment %}

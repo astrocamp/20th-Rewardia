@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .data.faq_content import FAQ_DATA
 
 def download(request):
@@ -13,11 +13,8 @@ def faq(request):
   }
   return render(request, "pages/faq.html", context)
 
-def register(request):
-  return render(request, "users/register.html")
 
-def login(request):
-  return render(request, "users/login.html")
+
 
 def card_new(request):
   return render(request, "pages/card_new.html")

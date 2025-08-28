@@ -20,7 +20,7 @@
 <form class="space-y-3" 
       x-data="login_form" 
       method="post"
-      action="{% url 'pages:login' %}">
+      action="{% url 'sessions:login' %}">
   {% csrf_token %}
   <!-- 帳號欄位 -->
   {% include 'components/auth-shared.html' with component="input-field" field_type="text" field_id="username" field_name="username" label_text="帳號" placeholder="請輸入您的帳號" required="true" %}
@@ -28,8 +28,7 @@
   <!-- 密碼欄位 -->
   {% include 'components/auth-shared.html' with component="input-field" field_type="password" field_id="password" field_name="password" label_text="密碼" placeholder="請輸入您的密碼" required="true" has_toggle="true" alpine_type="passwordVisible ? 'text' : 'password'" toggle_action="togglePassword()" %}
 
-  <!-- 記住我和忘記密碼 -->
-  {% include 'components/auth-shared.html' with component="remember-me-checkbox" %}
+
 
   <!-- 主要登入按鈕 -->
   {% include 'components/auth-shared.html' with component="primary-button" button_text="登入" %}
@@ -42,7 +41,7 @@
 {% include 'components/auth-shared.html' with component="google-button" action="登入" button_id="google-login" aria_label="使用 Google 帳號登入" %}
 
 <!-- 註冊連結 -->
-{% include 'components/auth-shared.html' with component="bottom-link" prefix_text="還沒有帳戶？" link_text="立即註冊" link_url="pages:register" %}
+{% include 'components/auth-shared.html' with component="bottom-link" prefix_text="還沒有帳戶？" link_text="立即註冊" link_url="users:register" %}
 
 {% include 'components/auth-shared.html' with component="page-container-end" %}
 {% endblock %}
