@@ -20,21 +20,20 @@ sleep_time = random.uniform(7, 14)
 
 
 def save_data(data):
-    bank, created = Bank.objects.get_or_create(
-        name=data["bank"],
-    )
+    # bank, created = Bank.objects.get_or_create(
+    #     name=data["bank"],
+    # )
 
-    card, created = CreditCard.objects.get_or_create(
-        name=data["card"],
-        bank=bank,
-    )
+    # card, created = CreditCard.objects.get_or_create(
+    #     name=data["card"],
+    #     bank=bank,
+    # )
 
     content = ",".join(data["content"])
 
     crawled_card, created = CrawledData.objects.update_or_create(
         url=data["url"],
         defaults={
-            "card": card,
             "content": content,
         },
     )
@@ -160,7 +159,7 @@ def crawl_roo_urls():
         try:
             driver.get(main_url_page)
             # 在尋找物件前要等多久
-            driver.implicitly_wait(2)
+            driver.implicitly_wait(5)
         except WebDriverException as error:
             print(f"Error fetching main page: {error}")
             driver.quit()

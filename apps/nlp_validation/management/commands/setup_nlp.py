@@ -9,7 +9,6 @@ class Command(BaseCommand):
         self.loaded_models = {}
 
     def handle(self, *args, **options):
-
         self.stdout.write(" NLP 系統初始化檢查\n")
 
         success = True
