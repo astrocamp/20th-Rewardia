@@ -1,0 +1,120 @@
+{% extends 'layouts/default.html' %}
+
+{% block title %}新增卡片 - Rewardia{% endblock %}
+
+{% block content %}
+<section class="calculator-page">
+  <div class="calculator-container">
+    <!-- 區塊標題：新增卡片 -->
+    {% if is_edit_mode %}
+        <h2 class="calculator-title">編輯卡片</h2>
+    {% else %}
+        <h2 class="calculator-title">新增卡片</h2>
+    {% endif %}
+
+    <!-- 🔥 重要：這裡啟動 Alpine.js 並傳入卡片資料 -->
+    <div class="add-card-container"
+         x-data="card_form({
+           allCards: [
+             {% for card in cards %}
+             {
+               id: {{ card.id }},
+               name: '{{ card.name }}',
+               bankId: {{ card.bank.id }}
+             }{% if not forloop.last %},{% endif %}
+             {% endfor %}
+           ],
+           {% if is_edit_mode and user_card %}
+           initialBankId: {{ user_card.card.bank.id }},
+           initialCardId: {{ user_card.card.id }}
+           {% else %}
+           initialBankId: null,
+           initialCardId: null
+           {% endif %}
+         })">
+
+      <div class="add-card-bg">
+        <!-- 標題列 -->
+        <div class="add-card-header">
+          <h3 class="add-card-title">我的卡片</h3>
+
+          <!-- 表單欄位 -->
+          {% if user_card %}
+          <form method="POST" action="{% url 'users:card_edit' user_card.id %}">
+          {% else %}
+          <form method="POST" action="{% url 'users:card_new' %}">
+          {% endif %}
+            {% csrf_token %}
+            <div class="add-card-fields">
+
+              <!-- 🏦 發卡銀行 -->
+              <div class="field-group">
+                <label for="bankSelect" class="field-label required">發卡銀行</label>
+                <div class="select-wrapper">
+                  <select id="bankSelect"
+                          name="bank_id"
+                          class="ui-select"
+                          aria-label="選擇發卡銀行"
+                          required
+                          x-model="selectedBank"
+                          @change="onBankChange()">
+                    <option value="">選擇發卡銀行</option>
+                    {% for bank in banks %}
+                    <option value="{{ bank.id }}">{{ bank.name }}</option>
+                    {% endfor %}
+                  </select>
+                  <div class="select-arrow" aria-hidden="true"></div>
+                </div>
+              </div>
+
+              <!-- 💳 卡片 -->
+              <div class="field-group">
+                <label for="cardSelect" class="field-label required">卡片</label>
+                <div class="select-wrapper">
+                  <select id="cardSelect"
+                          name="card_id"
+                          class="ui-select"
+                          aria-label="選擇卡片"
+                          required
+                          x-model="selectedCard">
+
+                    <!-- 🔄 Alpine.js 動態產生選項 -->
+                    <template x-if="!selectedBank">
+                      <option value="" selected disabled>請先選擇發卡銀行</option>
+                    </template>
+
+                    <template x-if="selectedBank && availableCards.length === 0">
+                      <option value="" selected disabled>該銀行暫無可選卡片</option>
+                    </template>
+
+                    <template x-if="selectedBank && availableCards.length > 0">
+                      <option value="" disabled>選擇卡片</option>
+                    </template>
+
+                    <template x-for="card in availableCards" :key="card.id">
+                      <option :value="card.id" x-text="card.name"></option>
+                    </template>
+
+                  </select>
+                  <div class="select-arrow" aria-hidden="true"></div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- 動作按鈕 -->
+            <div class="add-card-actions">
+              <a href="{% url 'users:member_zone' %}" class="ui-btn ui-btn-secondary">取消</a>
+              {% if user_card %}
+                <button type="submit" class="ui-btn ui-btn-primary">更新卡片</button>
+              {% else %}
+                <button type="submit" class="ui-btn ui-btn-primary">新增卡片</button>
+              {% endif %}
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

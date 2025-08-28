@@ -1,25 +1,27 @@
 from django.shortcuts import render, redirect
 from .data.faq_content import FAQ_DATA
 
+
 def download(request):
-  return render(request, "pages/download.html")
+    return render(request, "pages/download.html")
+
 
 def calculator(request):
+    return render(request, "pages/calculator.html")
 
-  return render(request, "pages/calculator.html")
 
 def card_new(request):
-  return redirect('users:card_new')
+    return redirect("users:card_new")
+
 
 def faq(request):
-  context = {
-    'faq_categories': FAQ_DATA['categories']
-  }
-  return render(request, "pages/faq.html", context)
+    context = {"faq_categories": FAQ_DATA["categories"]}
+    return render(request, "pages/faq.html", context)
 
 
+def register(request):
+    return render(request, "users/register.html")
 
 
-def card_new(request):
-  return render(request, "pages/card_new.html")
-
+def login(request):
+    return render(request, "users/login.html")
