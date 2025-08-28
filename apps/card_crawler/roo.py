@@ -1,8 +1,11 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import random
-from selenium.common.exceptions import WebDriverException, TimeoutException
-from selenium.webdriver.common.action_chains import ActionChains
+from selenium.common.exceptions import (
+    WebDriverException,
+    TimeoutException,
+    StaleElementReferenceException,
+)
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.relative_locator import locate_with
@@ -66,19 +69,24 @@ def get_card_info(url):
             # 找到navbar和footer之間的所有button
             buttons = driver.find_elements(
                 locate_with(By.TAG_NAME, "button")
-                .below({By.TAG_NAME: "nav"})
-                .above({By.TAG_NAME: "footer"})
+                .below({By.TAG_NAME: "h1"})
+                .above({By.XPATH: "//h2[text()='其他推薦信用卡']"})
             )
-            action = ActionChains(driver)
+            # action = ActionChains(driver)
 
             # 點選這些button，讓他們展開，因為資訊隱藏在裡面
             for button in buttons:
-                driver.execute_script(
-                    "arguments[0].scrollIntoView({block: 'center'});", button
-                )
-                action.move_to_element(button).click(on_element=button)
-                # perform會執行click的動作
-                action.perform()
+                try:
+                    driver.execute_script(
+                        "arguments[0].scrollIntoView({block: 'center'});", button
+                    )
+                    time.sleep(0.5)
+                    # 改成一個一個點按鈕好像比較有效，也比較不會漏點
+                    button.click()
+
+                # 為了忽略element移動找不到的錯誤，因為實際上還是點的到
+                except StaleElementReferenceException:
+                    continue
 
             try:
                 # 比較節省時間的等待方式，如果元素在5秒內還沒出現就會回傳錯誤
@@ -89,6 +97,7 @@ def get_card_info(url):
                 print("Error fetching elements")
                 answer_error = create_error_data(url, error, card_name=card_name)
                 failed_cards.append(answer_error)
+
         except WebDriverException as error:
             print(f"Error fetching button: {error}")
             button_error = create_error_data(url, error, card_name=card_name)
@@ -101,14 +110,15 @@ def get_card_info(url):
                 "content": [],
             }
 
-            driver.implicitly_wait(2)
+            driver.implicitly_wait(5)
             # 找到navbar和footer之間的所有h4, h5, li, p的元素
             contents = driver.find_elements(
-                locate_with(By.CSS_SELECTOR, "h4,h5,li,p")
+                locate_with(By.CSS_SELECTOR, "h4,h5,p")
                 .above({By.XPATH: "//h2[text()='其他推薦信用卡']"})
-                .below({By.TAG_NAME: "nav"})
+                .below({By.TAG_NAME: "h1"})
             )
             # 把它存到array
+            crawled_data["content"].append(card_name)
             for content in contents:
                 # 排出空白的
                 if len(content.text) > 1:
@@ -124,7 +134,7 @@ def get_card_info(url):
 
     except WebDriverException as error:
         print(f"Card not found: {error}")
-        webpage_error = create_error_data(url, error, card_name=card_name)
+        webpage_error = create_error_data(url, error)
         failed_cards.append(webpage_error)
         # 找不到卡，就終止這次的函式
         return webpage_error
