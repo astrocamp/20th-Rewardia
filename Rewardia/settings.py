@@ -52,7 +52,11 @@ INSTALLED_APPS = [
     "apps.cards",
     "apps.merchants",
     "apps.rewards",
+<<<<<<< HEAD
     "apps.sessions",
+=======
+    "apps.admins",
+>>>>>>> 34d5176 (feat: 創建admins應用程式做後台管理)
     # ------------------------------
     "apps.nlp_validation",
     "apps.card_crawler",
@@ -155,9 +159,17 @@ INTERNAL_IPS = [
 
 
 MESSAGE_TAGS = {
+<<<<<<< HEAD
     messages.DEBUG: "tw-toast tw-info",
     messages.INFO: "tw-toast tw-info",
     messages.SUCCESS: "tw-toast tw-success",
     messages.WARNING: "tw-toast tw-warn",
     messages.ERROR: "tw-toast tw-error",
 }
+=======
+    messages.SUCCESS: "alert-success",
+    messages.ERROR: "alert-error",
+}
+
+ADMIN_ENABLED = False
+>>>>>>> 34d5176 (feat: 創建admins應用程式做後台管理)
