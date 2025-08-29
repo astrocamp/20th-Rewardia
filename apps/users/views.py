@@ -10,8 +10,6 @@ from apps.banks.models import Bank
 from apps.cards.models import CreditCard
 from .models import UserCard
 
-# Create your views here.
-
 
 def member_zone(request):
     context = {}
@@ -30,39 +28,33 @@ def member_zone(request):
 
 # API 端點：根據銀行 ID 返回該銀行的所有信用卡（JSON 格式，給 Alpine.js 用）
 def get_cards_by_bank(request, bank_id):
-    """API 端點：返回指定銀行的所有信用卡"""
     try:
         # 確認銀行存在且啟用
         bank = Bank.objects.get(id=bank_id, is_active=True)
 
         # 取得該銀行的所有啟用信用卡
-        cards = CreditCard.objects.filter(
-            bank=bank,
-            is_active=True
-        ).only('id', 'name').order_by('name')
+        cards = (
+            CreditCard.objects.filter(bank=bank, is_active=True)
+            .only("id", "name")
+            .order_by("name")
+        )
 
         # 轉換為 JSON 格式
-        cards_data = [
-            {
-                'id': card.id,
-                'name': card.name
-            }
-            for card in cards
-        ]
+        cards_data = [{"id": card.id, "name": card.name} for card in cards]
 
-        return JsonResponse({
-            'success': True,
-            'bank_name': bank.name,
-            'cards': cards_data,
-            'message': f'載入 {bank.name} 的 {len(cards_data)} 張信用卡'
-        })
+        return JsonResponse(
+            {
+                "success": True,
+                "bank_name": bank.name,
+                "cards": cards_data,
+                "message": f"載入 {bank.name} 的 {len(cards_data)} 張信用卡",
+            }
+        )
 
     except Bank.DoesNotExist:
-        return JsonResponse({
-            'success': False,
-            'cards': [],
-            'message': '找不到指定的銀行'
-        }, status=404)
+        return JsonResponse(
+            {"success": False, "cards": [], "message": "找不到指定的銀行"}, status=404
+        )
 
 
 @login_required
@@ -83,9 +75,11 @@ def card_form(request, card_id=None):
         banks = Bank.objects.filter(is_active=True).only("id", "name", "code")
 
         # 統一邏輯：無論新增還是編輯模式，都載入所有卡片供 Alpine.js 篩選使用
-        cards = CreditCard.objects.filter(
-            is_active=True
-        ).select_related("bank").only("id", "name", "bank__id", "bank__name")
+        cards = (
+            CreditCard.objects.filter(is_active=True)
+            .select_related("bank")
+            .only("id", "name", "bank__id", "bank__name")
+        )
 
         # 設定選中的銀行（僅用於顯示）
         if is_edit_mode and user_card:
@@ -213,10 +207,9 @@ def card_form(request, card_id=None):
             return render(request, "users/card_form.html", context)
 
 
+# 刪除功能
 @login_required
 def card_delete(request, card_id):
-    """刪除卡片功能"""
-
     # 確保這張卡片屬於當前用戶
     user_card = get_object_or_404(UserCard, id=card_id, user=request.user)
 

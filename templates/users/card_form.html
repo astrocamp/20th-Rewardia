@@ -3,17 +3,17 @@
 {% block title %}新增卡片 - Rewardia{% endblock %}
 
 {% block content %}
-<section class="calculator-page">
-  <div class="calculator-container">
+<section class="bg-white" style="margin-top: 80px; padding-bottom: 80px;">
+  <div class="mx-auto max-w-[1360px] px-5 md:px-8">
     <!-- 區塊標題：新增卡片 -->
     {% if is_edit_mode %}
-        <h2 class="calculator-title">編輯卡片</h2>
+        <h2 class="text-[36px] leading-[0.98] font-bold text-black mb-6" style="margin-top: 5px;">編輯卡片</h2>
     {% else %}
-        <h2 class="calculator-title">新增卡片</h2>
+        <h2 class="text-[36px] leading-[0.98] font-bold text-black mb-6" style="margin-top: 5px;">新增卡片</h2>
     {% endif %}
 
-    <!-- 🔥 重要：這裡啟動 Alpine.js 並傳入卡片資料 -->
-    <div class="add-card-container"
+    <!-- 啟動 Alpine.js 並傳入卡片資料 -->
+    <div class="bg-white rounded-lg overflow-hidden"
          x-data="card_form({
            allCards: [
              {% for card in cards %}
@@ -33,86 +33,99 @@
            {% endif %}
          })">
 
-      <div class="add-card-bg">
+      <div class="bg-[#F9F9F9] rounded-lg min-h-[407px] p-5 md:p-[21px] md:pt-5 md:pb-8">
         <!-- 標題列 -->
-        <div class="add-card-header">
-          <h3 class="add-card-title">我的卡片</h3>
-
-          <!-- 表單欄位 -->
-          {% if user_card %}
-          <form method="POST" action="{% url 'users:card_edit' user_card.id %}">
-          {% else %}
-          <form method="POST" action="{% url 'users:card_new' %}">
-          {% endif %}
-            {% csrf_token %}
-            <div class="add-card-fields">
-
-              <!-- 🏦 發卡銀行 -->
-              <div class="field-group">
-                <label for="bankSelect" class="field-label required">發卡銀行</label>
-                <div class="select-wrapper">
-                  <select id="bankSelect"
-                          name="bank_id"
-                          class="ui-select"
-                          aria-label="選擇發卡銀行"
-                          required
-                          x-model="selectedBank"
-                          @change="onBankChange()">
-                    <option value="">選擇發卡銀行</option>
-                    {% for bank in banks %}
-                    <option value="{{ bank.id }}">{{ bank.name }}</option>
-                    {% endfor %}
-                  </select>
-                  <div class="select-arrow" aria-hidden="true"></div>
-                </div>
-              </div>
-
-              <!-- 💳 卡片 -->
-              <div class="field-group">
-                <label for="cardSelect" class="field-label required">卡片</label>
-                <div class="select-wrapper">
-                  <select id="cardSelect"
-                          name="card_id"
-                          class="ui-select"
-                          aria-label="選擇卡片"
-                          required
-                          x-model="selectedCard">
-
-                    <!-- 🔄 Alpine.js 動態產生選項 -->
-                    <template x-if="!selectedBank">
-                      <option value="" selected disabled>請先選擇發卡銀行</option>
-                    </template>
-
-                    <template x-if="selectedBank && availableCards.length === 0">
-                      <option value="" selected disabled>該銀行暫無可選卡片</option>
-                    </template>
-
-                    <template x-if="selectedBank && availableCards.length > 0">
-                      <option value="" disabled>選擇卡片</option>
-                    </template>
-
-                    <template x-for="card in availableCards" :key="card.id">
-                      <option :value="card.id" x-text="card.name"></option>
-                    </template>
-
-                  </select>
-                  <div class="select-arrow" aria-hidden="true"></div>
-                </div>
-              </div>
-
-            </div>
-
-            <!-- 動作按鈕 -->
-            <div class="add-card-actions">
-              <a href="{% url 'users:member_zone' %}" class="ui-btn ui-btn-secondary">取消</a>
-              {% if user_card %}
-                <button type="submit" class="ui-btn ui-btn-primary">更新卡片</button>
-              {% else %}
-                <button type="submit" class="ui-btn ui-btn-primary">新增卡片</button>
-              {% endif %}
-            </div>
-          </form>
+        <div class="mb-10 pb-[14px] border-b border-[#D1D5DB]">
+          <h3 class="text-2xl font-bold text-[#5D6970] m-0" style="line-height: 1.21;">我的卡片</h3>
         </div>
+
+        <!-- 表單區域 -->
+        {% if user_card %}
+        <form method="POST" action="{% url 'users:card_edit' user_card.id %}">
+        {% else %}
+        <form method="POST" action="{% url 'users:card_new' %}">
+        {% endif %}
+          {% csrf_token %}
+          <div class="space-y-6">
+
+            <!-- 發卡銀行 -->
+            <div class="relative mb-5">
+              <label for="bankSelect" class="block text-lg text-[#111827] mb-2 font-normal">
+                <span class="text-red-500">* </span>發卡銀行
+              </label>
+              <div class="relative">
+                <select id="bankSelect"
+                        name="bank_id"
+                        class="w-full h-12 rounded-lg bg-white border border-[#D1D5DB] px-4 text-gray-900 transition-colors duration-200 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        aria-label="選擇發卡銀行"
+                        required
+                        x-model="selectedBank"
+                        @change="onBankChange()">
+                  <option value="" class="text-[#949AA6]">選擇發卡銀行</option>
+                  {% for bank in banks %}
+                  <option value="{{ bank.id }}">{{ bank.name }}</option>
+                  {% endfor %}
+                </select>
+                <div class="select-arrow" aria-hidden="true"></div>
+              </div>
+            </div>
+
+            <!-- 卡片 -->
+            <div class="relative mb-5">
+              <label for="cardSelect" class="block text-lg text-[#111827] mb-2 font-normal">
+                <span class="text-red-500">* </span>卡片
+              </label>
+              <div class="relative">
+                <select id="cardSelect"
+                        name="card_id"
+                        class="w-full h-12 rounded-lg bg-white border border-[#D1D5DB] px-4 text-gray-900 transition-colors duration-200 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        aria-label="選擇卡片"
+                        required
+                        x-model="selectedCard">
+
+                  <!-- Alpine.js 動態產生選項 -->
+                  <template x-if="!selectedBank">
+                    <option value="" selected disabled class="text-[#949AA6]">請先選擇發卡銀行</option>
+                  </template>
+
+                  <template x-if="selectedBank && availableCards.length === 0">
+                    <option value="" selected disabled class="text-[#949AA6]">該銀行暫無可選卡片</option>
+                  </template>
+
+                  <template x-if="selectedBank && availableCards.length > 0">
+                    <option value="" disabled class="text-[#949AA6]">選擇卡片</option>
+                  </template>
+
+                  <template x-for="card in availableCards" :key="card.id">
+                    <option :value="card.id" x-text="card.name"></option>
+                  </template>
+
+                </select>
+                <div class="select-arrow" aria-hidden="true"></div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 動作按鈕 -->
+          <div class="flex items-center justify-center gap-6 mt-[52px] md:flex-row max-md:flex-col max-md:gap-4 max-md:mt-8">
+            <a href="{% url 'users:member_zone' %}"
+               class="inline-flex items-center justify-center rounded-lg w-[132px] h-[52px] max-md:w-full max-md:h-12 px-6 font-medium transition-colors duration-200 select-none bg-[#E5E7EB] text-gray-900 hover:bg-gray-300 active:bg-gray-400">
+              取消
+            </a>
+            {% if user_card %}
+              <button type="submit"
+                      class="inline-flex items-center justify-center rounded-lg w-[132px] h-[52px] max-md:w-full max-md:h-12 px-6 font-medium transition-colors duration-200 select-none bg-[#2060B9] text-white hover:bg-[#1c55a4] active:bg-[#184a90] disabled:bg-[#9BB6DD] disabled:cursor-not-allowed disabled:opacity-70">
+                更新卡片
+              </button>
+            {% else %}
+              <button type="submit"
+                      class="inline-flex items-center justify-center rounded-lg w-[132px] h-[52px] max-md:w-full max-md:h-12 px-6 font-medium transition-colors duration-200 select-none bg-[#2060B9] text-white hover:bg-[#1c55a4] active:bg-[#184a90] disabled:bg-[#9BB6DD] disabled:cursor-not-allowed disabled:opacity-70">
+                新增卡片
+              </button>
+            {% endif %}
+          </div>
+        </form>
       </div>
     </div>
   </div>
