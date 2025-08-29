@@ -680,7 +680,7 @@
 
     /* ===== 新增卡片頁面專用樣式 ===== */
     /* ========== 新增卡片容器 ========== */
-    .add-card-container {
+    /* .add-card-container {
         @apply bg-white rounded-lg overflow-hidden;
     }
 
@@ -695,7 +695,7 @@
   }
 
   /* 平板版調整 */
-  @media (min-width: 641px) and (max-width: 1024px) {
+  /* @media (min-width: 641px) and (max-width: 1024px) {
     .add-card-bg {
       min-height: 70vh;
       padding: 22px 18px 35px 18px;
@@ -704,7 +704,7 @@
     .add-card-actions {
       margin-top: 35px;
     }
-  }
+  }  */
 
     /* ========== 會員專區頁面樣式 ========== */
 
@@ -1001,4 +1001,77 @@
 @keyframes fadein {
   from { opacity:0; transform: translateY(-4px) }
   to   { opacity:1; transform: translateY(0) }
+}
+
+
+/* ===== 新增到 style.css 最下面的修復樣式 ===== */
+
+/* 修復新增卡片頁面樣式，*/
+@layer components {
+
+  /* 修復新增卡片背景容器 */
+  .add-card-bg {
+    @apply bg-[#F9F9F9] rounded-lg;
+    padding: 20px 21px 32px 21px; /* 符合 Figma 設計的 padding */
+    min-height: 407px; /* 符合 Figma 設計高度 */
+  }
+
+  /* 新增卡片標題區域 */
+  .add-card-header {
+    @apply mb-10; /* 標題與表單欄位的間距 */
+  }
+
+  /* 新增卡片標題樣式 */
+  .add-card-title {
+    @apply text-2xl font-bold text-[#5D6970] mb-[14px];
+    line-height: 1.21; /* 符合 Figma 設計 */
+  }
+
+  /* 新增卡片標題區域 */
+  .add-card-header {
+    @apply mb-10 pb-[14px] border-b border-[#D1D5DB];
+}
+
+  /* 修復表單欄位容器 */
+  .add-card-fields {
+    @apply space-y-6; /* 欄位之間的間距 */
+  }
+
+  /* 修復按鈕動作區域 */
+  .add-card-actions {
+    @apply flex items-center justify-center gap-6 mt-[52px];
+  }
+
+  /* 確保按鈕符合設計尺寸 */
+  .add-card-actions .ui-btn {
+    @apply w-[132px] h-[52px];
+  }
+
+  /* 平板和桌面版調整 */
+  @media (min-width: 641px) {
+    .add-card-bg {
+      padding: 20px 21px 32px 21px;
+      min-height: 407px;
+    }
+
+    .add-card-actions {
+      @apply mt-[52px];
+    }
+  }
+
+  /* 手機版調整 */
+  @media (max-width: 640px) {
+    .add-card-bg {
+      padding: 20px 15px 30px 15px;
+      min-height: auto;
+    }
+
+    .add-card-actions {
+      @apply flex-col gap-4 mt-8;
+    }
+
+    .add-card-actions .ui-btn {
+      @apply w-full h-12;
+    }
+  }
 }
