@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth import login as django_login
+from django.contrib.auth import login as django_login, logout
 from django.utils import timezone
 import logging
 
@@ -64,3 +64,17 @@ class UserAuthenticationService:
                     messages.error(request, '此帳號已被停用，請聯繫管理員。')
                 else:
                     messages.error(request, str(error))
+    
+    @staticmethod
+    def logout_user(request):
+        """用戶登出處理"""
+        if request.user.is_authenticated:
+            username = request.user.username
+            logout(request)
+            return username
+        return None
+    
+    @staticmethod
+    def handle_logout_success(request, username):
+        """處理登出成功"""
+        messages.success(request, f'{username}，您已成功登出。')
