@@ -22,8 +22,7 @@
   
   .download-btn-chrome {
     @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-dark-gray hover:bg-gray-800;
-    @apply w-full min-h-12 shadow-sm inline-flex items-center justify-center no-underline;
-    max-width: 17.5rem;
+    @apply w-full min-h-12 shadow-sm inline-flex items-center justify-center no-underline max-w-[17.5rem];
   }
   
   .download-btn-chrome:hover {
@@ -32,8 +31,7 @@
   
   .download-btn-app {
     @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-dark-gray hover:bg-gray-800;
-    @apply w-full min-h-12 shadow-sm inline-flex items-center justify-center no-underline;
-    max-width: 17.5rem;
+    @apply w-full min-h-12 shadow-sm inline-flex items-center justify-center no-underline max-w-[17.5rem];
   }
   
   .download-btn-app:hover {
