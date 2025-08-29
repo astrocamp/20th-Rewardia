@@ -28,8 +28,8 @@
     <label for="username" class="register-label">帳號</label>
     <div class="register-relative-container">
       <input type="text" id="username" name="username" placeholder="請輸入您的帳號" class="register-input" required
-             x-model="formData.username"
-             @blur="validateField('username')">
+            x-model="formData.username"
+            @blur="validateField('username')">
     </div>
     <template x-if="errors.username">
         <p class="text-red-500 text-sm mt-1" x-text="errors.username"></p>
@@ -41,13 +41,13 @@
       <label for="password" class="register-label">密碼</label>
       <div class="register-relative-container">
           <input :type="passwordVisible ? 'text' : 'password'"
-                 id="password"
-                 name="password"
-                 placeholder="請輸入您的密碼"
-                 class="register-input pr-12"
-                 required
-                 x-model="formData.password"
-                 @blur="validateField('password')">
+                id="password"
+                name="password"
+                placeholder="請輸入您的密碼"
+                class="register-input pr-12"
+                required
+                x-model="formData.password"
+                @blur="validateField('password')">
           <button type="button" class="password-toggle-btn" @click="togglePassword()" :aria-label="passwordVisible ? '隱藏密碼' : '顯示密碼'">
               <div x-show="!passwordVisible">
                   {% include 'components/icon.html' with name="eye" class="w-6 h-6" %}
