@@ -2,8 +2,6 @@ from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 import re
-from .services import UserRegistrationService
-
 
 class UserRegistrationForm(forms.Form):
     """使用者註冊表單"""
@@ -69,7 +67,7 @@ class UserRegistrationForm(forms.Form):
         if not re.match(r'^[a-zA-Z0-9]+$', username):
             raise ValidationError('帳號只能包含英文字母和數字，不能有空格或特殊字元')
         
-        if not UserRegistrationService.check_username_availability(username):
+        if User.objects.filter(username__iexact=username).exists():
             raise ValidationError('此帳號已被使用，請選擇其他帳號', code='username_in_use')
         
         return username
@@ -78,7 +76,7 @@ class UserRegistrationForm(forms.Form):
         """驗證電子信箱唯一性"""
         email = self.cleaned_data.get('email')
         
-        if not UserRegistrationService.check_email_availability(email):
+        if User.objects.filter(email__iexact=email).exists():
             raise ValidationError('此電子信箱已被使用，請使用其他信箱', code='email_in_use')
         
         return email
@@ -96,6 +94,9 @@ class UserRegistrationForm(forms.Form):
         if not re.search(r'[a-z]', password):
             raise ValidationError('密碼必須包含至少一個英文小寫字母')
         
+        if not re.search(r'[0-9]', password):
+            raise ValidationError('密碼必須包含至少一個數字')
+        
         return password
     
     def clean(self):
@@ -111,9 +112,6 @@ class UserRegistrationForm(forms.Form):
 
     def save(self):
         """創建新用戶並返回用戶對象"""
-        if not self.is_valid():
-            raise ValueError("表單驗證失敗，無法保存用戶")
-        
         user = User.objects.create_user(
             username=self.cleaned_data['username'],
             email=self.cleaned_data['email'],
