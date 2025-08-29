@@ -34,14 +34,14 @@ class UserLoginForm(forms.Form):
         password = cleaned_data.get('password')
         
         if username and password:
-            # 使用 Django 內建的 authenticate 函數驗證
+            
             user = authenticate(username=username, password=password)
             if user is None:
                 raise ValidationError('帳號或密碼錯誤，請重新輸入', code='invalid_login')
             elif not user.is_active:
                 raise ValidationError('此帳號已被停用，請聯繫管理員', code='inactive_user')
             
-            # 將驗證成功的用戶存儲在表單中，供後續使用
+            
             cleaned_data['user'] = user
         
         return cleaned_data
