@@ -57,13 +57,7 @@ class UserAuthenticationService:
         """處理表單驗證錯誤"""
         for field, errors in form.errors.items():
             for error in errors:
-                error_code = getattr(error, 'code', None)
-                if error_code == 'invalid_login':
-                    messages.error(request, '帳號或密碼錯誤，請重新輸入。')
-                elif error_code == 'inactive_user':
-                    messages.error(request, '此帳號已被停用，請聯繫管理員。')
-                else:
-                    messages.error(request, str(error))
+                messages.error(request, str(error))
     
     @staticmethod
     def logout_user(request):
