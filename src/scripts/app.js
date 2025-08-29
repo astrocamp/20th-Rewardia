@@ -203,6 +203,17 @@ Alpine.data('login_form', () => ({
     
     return true;
   },
+
+  submitForm(event) {
+    this.errors = {};
+
+    const isUsernameValid = this.validateUsername();
+    const isPasswordValid = this.validatePassword();
+
+    if (isUsernameValid && isPasswordValid) {
+      event.target.submit();
+    }
+  }
 }));
 
 
