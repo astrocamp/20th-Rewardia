@@ -24,8 +24,7 @@
   }
   
   .result-card-bg {
-      @apply relative flex items-center justify-between px-6 md:px-8 h-[117px] rounded-lg;
-      background: #193966; /* Primary-dark color from design system */
+      @apply relative flex items-center justify-between px-6 md:px-8 h-[117px] rounded-lg bg-primary-dark; /* Primary-dark color from design system */
   }
   
   .result-content {
