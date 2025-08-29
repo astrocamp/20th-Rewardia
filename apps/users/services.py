@@ -49,12 +49,4 @@ class UserRegistrationService:
             for error in errors:
                 messages.error(request, str(error))
     
-    @staticmethod
-    def check_username_availability(username):
-        """檢查帳號是否可用（不區分大小寫）"""
-        return not User.objects.filter(username__iexact=username).exists()
     
-    @staticmethod
-    def check_email_availability(email):
-        """檢查 email 是否可用（不區分大小寫）"""
-        return not User.objects.filter(email__iexact=email).exists()
