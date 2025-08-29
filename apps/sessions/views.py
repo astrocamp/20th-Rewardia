@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.views.decorators.http import require_POST
 from .forms import UserLoginForm
 from .services import UserAuthenticationService
 
@@ -22,3 +23,14 @@ def login_view(request):
         form = UserLoginForm()
     
     return render(request, 'users/login.html', {'form': form})
+
+
+@require_POST
+def logout_view(request):
+    """用戶登出視圖"""
+    username = UserAuthenticationService.logout_user(request)
+    
+    if username:
+        UserAuthenticationService.handle_logout_success(request, username)
+    
+    return redirect('pages:download')  # 重定向到首頁

@@ -69,36 +69,30 @@
             </div>
           </div>
           <!-- 登出按鈕（大畫面顯示） -->
-            <form method="post" action="#" class="hidden md:block">
-              {% csrf_token %}
-              <button type="submit" class="hidden md:block btn-outline border px-6 py-2 rounded-lg">
-                登出
-              </button>
-            </form>
+          <form method="post" action="{% url 'sessions:logout' %}" class="hidden md:block">
+            {% csrf_token %}
+            <button type="submit" class="btn-outline border px-6 py-2 rounded-lg">
+              登出
+            </button>
+          </form>
 
           <!-- 登出按鈕（小畫面顯示） -->
-            <form method="post" action="#" class="hidden md:block">
-              {% csrf_token %}
-              <button type="submit" class="md:hidden btn-outline border px-4 py-2 rounded-lg">
-                登出
-              </button>
-            </form>
+          <form method="post" action="{% url 'sessions:logout' %}" class="md:hidden">
+            {% csrf_token %}
+            <button type="submit" class="btn-outline border px-4 py-2 rounded-lg">
+              登出
+            </button>
+          </form>
 
         {% else %}
           <!-- 未登入：登入按鈕（大畫面顯示） -->
-            <form method="post" action="#" class="hidden md:block">
-              {% csrf_token %}
-              <button type="submit" class="hidden md:block btn-primary px-6 py-2 rounded-lg">
-                登入
-              </button>
-            </form>
+          <a href="{% url 'sessions:login' %}" class="hidden md:block btn-primary px-6 py-2 rounded-lg">
+            登入
+          </a>
           <!-- 未登入：登入按鈕（小畫面顯示） -->
-            <form method="post" action="#" class="hidden md:block">
-              {% csrf_token %}
-              <button type="submit" class="md:hidden btn-primary px-4 py-2 rounded-lg">
-                登入
-              </button>
-            </form>
+          <a href="{% url 'sessions:login' %}" class="md:hidden btn-primary px-4 py-2 rounded-lg">
+            登入
+          </a>
 
         {% endif %}
 
