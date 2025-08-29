@@ -1,25 +1,70 @@
-{% load static%}
-<!DOCTYPE html>
-<html lang="en" data-theme="light">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rewardia Cards Admin</title>
-  {%load static%}
-  <link rel="stylesheet" href="{% static 'styles/style.css' %}">
-  <script type="module" src="{% static 'scripts/app.js' %}"></script>
-</head>
-<body>
+{% extends 'admins/default.html' %} {%block content%}
+<section
+  class="relative mx-4 sm:mx-6 lg:mx-10 mb-4 sm:mb-6 lg:mb-8 banner-spacing overflow-hidden"
+>
+  <div class="my-4 sm:mb-6">
+    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black">
+      卡片資料庫
+    </h2>
+  </div>
 
+  <form action="" method="post">
+    {% csrf_token %}
+    <div class="px-2 flex flex-col flex-wrap">
+      <div class="field-group">
+        <label for="name" class="field-label required">銀行</label>
+        <input
+          id="name"
+          type="text"
+          class="ui-input"
+          placeholder="輸入銀行"
+          required
+        />
+      </div>
+      <div class="field-group">
+        <label for="card" class="field-label required">信用卡</label>
+        <input
+        id="card"
+        type="text"
+        class="ui-input"
+        placeholder="輸入信用卡名"
+        required
+        />
+      </div>
+      <div class="field-group">
+        <label for="network" class="field-label required">發卡機構</label>
+        <select id="network"
+          class="ui-select"
+          required>
+          <option value="" selected disabled>請選擇發卡機構</option>
+        <select/>
+      </div>
+      <div class="field-group">
+        <label for="network" class="field-label required">卡片等級</label>
+        <select id="network"
+        class="ui-select"
+        required>
+        <option value="" selected disabled>請選擇卡片等級</option>
+        <select/>
+      </div>
+      <div class="field-group">
+        <label for="foreign" class="field-label">國外交易手續費</label>
+        <input id="foreign" type="number" class="ui-input" />
+      </div>
+      <div id="is_active" class="field-group flex flex-row items-center">
+        <label for="checkbox" class="field-label">發行中？</label>
+        <input id="checkbox" class="checkbox mb-2" type="checkbox">
+      </div>
+    </div>
+    <div>
+      <button type="button" class="ui-btn ui-btn-secondary cursor-pointer">
+        取消
+      </button>
+      <button type="submit" class="ui-btn ui-btn-primary cursor-pointer">
+        新增卡片
+      </button>
+    </div>
+  </form>
+</section>
 
-  {% include 'admins/admin_header.html' %}
-
-  <main>
-    {% block content %}
-    {% endblock %}
-  </main>
-
-  {% include 'layouts/footer.html' %}
-
-</body>
-</html>
+{%endblock%}

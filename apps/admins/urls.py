@@ -5,4 +5,5 @@ app_name = "admins"
 
 urlpatterns = [
     path("cards/", views.cards, name="cards"),
+    path("rewards/", views.rewards, name="rewards"),
 ]

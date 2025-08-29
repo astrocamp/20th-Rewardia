@@ -9,8 +9,8 @@
 
       <!-- 桌機導覽 -->
       <nav class="hidden md:flex space-x-8">
-        <a href="{% url 'pages:download' %}" class="text-gray-700 hover:text-gray-900 font-medium">卡片</a>
-        <a href="{% url 'pages:calculator' %}" class="text-gray-700 hover:text-gray-900 font-medium">獎勵回饋</a>
+        <a href="{% url 'admins:cards' %}" class="text-gray-700 hover:text-gray-900 font-medium">卡片</a>
+        <a href="{% url 'admins:rewards' %}" class="text-gray-700 hover:text-gray-900 font-medium">獎勵回饋</a>
         <a href="{% url 'pages:faq' %}" class="text-gray-700 hover:text-gray-900 font-medium">選項3</a>
         <a href="#" class="text-gray-700 hover:text-gray-900 font-medium">選項4</a>
         <a href="{% url 'users:member_zone' %}" class="text-gray-700 hover:text-gray-900 font-medium">選項5</a>
@@ -31,8 +31,8 @@
     <!-- 行動選單（預設隱藏） -->
     <div id="mobile-menu" class="md:hidden hidden border-t border-gray-200 pt-3 pb-4">
       <nav class="flex flex-col space-y-2">
-        <a href="{% url 'pages:download' %}" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">卡片</a>
-        <a href="{% url 'pages:calculator' %}" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">獎勵回饋</a>
+        <a href="{% url 'admins:cards' %}" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">卡片</a>
+        <a href="{% url 'admins:rewards' %}" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">獎勵回饋</a>
         <a href="{% url 'pages:faq' %}" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">選項3</a>
         <a href="#" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">選項4</a>
         <a href="{% url 'users:member_zone' %}" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">選項5</a>
