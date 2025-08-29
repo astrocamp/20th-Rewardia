@@ -6,7 +6,7 @@ from .services import UserAuthenticationService
 
 def login_view(request):
     """用戶登入視圖"""
-    # 如果用戶已經登入，直接重定向到會員專區
+    
     if request.user.is_authenticated:
         return redirect('users:member_zone')
     
@@ -33,4 +33,4 @@ def logout_view(request):
     if username:
         UserAuthenticationService.handle_logout_success(request, username)
     
-    return redirect('pages:download')  # 重定向到首頁
+        return redirect('pages:download')

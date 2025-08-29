@@ -21,14 +21,14 @@ class UserAuthenticationService:
         try:
             user = form.get_user()
             
-            # 執行登入
+            
             django_login(request, user)
             
-            # 更新最後登入時間
+            
             user.last_login = timezone.now()
             user.save(update_fields=['last_login'])
             
-            # 設定會話期限為瀏覽器關閉時過期
+            
             request.session.set_expiry(0)
             
             return True, user, None
