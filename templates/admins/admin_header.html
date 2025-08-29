@@ -1,0 +1,42 @@
+<header class="fixed-header bg-white border-b border-gray-200 shadow-sm">
+  <!-- Main Header -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-20">
+      <!-- Logo -->
+      <div class="flex-shrink-0">
+        <h1 class="text-2xl font-bold text-black uppercase tracking-wider">Rewardia</h1>
+      </div>
+
+      <!-- 桌機導覽 -->
+      <nav class="hidden md:flex space-x-8">
+        <a href="{% url 'pages:download' %}" class="text-gray-700 hover:text-gray-900 font-medium">卡片</a>
+        <a href="{% url 'pages:calculator' %}" class="text-gray-700 hover:text-gray-900 font-medium">獎勵回饋</a>
+        <a href="{% url 'pages:faq' %}" class="text-gray-700 hover:text-gray-900 font-medium">選項3</a>
+        <a href="#" class="text-gray-700 hover:text-gray-900 font-medium">選項4</a>
+        <a href="{% url 'users:member_zone' %}" class="text-gray-700 hover:text-gray-900 font-medium">選項5</a>
+      </nav>
+
+        <!-- 漢堡按鈕：僅手機顯示 -->
+        <button id="menu-toggle"
+                class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100"
+                aria-controls="mobile-menu" aria-expanded="false" aria-label="打開主選單">
+          <!-- 三條線 icon -->
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M4 6h16M4 12h16M4 18h16" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- 行動選單（預設隱藏） -->
+    <div id="mobile-menu" class="md:hidden hidden border-t border-gray-200 pt-3 pb-4">
+      <nav class="flex flex-col space-y-2">
+        <a href="{% url 'pages:download' %}" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">卡片</a>
+        <a href="{% url 'pages:calculator' %}" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">獎勵回饋</a>
+        <a href="{% url 'pages:faq' %}" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">選項3</a>
+        <a href="#" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">選項4</a>
+        <a href="{% url 'users:member_zone' %}" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">選項5</a>
+      </nav>
+    </div>
+  </div>
+</header>
