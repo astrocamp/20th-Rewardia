@@ -20,7 +20,8 @@
 <form class="space-y-3" 
       x-data="register_form" 
       method="post"
-      action="{% url 'users:register' %}">
+      action="{% url 'users:register' %}"
+      @submit.prevent="submitForm($event)">
   {% csrf_token %}
   
   <!-- 帳號欄位 -->

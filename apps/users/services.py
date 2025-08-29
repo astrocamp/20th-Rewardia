@@ -47,13 +47,7 @@ class UserRegistrationService:
         """處理表單驗證錯誤"""
         for field, errors in form.errors.items():
             for error in errors:
-                error_code = getattr(error, 'code', None)
-                if error_code == 'username_in_use':
-                    messages.error(request, '此帳號已被註冊，請選擇其他帳號或嘗試登入。')
-                elif error_code == 'email_in_use':
-                    messages.error(request, '此電子信箱已被註冊，請使用其他信箱或嘗試登入。')
-                else:
-                    messages.error(request, error)
+                messages.error(request, str(error))
     
     @staticmethod
     def check_username_availability(username):

@@ -150,6 +150,21 @@ Alpine.data('register_form', () => ({
     return true;
   },
 
+  submitForm(event) {
+    this.errors = {};
+
+    const isValid = 
+      this.validateUsername() &&
+      this.validateEmail() &&
+      this.validatePassword() &&
+      this.validateConfirmPassword() &&
+      this.validateAgreeTerms();
+
+    if (isValid) {
+      event.target.submit();
+    }
+  }
+
 }));
 
 
