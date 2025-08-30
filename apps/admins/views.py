@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from apps.cards.models import CreditCard
 from apps.cards.models import Bank
 from django.contrib import messages
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_http_methods
+from django.http import HttpResponse
 
 
 # Create your views here.
@@ -48,6 +49,14 @@ def new_card(request):
     else:
         messages.success(request, "新增失敗")
         return redirect("admins:cards")
+
+
+@require_http_methods(["POST", "DELETE"])
+def delete_card(request, id):
+    card = CreditCard.objects.get(pk=id)
+    card.delete()
+    messages.success(request, "刪除成功")
+    return HttpResponse("")
 
 
 def rewards(request):
