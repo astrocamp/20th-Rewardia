@@ -1016,11 +1016,6 @@
     min-height: 407px; /* 符合 Figma 設計高度 */
   }
 
-  /* 新增卡片標題區域 */
-  .add-card-header {
-    @apply mb-10; /* 標題與表單欄位的間距 */
-  }
-
   /* 新增卡片標題樣式 */
   .add-card-title {
     @apply text-2xl font-bold text-[#5D6970] mb-[14px];
