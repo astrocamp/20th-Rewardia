@@ -1,4 +1,4 @@
-<tr>
+<tr id="card-{{card.id}}">
   <th class="text-center">{{card.id}}</th>
   <td class="text-center">{{card.name}}</td>
   <td class="text-center">{{card.bank.name}}</td>
@@ -9,4 +9,7 @@
   {%endif%}
   <td class="text-center">{{card.created_at}}</td>
   <td class="text-center">{{card.updated_at}}</td>
+  <td class="text-center text-red-400" hx-delete="{}">
+    <i class="fa-solid fa-trash"></i>
+  </td>
 </tr>
