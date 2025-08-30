@@ -10,50 +10,71 @@
 
   <form action="" method="post">
     {% csrf_token %}
+
     <div class="py-4 flex flex-col flex-wrap form-card-bg">
       <div class="field-group">
         <label for="name" class="field-label required">銀行</label>
-        <input
+        <select
           id="name"
+          name="bank"
           type="text"
           class="ui-input"
           placeholder="輸入銀行"
           required
-        />
+        >
+          <option value="" selected disabled>請選擇發卡機構</option>
+          {%for bank in banks%}
+          <option value="">{{bank.name}}</option>
+          {% endfor %}
+        <select/>
       </div>
+
       <div class="field-group">
         <label for="card" class="field-label required">信用卡</label>
         <input
         id="card"
+        name="card"
         type="text"
         class="ui-input"
         placeholder="輸入信用卡名"
         required
         />
       </div>
+
       <div class="field-group">
         <label for="network" class="field-label required">發卡機構</label>
         <select id="network"
           class="ui-select"
+          name="network"
           required>
           <option value="" selected disabled>請選擇發卡機構</option>
+          {%for card_network in card_networks%}
+          <option value="" >{{card_network}}</option>
+          {%endfor%}
         <select/>
       </div>
+
       <div class="field-group">
-        <label for="network" class="field-label required">卡片等級</label>
-        <select id="network"
+        <label for="card_type" class="field-label required">卡片等級</label>
+        <select id="card_type"
         class="ui-select"
+        name="card_type"
         required>
         <option value="" selected disabled>請選擇卡片等級</option>
+        {%for card_type in card_types%}
+        <option value="" >{{card_type}}</option>
+        {%endfor%}
         <select/>
       </div>
+
       <div class="field-group">
-        <label for="foreign" class="field-label">國外交易手續費</label>
-        <input id="foreign" type="number" class="ui-input" />
+        <label for="foreign" class="field-label">國外交易手續費（%）</label>
+        <input id="foreign" name="foreign" type="number" step="0.1" class="ui-input" />
       </div>
+
       <div id="is_active" class="field-group flex flex-row items-center">
-        <label for="checkbox" class="field-label">發行中？</label>
-        <input id="checkbox" class="checkbox mb-2" type="checkbox">
+        <label for="is_active" class="field-label">發行中？</label>
+        <input id="is_active" name="is_active" class="checkbox mb-2" type="checkbox">
       </div>
 
       <div>
