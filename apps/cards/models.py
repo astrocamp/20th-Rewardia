@@ -8,11 +8,11 @@ class CreditCard(models.Model):
 
     # 卡片網路選擇
     class CardNetwork(models.TextChoices):
-        VISA = "VISA", "Visa"
-        MASTERCARD = "MC", "MasterCard"
+        VISA = "Visa", "Visa"
+        MASTERCARD = "Mastercard", "Mastercard"
         JCB = "JCB", "JCB"
-        AMEX = "AMEX", "American Express"
-        UNION_PAY = "UP", "銀聯"
+        AMEX = "美國運通 AMEX", "美國運通"
+        UNION_PAY = "銀聯", "銀聯"
 
     # 卡片等級選擇
     class CardType(models.TextChoices):
