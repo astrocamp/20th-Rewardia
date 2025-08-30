@@ -1,29 +1,19 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from apps.cards.models import CreditCard
 from apps.cards.models import Bank
+from django.contrib import messages
+from django.views.decorators.http import require_POST
 
 
 # Create your views here.
+
+
+# 卡片頁面的函式
 def cards(request):
     banks = Bank.objects.filter(is_active=True)
     card_networks = CreditCard.CardNetwork
     card_types = CreditCard.CardType
-
-    if request.POST:
-        name = request.POST.get("card")
-        bank = request.POST.get("bank")
-        card_network = request.POST.get("network")
-        card_type = request.POST.get("card_type")
-        foreign_transaction_fee = request.POST.get("foreign")
-        is_active = request.POST.get("is_active")
-        CreditCard.objects.create(
-            name=name,
-            bank=bank,
-            network=card_network,
-            card_type=card_type,
-            foreign_transaction_fee=foreign_transaction_fee,
-            is_active=is_active,
-        )
+    cards = CreditCard.objects.filter(is_active=True).order_by("-updated_at")
     return render(
         request,
         "admins/cards.html",
@@ -31,8 +21,33 @@ def cards(request):
             "banks": banks,
             "card_networks": card_networks,
             "card_types": card_types,
+            "cards": cards,
         },
     )
+
+
+@require_POST
+def new_card(request):
+    name = request.POST.get("card")
+    bank = request.POST["bank"]
+    card_network = request.POST["network"]
+    card_type = request.POST["card_type"]
+    foreign_transaction_fee = request.POST.get("foreign")
+    is_active = request.POST.get("is_active") == "on"
+    new_card = CreditCard.objects.create(
+        name=f"{Bank.objects.get(id=bank).name} {name}",
+        bank=Bank.objects.get(id=bank),
+        card_network=card_network,
+        card_type=card_type,
+        foreign_transaction_fee=foreign_transaction_fee,
+        is_active=is_active,
+    )
+    if new_card:
+        messages.success(request, "新增卡片成功")
+        return redirect("admins:cards")
+    else:
+        messages.success(request, "新增失敗")
+        return redirect("admins:cards")
 
 
 def rewards(request):
