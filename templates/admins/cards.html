@@ -3,12 +3,12 @@
   class="relative mx-4 sm:mx-6 lg:mx-10 mb-4 sm:mb-6 lg:mb-8 banner-spacing overflow-hidden"
 >
   <div class="my-4 sm:mb-6">
-    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black">
+    <h2 class="text-2xl sm:text-2xl lg:text-2xl font-bold text-black">
       卡片資料庫
     </h2>
   </div>
 
-  <form hx-post="{%url 'admins:new_card'%}">
+  <form hx-post="{%url 'admins:new_card'%}" hx-target="">
     {% csrf_token %}
 
     <div class="py-4 flex flex-col flex-wrap form-card-bg">
@@ -23,7 +23,7 @@
           placeholder="輸入銀行"
           required
         >
-          <option value="" selected disabled>請選擇發卡機構</option>
+          <option value="" selected disabled>請選擇銀行</option>
           {%for bank in banks%}
           <option value="{{bank.id}}">{{bank.name}}</option>
           {% endfor %}
@@ -91,9 +91,42 @@
   </form>
 
   <div class="my-4 sm:mb-6">
-    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black">
+    <h2 class="text-2xl sm:text-2xl lg:text-2xl font-bold text-black">
       所有卡片
     </h2>
+  </div>
+
+    <div class="overflow-x-auto">
+      <table class="table table-zebra w-full">
+        <!-- head -->
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>信用卡</th>
+            <th>銀行</th>
+            <th>發行中</th>
+            <th>建立時間</th>
+            <th>最近更新時間</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- row 1 -->
+          {%for card in cards%}
+          <tr>
+            <th class="text-center">{{card.id}}</th>
+            <td class="text-center">{{card.name}}</td>
+            <td class="text-center">{{card.bank.name}}</td>
+            {%if card.is_active%}
+            <td class="text-center"><i class="fa-solid fa-check"></i></td>
+            {%else%}
+            <td class="text-center"><i class="fa-solid fa-xmark"></i></td>
+            {%endif%}
+            <td class="text-center">{{card.created_at}}</td>
+            <td class="text-center">{{card.updated_at}}</td>
+          </tr>
+          {%endfor%}
+        </tbody>
+      </table>
   </div>
 </section>
 

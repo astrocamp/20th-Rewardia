@@ -13,7 +13,7 @@ def cards(request):
     banks = Bank.objects.filter(is_active=True)
     card_networks = CreditCard.CardNetwork
     card_types = CreditCard.CardType
-    cards = CreditCard.objects.filter(is_active=True).order_by("-updated_at")
+    cards = CreditCard.objects.order_by("-updated_at")
     return render(
         request,
         "admins/cards.html",
