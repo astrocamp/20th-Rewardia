@@ -8,10 +8,11 @@
     </h2>
   </div>
 
-  <form action="" method="post">
+  <form hx-post="{%url 'admins:new_card'%}">
     {% csrf_token %}
 
     <div class="py-4 flex flex-col flex-wrap form-card-bg">
+      <h3 class="form-title mb-2">新增卡片</h3>
       <div class="field-group">
         <label for="name" class="field-label required">銀行</label>
         <select
@@ -24,7 +25,7 @@
         >
           <option value="" selected disabled>請選擇發卡機構</option>
           {%for bank in banks%}
-          <option value="">{{bank.name}}</option>
+          <option value="{{bank.id}}">{{bank.name}}</option>
           {% endfor %}
         <select/>
       </div>
@@ -49,7 +50,7 @@
           required>
           <option value="" selected disabled>請選擇發卡機構</option>
           {%for card_network in card_networks%}
-          <option value="" >{{card_network}}</option>
+          <option value="{{card_network}}" >{{card_network}}</option>
           {%endfor%}
         <select/>
       </div>
@@ -62,7 +63,7 @@
         required>
         <option value="" selected disabled>請選擇卡片等級</option>
         {%for card_type in card_types%}
-        <option value="" >{{card_type}}</option>
+        <option value="{{card_type}}" >{{card_type}}</option>
         {%endfor%}
         <select/>
       </div>
@@ -78,8 +79,8 @@
       </div>
 
       <div>
-        <button type="button" class="ui-btn ui-btn-secondary cursor-pointer">
-          取消
+        <button type="reset" class="ui-btn ui-btn-secondary cursor-pointer">
+          清除
         </button>
         <button type="submit" class="ui-btn ui-btn-primary cursor-pointer">
           新增卡片
@@ -88,6 +89,12 @@
     </div>
 
   </form>
+
+  <div class="my-4 sm:mb-6">
+    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black">
+      所有卡片
+    </h2>
+  </div>
 </section>
 
 {%endblock%}
