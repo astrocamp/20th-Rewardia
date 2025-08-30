@@ -10,7 +10,7 @@
 
   <form action="" method="post">
     {% csrf_token %}
-    <div class="px-2 flex flex-col flex-wrap">
+    <div class="py-4 flex flex-col flex-wrap form-card-bg">
       <div class="field-group">
         <label for="name" class="field-label required">銀行</label>
         <input
@@ -55,15 +55,17 @@
         <label for="checkbox" class="field-label">發行中？</label>
         <input id="checkbox" class="checkbox mb-2" type="checkbox">
       </div>
+
+      <div>
+        <button type="button" class="ui-btn ui-btn-secondary cursor-pointer">
+          取消
+        </button>
+        <button type="submit" class="ui-btn ui-btn-primary cursor-pointer">
+          新增卡片
+        </button>
+      </div>
     </div>
-    <div>
-      <button type="button" class="ui-btn ui-btn-secondary cursor-pointer">
-        取消
-      </button>
-      <button type="submit" class="ui-btn ui-btn-primary cursor-pointer">
-        新增卡片
-      </button>
-    </div>
+
   </form>
 </section>
 
