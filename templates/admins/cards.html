@@ -8,7 +8,7 @@
     </h2>
   </div>
 
-  <form hx-post="{%url 'admins:new_card'%}" hx-target="">
+  <form hx-post="{%url 'admins:new_card'%}" hx-target="#card_body" hx-swap="afterbegin" hx-on::after-request="this.reset()">
     {% csrf_token %}
 
     <div class="py-4 flex flex-col flex-wrap form-card-bg">
@@ -109,7 +109,7 @@
             <th>最近更新時間</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="card_body">
           <!-- row 1 -->
           {%for card in cards%}
           <tr>

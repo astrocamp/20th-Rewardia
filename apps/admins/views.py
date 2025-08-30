@@ -44,7 +44,7 @@ def new_card(request):
     )
     if new_card:
         messages.success(request, "新增卡片成功")
-        return redirect("admins:cards")
+        return render(request, "admins/card_row.html", {"card": new_card})
     else:
         messages.success(request, "新增失敗")
         return redirect("admins:cards")
