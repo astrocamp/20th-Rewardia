@@ -51,6 +51,10 @@ def new_card(request):
         return redirect("admins:cards")
 
 
+def edit_card(request, id):
+    pass
+
+
 @require_http_methods(["POST", "DELETE"])
 def delete_card(request, id):
     card = CreditCard.objects.get(pk=id)

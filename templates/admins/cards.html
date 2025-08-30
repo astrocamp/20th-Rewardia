@@ -105,6 +105,9 @@
             <th>信用卡</th>
             <th>銀行</th>
             <th>發行中</th>
+            <th>發卡機構</th>
+            <th>卡片等級</th>
+            <th>國外交易手續費</th>
             <th>建立時間</th>
             <th>最近更新時間</th>
           </tr>
@@ -122,9 +125,11 @@
             {%else%}
             <td class="text-center"><i class="fa-solid fa-xmark"></i></td>
             {%endif%}
-
-            <td class="text-center">{{card.created_at}}</td>
-            <td class="text-center">{{card.updated_at}}</td>
+            <td class="text-center">{{card.card_network}}</td>
+            <td class="text-center">{{card.card_type}}</td>
+            <td class="text-center">{{card.foreign_transaction_fee}}%</td>
+            <td class="text-center">{{card.created_at | date:'M d Y'}}</td>
+            <td class="text-center">{{card.updated_at | date:'M d Y'}}</td>
 
             <td class="text-center text-red-400">
               <form
