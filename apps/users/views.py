@@ -11,6 +11,33 @@ from apps.cards.models import CreditCard
 from .models import UserCard
 
 
+def prepare_card_form_context(
+    user_card=None, is_edit_mode=False, include_selected_bank=False
+):
+    # 基本的context資料
+    banks = Bank.objects.filter(is_active=True).only("id", "name", "code")
+    cards = (
+        CreditCard.objects.filter(is_active=True)
+        .select_related("bank")
+        .only("id", "name", "bank__id", "bank__name")
+    )
+
+    context = {
+        "banks": banks,
+        "cards": cards,
+        "user_card": user_card,
+        "is_edit_mode": is_edit_mode,
+    }
+
+    if include_selected_bank:
+        if is_edit_mode and user_card:
+            context["selected_bank"] = user_card.card.bank
+        else:
+            context["selected_bank"] = None
+
+    return context
+
+
 def member_zone(request):
     context = {}
 
@@ -19,17 +46,13 @@ def member_zone(request):
         user_cards = request.user.user_cards.select_related("card", "card__bank").all()
         context["user_cards"] = user_cards
 
-        # 暫時移除收藏卡片功能，避免錯誤
-        # favorite_cards = request.user.preferences.favorite_cards.select_related('bank').all()
-        # context['favorite_cards'] = favorite_cards
-
     return render(request, "users/member_zone.html", context)
 
 
 # API 端點：根據銀行 ID 返回該銀行的所有信用卡（JSON 格式，給 Alpine.js 用）
 def get_cards_by_bank(request, bank_id):
+    """API 端點：返回指定銀行的所有信用卡"""
     try:
-        # 確認銀行存在且啟用
         bank = Bank.objects.get(id=bank_id, is_active=True)
 
         # 取得該銀行的所有啟用信用卡
@@ -71,30 +94,10 @@ def card_form(request, card_id=None):
         is_edit_mode = False
 
     if request.method == "GET":
-        # 顯示表單頁面
-        banks = Bank.objects.filter(is_active=True).only("id", "name", "code")
-
-        # 統一邏輯：無論新增還是編輯模式，都載入所有卡片供 Alpine.js 篩選使用
-        cards = (
-            CreditCard.objects.filter(is_active=True)
-            .select_related("bank")
-            .only("id", "name", "bank__id", "bank__name")
+        # 顯示表單頁面 - 使用輔助函式準備context
+        context = prepare_card_form_context(
+            user_card=user_card, is_edit_mode=is_edit_mode, include_selected_bank=True
         )
-
-        # 設定選中的銀行（僅用於顯示）
-        if is_edit_mode and user_card:
-            selected_bank = user_card.card.bank
-        else:
-            selected_bank = None
-
-        context = {
-            "banks": banks,
-            "cards": cards,
-            "user_card": user_card,
-            "is_edit_mode": is_edit_mode,
-            "selected_bank": selected_bank,
-        }
-
         return render(request, "users/card_form.html", context)
 
     elif request.method == "POST":
@@ -105,33 +108,26 @@ def card_form(request, card_id=None):
         # 檢查資料完整性
         if not bank_id or not card_id_from_form:
             messages.error(request, "請選擇銀行和卡片")
-            # 重新準備表單資料
-            banks = Bank.objects.filter(is_active=True)
-            cards = CreditCard.objects.filter(is_active=True).select_related("bank")
-            context = {
-                "banks": banks,
-                "cards": cards,
-                "user_card": user_card,
-                "is_edit_mode": is_edit_mode,
-            }
+            # 使用輔助函式重新準備表單資料
+            context = prepare_card_form_context(
+                user_card=user_card,
+                is_edit_mode=is_edit_mode,
+                include_selected_bank=False,
+            )
             return render(request, "users/card_form.html", context)
 
         try:
-            # 取得選擇的卡片
             selected_card = CreditCard.objects.get(id=card_id_from_form, is_active=True)
 
             # 檢查卡片是否真的屬於選的銀行
             if str(selected_card.bank.id) != bank_id:
                 messages.error(request, "選擇的卡片與銀行不符！")
-                # 重新準備表單資料
-                banks = Bank.objects.filter(is_active=True)
-                cards = CreditCard.objects.filter(is_active=True).select_related("bank")
-                context = {
-                    "banks": banks,
-                    "cards": cards,
-                    "user_card": user_card,
-                    "is_edit_mode": is_edit_mode,
-                }
+                # 使用輔助函式重新準備表單資料
+                context = prepare_card_form_context(
+                    user_card=user_card,
+                    is_edit_mode=is_edit_mode,
+                    include_selected_bank=False,
+                )
                 return render(request, "users/card_form.html", context)
 
             if is_edit_mode:
@@ -144,17 +140,12 @@ def card_form(request, card_id=None):
 
                 if existing_card:
                     messages.error(request, "您已經擁有這張卡片了！無法重複新增。")
-                    # 重新準備表單資料
-                    banks = Bank.objects.filter(is_active=True)
-                    cards = CreditCard.objects.filter(is_active=True).select_related(
-                        "bank"
+                    # 使用輔助函式重新準備表單資料
+                    context = prepare_card_form_context(
+                        user_card=user_card,
+                        is_edit_mode=is_edit_mode,
+                        include_selected_bank=False,
                     )
-                    context = {
-                        "banks": banks,
-                        "cards": cards,
-                        "user_card": user_card,
-                        "is_edit_mode": is_edit_mode,
-                    }
                     return render(request, "users/card_form.html", context)
 
                 # 更新現有卡片
@@ -170,17 +161,12 @@ def card_form(request, card_id=None):
                     user=request.user, card=selected_card
                 ).exists():
                     messages.error(request, "您已經擁有這張卡片了！")
-                    # 重新準備表單資料，而不是 redirect
-                    banks = Bank.objects.filter(is_active=True)
-                    cards = CreditCard.objects.filter(is_active=True).select_related(
-                        "bank"
+                    # 使用輔助函式重新準備表單資料
+                    context = prepare_card_form_context(
+                        user_card=user_card,
+                        is_edit_mode=is_edit_mode,
+                        include_selected_bank=False,
                     )
-                    context = {
-                        "banks": banks,
-                        "cards": cards,
-                        "user_card": user_card,
-                        "is_edit_mode": is_edit_mode,
-                    }
                     return render(request, "users/card_form.html", context)
 
                 UserCard.objects.create(
@@ -195,15 +181,12 @@ def card_form(request, card_id=None):
 
         except CreditCard.DoesNotExist:
             messages.error(request, "選擇的卡片不存在")
-            # 重新準備表單資料
-            banks = Bank.objects.filter(is_active=True)
-            cards = CreditCard.objects.filter(is_active=True).select_related("bank")
-            context = {
-                "banks": banks,
-                "cards": cards,
-                "user_card": user_card,
-                "is_edit_mode": is_edit_mode,
-            }
+            # 使用輔助函式重新準備表單資料
+            context = prepare_card_form_context(
+                user_card=user_card,
+                is_edit_mode=is_edit_mode,
+                include_selected_bank=False,
+            )
             return render(request, "users/card_form.html", context)
 
 

@@ -1,5 +1,6 @@
-import Alpine from 'alpinejs';
-import 'htmx.org';
+import Alpine from "alpinejs";
+import "htmx.org";
+import message from './components/message.js';
 
 import faq from './components/faq.js';
 import login from './components/login.js';
@@ -14,19 +15,9 @@ Alpine.data('register_form', register);
 Alpine.data('subscribe_form', subscribe);
 window.Alpine = Alpine;
 
-// Toast 自動淡出功能 (Alpine.js 版本)
-Alpine.data('toast_fadeout', () => ({
-  init() {
-    // 4 秒自動淡出（多則訊息稍微錯開）
-    document.querySelectorAll('.tw-toast').forEach((el, i) => {
-      setTimeout(() => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(-6px)';
-        setTimeout(() => el.remove(), 200);
-      }, 4000 + i * 200);
-    });
-  }
-}));
+Alpine.data('toast_fadeout', message);
+
+
 
 // FAQ 頁面的 Alpine.js 功能
 Alpine.data('faq_accordion', () => ({
