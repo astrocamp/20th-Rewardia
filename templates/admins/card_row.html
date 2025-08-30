@@ -1,0 +1,12 @@
+<tr>
+  <th class="text-center">{{card.id}}</th>
+  <td class="text-center">{{card.name}}</td>
+  <td class="text-center">{{card.bank.name}}</td>
+  {%if card.is_active%}
+  <td class="text-center"><i class="fa-solid fa-check"></i></td>
+  {%else%}
+  <td class="text-center"><i class="fa-solid fa-xmark"></i></td>
+  {%endif%}
+  <td class="text-center">{{card.created_at}}</td>
+  <td class="text-center">{{card.updated_at}}</td>
+</tr>
