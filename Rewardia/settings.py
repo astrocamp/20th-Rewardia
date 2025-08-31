@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
 from pathlib import Path
 from dotenv import load_dotenv
 from django.contrib.messages import constants as messages
@@ -36,34 +35,47 @@ LOGIN_URL = "/sessions/login"
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
-    # ------------------------------
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'django.contrib.sites',  # OAuth 必要：allauth 需要 sites framework 來管理多站點
+# ------------------------------
     "debug_toolbar",
     # ------------------------------
-    # "apps.pages",
-    "apps.users",
-    "apps.cards",
-    "apps.rewards",
-    "apps.sessions",
-    # "apps.admins",
+    'apps.pages',
+    'apps.users',
+    'apps.cards', 
+    'apps.rewards',
+    'apps.sessions',
+    'apps.admins',
     # ------------------------------
     "apps.nlp_validation",
     "apps.card_crawler",
+
+# ------------------------------
+    # OAuth 相關套件 - django-allauth
+    'allauth',                                    # OAuth 核心套件
+    'allauth.account',                           # OAuth 必要：Email 管理和帳號功能
+    'allauth.socialaccount',                     # OAuth 必要：社交帳號登入核心
+    'allauth.socialaccount.providers.google',   # OAuth 必要：Google OAuth 提供者
+
+# ------------------------------
+
+
 ]
 
 MIDDLEWARE = [
-    "django.middleware.security.SecurityMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',  # OAuth 必要：處理 allauth 的帳號相關請求
     "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
@@ -85,6 +97,12 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "Rewardia.wsgi.application"
+
+# OAuth 必要：認證後端設定
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',           # Django 預設認證（用戶名/密碼）
+    'allauth.account.auth_backends.AuthenticationBackend', # OAuth 必要：allauth 社交登入認證
+]
 
 
 # Database
@@ -158,4 +176,40 @@ MESSAGE_TAGS = {
     messages.SUCCESS: "tw-toast tw-success",
     messages.WARNING: "tw-toast tw-warn",
     messages.ERROR: "tw-toast tw-error",
+}
+
+# ================================
+# OAuth 設定區塊
+# ================================
+
+# OAuth 必要：站點 ID 設定
+SITE_ID = 1  # 對應 Django Admin 中的 Sites 設定
+
+# OAuth 必要：登入/登出重導向 URL
+LOGIN_REDIRECT_URL = '/users/member/'  # OAuth 登入成功後重導向到會員專區
+LOGOUT_REDIRECT_URL = '/'              # 登出後重導向到首頁
+
+# OAuth 設定：社交帳號行為配置
+SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'  # 不需要額外 Email 驗證（Google 已驗證）
+SOCIALACCOUNT_AUTO_SIGNUP = True           # 自動註冊新用戶（無需手動註冊流程）
+SOCIALACCOUNT_STORE_TOKENS = False         # 不儲存 OAuth tokens（節省資料庫空間）
+SOCIALACCOUNT_LOGIN_ON_GET = True          # 允許 GET 請求直接觸發 OAuth 登入（簡化流程）
+
+# OAuth 核心：Google OAuth 提供者設定
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': os.getenv('GOOGLE_CLIENT_ID'),    # 從 .env 讀取 Google Client ID
+            'secret': os.getenv('GOOGLE_CLIENT_SECRET'),   # 從 .env 讀取 Google Client Secret
+            'key': ''                                      # Google OAuth 2.0 不需要 key
+        },
+        'SCOPE': [
+            'profile',  # 取得用戶基本資料（姓名、頭像）
+            'email',    # 取得用戶 Email 地址
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',  # 線上存取模式（不需要 refresh token）
+        },
+        'OAUTH_PKCE_ENABLED': True,   # 啟用 PKCE 安全機制（防止授權碼攔截）
+    }
 }

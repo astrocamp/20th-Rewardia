@@ -22,8 +22,9 @@
 {% include 'components/auth-shared.html' with component="google-button" action="註冊" button_id="google-register" aria_label="使用 Google 帳號註冊" %}
 {% endcomment %}
 {% if component == "google-button" %}
+{% load socialaccount %}
 <a 
-  href="#" 
+  href="{% provider_login_url 'google' %}"
   id="{{ button_id|default:'google-auth' }}"
   class="register-btn-google"
   role="button"
