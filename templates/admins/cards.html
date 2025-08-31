@@ -8,15 +8,20 @@
     </h2>
   </div>
 
-  <form hx-post="{%url 'admins:new_card'%}" hx-target="#card_body" hx-swap="afterbegin" hx-on::after-request="this.reset()">
+  <form
+    hx-post="{%url 'admins:new_card'%}"
+    hx-target="#card_body"
+    hx-swap="afterbegin"
+    hx-on::after-request="this.reset()"
+  >
     {% csrf_token %}
 
     <div class="py-4 flex flex-col flex-wrap form-card-bg">
       <h3 class="form-title mb-2">新增卡片</h3>
       <div class="field-group">
-        <label for="name" class="field-label required">銀行</label>
+        <label for="bank" class="field-label required">銀行</label>
         <select
-          id="name"
+          id="bank"
           name="bank"
           type="text"
           class="ui-input"
@@ -27,55 +32,60 @@
           {%for bank in banks%}
           <option value="{{bank.id}}">{{bank.name}}</option>
           {% endfor %}
-        <select/>
+        </select>
       </div>
 
       <div class="field-group">
         <label for="card" class="field-label required">信用卡</label>
         <input
-        id="card"
-        name="card"
-        type="text"
-        class="ui-input"
-        placeholder="輸入信用卡名"
-        required
+          id="card"
+          name="card"
+          type="text"
+          class="ui-input"
+          placeholder="輸入信用卡名"
+          required
         />
       </div>
 
       <div class="field-group">
         <label for="network" class="field-label required">發卡機構</label>
-        <select id="network"
-          class="ui-select"
-          name="network"
-          required>
+        <select id="network" class="ui-select" name="network" required>
           <option value="" selected disabled>請選擇發卡機構</option>
           {%for card_network in card_networks%}
-          <option value="{{card_network}}" >{{card_network}}</option>
+          <option value="{{card_network}}">{{card_network}}</option>
           {%endfor%}
-        <select/>
+        </select>
       </div>
 
       <div class="field-group">
         <label for="card_type" class="field-label required">卡片等級</label>
-        <select id="card_type"
-        class="ui-select"
-        name="card_type"
-        required>
-        <option value="" selected disabled>請選擇卡片等級</option>
-        {%for card_type in card_types%}
-        <option value="{{card_type}}" >{{card_type}}</option>
-        {%endfor%}
-        <select/>
+        <select id="card_type" class="ui-select" name="card_type" required>
+          <option value="" selected disabled>請選擇卡片等級</option>
+          {%for card_type in card_types%}
+          <option value="{{card_type}}">{{card_type}}</option>
+          {%endfor%}
+        </select>
       </div>
 
       <div class="field-group">
         <label for="foreign" class="field-label">國外交易手續費（%）</label>
-        <input id="foreign" name="foreign" type="number" step="0.1" class="ui-input" />
+        <input
+          id="foreign"
+          name="foreign"
+          type="number"
+          step="0.1"
+          class="ui-input"
+        />
       </div>
 
       <div id="is_active" class="field-group flex flex-row items-center">
         <label for="is_active" class="field-label">發行中？</label>
-        <input id="is_active" name="is_active" class="checkbox mb-2" type="checkbox">
+        <input
+          id="is_active"
+          name="is_active"
+          class="checkbox mb-2"
+          type="checkbox"
+        />
       </div>
 
       <div>
@@ -87,67 +97,40 @@
         </button>
       </div>
     </div>
-
   </form>
 
   <div class="my-4 sm:mb-6">
-    <h2 class="text-2xl sm:text-2xl lg:text-2xl font-bold text-black">
+    <h2
+      id="all_cards"
+      class="text-2xl sm:text-2xl lg:text-2xl font-bold text-black"
+    >
       所有卡片
     </h2>
   </div>
 
-    <div class="overflow-x-auto">
-      <table class="table table-zebra w-full">
-        <!-- head -->
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>信用卡</th>
-            <th>銀行</th>
-            <th>發行中</th>
-            <th>發卡機構</th>
-            <th>卡片等級</th>
-            <th>國外交易手續費</th>
-            <th>建立時間</th>
-            <th>最近更新時間</th>
-          </tr>
-        </thead>
-        <tbody id="card_body">
-          <!-- row 1 -->
-          {%for card in cards%}
-          <tr id="card-{{card.id}}">
-            <th class="text-center">{{card.id}}</th>
-            <td class="text-center">{{card.name}}</td>
-            <td class="text-center">{{card.bank.name}}</td>
-
-            {%if card.is_active%}
-            <td class="text-center"><i class="fa-solid fa-check"></i></td>
-            {%else%}
-            <td class="text-center"><i class="fa-solid fa-xmark"></i></td>
-            {%endif%}
-            <td class="text-center">{{card.card_network}}</td>
-            <td class="text-center">{{card.card_type}}</td>
-            <td class="text-center">{{card.foreign_transaction_fee}}%</td>
-            <td class="text-center">{{card.created_at | date:'M d Y'}}</td>
-            <td class="text-center">{{card.updated_at | date:'M d Y'}}</td>
-
-            <td class="text-center text-red-400">
-              <form
-                  hx-post={%url 'admins:delete_card' card.id%}
-                  hx-target="#card-{{card.id}}"
-                  hx-swap="outerHTML"
-                  hx-confirm="確定要刪除「{{card.name}}」嗎？">
-                {% csrf_token %}
-                <button>
-                  <i class="fa-solid fa-trash"></i>
-                </button>
-              </form>
-            </td>
-
-          </tr>
-          {%endfor%}
-        </tbody>
-      </table>
+  <div class="overflow-x-auto">
+    <table class="table table-zebra w-full">
+      <!-- head -->
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>信用卡</th>
+          <th>銀行</th>
+          <th>發行中</th>
+          <th>發卡機構</th>
+          <th>卡片等級</th>
+          <th>國外交易手續費</th>
+          <th>建立時間</th>
+          <th>最近更新時間</th>
+        </tr>
+      </thead>
+      <tbody id="card_body">
+        <!-- row 1 -->
+        {%for card in cards%}
+          {%include 'admins/card_row.html'%}
+        {%endfor%}
+      </tbody>
+    </table>
   </div>
 </section>
 

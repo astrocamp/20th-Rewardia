@@ -1,0 +1,100 @@
+{% comment %} 編輯卡片時的表單 {% endcomment %}
+<form
+  hx-post="{% url 'admins:update_card' card.id %}"
+  hx-target="#card-{{card.id}}"
+  hx-swap="outerHTML"
+  hx-confirm="確定要儲存嗎？"
+>
+    <div>{{card.id}}</div>
+    {% csrf_token %}
+    <div>
+      <label for="card_edit" class="">信用卡</label>
+      <input
+        id="card_edit"
+        class="border border-red-500 rounded-md"
+        name="card_edit"
+        type="text"
+        value="{{card.name}}"
+      />
+    </div>
+
+    <div>
+      <label for="bank_edit" class="">銀行</label>
+      <select
+        id="bank_edit"
+        name="bank_edit"
+        type="text"
+        class="border border-blue-500 rounded-md"
+        placeholder="輸入銀行"
+        required
+      >
+        <option value="{{bank.id}}" selected>{{card.bank.name}}</option>
+        {%for bank in banks%}
+          {%if bank.id != card.bank.id%}
+             <option value="{{bank.id}}">{{bank.name}}</option>
+          {%endif%}
+        {% endfor %}
+      </select>
+    </div>
+
+    <div>
+    <label for="is_active_edit">發行中？</label>
+    {%if card.is_active%}
+      <input id="is_active_edit" class="checkbox" name="is_active_edit" type="checkbox" checked />
+    {%else%}
+      <input id="is_active" class="checkbox" name="is_active_edit" type="checkbox" />
+    </div>
+    {%endif%}
+
+    <div>
+      <label for="network_edit" class="required">發卡機構</label>
+      <select
+        id="network_edit"
+        class="border border-blue-500 rounded-md"
+        name="network_edit"
+        required
+      >
+        <option value="{{card_network}}" selected>{{card.card_network}}</option>
+        {%for card_network in card_networks%}
+        {%if card_network != card.card_network %}
+        <option value="{{card_network}}">{{card_network}}</option>
+        {%endif%}
+        {%endfor%}
+      </select>
+    </div>
+
+    <div>
+      <label for="card_type_edit" class="required">卡片等級</label>
+      <select
+        id="card_type_edit"
+        class="border border-blue-500 rounded-md"
+        name="card_type_edit"
+        required
+      >
+        <option value="{{card_type}}" selected>{{card.card_type}}</option>
+        {%for card_type in card_types%}
+        {%if card_type != card.card_type %}
+        <option value="{{card_type}}">{{card_type}}</option>
+        {%endif%}
+        {%endfor%}
+      </select>
+    </div>
+
+    <div>
+      <label for="foreign_edit">國外交易手續費（%）</label>
+      <input
+        id="foreign_edit"
+        class="border border-blue-500 rounded-md"
+        name="foreign_edit"
+        type="text"
+        value="{{card.foreign_transaction_fee}}"
+      />
+    </div>
+
+    <td class="text-center text-blue-400">
+      <button type="submit">
+        <i class="fa-solid fa-floppy-disk"></i>
+      </button>
+    </td>
+  </tr>
+</form>
