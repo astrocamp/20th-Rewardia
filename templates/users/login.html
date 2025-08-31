@@ -19,6 +19,7 @@
 <!-- 主要登入表單 -->
 <form class="space-y-3" 
       x-data="login_form" 
+      novalidate
       method="post"
       action="{% url 'sessions:login' %}"
       @submit.prevent="submitForm($event)">

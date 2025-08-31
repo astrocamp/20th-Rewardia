@@ -19,6 +19,7 @@
 <!-- 主要註冊表單 -->
 <form class="space-y-3" 
       x-data="register_form" 
+      novalidate
       method="post"
       action="{% url 'users:register' %}"
       @submit.prevent="submitForm($event)">
