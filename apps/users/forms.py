@@ -7,6 +7,7 @@ class UserRegistrationForm(forms.Form):
     """使用者註冊表單"""
     
     username = forms.CharField(
+        min_length=5,
         max_length=150,
         required=True,
         widget=forms.TextInput(attrs={
@@ -68,7 +69,7 @@ class UserRegistrationForm(forms.Form):
         username = self.cleaned_data.get('username')
         
         if not re.match(r'^[a-zA-Z0-9]+$', username):
-            raise ValidationError('帳號只能包含英文字母和數字，不能有空格或特殊字元')
+            raise ValidationError('Invalid username format', code='username_format_invalid')
         
         if User.objects.filter(username__iexact=username).exists():
             raise ValidationError('此帳號已被使用，請選擇其他帳號', code='username_in_use')
@@ -89,13 +90,16 @@ class UserRegistrationForm(forms.Form):
         password = self.cleaned_data.get('password')
         
         if not re.match(r'^[a-zA-Z0-9]+$', password):
-            raise ValidationError('密碼只能包含英文字母和數字，不能有空格或特殊字元')
+            raise ValidationError('Invalid password format', code='password_format_invalid')
         
         if not re.search(r'[A-Z]', password):
-            raise ValidationError('密碼必須包含至少一個英文大寫字母')
+            raise ValidationError('Missing uppercase', code='password_missing_uppercase')
         
         if not re.search(r'[a-z]', password):
-            raise ValidationError('密碼必須包含至少一個英文小寫字母')
+            raise ValidationError('Missing lowercase', code='password_missing_lowercase')
+        
+        if not re.search(r'[0-9]', password):
+            raise ValidationError('Missing number', code='password_missing_number')
         
         if not re.search(r'[0-9]', password):
             raise ValidationError('密碼必須包含至少一個數字')
@@ -109,15 +113,15 @@ class UserRegistrationForm(forms.Form):
         confirm_password = cleaned_data.get('confirm_password')
         
         if password and confirm_password and password != confirm_password:
-            self.add_error('confirm_password', '兩次輸入的密碼不一致，請重新確認')
+            raise ValidationError('Password mismatch', code='password_mismatch')
         
         return cleaned_data
 
     def save(self):
         """創建新用戶並返回用戶對象"""
         user = User.objects.create_user(
-            username=self.cleaned_data['username'],
-            email=self.cleaned_data['email'],
-            password=self.cleaned_data['password']
+            username=username,
+            email=email,
+            password=password
         )
         return user

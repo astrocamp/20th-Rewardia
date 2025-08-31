@@ -51,7 +51,7 @@
               <div x-show="!passwordVisible">
                   {% include 'components/icon.html' with name="eye" class="w-6 h-6" %}
               </div>
-              <div x-show="passwordVisible">
+              <div x-show="showPassword">
                   {% include 'components/icon.html' with name="eye-off" class="w-6 h-6" %}
               </div>
           </button>

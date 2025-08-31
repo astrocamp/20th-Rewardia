@@ -37,9 +37,9 @@ class UserLoginForm(forms.Form):
             
             user = authenticate(username=username, password=password)
             if user is None:
-                raise ValidationError('帳號或密碼錯誤，請重新輸入', code='invalid_login')
+                raise ValidationError('Invalid login', code='invalid_login')
             elif not user.is_active:
-                raise ValidationError('此帳號已被停用，請聯繫管理員', code='inactive_user')
+                raise ValidationError('Inactive user', code='inactive_user')
             
             
             cleaned_data['user'] = user

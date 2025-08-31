@@ -63,10 +63,10 @@
 {% include 'components/auth-shared.html' with component="input-field" field_type="email" field_id="email" field_name="email" label_text="電子郵件" placeholder="請輸入您的電子郵件" required="true" %}
 
 <!-- 登入頁面密碼欄位（不帶參數） -->
-{% include 'components/auth-shared.html' with component="input-field" field_type="password" field_id="password" field_name="password" label_text="密碼" placeholder="請輸入您的密碼" required="true" has_toggle="true" alpine_type="passwordVisible ? 'text' : 'password'" toggle_action="togglePassword()" %}
+{% include 'components/auth-shared.html' with component="input-field" field_type="password" field_id="password" field_name="password" label_text="密碼" placeholder="請輸入您的密碼" required="true" has_toggle="true" alpine_type="showPassword ? 'text' : 'password'" toggle_action="togglePassword()" %}
 
 <!-- 註冊頁面密碼欄位（帶參數） -->
-{% include 'components/auth-shared.html' with component="input-field" field_type="password" field_id="password" field_name="password1" label_text="密碼" placeholder="請輸入您的密碼" required="true" has_toggle="true" alpine_type="passwordVisible ? 'text' : 'password'" toggle_action="togglePassword('password')" %}
+{% include 'components/auth-shared.html' with component="input-field" field_type="password" field_id="password" field_name="password1" label_text="密碼" placeholder="請輸入您的密碼" required="true" has_toggle="true" alpine_type="showPassword ? 'text' : 'password'" toggle_action="togglePassword('password')" %}
 
 <!-- 註冊頁面確認密碼欄位（帶參數） -->
 {% include 'components/auth-shared.html' with component="input-field" field_type="password" field_id="confirm-password" field_name="password2" label_text="確認密碼" placeholder="請再次輸入您的密碼" required="true" has_toggle="true" alpine_type="confirmPasswordVisible ? 'text' : 'password'" toggle_action="togglePassword('password_confirm')" aria_visible_var="confirmPasswordVisible" %}
@@ -90,12 +90,12 @@
       type="button" 
       class="password-toggle-btn"
       @click="{{ toggle_action }}"
-      :aria-label="{{ aria_visible_var|default:'passwordVisible' }} ? '隱藏{{ label_text }}' : '顯示{{ label_text }}'"
+      :aria-label="{{ aria_visible_var|default:'showPassword' }} ? '隱藏{{ label_text }}' : '顯示{{ label_text }}'"
     >
-      <div x-show="!{{ aria_visible_var|default:'passwordVisible' }}">
+      <div x-show="!{{ aria_visible_var|default:'showPassword' }}">
         {% include 'components/icon.html' with name="eye" class="w-6 h-6" %}
       </div>
-      <div x-show="{{ aria_visible_var|default:'passwordVisible' }}">
+      <div x-show="{{ aria_visible_var|default:'showPassword' }}">
         {% include 'components/icon.html' with name="eye-off" class="w-6 h-6" %}
       </div>
     </button>

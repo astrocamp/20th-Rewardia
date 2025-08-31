@@ -77,7 +77,6 @@ Alpine.data("register_form", () => ({
       this.errors.username = "帳號為必填項目";
       return false;
     }
-
     if (!/^[a-zA-Z0-9]+$/.test(username)) {
       this.errors.username = "帳號只能包含英文字母和數字，不能有空格或特殊字元";
       return false;
@@ -130,7 +129,6 @@ Alpine.data("register_form", () => ({
       this.errors.password = "密碼必須包含至少一個英文小寫字母";
       return false;
     }
-
     return true;
   },
 
@@ -171,7 +169,7 @@ Alpine.data("login_form", () => ({
   passwordVisible: false,
 
   togglePassword() {
-    this.passwordVisible = !this.passwordVisible;
+    this.showPassword = !this.showPassword;
   },
 
   validateField(fieldName) {
