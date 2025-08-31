@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from apps.cards.models import CreditCard
 from apps.cards.models import Bank
 from django.contrib import messages
@@ -51,11 +51,39 @@ def new_card(request):
         return redirect("admins:cards")
 
 
+@require_http_methods(["GET"])
 def edit_card(request, id):
-    pass
+    card = get_object_or_404(CreditCard, pk=id)
+    banks = Bank.objects.filter(is_active=True)
+    card_networks = CreditCard.CardNetwork
+    card_types = CreditCard.CardType
+    return render(
+        request,
+        "admins/edit_card_row.html",
+        {
+            "banks": banks,
+            "card_networks": card_networks,
+            "card_types": card_types,
+            "card": card,
+        },
+    )
 
 
-@require_http_methods(["POST", "DELETE"])
+@require_http_methods(["POST"])
+def update_card(request, id):
+    card = get_object_or_404(CreditCard, pk=id)
+    card.name = request.POST.get("card_edit")
+    card.bank = int(request.POST["bank_edit"])
+    card.card_network = request.POST["network_edit"]
+    card.card_type = request.POST["card_type_edit"]
+    card.foreign_transaction_fee = request.POST.get("foreign_edit")
+    card.is_active = request.POST.get("is_active") == "on"
+    card.save()
+    print("POST data received:", request.POST, card)
+    return render(request, "admins/card_row.html", {"card": card})
+
+
+@require_http_methods(["POST"])
 def delete_card(request, id):
     card = CreditCard.objects.get(pk=id)
     card.delete()
