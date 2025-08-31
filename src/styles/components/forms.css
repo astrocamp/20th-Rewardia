@@ -45,6 +45,11 @@
     @apply text-error-red;
     content: '* ';
   }
+
+  /* 錯誤訊息文字顏色 */
+  .text-error {
+    color: #dc2626;
+  }
   
   .select-wrapper {
     @apply relative;

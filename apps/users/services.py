@@ -35,9 +35,7 @@ class UserRegistrationService:
     @staticmethod
     def handle_registration_failure(request, error_type, form=None):
         """處理註冊失敗"""
-        if error_type == 'validation_error':
-            UserRegistrationService._handle_validation_errors(request, form)
-        elif error_type == 'database_error':
+        if error_type == 'database_error':
             messages.error(request, '註冊過程發生系統錯誤，請稍後再試。')
         else:
             messages.error(request, '註冊失敗，請檢查您的輸入並重試。')
