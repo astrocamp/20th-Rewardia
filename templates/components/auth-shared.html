@@ -38,7 +38,7 @@
 {% comment %}
 使用方式:
 {% include 'components/auth-shared.html' with component="bottom-link" prefix_text="還沒有帳戶？" link_text="立即註冊" link_url="users:register" %}
-{% include 'components/auth-shared.html' with component="bottom-link" prefix_text="已經有帳號？" link_text="登入" link_url="pages:login" suffix_text="去" %}
+{% include 'components/auth-shared.html' with component="bottom-link" prefix_text="已經有帳號？" link_text="登入" link_url="sessions:login" suffix_text="去" %}
 {% endcomment %}
 {% if component == "bottom-link" %}
 <div class="register-login-container">
