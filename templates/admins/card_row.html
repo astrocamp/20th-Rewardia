@@ -2,14 +2,43 @@
   <th class="text-center">{{card.id}}</th>
   <td class="text-center">{{card.name}}</td>
   <td class="text-center">{{card.bank.name}}</td>
+
   {%if card.is_active%}
   <td class="text-center"><i class="fa-solid fa-check"></i></td>
   {%else%}
   <td class="text-center"><i class="fa-solid fa-xmark"></i></td>
   {%endif%}
-  <td class="text-center">{{card.created_at}}</td>
-  <td class="text-center">{{card.updated_at}}</td>
-  <td class="text-center text-red-400" hx-delete="{}">
-    <i class="fa-solid fa-trash"></i>
+
+  <td class="text-center">{{card.card_network}}</td>
+  <td class="text-center">{{card.card_type}}</td>
+
+  <td class="text-center">{{card.foreign_transaction_fee}}%</td>
+
+  <td class="text-center">{{card.created_at|date:'M d Y'}}</td>
+  <td class="text-center">{{card.updated_at|date:'M d Y'}}</td>
+
+  <td class="text-center text-blue-400">
+
+      <button hx-get="{%url 'admins:edit_card' card.id%}"
+    hx-target="#all_cards"
+    hx-swap="afterend">
+        <a href="#all_cards">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </a>
+      </button>
+
+  </td>
+
+  <td class="text-center text-red-400">
+    <form
+        hx-post={%url 'admins:delete_card' card.id%}
+        hx-target="#card-{{card.id}}"
+        hx-swap="outerHTML"
+        hx-confirm="確定要刪除「{{card.name}}」嗎？">
+      {% csrf_token %}
+      <button>
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    </form>
   </td>
 </tr>
