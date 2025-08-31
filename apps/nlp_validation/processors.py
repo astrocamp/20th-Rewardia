@@ -12,6 +12,9 @@ def load_config(config_path=None):
 class AdvancedTextCleaner:
     """文本清洗"""
 
+    def __init__(self, config=None):
+        self.config = config or load_config()
+
     def clean_whitespace_and_newlines(self, text):
         """清空格換行"""
         cleaned = re.sub(r"\s+", " ", text)
@@ -47,8 +50,7 @@ class AdvancedTextCleaner:
             text = re.sub(r"(\d+),(\d{3})", r"\1\2", text)
             iteration_count += 1
 
-        config = load_config()
-        punctuation_map = config["punctuation_map"]
+        punctuation_map = self.config["punctuation_map"]
 
         for half, full in punctuation_map.items():
             text = text.replace(half, full)
@@ -57,8 +59,7 @@ class AdvancedTextCleaner:
 
     def remove_unnecessary_symbols(self, text):
         """移除符號"""
-        config = load_config()
-        unnecessary_symbols_regex = config["unnecessary_symbols_regex"]
+        unnecessary_symbols_regex = self.config["unnecessary_symbols_regex"]
         text = re.sub(unnecessary_symbols_regex, "", text)
 
         return text
@@ -83,11 +84,11 @@ class AdvancedTextCleaner:
 class SmartSentenceSplitter:
     """標點符號分段"""
 
-    def __init__(self, config_path=None):
-        config = load_config(config_path)
+    def __init__(self, config=None):
+        self.config = config or load_config()
 
-        self.sentence_endings = config["sentence_endings"]
-        self.min_sentence_length = config["settings"]["min_sentence_length"]
+        self.sentence_endings = self.config["sentence_endings"]
+        self.min_sentence_length = self.config["settings"]["min_sentence_length"]
 
     def split_by_comma_with_merge(self, text):
         """中介符號切句子"""
@@ -146,14 +147,16 @@ class SmartSentenceSplitter:
 class RewardContentFilter:
     """保留含有回饋句子"""
 
-    def __init__(self, config_path=None):
-        config = load_config(config_path)
+    def __init__(self, config=None):
+        self.config = config or load_config()
 
-        self.reward_keywords = config["reward_keywords"]["_keywords"]
+        self.reward_keywords = self.config["reward_keywords"]["_keywords"]
 
-        self.exclude_keywords = config["exclude_keywords"]["_keywords"]
+        self.exclude_keywords = self.config["exclude_keywords"]["_keywords"]
 
-        self.physical_store_keywords = config["physical_store_keywords"]["_keywords"]
+        self.physical_store_keywords = self.config["physical_store_keywords"][
+            "_keywords"
+        ]
 
     def contains_reward_indicators(self, sentence):
         return any(keyword in sentence for keyword in self.reward_keywords)
@@ -186,8 +189,8 @@ class RewardContentFilter:
 class SemanticClassifier:
     """spaCy語義分類"""
 
-    def __init__(self, config_path=None):
-        config = load_config(config_path)
+    def __init__(self, config=None):
+        self.config = config or load_config()
 
         try:
             self.nlp = spacy.load("zh_core_web_md")
@@ -197,26 +200,26 @@ class SemanticClassifier:
             raise
 
         # Category/Scope 語義種子詞
-        self.category_scope_seeds = config["category_scope_seeds"]
+        self.category_scope_seeds = self.config["category_scope_seeds"]
 
-        self.similarity_threshold = config["settings"]["similarity_threshold"]
+        self.similarity_threshold = self.config["settings"]["similarity_threshold"]
 
         # 信心度設定
-        self.confidence_scores = config["settings"]["confidence_scores"]
+        self.confidence_scores = self.config["settings"]["confidence_scores"]
 
         # 擴展模式
-        self.auto_expand_patterns = config["auto_expand_patterns"]
+        self.auto_expand_patterns = self.config["auto_expand_patterns"]
 
         # 關鍵詞擴展設定
-        self.smart_expansion_enabled = config["settings"].get(
+        self.smart_expansion_enabled = self.config["settings"].get(
             "smart_keyword_expansion", True
         )
-        self.expansion_similarity_threshold = config["settings"].get(
+        self.expansion_similarity_threshold = self.config["settings"].get(
             "expansion_similarity_threshold", 0.7
         )
 
-        self.domain_synonyms = config["domain_synonyms"]
-        self.keyword_variations = config["keyword_variations"]
+        self.domain_synonyms = self.config["domain_synonyms"]
+        self.keyword_variations = self.config["keyword_variations"]
 
         # 預先所有種子詞
         if self.smart_expansion_enabled:
@@ -391,20 +394,12 @@ class SemanticClassifier:
         except Exception:
             return []
 
-    # TODO: to config
     def auto_expand_category_keywords(self, text):
         """自動分類關鍵詞"""
-        for group, keywords in self.auto_expand_patterns.items():
-            for keyword in keywords:
+        for group, pattern_config in self.auto_expand_patterns.items():
+            for keyword in pattern_config["keywords"]:
                 if keyword in text:
-                    if group == "海外":
-                        return "一般消費", "海外"
-                    elif group == "線上":
-                        return "網購", "其他平台"
-                    elif group == "交通":
-                        return "交通/加油", "大眾運輸"
-                    elif group == "行動支付":
-                        return "交通/加油", "行動支付"
+                    return pattern_config["category"], pattern_config["scope"]
 
         return None, None
 
@@ -604,12 +599,12 @@ class SemanticClassifier:
 class RewardRateExtractor:
     """回饋率提取"""
 
-    def __init__(self, config_path=None):
-        config = load_config(config_path)
+    def __init__(self, config=None):
+        self.config = config or load_config()
 
-        self.reward_patterns = config["reward_patterns"]["_patterns"]
-        self.rate_range = config["settings"]["rate_range"]
-        self.reward_type_keywords = config["reward_type_keywords"]
+        self.reward_patterns = self.config["reward_patterns"]["_patterns"]
+        self.rate_range = self.config["settings"]["rate_range"]
+        self.reward_type_keywords = self.config["reward_type_keywords"]
 
     def extract_rates_from_sentence(self, sentence):
         """提取回饋率"""
@@ -711,14 +706,14 @@ class RewardRateExtractor:
         return results
 
 
-def test_processors_11():
-    cleaner = AdvancedTextCleaner()
-    splitter = SmartSentenceSplitter()
-    filter_obj = RewardContentFilter()
-    classifier = SemanticClassifier()
-    rate_extractor = RewardRateExtractor()
-
+def test_processors():
     config = load_config()
+
+    cleaner = AdvancedTextCleaner(config)
+    splitter = SmartSentenceSplitter(config)
+    filter_obj = RewardContentFilter(config)
+    classifier = SemanticClassifier(config)
+    rate_extractor = RewardRateExtractor(config)
 
     json_file_path = config["settings"]["test_parameters"]["json_file_path"]
 
@@ -767,11 +762,13 @@ def test_processors_11():
         else:
             filtered_docs = list(classifier.nlp.pipe(filtered, batch_size=50))
 
-            for i, (sentence, sentence_doc) in enumerate(zip(filtered, filtered_docs)):
+            sentence_to_doc = dict(zip(filtered, filtered_docs))
+
+            for sentence, sentence_doc in zip(filtered, filtered_docs):
                 is_duplicate = False
 
-                for j, existing in enumerate(unique_filtered):
-                    existing_doc = filtered_docs[filtered.index(existing)]
+                for existing in unique_filtered:
+                    existing_doc = sentence_to_doc[existing]
 
                     if sentence_doc.has_vector and existing_doc.has_vector:
                         similarity = sentence_doc.similarity(existing_doc)
@@ -877,4 +874,4 @@ def test_processors_11():
 
 
 if __name__ == "__main__":
-    test_processors_11()
+    test_processors()
