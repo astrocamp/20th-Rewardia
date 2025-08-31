@@ -41,6 +41,7 @@ Alpine.data("register_form", () => ({
   showConfirmPassword: false,
 
   validateField(fieldName) {
+    // 立即清除該欄位的錯誤訊息
     delete this.errors[fieldName];
 
     switch (fieldName) {
@@ -59,6 +60,13 @@ Alpine.data("register_form", () => ({
       case "agree_terms":
         this.validateAgreeTerms();
         break;
+    }
+  },
+
+  // 當使用者開始輸入時立即清除錯誤訊息
+  clearFieldError(fieldName) {
+    if (this.errors[fieldName]) {
+      delete this.errors[fieldName];
     }
   },
 
@@ -176,6 +184,13 @@ Alpine.data("login_form", () => ({
       case "password":
         this.validatePassword();
         break;
+    }
+  },
+
+  // 當使用者開始輸入時立即清除錯誤訊息
+  clearFieldError(fieldName) {
+    if (this.errors[fieldName]) {
+      delete this.errors[fieldName];
     }
   },
 

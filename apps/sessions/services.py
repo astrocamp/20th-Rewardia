@@ -45,19 +45,10 @@ class UserAuthenticationService:
     @staticmethod
     def handle_login_failure(request, error_type, form=None):
         """處理登入失敗"""
-        if error_type == 'validation_error':
-            UserAuthenticationService._handle_validation_errors(request, form)
-        elif error_type == 'system_error':
+        if error_type == 'system_error':
             messages.error(request, '登入過程發生系統錯誤，請稍後再試。')
         else:
             messages.error(request, '登入失敗，請檢查您的輸入並重試。')
-    
-    @staticmethod
-    def _handle_validation_errors(request, form):
-        """處理表單驗證錯誤"""
-        for field, errors in form.errors.items():
-            for error in errors:
-                messages.error(request, str(error))
     
     @staticmethod
     def logout_user(request):

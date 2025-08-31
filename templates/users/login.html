@@ -7,9 +7,9 @@
 
 <!-- Django Messages 顯示區域 -->
 {% if messages %}
-  <div class="space-y-2 mb-4">
+  <div class="space-y-2 mb-4" x-data="auto_dismiss_message" x-show="show">
     {% for message in messages %}
-      <div class="alert alert-{{ message.tags }}">
+      <div class="alert alert-{{ message.tags }}" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
         <span>{{ message }}</span>
       </div>
     {% endfor %}
@@ -32,9 +32,7 @@
             x-model="formData.username"
             @blur="validateField('username')">
     </div>
-    <template x-if="errors.username">
-        <p class="text-red-500 text-sm mt-1" x-text="errors.username"></p>
-    </template>
+    <div x-show="errors.username" class="text-error text-sm mt-1" x-text="errors.username"></div>
   </div>
 
   <!-- 密碼欄位 -->
@@ -58,9 +56,7 @@
               </div>
           </button>
       </div>
-      <template x-if="errors.password">
-        <p class="text-red-500 text-sm mt-1" x-text="errors.password"></p>
-      </template>
+      <div x-show="errors.password" class="text-error text-sm mt-1" x-text="errors.password"></div>
   </div>
 
   <!-- 主要登入按鈕 -->

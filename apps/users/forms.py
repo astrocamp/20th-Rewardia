@@ -57,7 +57,10 @@ class UserRegistrationForm(forms.Form):
             'class': 'checkbox checkbox-primary',
             'id': 'agree_terms'
         }),
-        label='我同意網站服務條款'
+        label='我同意網站服務條款',
+        error_messages={
+            'required': '請勾選同意服務條款'
+        }
     )
     
     def clean_username(self):
