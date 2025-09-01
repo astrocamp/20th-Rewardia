@@ -1,12 +1,9 @@
-import spacy
-import re
 import time
-import json
 from django.core.management.base import BaseCommand
 from apps.nlp_validation.config import NLPConfig
-from django.utils import timezone
 from apps.cards.models import CreditCard
 from apps.rewards.models import RewardCategory, PendingReward
+from apps.card_crawler.models import CrawledData
 from apps.nlp_validation.processors import (
     AdvancedTextCleaner,
     SmartSentenceSplitter,
@@ -47,22 +44,14 @@ class Command(BaseCommand):
         rate_extractor = RewardRateExtractor(config)
         bank_card_extractor = BankCardExtractor(config)
 
-        json_file_path = config["settings"]["test_parameters"]["json_file_path"]
+        # 從 CrawledData 模型讀取所有爬蟲資料
+        crawled_data = CrawledData.objects.filter(is_active=True).order_by("created_at")
 
-        try:
-            with open(json_file_path, "r", encoding="utf-8") as f:
-                card_data = json.load(f)
+        if not crawled_data.exists():
+            self.stdout.write(self.style.WARNING("沒有找到爬蟲資料"))
+            return
 
-            test_cases = []
-            min_cards = config["settings"]["test_parameters"]["min_test_cards"]
-            max_cards = config["settings"]["test_parameters"]["max_test_cards"]
-            for card in card_data[min_cards:max_cards]:
-                if "content" in card:
-                    test_cases.append(card["content"])
-
-        except FileNotFoundError:
-            self.stdout.write(self.style.WARNING("JSON檔案未找到，使用預設測試資料"))
-            test_cases = config["settings"]["test_parameters"]["fallback_test_data"]
+        test_cases = [data.content for data in crawled_data]
 
         total_start_time = time.time()
 
@@ -84,11 +73,23 @@ class Command(BaseCommand):
                 # 4. 查找或建立 CreditCard
                 credit_card = None
                 if bank_name and card_name:
-                    credit_card, created = CreditCard.objects.get_or_create(
-                        name=card_name, bank=bank_name, defaults={"is_active": False}
-                    )
-                    if created:
-                        self.stdout.write(f"建立新信用卡：{bank_name} {card_name}")
+                    try:
+                        credit_card, created = CreditCard.objects.get_or_create(
+                            name=card_name,
+                            bank=bank_name,
+                            defaults={"is_active": False},
+                        )
+                        if created:
+                            self.stdout.write(f"建立新信用卡：{bank_name} {card_name}")
+                    except Exception as e:
+                        self.stdout.write(f"CreditCard建立失敗: {e}")
+                        self.stdout.write(
+                            f"bank_name: '{bank_name}' (len: {len(bank_name)})"
+                        )
+                        self.stdout.write(
+                            f"card_name: '{card_name}' (len: {len(card_name)})"
+                        )
+                        continue
 
                 if not credit_card:
                     self.stdout.write(
@@ -167,17 +168,29 @@ class Command(BaseCommand):
                                     result["min_rate"] or result["max_rate"],
                                 )
 
-                                PendingReward.objects.create(
-                                    card=credit_card,
-                                    nlp_category=result["category"] or "未分類",
-                                    nlp_scope=result["scope"] or "未知範圍",
-                                    extracted_sentence=result["sentence"],
-                                    confidence=result["confidence"],
-                                    min_rate=result["min_rate"],
-                                    max_rate=result["max_rate"],
-                                    reward_type=result["reward_type"],
-                                    status=PendingReward.Status.PENDING,
-                                )
+                                try:
+                                    PendingReward.objects.create(
+                                        card=credit_card,
+                                        nlp_category=result["category"] or "未分類",
+                                        nlp_scope=result["scope"] or "未知範圍",
+                                        extracted_sentence=result["sentence"],
+                                        confidence=result["confidence"],
+                                        min_rate=result["min_rate"],
+                                        max_rate=result["max_rate"],
+                                        reward_type=result["reward_type"],
+                                        status=PendingReward.Status.PENDING,
+                                    )
+                                except Exception as e:
+                                    self.stdout.write(f"PendingReward建立失敗: {e}")
+                                    self.stdout.write(
+                                        f"nlp_category: '{result['category']}' (len: {len(str(result['category']) if result['category'] else '')})"
+                                    )
+                                    self.stdout.write(
+                                        f"nlp_scope: '{result['scope']}' (len: {len(str(result['scope']) if result['scope'] else '')})"
+                                    )
+                                    self.stdout.write(
+                                        f"reward_type: '{result['reward_type']}' (len: {len(str(result['reward_type']))})"
+                                    )
 
                 self.stdout.write(
                     f"=========={index} Done! ====<-{(time.time() - index_start_time):.3f}->===="
@@ -189,7 +202,7 @@ class Command(BaseCommand):
 
         total_time = time.time() - total_start_time
 
-        self.stdout.write(self.style.SUCCESS(f"\n總共載入了 {len(test_cases)} 張卡片"))
+        self.stdout.write(self.style.SUCCESS(f"\n總共載入ㄌ {len(test_cases)} 張卡片"))
         self.stdout.write(
             f"總測試時間: {time.strftime('%H:%M:%S', time.gmtime(total_time))}"
         )

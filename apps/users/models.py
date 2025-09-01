@@ -49,29 +49,3 @@ class UserCard(models.Model):
     def __str__(self):
         display_name = self.nickname or self.card.name
         return f"{self.user.username} - {display_name}"
-
-
-class UserPreference(models.Model):
-    # 用戶偏好設定
-    user = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE,
-        related_name="preferences",
-        verbose_name="User",  # 用戶
-    )
-
-    class Meta:
-        db_table = "user_preferences"
-        verbose_name = "User Preference"  # 用戶偏好
-        verbose_name_plural = "User Preferences"  # 用戶偏好
-
-    def __str__(self):
-        return f"{self.user.username} 的偏好設定"
-
-
-# 自動創建 Preference 的信號
-@receiver(post_save, sender=User)
-def create_user_preference(sender, instance, created, **kwargs):
-    # 當創建新用戶時，自動創建對應的偏好設定¶
-    if created:
-        UserPreference.objects.create(user=instance)
