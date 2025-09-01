@@ -3,14 +3,14 @@
   <td class="text-center">{{card.name}}</td>
   <td class="text-center">{{card.bank.name}}</td>
 
+  <td class="text-center">{{card.card_network}}</td>
+  <td class="text-center">{{card.card_type}}</td>
+
   {%if card.is_active%}
   <td class="text-center"><i class="fa-solid fa-check"></i></td>
   {%else%}
   <td class="text-center"><i class="fa-solid fa-xmark"></i></td>
   {%endif%}
-
-  <td class="text-center">{{card.card_network}}</td>
-  <td class="text-center">{{card.card_type}}</td>
 
   <td class="text-center">{{card.created_at|date:'M d Y'}}</td>
   <td class="text-center">{{card.updated_at|date:'M d Y'}}</td>
@@ -18,7 +18,7 @@
   <td class="text-center text-blue-400">
 
       <button hx-get="{%url 'admins:edit_card' card.id%}"
-    hx-target="body"
+    hx-target="#new_card_button"
     hx-swap="outerHTML">
         <a href="#all_cards">
           <i class="fa-solid fa-pen-to-square"></i>
