@@ -1,5 +1,4 @@
 from django.db import models
-from apps.banks.models import Bank
 
 
 # Create your models here.
@@ -27,12 +26,7 @@ class CreditCard(models.Model):
         SIGBUSINESS = "SIGBUSINESS", "商務御璽卡"
 
     name = models.CharField("信用卡名稱", max_length=100)
-    bank = models.ForeignKey(
-        Bank,
-        on_delete=models.CASCADE,
-        related_name="credit_cards",
-        verbose_name="Issuing Bank",
-    )
+    bank = models.CharField("銀行名稱", max_length=50)
     # annual_fee = models.DecimalField(
     #     "Annual Fee",
     #     max_digits=8,
@@ -69,7 +63,7 @@ class CreditCard(models.Model):
         db_table = "credit_cards"
         verbose_name = "Credit Card"
         verbose_name_plural = "Credit Cards"
-        ordering = ["bank__name", "name"]
+        ordering = ["bank", "name"]
         indexes = [
             models.Index(fields=["bank", "is_active"], name="cards_bank_active_idx"),
             models.Index(fields=["card_network"], name="cards_network_idx"),
@@ -77,46 +71,42 @@ class CreditCard(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.bank.name} {self.name}"
+        return f"{self.bank} {self.name}"
 
     @property
     def has_annual_fee(self):
         return self.annual_fee > 0
-    
+
     def calculate_reward(self, merchant, amount):
         """計算這張卡在指定商家的回饋"""
         from apps.rewards.models import RewardCategory, MerchantReward
         from decimal import Decimal
-        
+
         amount = Decimal(str(amount))
-        
+
         # 1. 優先找特定商家回饋
         try:
             merchant_reward = MerchantReward.objects.get(
-                card=self,
-                merchant=merchant,
-                is_active=True
+                card=self, merchant=merchant, is_active=True
             )
             rate = Decimal(str(merchant_reward.effective_rate))
             reward_amount = amount * rate / 100
             return float(reward_amount), float(rate), "使用商家特殊回饋"
         except MerchantReward.DoesNotExist:
             pass
-        
+
         # 2. 找分類回饋
         try:
             category_reward = RewardCategory.objects.get(
-                card=self,
-                category=merchant.category,
-                is_active=True
+                card=self, category=merchant.category, is_active=True
             )
             rate = Decimal(str(category_reward.effective_rate))
             reward_amount = amount * rate / 100
             return float(reward_amount), float(rate), "使用分類回饋"
         except RewardCategory.DoesNotExist:
             pass
-        
+
         # 3. 使用基本回饋
-        basic_rate = Decimal('1.0')
+        basic_rate = Decimal("1.0")
         reward_amount = amount * basic_rate / 100
         return float(reward_amount), float(basic_rate), "使用基本回饋(1%)"
