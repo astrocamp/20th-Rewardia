@@ -59,8 +59,7 @@ def get_card_info(url):
             ).text.strip()
 
         except WebDriverException as error:
-            # 找不到卡，就回傳這個字典
-            find_card_error = create_error_data(url, error, card_name)
+            find_card_error = create_error_data(url, error)
             failed_cards.append(find_card_error)
             print(f"Error fetching card: {error}")
 
