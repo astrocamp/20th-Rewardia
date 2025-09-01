@@ -34,21 +34,25 @@ def new_card(request):
 
     if request.method == "POST":
         name = request.POST.get("card")
-        bank = request.POST["bank"]
+
+        bank_id = request.POST["bank"]
+        bank = get_object_or_404(Bank, id=bank_id)
+
         card_network = request.POST["network"]
         card_type = request.POST["card_type"]
         is_active = request.POST.get("is_active") == "on"
-        new_card = CreditCard.objects.create(
-            name=f"{Bank.objects.get(id=bank).name} {name}",
-            bank=Bank.objects.get(id=bank),
-            card_network=card_network,
-            card_type=card_type,
-            is_active=is_active,
-        )
-        if new_card:
+
+        try:
+            new_card = CreditCard.objects.create(
+                name=f"{bank.name} {name}",
+                bank=bank,
+                card_network=card_network,
+                card_type=card_type,
+                is_active=is_active,
+            )
             messages.success(request, "新增卡片成功")
             return render(request, "admins/card_row.html", {"card": new_card})
-        else:
+        except:
             messages.success(request, "新增失敗")
             return redirect("admins:cards")
     else:
@@ -80,7 +84,7 @@ def update_card(request, id):
 
     # 因為是foreign key，所以要從Bank那裡的資料庫取得資料
     bank_id = request.POST["bank_edit"]
-    card.bank = Bank.objects.get(id=bank_id)
+    card.bank = get_object_or_404(Bank, id=bank_id)
 
     card.card_network = request.POST["network_edit"]
     card.card_type = request.POST["card_type_edit"]
@@ -95,7 +99,7 @@ def update_card(request, id):
 
 @require_http_methods(["POST"])
 def delete_card(request, id):
-    card = CreditCard.objects.get(pk=id)
+    card = get_object_or_404(CreditCard, pk=id)
     card.delete()
     messages.success(request, "刪除成功")
     return HttpResponse("")
