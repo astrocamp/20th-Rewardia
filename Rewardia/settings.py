@@ -193,7 +193,7 @@ LOGOUT_REDIRECT_URL = '/'              # 登出後重導向到首頁
 SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'  # 不需要額外 Email 驗證（Google 已驗證）
 SOCIALACCOUNT_AUTO_SIGNUP = True           # 自動註冊新用戶（無需手動註冊流程）
 SOCIALACCOUNT_STORE_TOKENS = False         # 不儲存 OAuth tokens（節省資料庫空間）
-SOCIALACCOUNT_LOGIN_ON_GET = True          # 允許 GET 請求直接觸發 OAuth 登入（簡化流程）
+SOCIALACCOUNT_LOGIN_ON_GET = True     # 允許 GET 請求直接觸發 OAuth 登入（簡化流程）
 
 # OAuth 核心：Google OAuth 提供者設定
 SOCIALACCOUNT_PROVIDERS = {
