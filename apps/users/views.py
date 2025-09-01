@@ -11,6 +11,10 @@ from apps.cards.models import CreditCard
 from .models import UserCard
 
 
+def register(request):
+    return HttpResponse("暫時的 register 頁面，之後要實作")
+
+
 def prepare_card_form_context(
     user_card=None, is_edit_mode=False, include_selected_bank=False
 ):
@@ -38,6 +42,7 @@ def prepare_card_form_context(
     return context
 
 
+@login_required
 def member_zone(request):
     context = {}
 
@@ -51,7 +56,6 @@ def member_zone(request):
 
 # API 端點：根據銀行 ID 返回該銀行的所有信用卡（JSON 格式，給 Alpine.js 用）
 def get_cards_by_bank(request, bank_id):
-    """API 端點：返回指定銀行的所有信用卡"""
     try:
         bank = Bank.objects.get(id=bank_id, is_active=True)
 
@@ -81,9 +85,6 @@ def get_cards_by_bank(request, bank_id):
 
 
 @login_required
-def card_create(request):
-    if request.method == "GET":
-        # 用戶想看申請表 - 準備銀行和卡片資料
 def card_form(request, card_id=None):
     # 判斷是新增還是編輯模式
     if card_id:
