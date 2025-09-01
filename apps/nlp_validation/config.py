@@ -420,7 +420,7 @@ class NLPConfig:
     @staticmethod
     def get_bank_pattern():
         """銀行名稱"""
-        return r"(滙豐|中國信託|國泰|玉山|台新|富邦|第一|合作?金?庫|兆豐|永豐|遠東|凱基|聯邦|星展|樂天|彰化|華南|新光|上海商銀|美國運通|渣打|陽信|LINE Bank|將來|元大|台中|王道)"
+        return r"(滙豐|中國|國泰|玉山|台新|富邦|第一|合庫|兆豐|永豐|遠東|凱基|聯邦|星展|樂天|彰化|華南|新光|上海|美國|渣打|陽信|Bank|將來|元大|台中|王道)"
 
     @staticmethod
     def get_settings():

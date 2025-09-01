@@ -45,12 +45,12 @@ INSTALLED_APPS = [
     # ------------------------------
     "debug_toolbar",
     # ------------------------------
-    "apps.pages",
+    # "apps.pages",
     "apps.users",
     "apps.cards",
     "apps.rewards",
     "apps.sessions",
-    "apps.admins",
+    # "apps.admins",
     # ------------------------------
     "apps.nlp_validation",
     "apps.card_crawler",

@@ -6,7 +6,7 @@ check:
 
 collectstatic:
 	uv run python manage.py collectstatic
-	
+
 runserver:
 	uv run python manage.py runserver
 
@@ -39,4 +39,4 @@ restart:
 # 	npm i; uv run (for windows 電腦用--因為無法使用原提供的restart指令)
 
 ins_spacy:
-	uv pip install pip && uv run python -m spacy download en_core_web_md && uv run python -m spacy download zh_core_web_md
+	uv pip install pip && uv run python -m spacy download zh_core_web_md
