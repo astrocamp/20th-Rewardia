@@ -55,7 +55,11 @@
   }
   
   .faq-arrow-icon {
-    @apply w-5 h-5 text-black transition-transform duration-200;
+    @apply w-5 h-5 text-black transition-transform duration-300;
+  }
+  
+  .rotate-180 {
+    transform: rotate(180deg);
   }
   
   .faq-answer {
