@@ -564,6 +564,7 @@
         text-align: center;
         flex: 1;
     }
+}
 
   /* ========== 表單卡片樣式 ========== */
   .form-card {
@@ -692,7 +693,7 @@
     .add-card-actions {
       margin-top: 30px;
     }
-  }
+  
 
   /* 平板版調整 */
   /* @media (min-width: 641px) and (max-width: 1024px) {
@@ -704,7 +705,7 @@
     .add-card-actions {
       margin-top: 35px;
     }
-  }  */
+    */
 
     /* ========== 會員專區頁面樣式 ========== */
 
@@ -1025,7 +1026,7 @@
   /* 新增卡片標題區域 */
   .add-card-header {
     @apply mb-10 pb-[14px] border-b border-[#D1D5DB];
-}
+  }
 
   /* 修復表單欄位容器 */
   .add-card-fields {
