@@ -42,8 +42,6 @@
     margin-top: 5rem; /* 80px - 標準橫幅上邊距，用於 download.html 和 faq.html */
   }
 
-}
-
   .btn-outline {
     @apply border-black text-black hover:bg-black hover:text-white transition-colors duration-200;
   }
@@ -55,8 +53,6 @@
   .btn-white-outline {
     @apply bg-white border border-black text-black hover:bg-gray-100 transition-colors duration-200;
   }
-
-
 
   /* ========== faq與 download共用樣式 ========== */
   /* faq與 download共用 */
@@ -129,11 +125,7 @@
     min-width: 15rem;
   }
 
-
-
-
   /* ========== Download Page 特定樣式 ========== */
-
   .download-banner {
     background: linear-gradient(135deg, rgba(32, 96, 185, 0.9) 0%, rgba(17, 24, 39, 0.9) 100%);
   }
@@ -185,7 +177,6 @@
     position: relative;
     overflow: hidden;
   }
-
 
   /* Download Page 手機版響應式樣式 (≤640px) */
   @media (max-width: 640px) {
@@ -299,11 +290,7 @@
     }
   }
 
-
-
   /* ========== FAQ Page 專用樣式 ========== */
-
-  /* FAQ 功能卡片樣式 */
   .faq-feature-card {
     @apply bg-[#E5E7EB] rounded-lg relative overflow-hidden;
     min-height: 327px;
@@ -360,8 +347,6 @@
     @apply space-y-4;
   }
 
-
-
   /* FAQ Q&A 項目樣式 */
   .faq-qa-item {
     @apply bg-white rounded-lg border border-[#D1D5DB] overflow-hidden;
@@ -416,10 +401,9 @@
   }
 
   /* ========== 響應式設計 ========== */
-
   @media (max-width: 640px) {
-      /* faq與 download共用 */
-  .download-btn-banner {
+    /* faq與 download共用 */
+    .download-btn-banner {
       max-width: 100% !important;
       min-width: auto;
     }
@@ -509,31 +493,24 @@
     }
   }
 
+  body .main-container .main-content.banner-hidden {
+    margin-top: 80px;
+  }
 
+  /* ===== 新增樣式：calculator 專用與 UI 元件四狀態 ===== */
+  /* ========== Calculator 頁面布局 ========== */
+  .calculator-page {
+    @apply bg-white;
+    margin-top: 80px; /* Header 高度（預設無 Banner） */
+    padding-bottom: 80px; /* Footer 間距 */
+  }
+  body.banner-visible .calculator-page {
+    margin-top: 40px;
+  }
 
-
-
-
-    body .main-container .main-content.banner-hidden {
-        margin-top: 80px;
-    }
-
-/* ===== 新增樣式：calculator 專用與 UI 元件四狀態 ===== */
-@layer components {
-
-    /* ========== Calculator 頁面布局 ========== */
-    .calculator-page {
-        @apply bg-white;
-        margin-top: 80px; /* Header 高度（預設無 Banner） */
-        padding-bottom: 80px; /* Footer 間距 */
-    }
-    body.banner-visible .calculator-page {
-        margin-top: 40px;
-    }
-
-    .calculator-container {
-        @apply mx-auto max-w-[1360px] px-5 md:px-8;
-    }
+  .calculator-container {
+    @apply mx-auto max-w-[1360px] px-5 md:px-8;
+  }
 
   /* ========== 標題樣式 ========== */
   .calculator-title {
@@ -541,30 +518,29 @@
     margin-top: 5px; /* 與 header 的間距 */
   }
 
-    /* ========== 結果卡樣式 ========== */
-    .result-card {
-        @apply relative w-full rounded-lg overflow-hidden mb-6 pt-4;
-    }
+  /* ========== 結果卡樣式 ========== */
+  .result-card {
+    @apply relative w-full rounded-lg overflow-hidden mb-6 pt-4;
+  }
 
-    .result-card-bg {
-        @apply relative flex items-center justify-between px-6 md:px-8 h-[117px] rounded-lg;
-        background: #193966;
-    }
+  .result-card-bg {
+    @apply relative flex items-center justify-between px-6 md:px-8 h-[117px] rounded-lg;
+    background: #193966;
+  }
 
-    .result-content {
-        @apply relative z-10 flex items-center justify-between w-full;
-    }
+  .result-content {
+    @apply relative z-10 flex items-center justify-between w-full;
+  }
 
-    .result-label {
-        @apply text-white text-2xl font-normal;
-    }
+  .result-label {
+    @apply text-white text-2xl font-normal;
+  }
 
-    .result-value {
-        @apply text-white text-[32px] font-bold;
-        text-align: center;
-        flex: 1;
-    }
-}
+  .result-value {
+    @apply text-white text-[32px] font-bold;
+    text-align: center;
+    flex: 1;
+  }
 
   /* ========== 表單卡片樣式 ========== */
   .form-card {
@@ -587,9 +563,15 @@
   .clear-btn {
     @apply bg-gray-900 text-white text-sm h-[38px] px-5 rounded-lg font-medium transition-colors duration-200;
   }
-  .clear-btn:hover { @apply bg-gray-800; }
-  .clear-btn:active { @apply bg-gray-700; }
-  .clear-btn:disabled { @apply bg-gray-700 text-gray-300 cursor-not-allowed opacity-70; }
+  .clear-btn:hover {
+    @apply bg-gray-800;
+  }
+  .clear-btn:active {
+    @apply bg-gray-700;
+  }
+  .clear-btn:disabled {
+    @apply bg-gray-700 text-gray-300 cursor-not-allowed opacity-70;
+  }
 
   /* ========== 表單欄位 ========== */
   .form-fields {
@@ -606,7 +588,7 @@
     @apply md:col-span-2;
   }
 
-    .field-label {
+  .field-label {
     @apply block text-[18px] text-[#111827] mb-2 font-normal;
   }
 
@@ -616,13 +598,11 @@
     color: #FF1F1F;
   }
 
-
   .select-wrapper {
     @apply relative;
   }
 
   /* ========== 按鈕元件（四狀態）：預設/hover/active/disabled ========== */
-
   .ui-btn {
     @apply inline-flex items-center justify-center rounded-lg h-12 px-6 font-medium transition-colors duration-200 select-none;
     width: 132px; /* 按照 Figma 設計 */
@@ -631,16 +611,28 @@
   .ui-btn-primary {
     @apply bg-[#2060B9] text-white;
   }
-  .ui-btn-primary:hover { @apply bg-[#1c55a4]; }
-  .ui-btn-primary:active { @apply bg-[#184a90]; }
-  .ui-btn-primary:disabled { @apply bg-[#9BB6DD] cursor-not-allowed opacity-70; }
+  .ui-btn-primary:hover {
+    @apply bg-[#1c55a4];
+  }
+  .ui-btn-primary:active {
+    @apply bg-[#184a90];
+  }
+  .ui-btn-primary:disabled {
+    @apply bg-[#9BB6DD] cursor-not-allowed opacity-70;
+  }
 
   .ui-btn-secondary {
     @apply bg-gray-200 text-gray-900;
   }
-  .ui-btn-secondary:hover { @apply bg-gray-300; }
-  .ui-btn-secondary:active { @apply bg-gray-400; }
-  .ui-btn-secondary:disabled { @apply bg-gray-200 text-gray-400 cursor-not-allowed opacity-70; }
+  .ui-btn-secondary:hover {
+    @apply bg-gray-300;
+  }
+  .ui-btn-secondary:active {
+    @apply bg-gray-400;
+  }
+  .ui-btn-secondary:disabled {
+    @apply bg-gray-200 text-gray-400 cursor-not-allowed opacity-70;
+  }
 
   /* ========== 輸入/下拉元件（四狀態）：預設/hover/focus/disabled/error ========== */
   .ui-input,
@@ -655,13 +647,21 @@
     color: #949AA6; /* 改成灰色，與 textarea 一致 */
   }
   .ui-input:hover,
-  .ui-select:hover { @apply border-gray-400; }
+  .ui-select:hover {
+    @apply border-gray-400;
+  }
   .ui-input:focus,
-  .ui-select:focus { @apply outline-none ring-2 ring-blue-500 border-blue-500; }
+  .ui-select:focus {
+    @apply outline-none ring-2 ring-blue-500 border-blue-500;
+  }
   .ui-input:disabled,
-  .ui-select:disabled { @apply bg-gray-100 text-gray-400 cursor-not-allowed; }
+  .ui-select:disabled {
+    @apply bg-gray-100 text-gray-400 cursor-not-allowed;
+  }
   .ui-input.ui-error,
-  .ui-select.ui-error { @apply border-red-500 ring-2 ring-red-200; }
+  .ui-select.ui-error {
+    @apply border-red-500 ring-2 ring-red-200;
+  }
 
   /* ========== 說明區塊 ========== */
   .disclaimer-section {
@@ -678,201 +678,179 @@
     @apply mt-8 flex items-center justify-center gap-4;
   }
 
+  /* ========== 會員專區頁面樣式 ========== */
+  /* 訪客內容區域 */
+  .member-guest-content {
+    @apply flex flex-col items-center justify-center text-center;
+    min-height: 500px;
+    gap: 2rem;
+  }
 
-    /* ===== 新增卡片頁面專用樣式 ===== */
-    /* ========== 新增卡片容器 ========== */
-    /* .add-card-container {
-        @apply bg-white rounded-lg overflow-hidden;
-    }
+  .member-guest-image {
+    @apply w-full max-w-sm;
+  }
 
-    .add-card-bg {
-      min-height: auto;
-      padding: 20px 15px 30px 15px;
-    }
+  .member-guest-text {
+    @apply space-y-6;
+  }
 
-    .add-card-actions {
-      margin-top: 30px;
-    }
-  
+  .member-guest-message {
+    @apply text-xl text-gray-700 font-medium;
+  }
 
-  /* 平板版調整 */
-  /* @media (min-width: 641px) and (max-width: 1024px) {
-    .add-card-bg {
-      min-height: 70vh;
-      padding: 22px 18px 35px 18px;
-    }
+  .member-guest-btn {
+    @apply mx-auto block;
+  }
 
-    .add-card-actions {
-      margin-top: 35px;
-    }
-    */
+  /* 會員區塊容器 */
+  .member-section {
+    @apply mb-8;
+  }
 
-    /* ========== 會員專區頁面樣式 ========== */
+  .member-section-bg {
+    @apply bg-[#F9F9F9] rounded-lg p-5 md:p-6;
+  }
 
-    /* 訪客內容區域 */
-    .member-guest-content {
-        @apply flex flex-col items-center justify-center text-center;
-        min-height: 500px;
-        gap: 2rem;
-    }
+  /* 區塊標題列 */
+  .member-section-header {
+    @apply flex items-center justify-between pb-5 border-b border-gray-300;
+  }
 
-    .member-guest-image {
-        @apply w-full max-w-sm;
-    }
+  .member-section-title {
+    @apply text-2xl font-bold text-[#5D6970];
+  }
 
-    .member-guest-text {
-        @apply space-y-6;
-    }
+  /* 會員資訊網格 */
+  .member-info-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+    margin-top: 2.5rem;
+  }
 
-    .member-guest-message {
-        @apply text-xl text-gray-700 font-medium;
-    }
+  .member-info-item {
+    @apply flex flex-col gap-2;
+  }
 
-    .member-guest-btn {
-        @apply mx-auto block;
-    }
+  .member-info-label {
+    @apply text-lg font-bold text-[#111827];
+  }
 
-    /* 會員區塊容器 */
-    .member-section {
-        @apply mb-8;
-    }
+  .member-info-value {
+    @apply text-base text-[#111827];
+  }
 
-    .member-section-bg {
-        @apply bg-[#F9F9F9] rounded-lg p-5 md:p-6;
-    }
+  .member-info-empty {
+    @apply text-[#111827] opacity-70;
+  }
 
-    /* 區塊標題列 */
+  /* 卡片列表（垂直排列，按照 Figma 設計） */
+  .member-cards-list {
+    @apply space-y-6;
+    margin-top: 2.5rem;
+  }
+
+  /* 卡片項目 */
+  .member-card-item {
+    @apply bg-white border border-gray-300 rounded-lg p-6 flex items-center gap-6;
+    min-height: 125px;
+  }
+
+  .member-card-image {
+    @apply flex-shrink-0 w-[114px] h-[65px] bg-gray-200 rounded flex items-center justify-center relative;
+  }
+
+  .member-card-image-placeholder {
+    @apply absolute inset-0 bg-gray-200 rounded;
+  }
+
+  .member-card-info {
+    @apply flex-1;
+  }
+
+  .member-card-name {
+    @apply text-2xl font-bold text-[#111827] mb-1;
+  }
+
+  .member-card-bank {
+    @apply text-base text-[#111827];
+  }
+
+  .member-card-actions {
+    @apply flex gap-3;
+  }
+
+  /* 小按鈕樣式 */
+  .ui-btn-small {
+    @apply inline-flex items-center justify-center rounded-lg h-10 px-5 font-normal text-base transition-colors duration-200;
+    width: 72px;
+  }
+
+  .ui-btn-small-dark {
+    @apply bg-[#111827] text-white;
+  }
+  .ui-btn-small-dark:hover {
+    @apply bg-gray-700;
+  }
+  .ui-btn-small-dark:active {
+    @apply bg-gray-600;
+  }
+
+  .ui-btn-small-gray {
+    @apply bg-gray-200 text-[#111827];
+  }
+  .ui-btn-small-gray:hover {
+    @apply bg-gray-300;
+  }
+  .ui-btn-small-gray:active {
+    @apply bg-gray-400;
+  }
+
+  /* 空狀態內容 */
+  .member-empty-content {
+    @apply flex flex-col items-center justify-center text-center;
+    margin-top: 2.5rem;
+    min-height: 270px;
+  }
+
+  .member-empty-icon {
+    @apply mb-6;
+  }
+
+  .member-empty-text {
+    @apply text-2xl text-[#949AA6] font-normal;
+  }
+
+  /* ========== 會員專區 RWD 調整 ========== */
+  @media (max-width: 640px) {
     .member-section-header {
-        @apply flex items-center justify-between pb-5 border-b border-gray-300;
+      @apply flex-col gap-4 items-start;
     }
 
-    .member-section-title {
-        @apply text-2xl font-bold text-[#5D6970];
-    }
-
-    /* 會員資訊網格 */
-    .member-info-grid {
-        @apply grid grid-cols-1 md:grid-cols-2 gap-6;
-        margin-top: 2.5rem;
-    }
-
-    .member-info-item {
-        @apply flex flex-col gap-2;
-    }
-
-    .member-info-label {
-        @apply text-lg font-bold text-[#111827];
-    }
-
-    .member-info-value {
-        @apply text-base text-[#111827];
-    }
-
-    .member-info-empty {
-        @apply text-[#111827] opacity-70;
-    }
-
-    /* 卡片列表（垂直排列，按照 Figma 設計） */
-    .member-cards-list {
-        @apply space-y-6;
-        margin-top: 2.5rem;
-    }
-
-    /* 卡片項目 */
     .member-card-item {
-        @apply bg-white border border-gray-300 rounded-lg p-6 flex items-center gap-6;
-        min-height: 125px;
+      @apply flex-col gap-4 text-center;
+      min-height: auto;
     }
 
     .member-card-image {
-        @apply flex-shrink-0 w-[114px] h-[65px] bg-gray-200 rounded flex items-center justify-center relative;
-    }
-
-    .member-card-image-placeholder {
-        @apply absolute inset-0 bg-gray-200 rounded;
-    }
-
-    .member-card-info {
-        @apply flex-1;
-    }
-
-    .member-card-name {
-        @apply text-2xl font-bold text-[#111827] mb-1;
-    }
-
-    .member-card-bank {
-        @apply text-base text-[#111827];
+      @apply mx-auto;
     }
 
     .member-card-actions {
-        @apply flex gap-3;
+      @apply justify-center;
     }
 
-    /* 小按鈕樣式 */
-    .ui-btn-small {
-        @apply inline-flex items-center justify-center rounded-lg h-10 px-5 font-normal text-base transition-colors duration-200;
-        width: 72px;
+    .member-info-grid {
+      @apply grid-cols-1 gap-4;
     }
 
-    .ui-btn-small-dark {
-        @apply bg-[#111827] text-white;
+    .member-cards-list {
+      @apply space-y-4;
     }
-    .ui-btn-small-dark:hover { @apply bg-gray-700; }
-    .ui-btn-small-dark:active { @apply bg-gray-600; }
-
-    .ui-btn-small-gray {
-        @apply bg-gray-200 text-[#111827];
-    }
-    .ui-btn-small-gray:hover { @apply bg-gray-300; }
-    .ui-btn-small-gray:active { @apply bg-gray-400; }
-
-    /* 空狀態內容 */
-    .member-empty-content {
-        @apply flex flex-col items-center justify-center text-center;
-        margin-top: 2.5rem;
-        min-height: 270px;
-    }
-
-    .member-empty-icon {
-        @apply mb-6;
-    }
-
-    .member-empty-text {
-        @apply text-2xl text-[#949AA6] font-normal;
-    }
-
-    /* ========== 會員專區 RWD 調整 ========== */
-  @media (max-width: 640px) {
-      .member-section-header {
-          @apply flex-col gap-4 items-start;
-      }
-
-      .member-card-item {
-          @apply flex-col gap-4 text-center;
-          min-height: auto;
-      }
-
-      .member-card-image {
-          @apply mx-auto;
-      }
-
-      .member-card-actions {
-          @apply justify-center;
-      }
-
-      .member-info-grid {
-          @apply grid-cols-1 gap-4;
-      }
-
-      .member-cards-list {
-          @apply space-y-4;
-      }
   }
 
   @media (min-width: 641px) and (max-width: 1024px) {
-      .member-cards-list {
-          @apply space-y-4;
-      }
+    .member-cards-list {
+      @apply space-y-4;
+    }
   }
 
 }
@@ -978,38 +956,9 @@
   .register-login-text {
     @apply text-lg text-gray-700 font-normal;
   }
-}
 
-
-@layer utilities {
-  .tw-toast { @apply bg-white text-gray-900 rounded-xl shadow px-4 py-3 text-sm ring-1 ring-black/5; }
-  .tw-toast svg { @apply text-gray-700; }
-
-  .tw-success { @apply bg-green-50 text-green-800; }
-  .tw-success svg { @apply text-green-600; }
-
-  .tw-error   { @apply bg-red-50 text-red-800; }
-  .tw-error svg { @apply text-red-600; }
-
-  .tw-warn    { @apply bg-yellow-50 text-yellow-900; }
-  .tw-warn svg { @apply text-yellow-600; }
-
-  .tw-info    { @apply bg-blue-50 text-blue-800; }
-  .tw-info svg { @apply text-blue-600; }
-}
-
-/* 小動畫：淡入 */
-@keyframes fadein {
-  from { opacity:0; transform: translateY(-4px) }
-  to   { opacity:1; transform: translateY(0) }
-}
-
-
-/* ===== 新增到 style.css 最下面的修復樣式 ===== */
-
-/* 修復新增卡片頁面樣式，*/
-@layer components {
-
+  /* ===== 新增到 style.css 最下面的修復樣式 ===== */
+  /* 修復新增卡片頁面樣式，*/
   /* 修復新增卡片背景容器 */
   .add-card-bg {
     @apply bg-[#F9F9F9] rounded-lg;
@@ -1070,4 +1019,55 @@
       @apply w-full h-12;
     }
   }
+}
+
+/* ===== 新增卡片頁面專用樣式 ===== */
+/* ========== 新增卡片容器 ========== */
+/* .add-card-container {
+    @apply bg-white rounded-lg overflow-hidden;
+}
+
+.add-card-bg {
+  min-height: auto;
+  padding: 20px 15px 30px 15px;
+}
+
+.add-card-actions {
+  margin-top: 30px;
+}
+
+
+/* 平板版調整 */
+/* @media (min-width: 641px) and (max-width: 1024px) {
+.add-card-bg {
+  min-height: 70vh;
+  padding: 22px 18px 35px 18px;
+}
+
+.add-card-actions {
+  margin-top: 35px;
+}
+*/
+
+@layer utilities {
+  .tw-toast { @apply bg-white text-gray-900 rounded-xl shadow px-4 py-3 text-sm ring-1 ring-black/5; }
+  .tw-toast svg { @apply text-gray-700; }
+
+  .tw-success { @apply bg-green-50 text-green-800; }
+  .tw-success svg { @apply text-green-600; }
+
+  .tw-error   { @apply bg-red-50 text-red-800; }
+  .tw-error svg { @apply text-red-600; }
+
+  .tw-warn    { @apply bg-yellow-50 text-yellow-900; }
+  .tw-warn svg { @apply text-yellow-600; }
+
+  .tw-info    { @apply bg-blue-50 text-blue-800; }
+  .tw-info svg { @apply text-blue-600; }
+}
+
+/* 小動畫：淡入 */
+@keyframes fadein {
+  from { opacity:0; transform: translateY(-4px) }
+  to   { opacity:1; transform: translateY(0) }
 }
