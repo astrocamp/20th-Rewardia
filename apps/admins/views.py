@@ -33,14 +33,13 @@ def new_card(request):
     bank = request.POST["bank"]
     card_network = request.POST["network"]
     card_type = request.POST["card_type"]
-    foreign_transaction_fee = request.POST.get("foreign")
+
     is_active = request.POST.get("is_active") == "on"
     new_card = CreditCard.objects.create(
         name=f"{Bank.objects.get(id=bank).name} {name}",
         bank=Bank.objects.get(id=bank),
         card_network=card_network,
         card_type=card_type,
-        foreign_transaction_fee=foreign_transaction_fee,
         is_active=is_active,
     )
     if new_card:
@@ -73,14 +72,18 @@ def edit_card(request, id):
 def update_card(request, id):
     card = get_object_or_404(CreditCard, pk=id)
     card.name = request.POST.get("card_edit")
-    card.bank = int(request.POST["bank_edit"])
+
+    # 因為是foreign key，所以要從Bank那裡的資料庫取得資料
+    bank_id = request.POST["bank_edit"]
+    card.bank = Bank.objects.get(id=bank_id)
+
     card.card_network = request.POST["network_edit"]
     card.card_type = request.POST["card_type_edit"]
-    card.foreign_transaction_fee = request.POST.get("foreign_edit")
-    card.is_active = request.POST.get("is_active") == "on"
+
+    card.is_active = request.POST.get("is_active_edit") == "on"
     card.save()
-    print("POST data received:", request.POST, card)
-    return render(request, "admins/card_row.html", {"card": card})
+    messages.success(request, "更新成功")
+    return redirect("admins:all_cards")
 
 
 @require_http_methods(["POST"])

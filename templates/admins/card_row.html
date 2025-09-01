@@ -12,16 +12,14 @@
   <td class="text-center">{{card.card_network}}</td>
   <td class="text-center">{{card.card_type}}</td>
 
-  <td class="text-center">{{card.foreign_transaction_fee}}%</td>
-
   <td class="text-center">{{card.created_at|date:'M d Y'}}</td>
   <td class="text-center">{{card.updated_at|date:'M d Y'}}</td>
 
   <td class="text-center text-blue-400">
 
       <button hx-get="{%url 'admins:edit_card' card.id%}"
-    hx-target="#all_cards"
-    hx-swap="afterend">
+    hx-target="body"
+    hx-swap="outerHTML">
         <a href="#all_cards">
           <i class="fa-solid fa-pen-to-square"></i>
         </a>
