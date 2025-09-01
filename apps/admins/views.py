@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from apps.cards.models import CreditCard
 from apps.cards.models import Bank
 from django.contrib import messages
@@ -46,7 +47,7 @@ def new_card(request):
         )
         if new_card:
             messages.success(request, "新增卡片成功")
-            return render(request, "admins/new_card.html", {"card": new_card})
+            return render(request, "admins/card_row.html", {"card": new_card})
         else:
             messages.success(request, "新增失敗")
             return redirect("admins:cards")
@@ -86,8 +87,10 @@ def update_card(request, id):
 
     card.is_active = request.POST.get("is_active_edit") == "on"
     card.save()
+    print(reverse("admins:cards"))
     messages.success(request, "更新成功")
-    return redirect("admins:cards")
+    url = reverse("admins:cards") + f"#card-{id}"
+    return redirect(url)
 
 
 @require_http_methods(["POST"])

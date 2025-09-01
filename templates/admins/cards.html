@@ -2,22 +2,30 @@
 <section
   class="relative mx-4 sm:mx-6 lg:mx-10 mb-4 sm:mb-6 lg:mb-8 banner-spacing overflow-hidden"
 >
-  <div class="my-4 sm:mb-6">
+  <div class="my-4 sm:mb-6 flex flex-row items-center">
     <h2 id="card_database_title" class="text-2xl sm:text-2xl lg:text-2xl font-bold text-black">
       卡片資料庫
     </h2>
+
+    <div id="new_card_button">
+      <button
+      hx-get="{%url 'admins:new_card'%}"
+      hx-target="#form_container"
+      hx-swap="innerHTML"
+      type="submit"
+      hx-disabled-elt="this"
+      class="ui-btn ui-btn-primary cursor-pointer mx-4 my-4">
+      <a href="#card_database_title">
+        新增卡片
+      </a>
+
+      </button>
+    </div>
   </div>
 
-  <div id="new_card_button">
-    <button
-    hx-get="{%url 'admins:new_card'%}"
-    hx-target="#new_card_button"
-    hx-swap="outerHTML"
-    type="submit"
-    class="ui-btn ui-btn-primary cursor-pointer mb-4">
-      新增卡片
-    </button>
-  </div>
+  <div id="form_container"></div>
+
+
 
   <div id="cards_db" class="overflow-x-auto">
     <table class="table table-zebra w-full">
@@ -27,9 +35,9 @@
           <th>ID</th>
           <th>信用卡</th>
           <th>銀行</th>
-          <th>發行中</th>
-          <th>發卡機構</th>
           <th>卡片等級</th>
+          <th>發卡機構</th>
+          <th>發行中</th>
           <th>建立時間</th>
           <th>最近更新時間</th>
         </tr>
