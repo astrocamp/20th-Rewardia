@@ -46,11 +46,8 @@ INSTALLED_APPS = [
     "debug_toolbar",
     # ------------------------------
     "apps.pages",
-    "apps.banks",
     "apps.users",
-    "apps.analytics",
     "apps.cards",
-    "apps.merchants",
     "apps.rewards",
     "apps.sessions",
     "apps.admins",
