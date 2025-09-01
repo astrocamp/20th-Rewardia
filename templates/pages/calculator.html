@@ -19,7 +19,7 @@
         </div>
       </div>
     </div>
-    <form id="calc_form">
+    <form id="calc_form" method="#" action="#">
       {% csrf_token %}
       <!-- 表單卡片 -->
       <div class="form-card">
@@ -36,11 +36,30 @@
             <div class="field-group">
               <label for="bank_select" class="field-label required">銀行</label>
               <div class="select-wrapper">
-                <select id="bank_select" class="ui-select" aria-label="選擇銀行">
+                <select id="bank_select" name="bank_select" class="ui-select" aria-label="選擇銀行"
+                        hx-get="/get-cards-by-bank/"
+                        hx-target="#card_select"
+                        hx-trigger="change"
+                        hx-include="this">
                   <option value="" selected disabled>請選擇銀行</option>
-                  <option>台新銀行</option>
-                  <option>國泰世華</option>
-                  <option>玉山銀行</option>
+                  {% for bank in banks %}
+                  <option value="{{ bank.id }}">{{ bank.name }}</option>
+                  {% endfor %}
+                </select>
+
+
+                <div class="select-arrow" aria-hidden="true">
+                </div>
+              </div>
+            </div>
+
+            <!-- 卡片 -->
+            <div class="field-group">
+
+              <label for="card_select" class="field-label required">卡片</label>
+              <div class="select-wrapper">
+                <select id="card_select" name="card_select" class="ui-select" aria-label="選擇卡片">
+                  <option value="" selected disabled>請先選擇銀行，再選擇卡片</option>
                 </select>
                 <div class="select-arrow" aria-hidden="true">
                 </div>
@@ -49,13 +68,13 @@
 
             <!-- 電商通路 -->
             <div class="field-group">
-              <label for="channel_select" class="field-label required">電商通路</label>
+              <label for="channel_select" class="field-label required">消費通路</label>
               <div class="select-wrapper">
-                <select id="channel_select" class="ui-select" aria-label="選擇電商通路">
+                <select id="channel_select" class="ui-select" aria-label="選擇消費通路">
                   <option value="" selected disabled>請選擇消費通路</option>
-                  <option>momo購物網</option>
-                  <option>蝦皮購物</option>
-                  <option>博客來</option>
+                  {% for merchant in merchants %}
+                    <option value="{{ merchant.id }}">{{ merchant.name }}</option>
+                  {% endfor %}
                 </select>
                 <div class="select-arrow" aria-hidden="true">
                 </div>
@@ -68,8 +87,9 @@
               <div class="select-wrapper">
                 <select id="overseas_select" class="ui-select" aria-label="是否為海外消費">
                   <option value="" selected disabled>請選擇是否是海外消費</option>
-                  <option>是</option>
-                  <option>否</option>
+                  {% for value, label in overseas_options %}
+                    <option value="{{ value }}">{{ label }}</option>
+                  {% endfor %}
                 </select>
                 <div class="select-arrow" aria-hidden="true">
                 </div>
@@ -82,9 +102,9 @@
               <div class="select-wrapper">
                 <select id="payment_select" class="ui-select" aria-label="選擇付款方式">
                   <option value="" selected disabled>請選擇付款方式</option>
-                  <option>信用卡</option>
-                  <option>數位錢包</option>
-                  <option>行動支付</option>
+                  {% for value, label in payment_methods %}
+                    <option value="{{ value }}">{{ label }}</option>
+                  {% endfor %}
                   </select>
                 <div class="select-arrow" aria-hidden="true">
 
@@ -92,17 +112,7 @@
               </div>
             </div>
 
-            <!-- 卡片 -->
-            <div class="field-group">
-              <label for="card_select" class="field-label required">卡片</label>
-              <div class="select-wrapper">
-                <select id="card_select" class="ui-select" aria-label="選擇卡片">
-                  <option value="" selected disabled>請選擇卡片</option>
-                </select>
-                <div class="select-arrow" aria-hidden="true">
-                </div>
-              </div>
-            </div>
+
 
             <!-- 消費金額 -->
             <div class="field-group field-full">

@@ -1,6 +1,8 @@
 import Alpine from "alpinejs";
 import "htmx.org";
 import message from './components/message.js';
+import cardForm from './components/card_form.js';
+
 
 import faq from './components/faq.js';
 import login from './components/login.js';
@@ -16,7 +18,7 @@ Alpine.data('subscribe_form', subscribe);
 window.Alpine = Alpine;
 
 Alpine.data('toast_fadeout', message);
-
+Alpine.data('card_form', cardForm);
 
 
 // FAQ 頁面的 Alpine.js 功能
@@ -276,36 +278,6 @@ Alpine.data('subscribe_form', () => ({
       this.message = '';
       this.messageType = '';
     }, 3000);
-  }
-}));
-
-// 卡片表單的 Alpine.js 功能（清理版本）
-Alpine.data('card_form', (config = {}) => ({
-  selectedBank: config.initialBankId || '',
-  selectedCard: config.initialCardId || '',
-  allCards: config.allCards || [],
-  availableCards: [],
-
-  init() {
-    if (this.selectedBank) {
-      this.filterCardsByBank(this.selectedBank);
-    }
-  },
-
-  onBankChange() {
-    if (this.selectedBank) {
-      this.selectedCard = '';
-      this.filterCardsByBank(this.selectedBank);
-    } else {
-      this.availableCards = [];
-      this.selectedCard = '';
-    }
-  },
-
-  filterCardsByBank(bankId) {
-    this.availableCards = this.allCards.filter(card => {
-      return card.bankId.toString() === bankId.toString();
-    });
   }
 }));
 

@@ -44,23 +44,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # ------------------------------
     "debug_toolbar",
-<<<<<<< HEAD
-
-# ------------------------------
-    'apps.pages',
-    'apps.banks',
-    'apps.users',
-    'apps.analytics',
-    'apps.cards',
-    'apps.merchants',
-    'apps.rewards',
-    'apps.sessions',
-
-# ------------------------------
-    'apps.nlp_validation',
-    'apps.card_crawler',
-
-=======
     # ------------------------------
     "apps.pages",
     "apps.banks",
@@ -69,10 +52,10 @@ INSTALLED_APPS = [
     "apps.cards",
     "apps.merchants",
     "apps.rewards",
+    "apps.sessions",
     # ------------------------------
     "apps.nlp_validation",
     "apps.card_crawler",
->>>>>>> 000d016 (feat: 暫存會員專區html  CRUD pr#52)
 ]
 
 MIDDLEWARE = [
