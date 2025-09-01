@@ -189,6 +189,9 @@ SITE_ID = 1  # 對應 Django Admin 中的 Sites 設定
 LOGIN_REDIRECT_URL = '/users/member/'  # OAuth 登入成功後重導向到會員專區
 LOGOUT_REDIRECT_URL = '/'              # 登出後重導向到首頁
 
+# OAuth 設定：帳號行為配置
+ACCOUNT_UNIQUE_EMAIL = True            # 強制 Email 唯一性
+
 # OAuth 設定：社交帳號行為配置
 SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'  # 不需要額外 Email 驗證（Google 已驗證）
 SOCIALACCOUNT_AUTO_SIGNUP = True           # 自動註冊新用戶（無需手動註冊流程）
