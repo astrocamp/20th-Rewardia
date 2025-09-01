@@ -596,6 +596,38 @@ class SemanticClassifier:
         return all_matches
 
 
+class BankCardExtractor:
+    """銀行與信用卡名稱"""
+
+    def __init__(self, config=None):
+        self.config = config or load_config()
+
+        self.bank_pattern = self.config["bank_pattern"]
+
+    def extract_bank_name(self, text):
+        matches = re.findall(self.bank_pattern, text)
+        return matches[0] if matches else None
+
+    def extract_card_name(self, text):
+        first_space = text.find(" ")
+        if first_space == -1:
+            return None
+
+        text_after_space = text[first_space + 1 :]
+        first_card = text_after_space.find("卡")
+        if first_card == -1:
+            return None
+
+        card_name = text_after_space[: first_card + 1]
+        return card_name.strip()
+
+    def extract_bank_and_card(self, text):
+        bank_name = self.extract_bank_name(text)
+        card_name = self.extract_card_name(text)
+
+        return [bank_name, card_name]
+
+
 class RewardRateExtractor:
     """回饋率提取"""
 
@@ -714,6 +746,7 @@ def test_processors():
     filter_obj = RewardContentFilter(config)
     classifier = SemanticClassifier(config)
     rate_extractor = RewardRateExtractor(config)
+    bank_card_extractor = BankCardExtractor(config)
 
     json_file_path = config["settings"]["test_parameters"]["json_file_path"]
 
@@ -741,6 +774,9 @@ def test_processors():
         # print(" ")
         # print(f"原始文本: \n{test_text}")
         # print(" ")
+
+        # 提取銀行和信用卡名稱
+        bank_card_info = bank_card_extractor.extract_bank_and_card(test_text)
 
         cleaned = cleaner.comprehensive_text_cleaning(test_text)
 
@@ -846,7 +882,7 @@ def test_processors():
                     uniques.append(unique)
 
         result = {
-            f"測試案例{index}:": [
+            f"測試案例{index} {bank_card_info[0]} {bank_card_info[1]}:": [
                 {"原始文本": test_text},
                 # {"切割後句子": sentences_text},
                 # {"過濾後": filtereds_text},

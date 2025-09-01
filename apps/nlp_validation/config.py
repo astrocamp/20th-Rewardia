@@ -418,6 +418,11 @@ class NLPConfig:
         return ["。", "！", "？", "；"]
 
     @staticmethod
+    def get_bank_pattern():
+        """銀行名稱"""
+        return r"(滙豐|中國信託|國泰|玉山|台新|富邦|第一|合作金庫|兆豐|永豐|遠東|凱基|聯邦|星展|樂天|彰化|華南|新光|上海商銀|美國運通|渣打|陽信|LINE Bank|將來|元大|台中商銀|王道)"
+
+    @staticmethod
     def get_settings():
         """處理器設定參數"""
         return {
@@ -434,7 +439,7 @@ class NLPConfig:
             },
             "test_parameters": {
                 "min_test_cards": 30,
-                "max_test_cards": 35,
+                "max_test_cards": 31,
                 "json_file_path": "apps/nlp_validation/crawler_data_202508281713.json",
                 "fallback_test_data": [
                     "泰 KOKO (COMBO)悠遊聯名卡（停發）,國泰 KOKO (COMBO)悠遊聯名卡（停發）評價好嗎？真實回饋攻略讓達人告訴你,5 大權益天天切換，指定消費 3% 起，回饋無上限"
@@ -458,5 +463,6 @@ class NLPConfig:
             "punctuation_map": cls.get_punctuation_map(),
             "unnecessary_symbols_regex": cls.get_unnecessary_symbols_regex(),
             "sentence_endings": cls.get_sentence_endings(),
+            "bank_pattern": cls.get_bank_pattern(),
             "settings": cls.get_settings(),
         }
