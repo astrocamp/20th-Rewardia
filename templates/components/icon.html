@@ -84,6 +84,18 @@
       <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
   </svg>
 
+{% elif name == "chevron-down" %}
+  <!-- 向下箭頭圖示 - FAQ展開/收合 -->
+  <svg class="icon {{ size|default:'w-5 h-5' }} {{ class|default:'' }}" 
+      fill="none" 
+      stroke="currentColor" 
+      viewBox="0 0 24 24"
+      stroke-width="2"
+      stroke-linecap="round" 
+      stroke-linejoin="round">
+      <path d="M6 9l6 6 6-6"/>
+  </svg>
+
 {% else %}
   <!-- 預設圖示或錯誤提示 -->
   <div class="icon-placeholder {{ size|default:'w-6 h-6' }} {{ class|default:'' }} bg-gray-300 rounded flex items-center justify-center text-xs text-gray-600">
