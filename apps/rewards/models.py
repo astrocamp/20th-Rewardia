@@ -130,6 +130,7 @@ class RewardCategory(models.Model):
 
         return True
 
+
 class PendingReward(models.Model):
     """待審核的回饋規則"""
 
