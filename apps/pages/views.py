@@ -9,6 +9,10 @@ def download(request):
     return render(request, "pages/download.html")
 
 
+def main(request):
+    return render(request, "pages/main.html")
+
+
 def calculator(request):
     banks = (
         CreditCard.objects.filter(is_active=True)

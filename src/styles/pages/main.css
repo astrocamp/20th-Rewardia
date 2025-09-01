@@ -1,0 +1,133 @@
+/* Primarily corresponds to: templates/pages/main.html */
+
+@layer components {
+  
+  /* ========== Horizontal Search Components ========== */
+  .horizontal-search-select {
+    @apply w-full h-20 px-4 py-5 bg-white text-base text-gray-700 border-none outline-none cursor-pointer appearance-none transition-all duration-200;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 1rem center;
+    background-repeat: no-repeat;
+    background-size: 1.25em 1.25em;
+    padding-right: 3rem;
+  }
+  
+  .horizontal-search-select:hover {
+    @apply bg-gray-50;
+  }
+  
+  .horizontal-search-select:focus {
+    @apply bg-blue-50 outline-none;
+  }
+  
+  .horizontal-search-input {
+    @apply flex-1 h-20 px-4 py-5 bg-white text-base text-gray-700 border-none outline-none placeholder-gray-400 transition-all duration-200;
+  }
+  
+  .horizontal-search-input:hover {
+    @apply bg-gray-50;
+  }
+  
+  .horizontal-search-input:focus {
+    @apply bg-blue-50 outline-none;
+  }
+  
+  .horizontal-search-btn {
+    @apply h-20 w-20 bg-cyan-500 text-white flex items-center justify-center border-none cursor-pointer transition-all duration-200 hover:bg-cyan-600;
+  }
+  
+  .horizontal-search-btn:hover {
+    @apply shadow-md;
+  }
+  
+  /* ========== Card Result Components ========== */
+  .card-result-item {
+    @apply flex flex-col lg:flex-row gap-6 p-6 bg-white border border-border-light rounded-lg hover:shadow-md transition-shadow duration-200;
+  }
+  
+  .card-info {
+    @apply flex flex-row gap-4 lg:min-w-[300px];
+  }
+  
+  .card-image {
+    @apply w-20 h-12 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden;
+  }
+  
+  .card-details {
+    @apply flex-1 min-w-0;
+  }
+  
+  .card-name {
+    @apply text-lg font-bold text-dark-gray mb-1 truncate;
+  }
+  
+  .card-bank {
+    @apply text-sm text-muted;
+  }
+  
+  .card-rewards {
+    @apply flex-1 space-y-3;
+  }
+  
+  .reward-item {
+    @apply flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-light-gray rounded-lg;
+  }
+  
+  .reward-highlight {
+    @apply bg-primary/10 border border-primary/20;
+  }
+  
+  .reward-category {
+    @apply text-sm font-medium text-dark-gray mb-1 sm:mb-0;
+  }
+  
+  .reward-rate {
+    @apply text-base font-bold text-primary mb-1 sm:mb-0;
+  }
+  
+  .reward-limit {
+    @apply text-xs text-muted;
+  }
+  
+  /* ========== Pagination ========== */
+  .pagination {
+    @apply flex items-center justify-center gap-4 mt-8;
+  }
+  
+  .pagination-btn {
+    @apply px-4 py-2 bg-white border border-border-light text-dark-gray rounded-lg hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .pagination-info {
+    @apply text-sm text-muted;
+  }
+  
+  /* ========== Responsive Styles ========== */
+  @media (max-width: 640px) {
+    
+    .card-result-item {
+      @apply p-4;
+    }
+    
+    .card-info {
+      @apply flex-col gap-3;
+    }
+    
+    .card-image {
+      @apply w-full h-32 max-w-[200px] self-center;
+    }
+    
+    .reward-item {
+      @apply flex-col items-start;
+    }
+  }
+  
+  @media (min-width: 641px) and (max-width: 1024px) {
+  }
+  
+  @media (min-width: 1025px) {
+    .card-info {
+      @apply min-w-[350px];
+    }
+  }
+}

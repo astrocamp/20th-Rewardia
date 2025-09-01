@@ -1,0 +1,135 @@
+{% extends 'layouts/default.html' %}
+
+{% block title %}首頁 - Rewardia{% endblock %}
+
+{% block content %}
+<!-- 主要橫幅區域 (Banner) -->
+<section class="relative mx-4 sm:mx-6 lg:mx-10 mb-4 sm:mb-6 lg:mb-8 banner-spacing overflow-hidden">
+  <!-- 頁面標題 - 在 banner 圖上方 -->
+  <div class="mb-4 sm:mb-6">
+    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black">首頁</h2>
+  </div>
+  
+  <!-- Banner 圖區域 -->
+  <div class="relative h-[300px] sm:h-[350px] lg:h-[400px] overflow-hidden rounded-lg">
+    <!-- 背景圖片 -->
+    <div class="absolute inset-0">
+      <img src="https://github.com/astrocamp/20th-Rewardia/blob/pic/img/ChatGPT%20Image%202025%E5%B9%B48%E6%9C%8821%E6%97%A5%20%E4%B8%8A%E5%8D%8806_10_26.png?raw=true" 
+        alt="Rewardia Banner Background" 
+        loading="eager"
+        class="w-full h-full object-cover object-[75%_9%]">
+    </div>
+    
+    <!-- 內容區域 - 限制在左半邊 -->
+    <div class="relative z-10 flex items-center h-full">
+      <div class="text-white px-4 sm:px-8 lg:px-12 w-full lg:w-1/2">
+        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 lg:mb-8 leading-tight tracking-wide">
+          每次購物都能獲得現金回饋
+        </h1>
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 lg:gap-6">
+          <a href="#" id="member-join-btn" class="download-btn-primary download-btn-banner">
+            立即比較，加入會員
+          </a>
+          <a href="#" id="chrome-download-btn" class="download-btn-secondary download-btn-banner">
+            免費新增至 Chrome
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 卡片總覽區塊 -->
+<section class="mx-4 sm:mx-6 lg:mx-10 my-8 sm:my-12 lg:my-16" x-data="main_search()">
+  <!-- 卡片總覽標題 -->
+  <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-8 sm:mb-12 text-left font-kulim-park leading-tight-custom">
+    卡片總覽
+  </h2>
+  
+  <!-- 搜尋區域 -->
+  <div class="mb-8">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div class="flex flex-col sm:flex-row">
+        <!-- 選擇信用卡 -->
+        <div class="flex-1 border-b sm:border-b-0 sm:border-r border-gray-200">
+          <select x-model="selectedBank" @change="onBankChange" class="horizontal-search-select" style="height: 80px; padding: 20px 16px; cursor: pointer;">
+            <option value="">選擇銀行</option>
+            <option value="fubon">富邦銀行</option>
+            <option value="ctbc">中國信託</option>
+            <option value="cathay">國泰世華</option>
+            <option value="line">LINE Bank</option>
+            <option value="shanghai">上海商銀</option>
+          </select>
+        </div>
+        
+        <!-- 選擇優惠類別 -->
+        <div class="flex-1 border-b sm:border-b-0 sm:border-r border-gray-200">
+          <select x-model="selectedReward" @change="onRewardChange" class="horizontal-search-select" style="height: 80px; padding: 20px 16px; cursor: pointer;">
+            <option value="">選擇優惠類別</option>
+            <option value="domestic">國內消費</option>
+            <option value="overseas">海外消費</option>
+            <option value="cashback">現金回饋</option>
+            <option value="points">紅利點數</option>
+            <option value="food">美食饗宴</option>
+            <option value="travel">旅遊探索</option>
+            <option value="shopping">購物禮遇</option>
+            <option value="digital">數位生活</option>
+          </select>
+        </div>
+        
+        <!-- 搜尋輸入與按鈕 -->
+        <div class="flex-1 flex">
+          <input type="text" placeholder="請輸入關鍵字" class="horizontal-search-input" style="height: 80px; padding: 20px 16px;">
+          <button @click="performSearch" class="horizontal-search-btn" style="height: 80px; width: 80px; cursor: pointer; background-color: #06b6d4;">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  
+  <!-- 搜尋結果區域 -->
+  <div class="grid gap-6">
+    <template x-for="card in displayCards" :key="card.id">
+      <div class="card-result-item">
+        <!-- 左側：信用卡圖片和名稱 -->
+        <div class="card-info">
+          <div class="card-image">
+            <img :src="card.image" :alt="card.name" class="w-full h-full object-cover rounded-lg">
+          </div>
+          <div class="card-details">
+            <h3 class="card-name" x-text="card.name"></h3>
+            <p class="card-bank" x-text="card.bank"></p>
+          </div>
+        </div>
+        
+        <!-- 右側：優惠條件列表 -->
+        <div class="card-rewards">
+          <template x-for="(reward, index) in card.rewards.slice(0, 4)" :key="index">
+            <div class="reward-item" :class="{'reward-highlight': index === 0 && isMatchingReward(reward)}">
+              <div class="reward-category" x-text="reward.category"></div>
+              <div class="reward-rate" x-text="reward.rate"></div>
+              <div class="reward-limit" x-text="reward.limit"></div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </template>
+    
+    <!-- 分頁控制 -->
+    <div x-show="totalPages > 1" class="pagination">
+      <button @click="prevPage" :disabled="currentPage === 1" class="pagination-btn">
+        上一頁
+      </button>
+      <span class="pagination-info">
+        第 <span x-text="currentPage"></span> 頁，共 <span x-text="totalPages"></span> 頁
+      </span>
+      <button @click="nextPage" :disabled="currentPage === totalPages" class="pagination-btn">
+        下一頁
+      </button>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
