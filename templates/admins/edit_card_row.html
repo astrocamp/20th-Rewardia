@@ -1,29 +1,30 @@
 {% comment %} 編輯卡片時的表單 {% endcomment %}
-<div>
-  <form
-    action="{% url 'admins:update_card' card.id %}"
-    method="post"
-  >
-      <div>{{card.id}}</div>
-      {% csrf_token %}
-      <div>
-        <label for="card_edit" class="">信用卡</label>
+<form
+  action="{% url 'admins:update_card' card.id %}"
+  method="post"
+>
+    {% csrf_token %}
+    <div class="py-4 flex flex-col flex-wrap form-card-bg">
+      <h3 class="form-title mb-2">編輯卡片</h3>
+      <label class="field-label">Card ID: {{card.id}}</label>
+      <div class="field-group">
+        <label for="card_edit" class="field-label">信用卡</label>
         <input
           id="card_edit"
-          class="border border-red-500 rounded-md"
+          class="ui-input"
           name="card_edit"
           type="text"
           value="{{card.name}}"
         />
       </div>
 
-      <div>
-        <label for="bank_edit" class="">銀行</label>
+      <div class="field-group">
+        <label for="bank_edit" class="field-label">銀行</label>
         <select
           id="bank_edit"
           name="bank_edit"
           type="text"
-          class="border border-blue-500 rounded-md"
+          class="ui-input"
           placeholder="輸入銀行"
           required
         >
@@ -36,20 +37,11 @@
         </select>
       </div>
 
-      <div>
-      <label for="is_active_edit">發行中？</label>
-      {%if card.is_active%}
-        <input id="is_active_edit" class="checkbox" name="is_active_edit" type="checkbox" checked />
-      {%else%}
-        <input id="is_active" class="checkbox" name="is_active_edit" type="checkbox" />
-      </div>
-      {%endif%}
-
-      <div>
-        <label for="network_edit" class="required">發卡機構</label>
+      <div class="field-group">
+        <label for="network_edit" class="field-label">發卡機構</label>
         <select
           id="network_edit"
-          class="border border-blue-500 rounded-md"
+          class="ui-input"
           name="network_edit"
           required
         >
@@ -62,11 +54,11 @@
         </select>
       </div>
 
-      <div>
-        <label for="card_type_edit" class="required">卡片等級</label>
+      <div class="field-group">
+        <label for="card_type_edit" class="field-label">卡片等級</label>
         <select
           id="card_type_edit"
-          class="border border-blue-500 rounded-md"
+          class="ui-input"
           name="card_type_edit"
           required
         >
@@ -79,12 +71,23 @@
         </select>
       </div>
 
-      <td class="text-center text-blue-400">
-        <button type="submit">
-          <i class="fa-solid fa-floppy-disk"></i>
+
+      <div class="field-group flex flex-row items-center">
+        <label for="is_active_edit" class="field-label">發行中？</label>
+        {%if card.is_active%}
+        <input id="is_active_edit" class="checkbox mb-2" name="is_active_edit" type="checkbox" checked />
+        {%else%}
+        <input id="is_active" class="checkbox mb-2" name="is_active_edit" type="checkbox" />
+         {%endif%}
+      </div>
+
+
+      <div>
+        <button type="submit" class="ui-btn ui-btn-primary cursor-pointer">
+          儲存
         </button>
-      </td>
-    </tr>
-  </form>
-</div>
+      </div>
+    </div>
+</form>
+
 
