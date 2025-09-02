@@ -90,7 +90,7 @@
     </div>
   
   <!-- 搜尋結果區域 -->
-  <div class="grid gap-6" style="margin-top: 24px;">
+  <div class="grid gap-6" style="margin-top: 24px; max-height: 80vh; overflow-y: auto;" @scroll="handleScroll">
     <template x-for="card in displayCards" :key="card.id">
       <div class="card-result-item" style="display: flex !important; flex-direction: row !important; gap: 24px !important; padding: 24px !important; background: white !important; border: 1px solid #e5e7eb !important; border-radius: 8px !important;">
         <!-- 左側：信用卡名稱和圖片（垂直布局） -->
@@ -125,17 +125,20 @@
       </div>
     </template>
     
-    <!-- 分頁控制 -->
-    <div x-show="totalPages > 1" class="pagination">
-      <button @click="prevPage" :disabled="currentPage === 1" class="pagination-btn">
-        上一頁
-      </button>
-      <span class="pagination-info">
-        第 <span x-text="currentPage"></span> 頁，共 <span x-text="totalPages"></span> 頁
-      </span>
-      <button @click="nextPage" :disabled="currentPage === totalPages" class="pagination-btn">
-        下一頁
-      </button>
+    <!-- 載入更多指示器 -->
+    <div x-show="hasMoreCards()" class="text-center py-6">
+      <div x-show="!isLoadingMore" class="text-gray-500">
+        向下滾動載入更多卡片...
+      </div>
+      <div x-show="isLoadingMore" class="flex justify-center items-center space-x-2">
+        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+        <span class="text-gray-500">載入中...</span>
+      </div>
+    </div>
+    
+    <!-- 沒有更多卡片時的提示 -->
+    <div x-show="!hasMoreCards() && displayCards.length > 0" class="text-center py-6 text-gray-500">
+      已顯示所有相關卡片
     </div>
   </div>
 </section>
