@@ -1,4 +1,5 @@
 from django.db import models
+import re
 
 
 # Create your models here.
@@ -25,18 +26,37 @@ class CreditCard(models.Model):
         BUSINESS = "BUSINESS", "商務卡"
         SIGBUSINESS = "SIGBUSINESS", "商務御璽卡"
 
+    class Bank(models.TextChoices):
+        滙豐 = "滙豐"
+        中國信託 = "中國信託"
+        國泰 = "國泰"
+        玉山 = "玉山"
+        台新 = "台新"
+        富邦 = "富邦"
+        第一 = "第一"
+        合庫 = "合庫"
+        兆豐 = "兆豐"
+        永豐 = "永豐"
+        遠東 = "遠東"
+        凱基 = "凱基"
+        聯邦 = "聯邦"
+        星展 = "星展"
+        樂天 = "樂天"
+        彰化 = "彰化"
+        華南 = "華南"
+        新光 = "新光"
+        上海商銀 = "上海商銀"
+        美國運通 = "美國運通"
+        渣打 = "渣打"
+        陽信 = "陽信"
+        LINEBank = "LINE Bank"
+        將來 = "將來"
+        元大 = "元大"
+        台中銀 = "台中銀"
+        王道 = "王道"
+
     name = models.CharField("信用卡名稱", max_length=100)
-    bank = models.CharField("銀行名稱", max_length=50)
-    # annual_fee = models.DecimalField(
-    #     "Annual Fee",
-    #     max_digits=8,
-    #     decimal_places=2,
-    #     blank=True,
-    #     null=True,
-    # )
-    # signup_bonus = models.IntegerField(
-    #     "Sign Up Bonus", blank=True, null=True, help_text="新戶禮金額或點數"
-    # )
+    bank = models.CharField("銀行名稱", max_length=50, choices=Bank.choices)
     foreign_transaction_fee = models.DecimalField(
         "Foreign Transaction Fee",
         max_digits=4,
@@ -73,3 +93,11 @@ class CreditCard(models.Model):
     def __str__(self):
         return f"{self.bank} {self.name}"
 
+    def save(self, *args, **kwargs):
+        self.bank = self.format_bank_name(self.bank)
+        super().save(*args, **kwargs)
+
+    def format_bank_name(self, bank_name):
+        if re.search(r"(合作?金?庫)", bank_name):
+            return "合庫"
+        return bank_name
