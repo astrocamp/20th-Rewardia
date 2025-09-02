@@ -1,9 +1,7 @@
 <form
     id="new_card_form"
-    hx-post="{%url 'admins:new_card'%}"
-    hx-target="#card_body"
-    hx-swap="afterbegin"
-    hx-on::after-request="this.reset()"
+    action="{% url 'admins:new_card' %}"
+    method="post"
   >
     {% csrf_token %}
 
