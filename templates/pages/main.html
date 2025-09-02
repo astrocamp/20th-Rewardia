@@ -42,7 +42,7 @@
 <!-- 卡片總覽區塊 -->
 <section class="mx-4 sm:mx-6 lg:mx-10 my-8 sm:my-12 lg:my-16" x-data="main_search">
   <!-- 卡片總覽標題 -->
-  <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-8 sm:mb-12 text-left font-kulim-park leading-tight-custom">
+  <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-8 sm:mb-12 text-left font-sans leading-tight">
     卡片總覽
   </h2>
   
@@ -52,7 +52,7 @@
       <div class="flex flex-col sm:flex-row">
         <!-- 選擇銀行 -->
         <div class="flex-1 border-b sm:border-b-0 sm:border-r border-gray-200">
-          <select x-model="selectedBank" @change="onBankChange" class="horizontal-search-select" style="height: 80px; padding: 20px 100px; cursor: pointer;">
+          <select x-model="selectedBank" @change="onBankChange" class="horizontal-search-select search-select-height search-select-padding">
             <option value="">選擇銀行</option>
             <template x-for="bank in banks" :key="bank.code">
               <option :value="bank.name" x-text="bank.name"></option>
@@ -62,7 +62,7 @@
         
         <!-- 選擇優惠類別 -->
         <div class="flex-1 border-b sm:border-b-0 sm:border-r border-gray-200">
-          <select x-model="selectedReward" @change="onRewardChange" class="horizontal-search-select" style="height: 80px; padding: 20px 100px; cursor: pointer;">
+          <select x-model="selectedReward" @change="onRewardChange" class="horizontal-search-select search-select-height search-select-padding">
             <option value="">選擇優惠類別</option>
             <template x-for="[code, display] in rewardCategoriesChoices" :key="code">
               <option :value="code" x-text="display"></option>
@@ -72,13 +72,13 @@
         
         <!-- 搜尋輸入 -->
         <div class="flex-1">
-          <input type="text" x-model="searchKeyword" @input="performSearch" placeholder="請輸入關鍵字" class="horizontal-search-input" style="height: 80px; padding: 20px 16px;">
+          <input type="text" x-model="searchKeyword" @input="performSearch" placeholder="請輸入關鍵字" class="horizontal-search-input search-input-height search-input-padding">
         </div>
       </div>
     </div>
   
   <!-- 卡牌式展示區域（畫面b）- 初始狀態 -->
-  <div x-show="viewMode === 'grid'" class="grid-view-container" style="margin-top: 24px; max-height: 80vh; overflow-y: auto;" @scroll="handleGridScroll">
+  <div x-show="viewMode === 'grid'" class="grid-view-container mt-6 max-h-[80vh] overflow-y-auto" @scroll="handleGridScroll">
     <div class="credit-card-grid">
       <template x-for="card in gridCards" :key="card.id">
         <div class="credit-card-item">
@@ -116,35 +116,35 @@
   </div>
 
   <!-- 搜尋結果區域（畫面a）- 搜尋後顯示 -->
-  <div x-show="viewMode === 'list'" class="grid gap-6" style="margin-top: 24px; max-height: 80vh; overflow-y: auto;" @scroll="handleScroll">
+  <div x-show="viewMode === 'list'" class="grid gap-6 mt-6 max-h-[80vh] overflow-y-auto" @scroll="handleScroll">
     <template x-for="card in displayCards" :key="card.id">
-      <div class="card-result-item" style="display: flex !important; flex-direction: row !important; gap: 24px !important; padding: 24px !important; background: white !important; border: 1px solid #e5e7eb !important; border-radius: 8px !important;">
+      <div class="card-result-item list-card-layout">
         <!-- 左側：信用卡名稱和圖片（垂直布局） -->
-        <div style="display: flex !important; flex-direction: column !important; width: 50% !important;">
+        <div class="list-card-left">
           <!-- 上方：卡片名稱和銀行 -->
-          <div style="margin-bottom: 12px !important;">
-            <h3 x-text="card.name" style="font-size: 32px !important; font-weight: 600 !important; color: #374151 !important; margin-bottom: 4px !important; line-height: 1.4 !important;"></h3>
-            <p x-text="card.bank" style="font-size: 24px !important; color: #6b7280 !important;"></p>
+          <div class="list-card-header">
+            <h3 x-text="card.name" class="list-card-title"></h3>
+            <p x-text="card.bank" class="list-card-bank"></p>
           </div>
           <!-- 下方：信用卡圖片 -->
-          <div style="height:240px !important; border-radius: 8px !important; overflow: hidden !important; display: flex !important; align-items: center !important; justify-content: center !important;">
-            <img :src="card.image" :alt="card.name" style="max-width: 100% !important; max-height: 100% !important; object-fit: contain !important; border-radius: 8px !important;">
+          <div class="list-card-image-container">
+            <img :src="card.image" :alt="card.name" class="list-card-image">
           </div>
         </div>
         
         <!-- 右側：優惠條件列表 -->
-        <div style="width: 50% !important; display: flex !important; flex-direction: column !important; padding-top: 0 !important;">
+        <div class="list-card-right">
           <template x-for="(reward, index) in card.rewards.slice(0, 4)" :key="index">
             <div>
               <!-- 項目名稱與數值 - 左右排列 -->
-              <div style="display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; width: 100% !important; padding: 16px 0 !important;" :style="index === 0 && isMatchingReward(reward) ? 'background: #eff6ff !important; padding: 16px 12px !important; border-radius: 4px !important;' : ''">
-                <div style="font-size: 16px !important; font-weight: 600 !important; color: #374151 !important; text-align: left !important; flex: 1 !important;" x-text="reward.category"></div>
-                <div style="font-size: 18px !important; font-weight: bold !important; color: #1d4ed8 !important; text-align: right !important; flex-shrink: 0 !important;" x-text="reward.rate"></div>
+              <div class="list-reward-row" :class="index === 0 && isMatchingReward(reward) ? 'list-reward-highlight' : ''">
+                <div class="list-reward-category" x-text="reward.category"></div>
+                <div class="list-reward-rate" x-text="reward.rate"></div>
               </div>
               <!-- 限制條件 -->
-              <div style="font-size: 13px !important; color: #6b7280 !important; text-align: left !important; padding-bottom: 12px !important;" x-text="reward.limit" x-show="reward.limit"></div>
+              <div class="list-reward-limit" x-text="reward.limit" x-show="reward.limit"></div>
               <!-- 分隔線（除了最後一項） -->
-              <div x-show="index < card.rewards.slice(0, 4).length - 1" style="height: 1px !important; background: #e5e7eb !important; margin: 8px 0 !important;"></div>
+              <div x-show="index < card.rewards.slice(0, 4).length - 1" class="list-reward-divider"></div>
             </div>
           </template>
         </div>

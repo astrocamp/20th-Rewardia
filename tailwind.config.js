@@ -4,19 +4,28 @@ export default defineConfig({
   content: ["./templates/**/*.html"],
   theme: {
     colors: {
+      // Custom brand colors
       primary: "#2060B9",
-      "primary-dark": "#193966",
+      "primary-dark": "#193966", 
       "primary-hover": "#1c55a4",
       "primary-active": "#184a90",
       "primary-disabled": "#9BB6DD",
-      muted: "#5D6970",
-      "light-gray": "#F9F9F9",
-      "dark-gray": "#111827",
-      "border-light": "#D1D5DB",
-      "placeholder-gray": "#949AA6",
-      "error-red": "#FF1F1F",
-      "bg-light-alt": "#E5E7EB",
-      "border-subtle": "#BEC1C6",
+      "dark-charcoal": "#111827", // 深色按鈕顏色
+      // Custom semantic colors
+      "custom-muted": "#5D6970",
+      "custom-light-gray": "#F9F9F9", 
+      "custom-border-light": "#D1D5DB",
+      "custom-placeholder": "#949AA6",
+      "custom-error": "#FF1F1F",
+      "custom-bg-alt": "#E5E7EB",
+      "custom-border-subtle": "#BEC1C6",
+      // List view specific colors
+      "list-title": "#374151",
+      "list-bank": "#6b7280", 
+      "list-highlight-bg": "#eff6ff",
+      "list-rate": "#1d4ed8",
+      "list-limit": "#6b7280",
+      "list-divider": "#e5e7eb",
       // Standard colors
       black: "#000000",
       white: "#ffffff",
