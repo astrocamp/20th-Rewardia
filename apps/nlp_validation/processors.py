@@ -623,8 +623,19 @@ class BankCardExtractor:
 
     def extract_bank_and_card(self, text):
         bank_name = self.extract_bank_name(text)
-        card_name = self.extract_card_name(text)
+        card_name = None
+        if bank_name:
+            try:
+                bank_end_pos = text.index(bank_name) + len(bank_name)
+                search_text = text[bank_end_pos:].lstrip()
+                card_end_pos = search_text.find("卡")
+                if card_end_pos != -1:
+                    card_name = search_text[: card_end_pos + 1].strip()
+            except ValueError:
+                pass
 
+        if not card_name:
+            card_name = self.extract_card_name(text)
         return [bank_name, card_name]
 
 
