@@ -26,7 +26,7 @@ def new_card(request):
     card_networks = CreditCard.CardNetwork
     card_types = CreditCard.CardType
     card_form_data = {
-        "banks": banks,
+        # "banks": banks,
         "card_networks": card_networks,
         "card_types": card_types,
     }
@@ -65,7 +65,7 @@ def edit_card(request, id):
         request,
         "admins/edit_card_row.html",
         {
-            "banks": banks,
+            # "banks": banks,
             "card_networks": card_networks,
             "card_types": card_types,
             "card": card,
@@ -77,12 +77,15 @@ def edit_card(request, id):
 def update_card(request, id):
     card = get_object_or_404(CreditCard, pk=id)
     card.name = request.POST.get("card_edit")
-    card.bank = request.POST["bank_edit"]
+
+    bank_id = request.POST["bank_edit"]
+
     card.card_network = request.POST["network_edit"]
     card.card_type = request.POST["card_type_edit"]
+
     card.is_active = request.POST.get("is_active_edit") == "on"
     card.save()
-
+    print(reverse("admins:cards"))
     messages.success(request, "更新成功")
     url = reverse("admins:cards") + f"#card-{id}"
     return redirect(url)

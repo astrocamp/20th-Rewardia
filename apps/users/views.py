@@ -40,7 +40,7 @@ def prepare_card_form_context(
     banks = [{"id": i + 1, "name": bank} for i, bank in enumerate(banks_with_cards)]
 
     context = {
-        "banks": banks,
+        # "banks": banks,
         "cards": cards,
         "user_card": user_card,
         "is_edit_mode": is_edit_mode,
@@ -76,7 +76,7 @@ def get_cards_by_bank(request, bank_name):
         )
 
         # 轉換為 JSON 格式
-        cards_data = [{"id": card.id, "name": card.name} for card in cards]
+        # cards_data = [{"id": card.id, "name": card.name} for card in cards]
 
         return JsonResponse(
             {
