@@ -12,7 +12,22 @@ from .models import UserCard
 
 
 def register(request):
-    return HttpResponse("暫時的 register 頁面，之後要實作")
+    """使用者註冊"""
+    if request.method == "POST":
+        form = UserRegistrationForm(request.POST)
+        success, user, error_type = UserRegistrationService.register_user(form)
+
+        if success:
+            UserRegistrationService.handle_registration_success(request, user)
+            return redirect("sessions:login")
+        else:
+            UserRegistrationService.handle_registration_failure(
+                request, error_type, form
+            )
+    else:
+        form = UserRegistrationForm()
+
+    return render(request, "users/register.html", {"form": form})
 
 
 def prepare_card_form_context(
