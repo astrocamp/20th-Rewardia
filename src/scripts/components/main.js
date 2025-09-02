@@ -145,7 +145,10 @@ export default () => ({
   // 執行搜尋
   performSearch() {
     if (!this.selectedBank && !this.selectedReward) {
-      this.displayRandomCards();
+      // 沒有選擇條件時，顯示所有卡片
+      this.allCards = [...this.originalCards];
+      this.loadedCount = Math.min(3, this.allCards.length);
+      this.updateDisplayCards();
       return;
     }
     
@@ -202,8 +205,17 @@ export default () => ({
         });
       }
       
-      // 按照相關性排序（這裡簡化為隨機）
-      filteredCards.sort(() => 0.5 - Math.random());
+      // 按照優惠數值排序（數值最高的優先）
+      if (this.selectedReward) {
+        filteredCards.sort((a, b) => {
+          const aMaxRate = this.getMaxRewardRate(a, this.selectedReward);
+          const bMaxRate = this.getMaxRewardRate(b, this.selectedReward);
+          return bMaxRate - aMaxRate; // 降序排列（高到低）
+        });
+      } else {
+        // 沒有優惠條件時保持隨機排序
+        filteredCards.sort(() => 0.5 - Math.random());
+      }
       
       this.allCards = filteredCards; // 更新工作資料
       this.loadedCount = Math.min(3, filteredCards.length); // 重置載入數量
@@ -261,5 +273,36 @@ export default () => ({
     
     const searchTerms = rewardTypes[this.selectedReward] || [];
     return searchTerms.some(term => reward.category.includes(term));
+  },
+  
+  // 獲取卡片在特定優惠類型下的最高數值
+  getMaxRewardRate(card, rewardType) {
+    const rewardTypes = {
+      'domestic': ['國內消費', '一般消費', '指定通路'],
+      'overseas': ['海外消費', '國外消費'],
+      'cashback': ['現金回饋', '消費'],
+      'points': ['紅利點數', 'POINT']
+    };
+    
+    const searchTerms = rewardTypes[rewardType] || [];
+    const matchingRewards = card.rewards.filter(reward =>
+      searchTerms.some(term => reward.category.includes(term))
+    );
+    
+    if (matchingRewards.length === 0) return 0;
+    
+    // 提取數值並找最大值
+    const rates = matchingRewards.map(reward => {
+      const rateStr = reward.rate;
+      // 提取百分比數值 (例如: "3.8%" -> 3.8, "5%" -> 5)
+      const percentMatch = rateStr.match(/(\d+\.?\d*)%/);
+      if (percentMatch) {
+        return parseFloat(percentMatch[1]);
+      }
+      // 如果不是百分比，返回0（例如年費相關項目）
+      return 0;
+    });
+    
+    return Math.max(...rates);
   }
 });
