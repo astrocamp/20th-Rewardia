@@ -47,8 +47,6 @@ INSTALLED_APPS = [
     "django.contrib.sites",  # OAuth 必要：allauth 需要 sites framework 來管理多站點
     # ------------------------------
     "django_celery_results",
-    # ------------------------------
-    "django_celery_results",
     # "kombu.transport.django"
     # ------------------------------
     "debug_toolbar",
