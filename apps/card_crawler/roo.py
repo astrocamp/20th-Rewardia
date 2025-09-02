@@ -24,9 +24,7 @@ def save_data(data):
 
     crawled_card, created = CrawledData.objects.update_or_create(
         url=data["url"],
-        defaults={
-            "content": content,
-        },
+        defaults={"content": content, "is_active": True, "deleted_at": None},
     )
 
 
@@ -46,9 +44,8 @@ def create_error_data(url, error, card_name=None):
 
 
 # 抓一張卡的function
-def get_card_info(url):
+def get_card_info(driver, url):
     try:
-        driver = webdriver.Chrome()
         driver.get(url)
         print(f"Processing: {url}")
 
@@ -138,12 +135,10 @@ def get_card_info(url):
 
     finally:
         print("Finished.")
-        driver.quit()
 
 
 # 把整個爬url的功能包成一個function
-def crawl_roo_urls():
-    driver = webdriver.Chrome()
+def crawl_roo_urls(driver):
     main_url_page = "https://roo.cash/creditcard/"
 
     try:
@@ -153,7 +148,6 @@ def crawl_roo_urls():
             driver.implicitly_wait(5)
         except WebDriverException as error:
             print(f"Error fetching main page: {error}")
-            driver.quit()
 
         try:
             categories = driver.find_elements(
@@ -168,17 +162,10 @@ def crawl_roo_urls():
         except WebDriverException as error:
             print(f"Error fetching element: {error}")
 
-    finally:
-        # 關閉查找
-        print("Closing webdriver.")
-        driver.quit()
-
 
 # 抓所有卡的function
-def crawl_roo_cards(cat_urls):
+def crawl_roo_cards(driver, cat_urls):
     try:
-        driver = webdriver.Chrome()
-
         # 先進到每一個類別的分頁，跳過第一個，因為第一個是2025年精選，那些一定分散在各個類別裡
         for url in cat_urls[1:]:
             driver.get(url)
@@ -189,7 +176,7 @@ def crawl_roo_cards(cat_urls):
             card_urls = [card.get_attribute("href") for card in card_names]
 
             for card_url in card_urls:
-                get_card_info(card_url)
+                get_card_info(driver, card_url)
                 time.sleep(sleep_time)
                 processed_urls.add(card_url)
 
@@ -202,4 +189,21 @@ def crawl_roo_cards(cat_urls):
     finally:
         print(f"Failed or with error: {failed_cards}")
         print(f"Processed {len(processed_urls)} cards.")
+
+
+# 寫這個目的是讓瀏覽器只要開一次，不要開開關關
+def main_crawler():
+    try:
+        driver = webdriver.Chrome()
+        category_urls = crawl_roo_urls(driver)
+        crawl_roo_cards(driver, category_urls)
+
+    except Exception as error:
+        print(f"失敗: {error}")
+
+    finally:
         driver.quit()
+
+
+if __name__ == "__main__":
+    main_crawler()

@@ -1,5 +1,4 @@
 from django.db import models
-from apps.cards.models import CreditCard
 
 
 # Create your models here.
