@@ -21,9 +21,9 @@ from django.urls import path, include
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("pages/", include("apps.pages.urls")),
+    path("", include("apps.pages.urls")),
     path("users/", include("apps.users.urls")),
     path("sessions/", include("apps.sessions.urls")),
     path("admins/", include("apps.admins.urls")),
-    path('accounts/', include('allauth.urls')),  # allauth URLs
+    path("accounts/", include("allauth.urls")),  # allauth URLs
 ] + debug_toolbar_urls()
