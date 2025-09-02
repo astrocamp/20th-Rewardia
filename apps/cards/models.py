@@ -49,11 +49,12 @@ class CreditCard(models.Model):
         美國運通 = "美國運通"
         渣打 = "渣打"
         陽信 = "陽信"
-        LINEBank = "LINE Bank"
+        LINE_Bank = "LINE Bank"
         將來 = "將來"
         元大 = "元大"
-        台中銀 = "台中銀"
+        台中 = "台中"
         王道 = "王道"
+        無 = "無"
 
     name = models.CharField("信用卡名稱", max_length=100)
     bank = models.CharField("銀行名稱", max_length=50, choices=Bank.choices)
@@ -100,4 +101,6 @@ class CreditCard(models.Model):
     def format_bank_name(self, bank_name):
         if re.search(r"(合作?金?庫)", bank_name):
             return "合庫"
+        if bank_name not in CreditCard.Bank.values:
+            return "無"
         return bank_name
