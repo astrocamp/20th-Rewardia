@@ -28,10 +28,10 @@
           placeholder="輸入銀行"
           required
         >
-          <option value="{{card.bank.id}}" selected>{{card.bank.name}}</option>
+          <option value="{{card.bank}}" selected>{{card.bank}}</option>
           {%for bank in banks%}
-            {%if bank.id != card.bank.id%}
-              <option value="{{bank.id}}">{{bank.name}}</option>
+            {%if card.bank != bank%}
+              <option value="{{bank}}">{{bank}}</option>
             {%endif%}
           {% endfor %}
         </select>
