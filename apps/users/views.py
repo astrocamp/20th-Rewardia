@@ -6,7 +6,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
-from apps.banks.models import Bank
+
+# from apps.banks.models import Bank
 from apps.cards.models import CreditCard
 from .models import UserCard
 
@@ -34,25 +35,25 @@ def prepare_card_form_context(
     user_card=None, is_edit_mode=False, include_selected_bank=False
 ):
     # 基本的context資料
-    banks = Bank.objects.filter(is_active=True).only("id", "name", "code")
-    cards = (
-        CreditCard.objects.filter(is_active=True)
-        .select_related("bank")
-        .only("id", "name", "bank__id", "bank__name")
-    )
+    # banks = Bank.objects.filter(is_active=True).only("id", "name", "code")
+    # cards = (
+    #     CreditCard.objects.filter(is_active=True)
+    #     .select_related("bank")
+    #     .only("id", "name", "bank__id", "bank__name")
+    # )
 
     context = {
-        "banks": banks,
-        "cards": cards,
+        # "banks": banks,
+        # "cards": cards,
         "user_card": user_card,
         "is_edit_mode": is_edit_mode,
     }
 
-    if include_selected_bank:
-        if is_edit_mode and user_card:
-            context["selected_bank"] = user_card.card.bank
-        else:
-            context["selected_bank"] = None
+    # if include_selected_bank:
+    #     if is_edit_mode and user_card:
+    #         context["selected_bank"] = user_card.card.bank
+    #     else:
+    #         context["selected_bank"] = None
 
     return context
 
@@ -71,32 +72,32 @@ def member_zone(request):
 
 # API 端點：根據銀行 ID 返回該銀行的所有信用卡（JSON 格式，給 Alpine.js 用）
 def get_cards_by_bank(request, bank_id):
-    try:
-        bank = Bank.objects.get(id=bank_id, is_active=True)
+    # try:
+    # bank = Bank.objects.get(id=bank_id, is_active=True)
 
-        # 取得該銀行的所有啟用信用卡
-        cards = (
-            CreditCard.objects.filter(bank=bank, is_active=True)
-            .only("id", "name")
-            .order_by("name")
-        )
+    # 取得該銀行的所有啟用信用卡
+    cards = (
+        # CreditCard.objects.filter(bank=bank, is_active=True)
+        # .only("id", "name")
+        # .order_by("name")
+    )
 
-        # 轉換為 JSON 格式
-        cards_data = [{"id": card.id, "name": card.name} for card in cards]
+    # 轉換為 JSON 格式
+    cards_data = [{"id": card.id, "name": card.name} for card in cards]
 
-        return JsonResponse(
-            {
-                "success": True,
-                "bank_name": bank.name,
-                "cards": cards_data,
-                "message": f"載入 {bank.name} 的 {len(cards_data)} 張信用卡",
-            }
-        )
+    return JsonResponse(
+        {
+            "success": True,
+            # "bank_name": bank.name,
+            "cards": cards_data,
+            # "message": f"載入 {bank.name} 的 {len(cards_data)} 張信用卡",
+        }
+    )
 
-    except Bank.DoesNotExist:
-        return JsonResponse(
-            {"success": False, "cards": [], "message": "找不到指定的銀行"}, status=404
-        )
+    # except Bank.DoesNotExist:
+    return JsonResponse(
+        {"success": False, "cards": [], "message": "找不到指定的銀行"}, status=404
+    )
 
 
 @login_required
@@ -112,25 +113,25 @@ def card_form(request, card_id=None):
     if request.method == "GET":
         # 顯示表單頁面 - 使用輔助函式準備context
         context = prepare_card_form_context(
-            user_card=user_card, is_edit_mode=is_edit_mode, include_selected_bank=True
+            # user_card=user_card, is_edit_mode=is_edit_mode, include_selected_bank=True
         )
         return render(request, "users/card_form.html", context)
 
     elif request.method == "POST":
         # 取得表單資料
-        bank_id = request.POST.get("bank_id")
+        # bank_id = request.POST.get("bank_id")
         card_id_from_form = request.POST.get("card_id")
 
         # 檢查資料完整性
-        if not bank_id or not card_id_from_form:
-            messages.error(request, "請選擇銀行和卡片")
-            # 使用輔助函式重新準備表單資料
-            context = prepare_card_form_context(
-                user_card=user_card,
-                is_edit_mode=is_edit_mode,
-                include_selected_bank=False,
-            )
-            return render(request, "users/card_form.html", context)
+        # if not bank_id or not card_id_from_form:
+        # messages.error(request, "請選擇銀行和卡片")
+        # 使用輔助函式重新準備表單資料
+        # context = prepare_card_form_context(
+        #     user_card=user_card,
+        #     is_edit_mode=is_edit_mode,
+        #     # include_selected_bank=False,
+        # )
+        # return render(request, "users/card_form.html", context)
 
         try:
             selected_card = CreditCard.objects.get(id=card_id_from_form, is_active=True)
@@ -214,7 +215,7 @@ def card_delete(request, card_id):
 
     if request.method == "POST":
         # 處理刪除請求
-        card_name = f"{user_card.card.bank.name} {user_card.card.name}"
+        # card_name = f"{user_card.card.bank.name} {user_card.card.name}"
         user_card.delete()
         messages.success(request, f"成功刪除 {card_name}！")
         return redirect("users:member_zone")
