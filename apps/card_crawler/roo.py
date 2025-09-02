@@ -21,10 +21,16 @@ sleep_time = random.uniform(0.7, 1.4)
 
 def save_data(data):
     content = ",".join(data["content"])
+    card_img = data["card_img"]
 
     crawled_card, created = CrawledData.objects.update_or_create(
         url=data["url"],
-        defaults={"content": content, "is_active": True, "deleted_at": None},
+        defaults={
+            "content": content,
+            "is_active": True,
+            "card_img": card_img,
+            "deleted_at": None,
+        },
     )
 
 
@@ -54,6 +60,11 @@ def get_card_info(driver, url):
             card_name = driver.find_element(
                 By.CSS_SELECTOR, 'h1[data-testid="product-title"]'
             ).text.strip()
+            card_img = driver.find_element(
+                By.CSS_SELECTOR, 'img[data-testid="product-logo"]'
+            ).get_attribute("src")
+
+            print(card_img)
 
         except WebDriverException as error:
             find_card_error = create_error_data(url, error)
@@ -85,7 +96,7 @@ def get_card_info(driver, url):
 
             try:
                 # 比較節省時間的等待方式，如果元素在5秒內還沒出現就會回傳錯誤
-                WebDriverWait(driver, 5).until(
+                WebDriverWait(driver, 10).until(
                     EC.visibility_of_all_elements_located((By.CLASS_NAME, "answer"))
                 )
             except TimeoutException as error:
@@ -100,10 +111,7 @@ def get_card_info(driver, url):
 
         try:
             # 將抓取到的資料整理成字典
-            crawled_data = {
-                "url": url,
-                "content": [],
-            }
+            crawled_data = {"url": url, "content": [], "card_img": card_img}
 
             driver.implicitly_wait(5)
             # 找到navbar和footer之間的所有h4, h5, li, p的元素
@@ -142,12 +150,9 @@ def crawl_roo_urls(driver):
     main_url_page = "https://roo.cash/creditcard/"
 
     try:
-        try:
-            driver.get(main_url_page)
-            # 在尋找物件前要等多久
-            driver.implicitly_wait(5)
-        except WebDriverException as error:
-            print(f"Error fetching main page: {error}")
+        driver.get(main_url_page)
+        # 在尋找物件前要等多久
+        driver.implicitly_wait(5)
 
         try:
             categories = driver.find_elements(
@@ -161,6 +166,9 @@ def crawl_roo_urls(driver):
 
         except WebDriverException as error:
             print(f"Error fetching element: {error}")
+
+    except WebDriverException as error:
+        print(f"Error fetching main page: {error}")
 
 
 # 抓所有卡的function
