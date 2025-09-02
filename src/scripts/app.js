@@ -1,28 +1,15 @@
 import Alpine from "alpinejs";
 import "htmx.org";
-import message from './components/message.js';
-import cardForm from './components/card_form.js';
-
-
-import faq from './components/faq.js';
-import login from './components/login.js';
-import register from './components/register.js';
-import subscribe from './components/subscribe.js';
+import message from "./components/message.js";
+import cardForm from "./components/card_form.js";
 
 window.Alpine = Alpine;
 
-Alpine.data('faq_accordion', faq);
-Alpine.data('login_form', login);
-Alpine.data('register_form', register);
-Alpine.data('subscribe_form', subscribe);
-window.Alpine = Alpine;
-
-Alpine.data('toast_fadeout', message);
-Alpine.data('card_form', cardForm);
-
+Alpine.data("toast_fadeout", message);
+Alpine.data("card_form", cardForm);
 
 // FAQ 頁面的 Alpine.js 功能
-Alpine.data('faq_accordion', () => ({
+Alpine.data("faq_accordion", () => ({
   openItem: null,
 
   toggleItem(itemId) {
@@ -35,19 +22,17 @@ Alpine.data('faq_accordion', () => ({
 
   isOpen(itemId) {
     return this.openItem === itemId;
-  }
+  },
 }));
 
-
-
 //  register.html
-Alpine.data('register_form', () => ({
+Alpine.data("register_form", () => ({
   formData: {
-    username: '',
-    email: '',
-    password: '',
-    confirm_password: '',
-    agree_terms: false
+    username: "",
+    email: "",
+    password: "",
+    confirm_password: "",
+    agree_terms: false,
   },
 
   errors: {},
@@ -58,20 +43,20 @@ Alpine.data('register_form', () => ({
   validateField(fieldName) {
     delete this.errors[fieldName];
 
-    switch(fieldName) {
-      case 'username':
+    switch (fieldName) {
+      case "username":
         this.validateUsername();
         break;
-      case 'email':
+      case "email":
         this.validateEmail();
         break;
-      case 'password':
+      case "password":
         this.validatePassword();
         break;
-      case 'confirm_password':
+      case "confirm_password":
         this.validateConfirmPassword();
         break;
-      case 'agree_terms':
+      case "agree_terms":
         this.validateAgreeTerms();
         break;
     }
@@ -81,12 +66,12 @@ Alpine.data('register_form', () => ({
     const username = this.formData.username.trim();
 
     if (!username) {
-      this.errors.username = '帳號為必填項目';
+      this.errors.username = "帳號為必填項目";
       return false;
     }
 
     if (!/^[a-zA-Z0-9]+$/.test(username)) {
-      this.errors.username = '帳號只能包含英文字母和數字，不能有空格或特殊字元';
+      this.errors.username = "帳號只能包含英文字母和數字，不能有空格或特殊字元";
       return false;
     }
 
@@ -97,13 +82,13 @@ Alpine.data('register_form', () => ({
     const email = this.formData.email.trim();
 
     if (!email) {
-      this.errors.email = '電子信箱為必填項目';
+      this.errors.email = "電子信箱為必填項目";
       return false;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      this.errors.email = '請輸入有效的電子信箱格式';
+      this.errors.email = "請輸入有效的電子信箱格式";
       return false;
     }
 
@@ -114,27 +99,27 @@ Alpine.data('register_form', () => ({
     const password = this.formData.password;
 
     if (!password) {
-      this.errors.password = '密碼為必填項目';
+      this.errors.password = "密碼為必填項目";
       return false;
     }
 
     if (password.length < 8 || password.length > 20) {
-      this.errors.password = '密碼長度必須在 8-20 個字元之間';
+      this.errors.password = "密碼長度必須在 8-20 個字元之間";
       return false;
     }
 
     if (!/^[a-zA-Z0-9]+$/.test(password)) {
-      this.errors.password = '密碼只能包含英文字母和數字，不能有空格或特殊字元';
+      this.errors.password = "密碼只能包含英文字母和數字，不能有空格或特殊字元";
       return false;
     }
 
     if (!/[A-Z]/.test(password)) {
-      this.errors.password = '密碼必須包含至少一個英文大寫字母';
+      this.errors.password = "密碼必須包含至少一個英文大寫字母";
       return false;
     }
 
     if (!/[a-z]/.test(password)) {
-      this.errors.password = '密碼必須包含至少一個英文小寫字母';
+      this.errors.password = "密碼必須包含至少一個英文小寫字母";
       return false;
     }
 
@@ -145,12 +130,12 @@ Alpine.data('register_form', () => ({
     const confirmPassword = this.formData.confirm_password;
 
     if (!confirmPassword) {
-      this.errors.confirm_password = '確認密碼為必填項目';
+      this.errors.confirm_password = "確認密碼為必填項目";
       return false;
     }
 
     if (confirmPassword !== this.formData.password) {
-      this.errors.confirm_password = '兩次輸入的密碼不一致，請重新確認';
+      this.errors.confirm_password = "兩次輸入的密碼不一致，請重新確認";
       return false;
     }
 
@@ -159,23 +144,19 @@ Alpine.data('register_form', () => ({
 
   validateAgreeTerms() {
     if (!this.formData.agree_terms) {
-      this.errors.agree_terms = '請勾選同意服務條款';
+      this.errors.agree_terms = "請勾選同意服務條款";
       return false;
     }
 
     return true;
   },
-
 }));
 
-
-
-
 // login.html
-Alpine.data('login_form', () => ({
+Alpine.data("login_form", () => ({
   formData: {
-    username: '',
-    password: ''
+    username: "",
+    password: "",
   },
 
   errors: {},
@@ -188,11 +169,11 @@ Alpine.data('login_form', () => ({
   validateField(fieldName) {
     delete this.errors[fieldName];
 
-    switch(fieldName) {
-      case 'username':
+    switch (fieldName) {
+      case "username":
         this.validateUsername();
         break;
-      case 'password':
+      case "password":
         this.validatePassword();
         break;
     }
@@ -202,7 +183,7 @@ Alpine.data('login_form', () => ({
     const username = this.formData.username.trim();
 
     if (!username) {
-      this.errors.username = '帳號為必填項目';
+      this.errors.username = "帳號為必填項目";
       return false;
     }
 
@@ -213,7 +194,7 @@ Alpine.data('login_form', () => ({
     const password = this.formData.password;
 
     if (!password) {
-      this.errors.password = '密碼為必填項目';
+      this.errors.password = "密碼為必填項目";
       return false;
     }
 
@@ -229,42 +210,41 @@ Alpine.data('login_form', () => ({
     if (isUsernameValid && isPasswordValid) {
       event.target.submit();
     }
-  }
+  },
 }));
 
-
 // footer.html  訂閱~尚未處理完
-Alpine.data('subscribe_form', () => ({
-  email: '',
+Alpine.data("subscribe_form", () => ({
+  email: "",
   isSubmitting: false,
-  message: '',
-  messageType: '',
+  message: "",
+  messageType: "",
   isValidEmail() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(this.email);
   },
 
   async submitForm() {
-    this.message = '';
-    this.messageType = '';
+    this.message = "";
+    this.messageType = "";
 
     if (!this.email.trim()) {
-      this.showMessage('請輸入 Email 地址。', 'error');
+      this.showMessage("請輸入 Email 地址。", "error");
       return;
     }
 
     if (!this.isValidEmail()) {
-      this.showMessage('請輸入有效的 Email 地址。', 'error');
+      this.showMessage("請輸入有效的 Email 地址。", "error");
       return;
     }
     this.isSubmitting = true;
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      this.showMessage('感謝您的訂閱！我們將儘快為您提供服務。', 'success');
-      this.email = '';
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      this.showMessage("感謝您的訂閱！我們將儘快為您提供服務。", "success");
+      this.email = "";
     } catch (error) {
-      this.showMessage('訂閱失敗，請稍後再試。', 'error');
+      this.showMessage("訂閱失敗，請稍後再試。", "error");
     } finally {
       this.isSubmitting = false;
     }
@@ -275,10 +255,10 @@ Alpine.data('subscribe_form', () => ({
     this.messageType = type;
 
     setTimeout(() => {
-      this.message = '';
-      this.messageType = '';
+      this.message = "";
+      this.messageType = "";
     }, 3000);
-  }
+  },
 }));
 
 Alpine.start();
