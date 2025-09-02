@@ -609,7 +609,7 @@ class BankCardExtractor:
         return matches[0] if matches else None
 
     def extract_card_name(self, text):
-        first_space = text.find(" ")
+        first_space = text.find("")
         if first_space == -1:
             return None
 
@@ -636,7 +636,7 @@ class BankCardExtractor:
 
         if not card_name:
             card_name = self.extract_card_name(text)
-        return [bank_name, card_name]
+        return [bank_name, f"{bank_name} {card_name}"]
 
 
 class RewardRateExtractor:
