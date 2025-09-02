@@ -2,7 +2,7 @@ import spacy
 import re
 import time
 import json
-from config import NLPConfig
+from .config import NLPConfig
 
 
 def load_config(config_path=None):

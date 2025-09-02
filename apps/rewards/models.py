@@ -131,3 +131,56 @@ class RewardCategory(models.Model):
         return True
 
 
+class PendingReward(models.Model):
+    """待審核的回饋規則"""
+
+    class Status(models.TextChoices):
+        PENDING = "PENDING", "待審核"
+        APPROVED = "APPROVED", "已通過"
+        REJECTED = "REJECTED", "已拒絕"
+
+    # 關聯
+    card = models.ForeignKey(
+        CreditCard,
+        on_delete=models.CASCADE,
+        related_name="pending_rewards",
+        verbose_name="信用卡",
+    )
+
+    # NLP 提取資料
+    nlp_category = models.CharField("NLP分類", max_length=50)
+    nlp_scope = models.CharField("NLP範圍", max_length=50)
+    extracted_sentence = models.TextField("提取句子")
+    confidence = models.DecimalField("信心度", max_digits=4, decimal_places=3)
+    min_rate = models.DecimalField(
+        "最低回饋率", max_digits=4, decimal_places=2, null=True, blank=True
+    )
+    max_rate = models.DecimalField(
+        "最高回饋率", max_digits=4, decimal_places=2, null=True, blank=True
+    )
+    reward_type = models.CharField("回饋類型", max_length=20)
+
+    # 審核狀態
+    status = models.CharField(
+        "審核狀態", max_length=10, choices=Status.choices, default=Status.PENDING
+    )
+
+    # 時間戳記
+    created_at = models.DateTimeField("建立時間", auto_now_add=True)
+
+    class Meta:
+        db_table = "pending_rewards"
+        verbose_name = "待審核回饋規則"
+        verbose_name_plural = "待審核回饋規則"
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["status"], name="pending_rewards_status_idx"),
+            models.Index(fields=["card"], name="pending_rewards_card_idx"),
+            models.Index(fields=["-created_at"], name="pending_rewards_date_idx"),
+        ]
+
+    def __str__(self):
+        rate_display = self.min_rate or self.max_rate or "未知"
+        return (
+            f"{self.card.name} - {self.nlp_category}/{self.nlp_scope}: {rate_display}%"
+        )

@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from apps.cards.models import CreditCard
-from apps.cards.models import Bank
+
+# from apps.cards.models import Bank
 from django.contrib import messages
 from django.views.decorators.http import require_POST, require_http_methods
 from django.http import HttpResponse
@@ -23,11 +24,11 @@ def cards(request):
 
 
 def new_card(request):
-    banks = Bank.objects.filter(is_active=True)
+    # banks = Bank.objects.filter(is_active=True)
     card_networks = CreditCard.CardNetwork
     card_types = CreditCard.CardType
     card_form_data = {
-        "banks": banks,
+        # "banks": banks,
         "card_networks": card_networks,
         "card_types": card_types,
     }
@@ -36,7 +37,7 @@ def new_card(request):
         name = request.POST.get("card")
 
         bank_id = request.POST["bank"]
-        bank = get_object_or_404(Bank, id=bank_id)
+        # bank = get_object_or_404(Bank, id=bank_id)
 
         card_network = request.POST["network"]
         card_type = request.POST["card_type"]
@@ -44,8 +45,8 @@ def new_card(request):
 
         try:
             new_card = CreditCard.objects.create(
-                name=f"{bank.name} {name}",
-                bank=bank,
+                # name=f"{bank.name} {name}",
+                # bank=bank,
                 card_network=card_network,
                 card_type=card_type,
                 is_active=is_active,
@@ -62,14 +63,14 @@ def new_card(request):
 @require_http_methods(["GET"])
 def edit_card(request, id):
     card = get_object_or_404(CreditCard, pk=id)
-    banks = Bank.objects.filter(is_active=True)
+    # banks = Bank.objects.filter(is_active=True)
     card_networks = CreditCard.CardNetwork
     card_types = CreditCard.CardType
     return render(
         request,
         "admins/edit_card_row.html",
         {
-            "banks": banks,
+            # "banks": banks,
             "card_networks": card_networks,
             "card_types": card_types,
             "card": card,
@@ -84,7 +85,7 @@ def update_card(request, id):
 
     # 因為是foreign key，所以要從Bank那裡的資料庫取得資料
     bank_id = request.POST["bank_edit"]
-    card.bank = get_object_or_404(Bank, id=bank_id)
+    # card.bank = get_object_or_404(Bank, id=bank_id)
 
     card.card_network = request.POST["network_edit"]
     card.card_type = request.POST["card_type_edit"]

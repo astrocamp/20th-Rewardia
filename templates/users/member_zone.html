@@ -75,7 +75,7 @@
           {% for user_card in user_cards %}
           <div class="member-card-item">
             <div class="member-card-info">
-              <h4 class="member-card-name">{{ user_card.card.bank.name }}{{ user_card.card.name }}</h4>
+              <h4 class="member-card-name">{{ credit_cards.bank }}{{ user_card.card.name }}</h4>
               <p class="member-card-bank">{{ user_card.card.bank.name }}</p>
             </div>
             <div class="member-card-actions">

@@ -439,7 +439,7 @@ class NLPConfig:
             },
             "test_parameters": {
                 "min_test_cards": 30,
-                "max_test_cards": 31,
+                "max_test_cards": 36,
                 "json_file_path": "apps/nlp_validation/crawler_data_202508281713.json",
                 "fallback_test_data": [
                     "泰 KOKO (COMBO)悠遊聯名卡（停發）,國泰 KOKO (COMBO)悠遊聯名卡（停發）評價好嗎？真實回饋攻略讓達人告訴你,5 大權益天天切換，指定消費 3% 起，回饋無上限"

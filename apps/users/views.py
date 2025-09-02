@@ -5,7 +5,8 @@ from .services import UserRegistrationService
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
-from apps.banks.models import Bank
+
+# from apps.banks.models import Bank
 from apps.cards.models import CreditCard
 from .models import UserCard
 
@@ -33,7 +34,7 @@ def prepare_card_form_context(
     user_card=None, is_edit_mode=False, include_selected_bank=False
 ):
     # 基本的context資料
-    banks = Bank.objects.filter(is_active=True).only("id", "name", "code")
+    # banks = Bank.objects.filter(is_active=True).only("id", "name", "code")
     cards = (
         CreditCard.objects.filter(is_active=True)
         .select_related("bank")
@@ -41,7 +42,7 @@ def prepare_card_form_context(
     )
 
     context = {
-        "banks": banks,
+        # "banks": banks,
         "cards": cards,
         "user_card": user_card,
         "is_edit_mode": is_edit_mode,
@@ -69,33 +70,33 @@ def member_zone(request):
 
 
 # API 端點：根據銀行 ID 返回該銀行的所有信用卡（JSON 格式，給 Alpine.js 用）
-def get_cards_by_bank(request, bank_id):
-    try:
-        bank = Bank.objects.get(id=bank_id, is_active=True)
+# def get_cards_by_bank(request, bank_id):
+# try:
+# bank = Bank.objects.get(id=bank_id, is_active=True)
 
-        # 取得該銀行的所有啟用信用卡
-        cards = (
-            CreditCard.objects.filter(bank=bank, is_active=True)
-            .only("id", "name")
-            .order_by("name")
-        )
+# 取得該銀行的所有啟用信用卡
+# cards = (
+#     # CreditCard.objects.filter(bank=bank, is_active=True)
+#     .only("id", "name")
+#     .order_by("name")
+# )
 
-        # 轉換為 JSON 格式
-        cards_data = [{"id": card.id, "name": card.name} for card in cards]
+# 轉換為 JSON 格式
+# cards_data = [{"id": card.id, "name": card.name} for card in cards]
 
-        return JsonResponse(
-            {
-                "success": True,
-                "bank_name": bank.name,
-                "cards": cards_data,
-                "message": f"載入 {bank.name} 的 {len(cards_data)} 張信用卡",
-            }
-        )
+# return JsonResponse(
+#     {
+#         "success": True,
+#         "bank_name": bank.name,
+#         "cards": cards_data,
+#         "message": f"載入 {bank.name} 的 {len(cards_data)} 張信用卡",
+#     }
+# )
 
-    except Bank.DoesNotExist:
-        return JsonResponse(
-            {"success": False, "cards": [], "message": "找不到指定的銀行"}, status=404
-        )
+# except Bank.DoesNotExist:
+#     return JsonResponse(
+#         {"success": False, "cards": [], "message": "找不到指定的銀行"}, status=404
+#     )
 
 
 @login_required
