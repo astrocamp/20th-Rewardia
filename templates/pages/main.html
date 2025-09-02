@@ -40,7 +40,7 @@
 </section>
 
 <!-- 卡片總覽區塊 -->
-<section class="mx-4 sm:mx-6 lg:mx-10 my-8 sm:my-12 lg:my-16" x-data="main_search()">
+<section class="mx-4 sm:mx-6 lg:mx-10 my-8 sm:my-12 lg:my-16" x-data="main_search">
   <!-- 卡片總覽標題 -->
   <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-8 sm:mb-12 text-left font-kulim-park leading-tight-custom">
     卡片總覽
@@ -50,15 +50,13 @@
   <div class="mb-8">
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
       <div class="flex flex-col sm:flex-row">
-        <!-- 選擇信用卡 -->
+        <!-- 選擇銀行 -->
         <div class="flex-1 border-b sm:border-b-0 sm:border-r border-gray-200">
           <select x-model="selectedBank" @change="onBankChange" class="horizontal-search-select" style="height: 80px; padding: 20px 16px; cursor: pointer;">
             <option value="">選擇銀行</option>
-            <option value="fubon">富邦銀行</option>
-            <option value="ctbc">中國信託</option>
-            <option value="cathay">國泰世華</option>
-            <option value="line">LINE Bank</option>
-            <option value="shanghai">上海商銀</option>
+            <template x-for="bank in banks" :key="bank.code">
+              <option :value="bank.name" x-text="bank.name"></option>
+            </template>
           </select>
         </div>
         
@@ -66,14 +64,9 @@
         <div class="flex-1 border-b sm:border-b-0 sm:border-r border-gray-200">
           <select x-model="selectedReward" @change="onRewardChange" class="horizontal-search-select" style="height: 80px; padding: 20px 16px; cursor: pointer;">
             <option value="">選擇優惠類別</option>
-            <option value="domestic">國內消費</option>
-            <option value="overseas">海外消費</option>
-            <option value="cashback">現金回饋</option>
-            <option value="points">紅利點數</option>
-            <option value="food">美食饗宴</option>
-            <option value="travel">旅遊探索</option>
-            <option value="shopping">購物禮遇</option>
-            <option value="digital">數位生活</option>
+            <template x-for="[code, display] in rewardCategoriesChoices" :key="code">
+              <option :value="code" x-text="display"></option>
+            </template>
           </select>
         </div>
         
@@ -144,3 +137,4 @@
 </section>
 
 {% endblock %}
+

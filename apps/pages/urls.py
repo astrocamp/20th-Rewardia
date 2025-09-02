@@ -4,8 +4,8 @@ from . import views
 
 app_name = "pages"
 urlpatterns = [
-    path("", views.download, name="download"),
-    path("main/", views.main, name="main"),
+    path("download/", views.download, name="download"),
+    path("", views.main, name="main"),
     path("faq/", views.faq, name="faq"),
     path("calculator/", views.calculator, name="calculator"),
     path("login/", views.login, name="login"),
@@ -22,4 +22,5 @@ urlpatterns = [
     ),
     path("get-messages/", views.get_messages, name="get_messages"),
     path("calculate-reward/", views.calculate_reward, name="calculate_reward"),
+    path("api/main-data/", views.get_main_data, name="get_main_data"),
 ]
