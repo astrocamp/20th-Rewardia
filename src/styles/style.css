@@ -56,44 +56,26 @@
   /* ========== faq與 download共用樣式 ========== */
   /* faq與 download共用 */
   .download-btn-primary {
-    @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-[#2060B9] hover:bg-blue-700;
-    width: 100%;
-    min-height: 3rem;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
-    max-width: 16rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
+    @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-blue-600 hover:bg-blue-700 w-full min-h-12 shadow-sm max-w-64 inline-flex items-center justify-center no-underline;
   }
 
   /* faq與 download共用 */
   .download-btn-primary:hover {
-    transform: translateY(-0.125rem);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    @apply -translate-y-0.5 shadow-lg;
   }
 
   /* faq與 download共用 */
   .download-btn-secondary {
-    @apply text-black px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-white hover:bg-gray-100;
-    width: 100%;
-    min-height: 3rem;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
-    max-width: 16rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
+    @apply text-black px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-white hover:bg-gray-100 w-full min-h-12 shadow-sm max-w-64 inline-flex items-center justify-center no-underline;
   }
 
   /* faq與 download共用 */
   .download-btn-secondary:hover {
-    transform: translateY(-0.125rem);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    @apply -translate-y-0.5 shadow-lg;
   }
 
   .download-btn-chrome {
-    @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-[#111827] hover:bg-gray-800;
+    @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-gray-900 hover:bg-gray-800;
     width: 100%;
     min-height: 3rem;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
@@ -106,7 +88,7 @@
   }
 
   .download-btn-app {
-    @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-[#111827] hover:bg-gray-800;
+    @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-gray-900 hover:bg-gray-800;
     width: 100%;
     min-height: 3rem;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
@@ -120,8 +102,7 @@
 
   /* faq與 download共用 */
   .download-btn-banner {
-    max-width: 15rem !important;
-    min-width: 15rem;
+    @apply max-w-60 min-w-60;
   }
 
   /* ========== Download Page 特定樣式 ========== */
@@ -190,8 +171,7 @@
     }
 
     .download-btn-banner {
-      max-width: none !important;
-      min-width: auto;
+      @apply max-w-none min-w-0;
     }
 
     .download-banner-content {
@@ -237,8 +217,7 @@
   /* Download Page 平板版響應式樣式 (641px-768px) */
   @media (min-width: 641px) and (max-width: 768px) {
     .download-btn-banner {
-      max-width: 12rem !important;
-      min-width: 12rem;
+      @apply max-w-48 min-w-48;
     }
 
     .download-banner-content {
@@ -258,8 +237,7 @@
   /* Download Page 中等桌面版響應式樣式 (769px-1024px) */
   @media (min-width: 769px) and (max-width: 1024px) {
     .download-btn-banner {
-      max-width: 13rem !important;
-      min-width: 13rem;
+      @apply max-w-52 min-w-52;
     }
 
     .download-banner-content {
@@ -275,8 +253,7 @@
   /* Download Page 大桌面版響應式樣式 (≥1025px) */
   @media (min-width: 1025px) {
     .download-btn-banner {
-      max-width: 15rem !important;
-      min-width: 15rem;
+      @apply max-w-60 min-w-60;
     }
 
     .download-banner-content {
@@ -291,13 +268,13 @@
 
   /* ========== FAQ Page 專用樣式 ========== */
   .faq-feature-card {
-    @apply bg-[#E5E7EB] rounded-lg relative overflow-hidden;
+    @apply bg-gray-200 rounded-lg relative overflow-hidden;
     min-height: 327px;
   }
 
   /* FAQ 功能卡片圖片區域 */
   .faq-feature-bg {
-    @apply w-full h-[320px] bg-[#E5E7EB] rounded-t-lg;
+    @apply w-full h-[320px] bg-gray-200 rounded-t-lg;
   }
 
   /* FAQ 功能卡片圖片預留空間 */
@@ -308,7 +285,7 @@
 
   /* FAQ 功能卡片數字樣式 */
   .faq-feature-number {
-    @apply w-12 h-12 bg-[#2060B9] text-white rounded-full flex items-center justify-center text-3xl font-bold;
+    @apply w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center text-3xl font-bold;
     font-family: 'Kulim Park', sans-serif;
     line-height: 0.98;
     margin-right: 1rem;
@@ -333,7 +310,7 @@
 
   /* FAQ 分類標題樣式 */
   .faq-category-title {
-    @apply text-2xl font-bold text-[#5D6970] mb-6;
+    @apply text-2xl font-bold text-gray-600 mb-6;
     font-family: 'Inter', sans-serif;
     line-height: 1.21;
     background: none;
@@ -348,7 +325,7 @@
 
   /* FAQ Q&A 項目樣式 */
   .faq-qa-item {
-    @apply bg-white rounded-lg border border-[#D1D5DB] overflow-hidden;
+    @apply bg-white rounded-lg border border-gray-300 overflow-hidden;
     min-height: 60px;
   }
 
@@ -360,7 +337,7 @@
   }
 
   .faq-question-text {
-    @apply text-lg font-bold text-[#111827] flex-1 pr-4;
+    @apply text-lg font-bold text-gray-900 flex-1 pr-4;
     font-family: 'Inter', sans-serif;
     line-height: 1.21;
     cursor: default;
@@ -385,7 +362,7 @@
 
   /* FAQ 答案樣式 */
   .faq-answer {
-    @apply p-4 border-t border-[#D1D5DB] bg-white;
+    @apply p-4 border-t border-gray-300 bg-white;
     min-height: 20px;
   }
 
@@ -394,7 +371,7 @@
   }
 
   .faq-answer-text {
-    @apply text-lg text-[#111827] leading-relaxed;
+    @apply text-lg text-gray-900 leading-relaxed;
     font-family: 'Inter', sans-serif;
     line-height: 1.5;
   }
@@ -403,8 +380,7 @@
   @media (max-width: 640px) {
     /* faq與 download共用 */
     .download-btn-banner {
-      max-width: 100% !important;
-      min-width: auto;
+      @apply max-w-full min-w-0;
     }
 
     .faq-feature-card {
@@ -547,7 +523,7 @@
   }
 
   .form-card-bg {
-    @apply bg-[#F9F9F9] rounded-lg p-5 md:p-6;
+    @apply bg-gray-50 rounded-lg p-5 md:p-6;
   }
 
   /* ========== 表單標題列 ========== */
@@ -556,7 +532,7 @@
   }
 
   .form-title {
-    @apply text-[24px] leading-[1.21] font-bold text-[#5D6970];
+    @apply text-2xl leading-relaxed font-bold text-gray-600;
   }
 
   .clear-btn {
@@ -588,7 +564,7 @@
   }
 
   .field-label {
-    @apply block text-[18px] text-[#111827] mb-2 font-normal;
+    @apply block text-lg text-gray-900 mb-2 font-normal;
   }
 
   /* 只給需要必填的加 .required */
@@ -608,16 +584,16 @@
   }
 
   .ui-btn-primary {
-    @apply bg-[#2060B9] text-white;
+    @apply bg-blue-600 text-white;
   }
   .ui-btn-primary:hover {
-    @apply bg-[#1c55a4];
+    @apply bg-blue-700;
   }
   .ui-btn-primary:active {
-    @apply bg-[#184a90];
+    @apply bg-blue-800;
   }
   .ui-btn-primary:disabled {
-    @apply bg-[#9BB6DD] cursor-not-allowed opacity-70;
+    @apply bg-blue-300 cursor-not-allowed opacity-70;
   }
 
   .ui-btn-secondary {
@@ -669,7 +645,7 @@
   }
 
   .disclaimer-list {
-    @apply text-[#5D6970] text-base leading-6 list-disc pl-5;
+    @apply text-gray-600 text-base leading-6 list-disc pl-5;
   }
 
   /* ========== 動作按鈕區 ========== */
@@ -707,7 +683,7 @@
   }
 
   .member-section-bg {
-    @apply bg-[#F9F9F9] rounded-lg p-5 md:p-6;
+    @apply bg-gray-50 rounded-lg p-5 md:p-6;
   }
 
   /* 區塊標題列 */
@@ -716,7 +692,7 @@
   }
 
   .member-section-title {
-    @apply text-2xl font-bold text-[#5D6970];
+    @apply text-2xl font-bold text-gray-600;
   }
 
   /* 會員資訊網格 */
@@ -730,15 +706,15 @@
   }
 
   .member-info-label {
-    @apply text-lg font-bold text-[#111827];
+    @apply text-lg font-bold text-gray-900;
   }
 
   .member-info-value {
-    @apply text-base text-[#111827];
+    @apply text-base text-gray-900;
   }
 
   .member-info-empty {
-    @apply text-[#111827] opacity-70;
+    @apply text-gray-900 opacity-70;
   }
 
   /* 卡片列表（垂直排列，按照 Figma 設計） */
@@ -766,11 +742,11 @@
   }
 
   .member-card-name {
-    @apply text-2xl font-bold text-[#111827] mb-1;
+    @apply text-2xl font-bold text-gray-900 mb-1;
   }
 
   .member-card-bank {
-    @apply text-base text-[#111827];
+    @apply text-base text-gray-900;
   }
 
   .member-card-actions {
@@ -784,7 +760,7 @@
   }
 
   .ui-btn-small-dark {
-    @apply bg-[#111827] text-white;
+    @apply bg-gray-900 text-white;
   }
   .ui-btn-small-dark:hover {
     @apply bg-gray-700;
@@ -794,7 +770,7 @@
   }
 
   .ui-btn-small-gray {
-    @apply bg-gray-200 text-[#111827];
+    @apply bg-gray-200 text-gray-900;
   }
   .ui-btn-small-gray:hover {
     @apply bg-gray-300;
@@ -815,7 +791,7 @@
   }
 
   .member-empty-text {
-    @apply text-2xl text-[#949AA6] font-normal;
+    @apply text-2xl text-gray-400 font-normal;
   }
 
   /* ========== 會員專區 RWD 調整 ========== */
@@ -960,20 +936,20 @@
   /* 修復新增卡片頁面樣式，*/
   /* 修復新增卡片背景容器 */
   .add-card-bg {
-    @apply bg-[#F9F9F9] rounded-lg;
+    @apply bg-gray-50 rounded-lg;
     padding: 20px 21px 32px 21px; /* 符合 Figma 設計的 padding */
     min-height: 407px; /* 符合 Figma 設計高度 */
   }
 
   /* 新增卡片標題樣式 */
   .add-card-title {
-    @apply text-2xl font-bold text-[#5D6970] mb-[14px];
+    @apply text-2xl font-bold text-gray-600 mb-3.5;
     line-height: 1.21; /* 符合 Figma 設計 */
   }
 
   /* 新增卡片標題區域 */
   .add-card-header {
-    @apply mb-10 pb-[14px] border-b border-[#D1D5DB];
+    @apply mb-10 pb-3.5 border-b border-gray-300;
   }
 
   /* 修復表單欄位容器 */
