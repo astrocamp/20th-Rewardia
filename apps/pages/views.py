@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from .data.faq_content import FAQ_DATA
 from apps.cards.models import CreditCard
-from apps.rewards.models import RewardCategory
-from django.http import HttpResponse
+from apps.rewards.models import PendingReward, RewardCategory
+from django.http import HttpResponse, JsonResponse # Added JsonResponse
+from django.db.models import Prefetch
+import json
 
 
 def download(request):
@@ -11,6 +13,98 @@ def download(request):
 
 def main(request):
     return render(request, "pages/main.html")
+
+
+def get_main_data(request):
+    # 直接查詢所有活躍的信用卡
+    cards = CreditCard.objects.filter(is_active=True)
+
+    all_cards_data = []
+    for card in cards:
+        rewards_data = []
+        
+        # 處理已確認的回饋類別 (reward_categories 表格)
+        confirmed_rewards = RewardCategory.objects.filter(card=card)
+        for reward in confirmed_rewards:
+            rate_display = f"{reward.rate}%"
+            limit_text = ""
+            
+            # 組合限制條件文字
+            if reward.max_spending:
+                limit_text += f"上限 ${reward.max_spending:,.0f}"
+            if reward.requires_activation:
+                limit_text += " (需登錄)" if limit_text else "需登錄"
+            if reward.is_rotating:
+                limit_text += " (季度輪替)" if limit_text else "季度輪替"
+                
+            rewards_data.append({
+                'category': reward.get_category_display(),
+                'rate': rate_display,
+                'limit': limit_text,
+                'category_code': reward.category,
+                'source': 'confirmed'
+            })
+        
+        # 處理待審核回饋 (pending_rewards 表格)
+        pending_rewards = PendingReward.objects.filter(card=card)
+        for reward in pending_rewards:
+            rate_display = ""
+            if reward.max_rate is not None:
+                rate_display = f"{reward.max_rate}%"
+            elif reward.min_rate is not None:
+                rate_display = f"{reward.min_rate}%"
+            else:
+                rate_display = "N/A"
+
+            rewards_data.append({
+                'category': f"{reward.nlp_category} ({reward.nlp_scope})",
+                'rate': rate_display,
+                'limit': reward.extracted_sentence,
+                'category_code': reward.nlp_category,
+                'source': 'pending'
+            })
+
+        # 卡片模型中沒有圖片欄位，這裡使用 placeholder 圖片
+        all_cards_data.append({
+            'id': card.id,
+            'name': card.name,
+            'bank': card.bank,
+            'card_type': card.get_card_type_display() if card.card_type else '',
+            'card_network': card.get_card_network_display() if card.card_network else '',
+            'foreign_fee': float(card.foreign_transaction_fee) if card.foreign_transaction_fee else 0,
+            'image': f'https://via.placeholder.com/300x180.png?text={card.name.replace(" ", "+")}',
+            'rewards': rewards_data[:6]  # 增加顯示數量以包含更多回饋資訊
+        })
+
+    # 獲取所有不重複的銀行名稱，用於篩選下拉選單
+    banks_data = list(CreditCard.objects.filter(is_active=True).values_list('bank', flat=True).distinct().order_by('bank'))
+    
+    # 將銀行資料轉換為前端需要的格式
+    banks = [{'code': bank.lower().replace(' ', '_'), 'name': bank} for bank in banks_data]
+
+    # 獲取回饋類別選項 - 專注由 rewards_pendingreward 的 nlp_category 欄位獲取
+    pending_categories = list(PendingReward.objects.exclude(nlp_category__isnull=True).exclude(nlp_category__exact='').values_list('nlp_category', flat=True).distinct())
+    
+    reward_categories_choices = []
+    reward_category_map = {}
+    
+    for category in pending_categories:
+        # 為每個類別創建一個唯一的 code 供前端使用
+        category_code = category.upper().replace(' ', '_').replace('/', '_')
+        if category_code not in reward_category_map:
+            reward_categories_choices.append((category_code, category))
+            reward_category_map[category_code] = category
+
+    response_data = {
+        'all_cards_data': all_cards_data,
+        'banks': banks,
+        'reward_categories_choices': reward_categories_choices,
+        'reward_category_map': reward_category_map,
+    }
+    return JsonResponse(response_data, safe=False)
+
+
+
 
 
 def calculator(request):
@@ -97,14 +191,6 @@ def get_scopes_by_category(request):
 def faq(request):
     context = {"faq_categories": FAQ_DATA["categories"]}
     return render(request, "pages/faq.html", context)
-
-
-def register(request):
-    return render(request, "users/register.html")
-
-
-def login(request):
-    return render(request, "users/login.html")
 
 
 def calculate_reward(request):
