@@ -19,8 +19,8 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("name", models.TextField(verbose_name="信用卡名稱")),
-                ("bank", models.CharField(max_length=20, verbose_name="銀行名稱")),
+                ("name", models.TextField(max_length=10)),
+                ("bank", models.CharField(max_length=20)),
                 (
                     "is_active",
                     models.BooleanField(default=True, verbose_name="Is Active"),

@@ -130,10 +130,15 @@ class RewardCategory(models.Model):
 
         return True
 
-
 class PendingReward(models.Model):
     """待審核的回饋規則"""
 
+<<<<<<< HEAD
+class PendingReward(models.Model):
+    """待審核的回饋規則"""
+
+=======
+>>>>>>> f2ae75d (新資料庫狀態暫存)
     class Status(models.TextChoices):
         PENDING = "PENDING", "待審核"
         APPROVED = "APPROVED", "已通過"
