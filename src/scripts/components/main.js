@@ -2,6 +2,7 @@
 export default () => ({
   selectedBank: '',
   selectedReward: '',
+  searchKeyword: '',
   displayCards: [],
   allCards: [],
   originalCards: [], 
@@ -57,7 +58,8 @@ export default () => ({
   
   // 執行搜尋
   performSearch() {
-    if (!this.selectedBank && !this.selectedReward) {
+    // Trigger search if any filter is used
+    if (!this.selectedBank && !this.selectedReward && !this.searchKeyword.trim()) {
       this.allCards = [...this.originalCards];
       this.loadedCount = Math.min(3, this.allCards.length);
       this.updateDisplayCards();
@@ -69,14 +71,14 @@ export default () => ({
     setTimeout(() => {
       let filteredCards = [...this.originalCards]; 
       
-      // 根據銀行篩選
+      // Filter by bank
       if (this.selectedBank) {
         filteredCards = filteredCards.filter(card => 
           card.bank === this.selectedBank
         );
       }
       
-      // 根據優惠類型篩選
+      // Filter by reward category dropdown
       if (this.selectedReward) {
         const selectedCategoryDisplay = this.rewardCategoryMap[this.selectedReward];
         filteredCards = filteredCards.filter(card =>
@@ -84,9 +86,22 @@ export default () => ({
             reward.category.includes(selectedCategoryDisplay)
           )
         );
-        
-        // 將符合條件的優惠排到第一個
+      }
+
+      // Filter by keyword (fuzzy search on reward category)
+      if (this.searchKeyword && this.searchKeyword.trim() !== '') {
+        const keyword = this.searchKeyword.trim().toLowerCase();
+        filteredCards = filteredCards.filter(card =>
+          card.rewards.some(reward =>
+            reward.category.toLowerCase().includes(keyword)
+          )
+        );
+      }
+
+      // 將符合條件的優惠排到第一個
+      if (this.selectedReward) {
         filteredCards = filteredCards.map(card => {
+          const selectedCategoryDisplay = this.rewardCategoryMap[this.selectedReward];
           const matchingRewards = card.rewards.filter(reward =>
             reward.category.includes(selectedCategoryDisplay)
           );
