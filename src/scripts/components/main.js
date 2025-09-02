@@ -13,9 +13,14 @@ export default () => ({
   rewardCategoryMap: {},
   rewardCategoriesChoices: [], // New property for reward choices
   banks: [], // New property for banks
+  viewMode: 'grid', // 'grid' for card view (畫面b), 'list' for search results (畫面a)
+  gridCards: [], // Cards to display in grid view
+  gridLoadedCount: 9, // Number of cards loaded in grid view
+  gridLoadIncrement: 6, // Load 6 more cards each time in grid view
   
   // 使用 API 獲取資料進行初始化
   async init() {
+    console.log('Initializing main component, viewMode:', this.viewMode);
     try {
       const response = await fetch('/api/main-data/');
       if (!response.ok) {
@@ -29,12 +34,53 @@ export default () => ({
       this.rewardCategoriesChoices = data.reward_categories_choices; // Populate reward choices
       this.banks = data.banks; // Populate banks from API
       
+      this.setupGridView();
       this.displayRandomCards();
     } catch (error) {
       console.error("Error fetching initial data:", error);
       // Handle error, e.g., display an error message to the user
     } finally {
       this.isLoading = false;
+    }
+  },
+  
+  // 設定網格視圖的卡片
+  setupGridView() {
+    console.log('Setting up grid view, allCards length:', this.allCards.length);
+    const shuffled = [...this.allCards].sort(() => 0.5 - Math.random());
+    this.allCards = shuffled; // Update allCards with shuffled order for grid view
+    this.gridLoadedCount = Math.min(9, this.allCards.length);
+    this.updateGridCards();
+    console.log('Grid cards set:', this.gridCards.length);
+  },
+  
+  // 更新網格視圖顯示的卡片
+  updateGridCards() {
+    this.gridCards = this.allCards.slice(0, this.gridLoadedCount);
+  },
+  
+  // 載入更多網格卡片
+  loadMoreGridCards() {
+    if (this.gridLoadedCount >= this.allCards.length) {
+      return;
+    }
+    
+    this.gridLoadedCount = Math.min(this.gridLoadedCount + this.gridLoadIncrement, this.allCards.length);
+    this.updateGridCards();
+  },
+  
+  // 檢查網格視圖是否還有更多卡片
+  hasMoreGridCards() {
+    return this.gridLoadedCount < this.allCards.length;
+  },
+  
+  // 網格視圖滾動監聽處理
+  handleGridScroll(event) {
+    const element = event.target;
+    const threshold = 100;
+    
+    if (element.scrollTop + element.clientHeight >= element.scrollHeight - threshold) {
+      this.loadMoreGridCards();
     }
   },
   
@@ -49,23 +95,31 @@ export default () => ({
   // 銀行選擇變更
   onBankChange() {
     console.log('Bank changed:', this.selectedBank);
+    this.performSearch();
   },
   
   // 優惠選擇變更
   onRewardChange() {
     console.log('Reward changed:', this.selectedReward);
+    this.performSearch();
   },
   
   // 執行搜尋
   performSearch() {
-    // Trigger search if any filter is used
-    if (!this.selectedBank && !this.selectedReward && !this.searchKeyword.trim()) {
+    // Check if any search criteria is active
+    const hasSearchCriteria = this.selectedBank || this.selectedReward || this.searchKeyword.trim();
+    
+    if (!hasSearchCriteria) {
+      // No search criteria - return to grid view
+      this.viewMode = 'grid';
       this.allCards = [...this.originalCards];
       this.loadedCount = Math.min(3, this.allCards.length);
       this.updateDisplayCards();
       return;
     }
     
+    // Switch to list view for search results
+    this.viewMode = 'list';
     this.isLoading = true;
     
     setTimeout(() => {

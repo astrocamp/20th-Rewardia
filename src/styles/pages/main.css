@@ -58,11 +58,11 @@
   }
   
   .card-name {
-    @apply text-lg font-bold text-dark-gray mb-1 truncate;
+    @apply text-lg font-bold text-gray-700 mb-1 truncate;
   }
   
   .card-bank {
-    @apply text-sm text-muted;
+    @apply text-sm text-gray-500;
   }
   
   .card-rewards {
@@ -70,23 +70,23 @@
   }
   
   .reward-item {
-    @apply flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-light-gray rounded-lg;
+    @apply flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-100 rounded-lg;
   }
   
   .reward-highlight {
-    @apply bg-primary/10 border border-primary/20;
+    @apply bg-blue-50 border border-blue-200;
   }
   
   .reward-category {
-    @apply text-sm font-medium text-dark-gray mb-1 sm:mb-0;
+    @apply text-sm font-medium text-gray-700 mb-1 sm:mb-0;
   }
   
   .reward-rate {
-    @apply text-base font-bold text-primary mb-1 sm:mb-0;
+    @apply text-base font-bold text-blue-600 mb-1 sm:mb-0;
   }
   
   .reward-limit {
-    @apply text-xs text-muted;
+    @apply text-xs text-gray-500;
   }
   
   /* ========== Pagination ========== */
@@ -95,15 +95,83 @@
   }
   
   .pagination-btn {
-    @apply px-4 py-2 bg-white border border-border-light text-dark-gray rounded-lg hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
   }
   
   .pagination-info {
-    @apply text-sm text-muted;
+    @apply text-sm text-gray-500;
   }
   
+  /* ========== Grid View Components (畫面b) ========== */
+  .grid-view-container {
+    @apply w-full;
+  }
+  
+  .credit-card-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8;
+  }
+  
+  .credit-card-item {
+    @apply bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 cursor-pointer;
+  }
+  
+  .card-image-container {
+    @apply relative h-48 sm:h-52 lg:h-56 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4;
+  }
+  
+  .card-image {
+    @apply max-w-full max-h-full object-contain rounded-lg;
+  }
+  
+  .card-info-container {
+    @apply p-4 lg:p-6;
+  }
+  
+  .card-title {
+    @apply text-lg lg:text-xl font-bold text-gray-800 mb-2 leading-tight;
+  }
+  
+  .card-bank {
+    @apply text-sm lg:text-base text-gray-600 mb-3;
+  }
+  
+  .card-main-reward {
+    @apply mt-3 pt-3 border-t border-gray-100;
+  }
+  
+  .reward-highlight-item {
+    @apply flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2;
+  }
+  
+  .reward-category-text {
+    @apply text-sm font-medium text-gray-700;
+  }
+  
+  .reward-rate-text {
+    @apply text-base lg:text-lg font-bold text-blue-600;
+  }
+
   /* ========== Responsive Styles ========== */
   @media (max-width: 640px) {
+    .credit-card-grid {
+      @apply gap-4;
+    }
+    
+    .card-image-container {
+      @apply h-40;
+    }
+    
+    .card-info-container {
+      @apply p-4;
+    }
+    
+    .card-title {
+      @apply text-base;
+    }
+    
+    .reward-rate-text {
+      @apply text-sm;
+    }
     
     .card-result-item {
       @apply p-4;
@@ -123,6 +191,13 @@
   }
   
   @media (min-width: 641px) and (max-width: 1024px) {
+    .credit-card-grid {
+      @apply gap-6;
+    }
+    
+    .card-image-container {
+      @apply h-48;
+    }
   }
   
   @media (min-width: 1025px) {

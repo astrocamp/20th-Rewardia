@@ -42,7 +42,7 @@
   }
 
   .field-label.required::before {
-    @apply text-error-red;
+    @apply text-red-500;
     content: '* ';
   }
 
