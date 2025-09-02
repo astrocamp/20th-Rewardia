@@ -90,27 +90,35 @@
     </div>
   
   <!-- 搜尋結果區域 -->
-  <div class="grid gap-6">
+  <div class="grid gap-6" style="margin-top: 24px;">
     <template x-for="card in displayCards" :key="card.id">
-      <div class="card-result-item">
-        <!-- 左側：信用卡圖片和名稱 -->
-        <div class="card-info">
-          <div class="card-image">
-            <img :src="card.image" :alt="card.name" class="w-full h-full object-cover rounded-lg">
+      <div class="card-result-item" style="display: flex !important; flex-direction: row !important; gap: 24px !important; padding: 24px !important; background: white !important; border: 1px solid #e5e7eb !important; border-radius: 8px !important;">
+        <!-- 左側：信用卡名稱和圖片（垂直布局） -->
+        <div style="display: flex !important; flex-direction: column !important; width: 50% !important;">
+          <!-- 上方：卡片名稱和銀行 -->
+          <div style="margin-bottom: 12px !important;">
+            <h3 x-text="card.name" style="font-size: 32px !important; font-weight: 600 !important; color: #374151 !important; margin-bottom: 4px !important; line-height: 1.4 !important;"></h3>
+            <p x-text="card.bank" style="font-size: 24px !important; color: #6b7280 !important;"></p>
           </div>
-          <div class="card-details">
-            <h3 class="card-name" x-text="card.name"></h3>
-            <p class="card-bank" x-text="card.bank"></p>
+          <!-- 下方：信用卡圖片 -->
+          <div style="height:240px !important; border-radius: 8px !important; overflow: hidden !important; display: flex !important; align-items: center !important; justify-content: center !important;">
+            <img :src="card.image" :alt="card.name" style="max-width: 100% !important; max-height: 100% !important; object-fit: contain !important; border-radius: 8px !important;">
           </div>
         </div>
         
         <!-- 右側：優惠條件列表 -->
-        <div class="card-rewards">
+        <div style="width: 50% !important; display: flex !important; flex-direction: column !important; padding-top: 0 !important;">
           <template x-for="(reward, index) in card.rewards.slice(0, 4)" :key="index">
-            <div class="reward-item" :class="{'reward-highlight': index === 0 && isMatchingReward(reward)}">
-              <div class="reward-category" x-text="reward.category"></div>
-              <div class="reward-rate" x-text="reward.rate"></div>
-              <div class="reward-limit" x-text="reward.limit"></div>
+            <div>
+              <!-- 項目名稱與數值 - 左右排列 -->
+              <div style="display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; width: 100% !important; padding: 16px 0 !important;" :style="index === 0 && isMatchingReward(reward) ? 'background: #eff6ff !important; padding: 16px 12px !important; border-radius: 4px !important;' : ''">
+                <div style="font-size: 16px !important; font-weight: 600 !important; color: #374151 !important; text-align: left !important; flex: 1 !important;" x-text="reward.category"></div>
+                <div style="font-size: 18px !important; font-weight: bold !important; color: #1d4ed8 !important; text-align: right !important; flex-shrink: 0 !important;" x-text="reward.rate"></div>
+              </div>
+              <!-- 限制條件 -->
+              <div style="font-size: 13px !important; color: #6b7280 !important; text-align: left !important; padding-bottom: 12px !important;" x-text="reward.limit" x-show="reward.limit"></div>
+              <!-- 分隔線（除了最後一項） -->
+              <div x-show="index < card.rewards.slice(0, 4).length - 1" style="height: 1px !important; background: #e5e7eb !important; margin: 8px 0 !important;"></div>
             </div>
           </template>
         </div>

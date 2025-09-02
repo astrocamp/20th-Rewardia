@@ -42,15 +42,15 @@
   
   /* ========== Card Result Components ========== */
   .card-result-item {
-    @apply flex flex-col lg:flex-row gap-6 p-6 bg-white border border-border-light rounded-lg hover:shadow-md transition-shadow duration-200;
+    @apply flex flex-row gap-6 p-6 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow duration-200;
   }
   
   .card-info {
-    @apply flex flex-row gap-4 lg:min-w-[300px];
+    @apply flex flex-row gap-4 w-1/2 min-w-[300px];
   }
   
   .card-image {
-    @apply w-20 h-12 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden;
+    @apply w-32 h-20 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden;
   }
   
   .card-details {
@@ -66,7 +66,7 @@
   }
   
   .card-rewards {
-    @apply flex-1 space-y-3;
+    @apply w-1/2 space-y-3;
   }
   
   .reward-item {

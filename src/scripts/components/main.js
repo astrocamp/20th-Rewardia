@@ -4,6 +4,7 @@ export default () => ({
   selectedReward: '',
   displayCards: [],
   allCards: [],
+  originalCards: [], // 保存原始完整卡片資料
   currentPage: 1,
   itemsPerPage: 3,
   totalPages: 1,
@@ -16,7 +17,8 @@ export default () => ({
   
   // 載入初始隨機卡片
   loadInitialCards() {
-    this.allCards = this.generateMockCards();
+    this.originalCards = this.generateMockCards(); // 保存原始資料
+    this.allCards = [...this.originalCards]; // 複製一份作為工作資料
     this.displayRandomCards();
   },
   
@@ -27,7 +29,7 @@ export default () => ({
         id: 1,
         name: '滙豐銀行 現金回饋御璽卡',
         bank: '滙豐銀行',
-        image: 'https://via.placeholder.com/320x200/2060B9/FFFFFF?text=HSBC',
+        image: '/assets/card_img/尊御卡_MW.png',
         rewards: [
           { category: '國內消費現金回饋', rate: '1.22%', limit: '' },
           { category: '保險消費現金回饋', rate: '3.88%', limit: '' },
@@ -39,7 +41,7 @@ export default () => ({
         id: 2,
         name: '富邦 J卡',
         bank: '富邦銀行',
-        image: 'https://via.placeholder.com/320x200/FF6B6B/FFFFFF?text=FUBON',
+        image: '/assets/card_img/J卡.gif',
         rewards: [
           { category: '數位通路消費', rate: '3%', limit: '月上限500元' },
           { category: '一般消費', rate: '0.5%', limit: '無上限' },
@@ -51,7 +53,7 @@ export default () => ({
         id: 3,
         name: '國泰世華 CUBE卡',
         bank: '國泰世華',
-        image: 'https://via.placeholder.com/320x200/4ECDC4/FFFFFF?text=CATHAY',
+        image: '/assets/card_img/VS91.png',
         rewards: [
           { category: '指定通路消費', rate: '3%', limit: '月上限300元' },
           { category: '一般消費', rate: '0.5%', limit: '無上限' },
@@ -63,7 +65,7 @@ export default () => ({
         id: 4,
         name: '中國信託 英雄聯盟卡',
         bank: '中國信託',
-        image: 'https://via.placeholder.com/320x200/45B7D1/FFFFFF?text=CTBC',
+        image: '/assets/card_img/VST88-1.png',
         rewards: [
           { category: '遊戲消費', rate: '5%', limit: '月上限200元' },
           { category: '數位娛樂', rate: '3%', limit: '月上限300元' },
@@ -75,7 +77,7 @@ export default () => ({
         id: 5,
         name: 'LINE Bank 快點卡',
         bank: 'LINE Bank',
-        image: 'https://via.placeholder.com/320x200/00C851/FFFFFF?text=LINE',
+        image: '/assets/card_img/VSB98.png',
         rewards: [
           { category: 'LINE相關消費', rate: '5%', limit: '月上限100元' },
           { category: '指定通路', rate: '2%', limit: '月上限500元' },
@@ -87,7 +89,7 @@ export default () => ({
         id: 6,
         name: '上海商銀 簡單卡',
         bank: '上海商銀',
-        image: 'https://via.placeholder.com/320x200/FF9500/FFFFFF?text=SCS',
+        image: '/assets/card_img/JST59.png',
         rewards: [
           { category: '指定通路消費', rate: '3%', limit: '月上限200元' },
           { category: '海外消費', rate: '2.5%', limit: '無上限' },
@@ -126,7 +128,7 @@ export default () => ({
     
     // 模擬API呼叫延遲
     setTimeout(() => {
-      let filteredCards = [...this.allCards];
+      let filteredCards = [...this.originalCards]; // 每次都從原始資料開始篩選
       
       // 根據銀行篩選
       if (this.selectedBank) {
@@ -178,7 +180,7 @@ export default () => ({
       // 按照相關性排序（這裡簡化為隨機）
       filteredCards.sort(() => 0.5 - Math.random());
       
-      this.allCards = filteredCards;
+      this.allCards = filteredCards; // 更新工作資料
       this.currentPage = 1;
       this.updateDisplayCards();
       this.isLoading = false;
