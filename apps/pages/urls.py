@@ -10,4 +10,8 @@ urlpatterns = [
     path("register/", views.register, name="register"),
     path("login/", views.login, name="login"),
     path("get-cards-by-bank/", views.get_cards_by_bank, name="get_cards_by_bank"),
+    path("get-categories-by-card/", views.get_categories_by_card, name="get_categories_by_card"),
+    path("get-scopes-by-category/", views.get_scopes_by_category, name="get_scopes_by_category"),
+    path("get-messages/", views.get_messages, name="get_messages"),
+    path("calculate-reward/", views.calculate_reward, name="calculate_reward"),
 ]

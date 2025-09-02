@@ -31,7 +31,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-LOGIN_URL = "/admin/login/"
+LOGIN_URL = "/sessions/login"
+
 
 # Application definition
 

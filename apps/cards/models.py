@@ -82,3 +82,41 @@ class CreditCard(models.Model):
     @property
     def has_annual_fee(self):
         return self.annual_fee > 0
+    
+    def calculate_reward(self, merchant, amount):
+        """計算這張卡在指定商家的回饋"""
+        from apps.rewards.models import RewardCategory, MerchantReward
+        from decimal import Decimal
+        
+        amount = Decimal(str(amount))
+        
+        # 1. 優先找特定商家回饋
+        try:
+            merchant_reward = MerchantReward.objects.get(
+                card=self,
+                merchant=merchant,
+                is_active=True
+            )
+            rate = Decimal(str(merchant_reward.effective_rate))
+            reward_amount = amount * rate / 100
+            return float(reward_amount), float(rate), "使用商家特殊回饋"
+        except MerchantReward.DoesNotExist:
+            pass
+        
+        # 2. 找分類回饋
+        try:
+            category_reward = RewardCategory.objects.get(
+                card=self,
+                category=merchant.category,
+                is_active=True
+            )
+            rate = Decimal(str(category_reward.effective_rate))
+            reward_amount = amount * rate / 100
+            return float(reward_amount), float(rate), "使用分類回饋"
+        except RewardCategory.DoesNotExist:
+            pass
+        
+        # 3. 使用基本回饋
+        basic_rate = Decimal('1.0')
+        reward_amount = amount * basic_rate / 100
+        return float(reward_amount), float(basic_rate), "使用基本回饋(1%)"
