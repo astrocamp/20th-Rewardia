@@ -29,8 +29,6 @@ def check_existing_reward(card, nlp_category, nlp_scope, rate):
 
 
 class Command(BaseCommand):
-    help = "Run NLP validation processors and save results to PendingReward model"
-
     def handle(self, *args, **options):
         """主要處理邏輯"""
         self.stdout.write(self.style.SUCCESS("開始 NLP 驗證處理..."))
@@ -150,7 +148,6 @@ class Command(BaseCommand):
                         classification = classifier.classify_sentence_cached(
                             sent, context_text, main_doc, context_doc
                         )
-
                         # 9. 回饋率提取
                         rates = rate_extractor.extract_rates_from_sentence(sent)
                         results_list = rate_extractor.record_extraction_results(

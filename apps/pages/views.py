@@ -1,8 +1,5 @@
 from django.shortcuts import render, redirect
 from .data.faq_content import FAQ_DATA
-
-# from apps.banks.models import Bank
-# from apps.merchants.models import Merchant
 from apps.cards.models import CreditCard
 from django.http import HttpResponse
 
