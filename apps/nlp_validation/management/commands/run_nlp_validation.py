@@ -189,7 +189,7 @@ class Command(BaseCommand):
 
         total_time = time.time() - total_start_time
 
-        self.stdout.write(self.style.SUCCESS(f"\n總共載入ㄌ {len(test_cases)} 張卡片"))
+        self.stdout.write(self.style.SUCCESS(f"\n總共載入了 {len(test_cases)} 張卡片"))
         self.stdout.write(
             f"總測試時間: {time.strftime('%H:%M:%S', time.gmtime(total_time))}"
         )
