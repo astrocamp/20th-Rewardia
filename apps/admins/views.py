@@ -40,14 +40,14 @@ def new_card(request):
 
         try:
             new_card = CreditCard.objects.create(
-                name=f"{bank} {name}",
+                name=name,
                 bank=bank,
                 card_network=card_network,
                 card_type=card_type,
                 is_active=is_active,
             )
             messages.success(request, "新增卡片成功")
-            return render(request, "admins/card_row.html", {"card": new_card})
+            return redirect("admins:cards")
         except:
             messages.success(request, "新增失敗")
             return redirect("admins:cards")
