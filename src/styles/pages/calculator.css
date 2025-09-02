@@ -15,7 +15,7 @@
 
   /* ========== Title Style ========== */
   .calculator-title {
-    @apply text-4xl leading-tight-custom font-bold text-black mb-6 mt-1;
+    @apply text-4xl leading-tight font-bold text-black mb-6 mt-1;
   }
 
   /* ========== Result Card ========== */
@@ -24,7 +24,7 @@
   }
   
   .result-card-bg {
-      @apply relative flex items-center justify-between px-6 md:px-8 h-[117px] rounded-lg bg-primary-dark; /* Primary-dark color from design system */
+      @apply relative flex items-center justify-between px-6 md:px-8 h-[117px] rounded-lg bg-blue-900; /* Primary-dark color from design system */
   }
   
   .result-content {
@@ -45,7 +45,8 @@
   }
   
   .form-card-bg {
-    @apply bg-light-gray rounded-lg p-5 md:p-6;
+
+    @apply bg-gray-100 rounded-lg p-5 md:p-6;
   }
 
   /* ========== Form Header ========== */
@@ -54,17 +55,17 @@
   }
   
   .form-title {
-    @apply text-2xl leading-relaxed-custom font-bold text-muted;
+    @apply text-2xl leading-relaxed font-bold text-gray-500;
   }
 
   /* ========== Disclaimer Section ========== */
   .disclaimer-section {
     @apply mt-6 rounded-lg bg-gray-200 p-5;
-    background-color: theme('colors.bg-light-alt'); /* As per Figma */
+    background-color: #f8fafc; /* Light gray background */
   }
   
   .disclaimer-list {
-    @apply text-muted text-base leading-6 list-disc pl-5;
+    @apply text-gray-500 text-base leading-6 list-disc pl-5;
   }
 
   /* ========== Action Buttons ========== */

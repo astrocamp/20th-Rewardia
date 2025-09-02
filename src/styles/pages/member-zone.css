@@ -28,7 +28,7 @@
   }
 
   .member-section-bg {
-    @apply bg-light-gray rounded-lg p-5 md:p-6;
+    @apply bg-gray-100 rounded-lg p-5 md:p-6;
   }
 
   .member-section-header {
@@ -36,7 +36,7 @@
   }
 
   .member-section-title {
-    @apply text-2xl font-bold text-muted;
+    @apply text-2xl font-bold text-gray-500;
   }
 
   /* ========== Member Info ========== */
@@ -49,15 +49,15 @@
   }
 
   .member-info-label {
-    @apply text-lg font-bold text-dark-gray;
+    @apply text-lg font-bold text-gray-700;
   }
 
   .member-info-value {
-    @apply text-base text-dark-gray;
+    @apply text-base text-gray-700;
   }
 
   .member-info-empty {
-    @apply text-dark-gray opacity-70;
+    @apply text-gray-700 opacity-70;
   }
 
   /* ========== Member Cards ========== */
@@ -82,11 +82,11 @@
   }
 
   .member-card-name {
-    @apply text-2xl font-bold text-dark-gray mb-1;
+    @apply text-2xl font-bold text-gray-700 mb-1;
   }
 
   .member-card-bank {
-    @apply text-base text-dark-gray;
+    @apply text-base text-gray-700;
   }
 
   .member-card-actions {
@@ -103,7 +103,7 @@
   }
 
   .member-empty-text {
-    @apply text-2xl text-placeholder-gray font-normal;
+    @apply text-2xl text-gray-400 font-normal;
   }
 
   /* ========== Responsive Styles for Member Zone ========== */

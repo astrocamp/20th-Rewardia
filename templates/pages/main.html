@@ -86,8 +86,46 @@
       </div>
     </div>
   
-  <!-- 搜尋結果區域 -->
-  <div class="grid gap-6" style="margin-top: 24px; max-height: 80vh; overflow-y: auto;" @scroll="handleScroll">
+  <!-- 卡牌式展示區域（畫面b）- 初始狀態 -->
+  <div x-show="viewMode === 'grid'" class="grid-view-container" style="margin-top: 24px; max-height: 80vh; overflow-y: auto;" @scroll="handleGridScroll">
+    <div class="credit-card-grid">
+      <template x-for="card in gridCards" :key="card.id">
+        <div class="credit-card-item">
+          <!-- 卡片圖片 -->
+          <div class="card-image-container">
+            <img :src="card.image" :alt="card.name" class="card-image">
+          </div>
+          <!-- 卡片資訊 -->
+          <div class="card-info-container">
+            <h3 x-text="card.name" class="card-title"></h3>
+            <p x-text="card.bank" class="card-bank"></p>
+            <!-- 主要優惠 -->
+            <div class="card-main-reward" x-show="card.rewards && card.rewards.length > 0">
+              <div class="reward-highlight-item">
+                <span x-text="card.rewards[0].category" class="reward-category-text"></span>
+                <span x-text="card.rewards[0].rate" class="reward-rate-text"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+    
+    <!-- 網格視圖載入更多指示器 -->
+    <div x-show="hasMoreGridCards()" class="text-center py-6">
+      <div class="text-gray-500">
+        向下滾動載入更多卡片...
+      </div>
+    </div>
+    
+    <!-- 網格視圖沒有更多卡片時的提示 -->
+    <div x-show="!hasMoreGridCards() && gridCards.length > 0" class="text-center py-6 text-gray-500">
+      已顯示所有卡片
+    </div>
+  </div>
+
+  <!-- 搜尋結果區域（畫面a）- 搜尋後顯示 -->
+  <div x-show="viewMode === 'list'" class="grid gap-6" style="margin-top: 24px; max-height: 80vh; overflow-y: auto;" @scroll="handleScroll">
     <template x-for="card in displayCards" :key="card.id">
       <div class="card-result-item" style="display: flex !important; flex-direction: row !important; gap: 24px !important; padding: 24px !important; background: white !important; border: 1px solid #e5e7eb !important; border-radius: 8px !important;">
         <!-- 左側：信用卡名稱和圖片（垂直布局） -->

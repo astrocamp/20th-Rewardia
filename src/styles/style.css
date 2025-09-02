@@ -1,6 +1,4 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@import "tailwindcss";
 
 /* Import component styles */
 @import "./components/buttons.css";
@@ -44,7 +42,7 @@
   }
 
   .btn-outline {
-    @apply border-black text-black hover:bg-black hover:text-white transition-colors duration-200;
+    @apply border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-colors duration-200;
   }
 
   .btn-blue {
