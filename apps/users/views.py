@@ -5,8 +5,6 @@ from .services import UserRegistrationService
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
-
-# from apps.banks.models import Bank
 from apps.cards.models import CreditCard
 from .models import UserCard
 

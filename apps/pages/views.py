@@ -1,12 +1,11 @@
 from django.shortcuts import render, redirect
 from .data.faq_content import FAQ_DATA
-from apps.banks.models import Bank
-from apps.merchants.models import Merchant
 from apps.cards.models import CreditCard
-from apps.analytics.models import OnlineTransaction
+
+# from apps.analytics.models import OnlineTransaction
 from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
-from .forms import RewardCalculatorForm
+# from .forms import RewardCalculatorForm
 
 
 # 假資料 - 消費類別和種類
@@ -27,7 +26,7 @@ def download(request):
 
 
 def calculator(request):
-    banks = Bank.objects.filter(is_active=True).order_by("name")
+    banks = CreditCard.objects.filter(is_active=True).order_by("name")
 
     # 消費類別假資料
     categories = [(code, name) for code, name in FAKE_CATEGORIES.items()]
@@ -146,13 +145,13 @@ def calculate_reward(request):
                     result = f"{min_reward:.0f} ~ {max_reward:.0f} 元/點數"
                     messages.success(
                         request,
-                        f"計算成功！{card.bank.name} {card.name} 在 {scope_name} 的回饋為 {result}",
+                        f"計算成功！{card.bank} {card.name} 在 {scope_name} 的回饋為 {result}",
                     )
                 else:
                     result = f"{min_reward:.0f} 元/點數"
                     messages.success(
                         request,
-                        f"計算成功！{card.bank.name} {card.name} 在 {scope_name} 的回饋為 {result}",
+                        f"計算成功！{card.bank} {card.name} 在 {scope_name} 的回饋為 {result}",
                     )
 
                 # 回傳結果 + 訊息更新觸發器
@@ -163,7 +162,7 @@ def calculate_reward(request):
             else:
                 messages.warning(
                     request,
-                    f"找不到 {card.bank.name} {card.name} 在 {scope_name} 的回饋資訊",
+                    f"找不到 {card.bank} {card.name} 在 {scope_name} 的回饋資訊",
                 )
                 return HttpResponse("""
                     <div class="result-warning">找不到對應的回饋資訊</div>
