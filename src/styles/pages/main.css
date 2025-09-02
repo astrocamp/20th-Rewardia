@@ -32,13 +32,7 @@
     @apply bg-blue-50 outline-none;
   }
   
-  .horizontal-search-btn {
-    @apply h-20 w-20 bg-cyan-500 text-white flex items-center justify-center border-none cursor-pointer transition-all duration-200 hover:bg-cyan-600;
-  }
-  
-  .horizontal-search-btn:hover {
-    @apply shadow-md;
-  }
+
   
   /* ========== Card Result Components ========== */
   .card-result-item {
@@ -112,7 +106,7 @@
   }
   
   .credit-card-item {
-    @apply bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 cursor-pointer;
+    @apply bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100;
   }
   
   .card-image-container {
