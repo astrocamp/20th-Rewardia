@@ -7,7 +7,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 <<<<<<< HEAD
+<<<<<<< HEAD
 
+=======
+>>>>>>> f2ae75d (新資料庫狀態暫存)
 =======
 >>>>>>> f2ae75d (新資料庫狀態暫存)
 # from apps.banks.models import Bank
@@ -40,6 +43,7 @@ def prepare_card_form_context(
     # 基本的context資料
     # banks = Bank.objects.filter(is_active=True).only("id", "name", "code")
 <<<<<<< HEAD
+<<<<<<< HEAD
     # cards = (
     #     CreditCard.objects.filter(is_active=True)
     #     .select_related("bank")
@@ -50,6 +54,8 @@ def prepare_card_form_context(
         # "banks": banks,
         # "cards": cards,
 =======
+=======
+>>>>>>> f2ae75d (新資料庫狀態暫存)
     cards = (
         CreditCard.objects.filter(is_active=True)
         .select_related("bank")
@@ -87,6 +93,7 @@ def member_zone(request):
 
 # API 端點：根據銀行 ID 返回該銀行的所有信用卡（JSON 格式，給 Alpine.js 用）
 <<<<<<< HEAD
+<<<<<<< HEAD
 def get_cards_by_bank(request, bank_id):
     # try:
     # bank = Bank.objects.get(id=bank_id, is_active=True)
@@ -115,6 +122,8 @@ def get_cards_by_bank(request, bank_id):
         {"success": False, "cards": [], "message": "找不到指定的銀行"}, status=404
     )
 =======
+=======
+>>>>>>> f2ae75d (新資料庫狀態暫存)
 # def get_cards_by_bank(request, bank_id):
     # try:
         # bank = Bank.objects.get(id=bank_id, is_active=True)
@@ -142,6 +151,9 @@ def get_cards_by_bank(request, bank_id):
     #     return JsonResponse(
     #         {"success": False, "cards": [], "message": "找不到指定的銀行"}, status=404
     #     )
+<<<<<<< HEAD
+>>>>>>> f2ae75d (新資料庫狀態暫存)
+=======
 >>>>>>> f2ae75d (新資料庫狀態暫存)
 
 
