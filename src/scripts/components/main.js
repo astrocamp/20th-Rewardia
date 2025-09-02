@@ -5,10 +5,10 @@ export default () => ({
   displayCards: [],
   allCards: [],
   originalCards: [], // 保存原始完整卡片資料
-  currentPage: 1,
-  itemsPerPage: 3,
-  totalPages: 1,
+  loadedCount: 3, // 已載入的卡片數量
+  loadIncrement: 1, // 每次滾動載入的數量
   isLoading: false,
+  isLoadingMore: false, // 是否正在載入更多
   
   // 初始化假資料
   init() {
@@ -96,6 +96,30 @@ export default () => ({
           { category: '一般消費', rate: '0.5%', limit: '無上限' },
           { category: '年費', rate: '首年免年費', limit: '' }
         ]
+      },
+      {
+        id: 7,
+        name: '台新銀行 @GOGO卡',
+        bank: '台新銀行',
+        image: '/assets/card_img/數位生活.gif',
+        rewards: [
+          { category: '指定通路消費', rate: '3.8%', limit: '月上限300元' },
+          { category: '數位消費', rate: '2.8%', limit: '月上限200元' },
+          { category: '一般消費', rate: '0.5%', limit: '無上限' },
+          { category: '年費', rate: '首年免年費', limit: '' }
+        ]
+      },
+      {
+        id: 8,
+        name: '玉山銀行 U Bear卡',
+        bank: '玉山銀行',
+        image: '/assets/card_img/ui_flow_chart.png',
+        rewards: [
+          { category: '網購消費', rate: '5%', limit: '月上限150元' },
+          { category: '超商消費', rate: '3%', limit: '月上限200元' },
+          { category: '海外消費', rate: '2.2%', limit: '無上限' },
+          { category: '年費', rate: '永久免年費', limit: '' }
+        ]
       }
     ];
   },
@@ -103,8 +127,9 @@ export default () => ({
   // 顯示隨機3張卡片
   displayRandomCards() {
     const shuffled = [...this.allCards].sort(() => 0.5 - Math.random());
-    this.displayCards = shuffled.slice(0, 3);
-    this.updatePagination();
+    this.allCards = shuffled; // 更新為隨機排序後的資料
+    this.loadedCount = 3;
+    this.displayCards = this.allCards.slice(0, this.loadedCount);
   },
   
   // 銀行選擇變更
@@ -181,7 +206,7 @@ export default () => ({
       filteredCards.sort(() => 0.5 - Math.random());
       
       this.allCards = filteredCards; // 更新工作資料
-      this.currentPage = 1;
+      this.loadedCount = Math.min(3, filteredCards.length); // 重置載入數量
       this.updateDisplayCards();
       this.isLoading = false;
     }, 500);
@@ -189,30 +214,37 @@ export default () => ({
   
   // 更新顯示的卡片
   updateDisplayCards() {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    this.displayCards = this.allCards.slice(startIndex, endIndex);
-    this.updatePagination();
+    this.displayCards = this.allCards.slice(0, this.loadedCount);
   },
   
-  // 更新分頁資訊
-  updatePagination() {
-    this.totalPages = Math.ceil(this.allCards.length / this.itemsPerPage);
-  },
-  
-  // 上一頁
-  prevPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.updateDisplayCards();
+  // 載入更多卡片
+  loadMoreCards() {
+    if (this.isLoadingMore || this.loadedCount >= this.allCards.length) {
+      return;
     }
+    
+    this.isLoadingMore = true;
+    
+    // 模擬載入延遲
+    setTimeout(() => {
+      this.loadedCount = Math.min(this.loadedCount + this.loadIncrement, this.allCards.length);
+      this.updateDisplayCards();
+      this.isLoadingMore = false;
+    }, 300);
   },
   
-  // 下一頁
-  nextPage() {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.updateDisplayCards();
+  // 檢查是否還有更多卡片可載入
+  hasMoreCards() {
+    return this.loadedCount < this.allCards.length;
+  },
+  
+  // 滾動監聽處理
+  handleScroll(event) {
+    const element = event.target;
+    const threshold = 100; // 距離底部100px時開始載入
+    
+    if (element.scrollTop + element.clientHeight >= element.scrollHeight - threshold) {
+      this.loadMoreCards();
     }
   },
   
