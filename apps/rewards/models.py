@@ -179,7 +179,11 @@ class PendingReward(models.Model):
         ]
 
     def __str__(self):
-        rate_display = self.min_rate or self.max_rate or "未知"
-        return (
-            f"{self.card.name} - {self.nlp_category}/{self.nlp_scope}: {rate_display}%"
-        )
+        rates = []
+        if self.min_rate is not None:
+            rates.append(f"最低{self.min_rate}%")
+        if self.max_rate is not None:
+            rates.append(f"最高{self.max_rate}%")
+
+        rate_display = " ~ ".join(rates) if rates else "未知"
+        return f"{self.card.bank} {self.card.name} -> {self.nlp_category}/{self.nlp_scope}: {rate_display}"
