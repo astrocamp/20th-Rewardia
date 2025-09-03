@@ -16,9 +16,6 @@ class CrawledData(models.Model):
         verbose_name = "Crawled Card"
         verbose_name_plural = "Crawled Cards"
 
-    def __str__(self):
-        return self.card.name
-
 
 class CrawledRecord(models.Model):
     total_time = models.DecimalField("Total Time", max_digits=8, decimal_places=3)
