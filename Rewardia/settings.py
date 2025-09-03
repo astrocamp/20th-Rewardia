@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     # ------------------------------
     "debug_toolbar",
     # ------------------------------
+<<<<<<< HEAD
     'apps.pages',
     'apps.users',
     'apps.cards', 
@@ -61,6 +62,14 @@ INSTALLED_APPS = [
     'apps.sessions',
     'apps.admins',
     'apps.chatbot',  #Gemini AI robot
+=======
+    "apps.pages",
+    "apps.users",
+    "apps.cards",
+    "apps.rewards",
+    "apps.sessions",
+    "apps.admins",
+>>>>>>> c8aa005 (feat: 建置chrome extension的基本資料和檔案)
     # ------------------------------
     "apps.nlp_validation",
     "apps.card_crawler",
