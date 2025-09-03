@@ -13,7 +13,7 @@ import time
 from apps.card_crawler.models import CrawledData, CrawledRecord
 from datetime import datetime
 
-failed_cards = {}
+failed_cards = {"failed": []}
 processed_urls = set()
 # 仿效真人操作瀏覽器，隨機從0.7-1.4秒之間，挑選暫停秒數
 sleep_time = random.uniform(0.7, 1.4)
@@ -64,11 +64,13 @@ def get_card_info(driver, url):
                 By.CSS_SELECTOR, 'img[data-testid="product-logo"]'
             ).get_attribute("src")
 
-            print(card_img)
+            # 將抓取到的資料整理成字典
+            crawled_data = {"url": url, "content": [], "card_img": card_img}
+            crawled_data["content"].append(card_name)
 
         except WebDriverException as error:
             find_card_error = create_error_data(url, error)
-            failed_cards.append(find_card_error)
+            failed_cards["failed"].append(find_card_error)
             print(f"Error fetching card: {error}")
 
         try:
@@ -90,56 +92,64 @@ def get_card_info(driver, url):
                     # 改成一個一個點按鈕好像比較有效，也比較不會漏點
                     button.click()
 
-                # 為了忽略element移動找不到的錯誤，因為實際上還是點的到
-                except StaleElementReferenceException:
-                    continue
+                    try:
+                        time.sleep(0.5)
+                        # 找到navbar和footer之間的所有h4, h5, li, p的元素
+                        contents = driver.find_elements(
+                            locate_with(By.CSS_SELECTOR, "h4,h5,li,p:not(li p)")
+                            .above({By.XPATH: "//h2[text()='其他推薦信用卡']"})
+                            .below({By.TAG_NAME: "h1"})
+                        )
 
-            try:
-                # 比較節省時間的等待方式，如果元素在5秒內還沒出現就會回傳錯誤
-                WebDriverWait(driver, 10).until(
-                    EC.visibility_of_all_elements_located((By.CLASS_NAME, "answer"))
-                )
-            except TimeoutException as error:
-                print("Error fetching elements")
-                answer_error = create_error_data(url, error, card_name=card_name)
-                failed_cards.append(answer_error)
+                        # if not contents:
+                        #     button.click()
+                        #     contents = driver.find_elements(
+                        #         locate_with(By.CSS_SELECTOR, "h4,h5,li,p:not(li p)")
+                        #         .above({By.XPATH: "//h2[text()='其他推薦信用卡']"})
+                        #         .below({By.TAG_NAME: "h1"})
+                        #     )
 
-        except WebDriverException as error:
-            print(f"Error fetching button: {error}")
-            button_error = create_error_data(url, error, card_name=card_name)
-            failed_cards.append(button_error)
+                        for content in contents:
+                            # 排出空白的
+                            if len(content.text) > 1:
+                                crawled_data["content"].append(content.text)
 
-        try:
-            # 將抓取到的資料整理成字典
-            crawled_data = {"url": url, "content": [], "card_img": card_img}
+                    # 為了忽略element移動找不到的錯誤，因為實際上還是點的到
+                    except StaleElementReferenceException:
+                        continue
 
-            driver.implicitly_wait(5)
-            # 找到navbar和footer之間的所有h4, h5, li, p的元素
-            contents = driver.find_elements(
-                locate_with(By.CSS_SELECTOR, "h4,h5,li,p,p:not(li p)")
-                .above({By.XPATH: "//h2[text()='其他推薦信用卡']"})
-                .below({By.TAG_NAME: "h1"})
-            )
-            # 把它存到array
-            crawled_data["content"].append(card_name)
-            for content in contents:
-                # 排出空白的
-                if len(content.text) > 1:
-                    crawled_data["content"].append(content.text)
+                    except WebDriverException as error:
+                        print(f"Error finding content: {error}")
+                        tags_error = create_error_data(url, error, card_name=card_name)
+                        failed_cards["failed"].append(tags_error)
 
-            # 把爬到的資料存進資料庫
+                except WebDriverException as error:
+                    print(f"Error fetching button: {error}")
+                    button_error = create_error_data(url, error, card_name=card_name)
+                    failed_cards["failed"].append(button_error)
+
+            # try:
+            #     # 比較節省時間的等待方式，如果元素在10秒內還沒出現就會回傳錯誤
+            #     WebDriverWait(driver, 10).until(
+            #         EC.visibility_of_all_elements_located(
+            #             (By.CSS_SELECTOR, "h4,h5,li,p:not(li p)")
+            #         )
+            #     )
+            # except TimeoutException as error:
+            #     print("Error fetching elements")
+            #     answer_error = create_error_data(url, error, card_name=card_name)
+            #     failed_cards["failed"].append(answer_error)
             save_data(crawled_data)
-
         except WebDriverException as error:
-            print(f"Error finding content: {error}")
-            tags_error = create_error_data(url, error, card_name=card_name)
-            failed_cards.append(tags_error)
+            print(f"Card not found: {error}")
+            webpage_error = create_error_data(url, error)
+            failed_cards["failed"].append(webpage_error)
+            # 找不到卡，就終止這次的函式
 
     except WebDriverException as error:
-        print(f"Card not found: {error}")
-        webpage_error = create_error_data(url, error)
-        failed_cards.append(webpage_error)
-        # 找不到卡，就終止這次的函式
+        print(f"Error finding content: {error}")
+        tags_error = create_error_data(url, error, card_name=card_name)
+        failed_cards["failed"].append(tags_error)
 
     finally:
         print("Finished.")
@@ -195,14 +205,14 @@ def crawl_roo_cards(driver, cat_urls):
         print(f"Error fetching page: {error}")
 
     finally:
-        print(f"Failed or with error: {failed_cards}")
+        print(f"Failed or with error: {failed_cards['failed']}")
 
 
 def save_crawl_record(data):
     CrawledRecord.objects.create(
         total_time=data["total_time"],
         total_cards=data["total_cards"],
-        average_time=data["average_cards"],
+        average_time=data["average_time"],
         errors=data["errors"],
     )
 
