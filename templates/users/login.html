@@ -7,7 +7,7 @@
 
 <!-- Django Messages 顯示區域 -->
 {% if messages %}
-  <div class="space-y-2 mb-4" x-data="auto_dismiss_message" x-show="show">
+  <div class="space-y-2 mb-4" x-data="toast_fadeout" x-show="show">
     {% for message in messages %}
       <div class="tw-toast {{ message.tags }}" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
         <span>{{ message }}</span>
@@ -51,9 +51,9 @@
               <div x-show="!passwordVisible">
                   {% include 'components/icon.html' with name="eye" class="w-6 h-6" %}
               </div>
-              <div x-show="showPassword">
-                  {% include 'components/icon.html' with name="eye-off" class="w-6 h-6" %}
-              </div>
+                      <div x-show="passwordVisible">
+          {% include 'components/icon.html' with name="eye-off" class="w-6 h-6" %}
+        </div>
           </button>
       </div>
       <div x-show="errors.password" class="text-error text-sm mt-1" x-text="errors.password"></div>

@@ -1,5 +1,5 @@
 // login.html 
-Alpine.data('login_form', () => ({
+export default () => ({
   formData: {
     username: '',
     password: ''
@@ -57,4 +57,4 @@ Alpine.data('login_form', () => ({
       event.target.submit();
     }
   }
-}));
+});
