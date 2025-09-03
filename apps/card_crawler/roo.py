@@ -44,7 +44,8 @@ def handle_missing_urls(urls):
 def create_error_data(url, error, card_name=None):
     return {
         "url": url,
-        "error": error,
+        # 這裡只存取error的名字，因為error本身是object，所以無法存進JSONField
+        "error": type(error).__name__,
         "card_name": card_name if card_name else "Card not found.",
     }
 
@@ -60,27 +61,37 @@ def get_card_info(driver, url):
             card_name = driver.find_element(
                 By.CSS_SELECTOR, 'h1[data-testid="product-title"]'
             ).text.strip()
+
             card_img = driver.find_element(
                 By.CSS_SELECTOR, 'img[data-testid="product-logo"]'
             ).get_attribute("src")
+
+            contents = driver.find_elements(
+                locate_with(By.CSS_SELECTOR, "h4,h5,li,p:not(li p)")
+                .above({By.XPATH: "//h2[text()='其他推薦信用卡']"})
+                .below({By.TAG_NAME: "h1"})
+            )
 
             # 將抓取到的資料整理成字典
             crawled_data = {"url": url, "content": [], "card_img": card_img}
             crawled_data["content"].append(card_name)
 
+            for content in contents:
+                if len(content.text) > 1:
+                    crawled_data["content"].append(content.text)
+
         except WebDriverException as error:
             find_card_error = create_error_data(url, error)
-            failed_cards["failed"].append(find_card_error)
+            failed_cards.append(find_card_error)
             print(f"Error fetching card: {error}")
 
         try:
             # 找到navbar和footer之間的所有button
             buttons = driver.find_elements(
-                locate_with(By.TAG_NAME, "button")
+                locate_with(By.CSS_SELECTOR, "button[type='button']")
                 .below({By.TAG_NAME: "h1"})
                 .above({By.XPATH: "//h2[text()='其他推薦信用卡']"})
             )
-            # action = ActionChains(driver)
 
             # 點選這些button，讓他們展開，因為資訊隱藏在裡面
             for button in buttons:
@@ -94,25 +105,16 @@ def get_card_info(driver, url):
 
                     try:
                         time.sleep(0.5)
-                        # 找到navbar和footer之間的所有h4, h5, li, p的元素
-                        contents = driver.find_elements(
-                            locate_with(By.CSS_SELECTOR, "h4,h5,li,p:not(li p)")
+                        answer = driver.find_element(
+                            locate_with(By.CLASS_NAME, "answer")
                             .above({By.XPATH: "//h2[text()='其他推薦信用卡']"})
                             .below({By.TAG_NAME: "h1"})
                         )
 
-                        # if not contents:
-                        #     button.click()
-                        #     contents = driver.find_elements(
-                        #         locate_with(By.CSS_SELECTOR, "h4,h5,li,p:not(li p)")
-                        #         .above({By.XPATH: "//h2[text()='其他推薦信用卡']"})
-                        #         .below({By.TAG_NAME: "h1"})
-                        #     )
-
-                        for content in contents:
-                            # 排出空白的
-                            if len(content.text) > 1:
-                                crawled_data["content"].append(content.text)
+                        # for answer in answers:
+                        #     # 排出空白的
+                        if answer and len(answer.text) > 1:
+                            crawled_data["content"].append(answer.text)
 
                     # 為了忽略element移動找不到的錯誤，因為實際上還是點的到
                     except StaleElementReferenceException:
@@ -123,10 +125,14 @@ def get_card_info(driver, url):
                         tags_error = create_error_data(url, error, card_name=card_name)
                         failed_cards["failed"].append(tags_error)
 
+                    # 打開了，再把它關起來
+                    button.click()
+
                 except WebDriverException as error:
                     print(f"Error fetching button: {error}")
                     button_error = create_error_data(url, error, card_name=card_name)
                     failed_cards["failed"].append(button_error)
+                    print(failed_cards)
 
             # try:
             #     # 比較節省時間的等待方式，如果元素在10秒內還沒出現就會回傳錯誤
