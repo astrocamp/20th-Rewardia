@@ -16,55 +16,58 @@ def main(request):
 
 
 def get_main_data(request):
-    # 直接查詢所有活躍的信用卡
-    cards = CreditCard.objects.filter(is_active=True)
+    # 使用 prefetch_related 優化查詢，避免 N+1 問題
+    cards = CreditCard.objects.filter(is_active=True).prefetch_related(
+        'reward_categories',  # 預取已確認回饋
+        'pending_rewards'     # 預取待審核回饋
+    ).order_by('bank', 'name')
 
+    # 一次性獲取所有需要的資料
+    banks_set = set()
+    pending_categories_set = set()
     all_cards_data = []
+    
     for card in cards:
+        banks_set.add(card.bank)
         rewards_data = []
         
-        # 處理已確認的回饋類別 (reward_categories 表格)
-        confirmed_rewards = RewardCategory.objects.filter(card=card)
-        for reward in confirmed_rewards:
-            rate_display = f"{reward.rate}%"
-            limit_text = ""
-            
-            # 組合限制條件文字
+        # 處理已確認的回饋類別
+        for reward in card.reward_categories.all():
+            limit_parts = []
             if reward.max_spending:
-                limit_text += f"上限 ${reward.max_spending:,.0f}"
+                limit_parts.append(f"上限 ${reward.max_spending:,.0f}")
             if reward.requires_activation:
-                limit_text += " (需登錄)" if limit_text else "需登錄"
+                limit_parts.append("需登錄")
             if reward.is_rotating:
-                limit_text += " (季度輪替)" if limit_text else "季度輪替"
+                limit_parts.append("季度輪替")
                 
             rewards_data.append({
                 'category': reward.get_category_display(),
-                'rate': rate_display,
-                'limit': limit_text,
+                'rate': f"{reward.rate}%",
+                'limit': " ".join(limit_parts),
                 'category_code': reward.category,
                 'source': 'confirmed'
             })
         
-        # 處理待審核回饋 (pending_rewards 表格)
-        pending_rewards = PendingReward.objects.filter(card=card)
-        for reward in pending_rewards:
-            rate_display = ""
-            if reward.max_rate is not None:
-                rate_display = f"{reward.max_rate}%"
-            elif reward.min_rate is not None:
-                rate_display = f"{reward.min_rate}%"
-            else:
+        # 處理待審核回饋
+        for reward in card.pending_rewards.all():
+            if reward.nlp_category:
+                pending_categories_set.add(reward.nlp_category)
+                
                 rate_display = "N/A"
+                if reward.max_rate is not None:
+                    rate_display = f"{reward.max_rate}%"
+                elif reward.min_rate is not None:
+                    rate_display = f"{reward.min_rate}%"
 
-            rewards_data.append({
-                'category': f"{reward.nlp_category} ({reward.nlp_scope})",
-                'rate': rate_display,
-                'limit': reward.extracted_sentence,
-                'category_code': reward.nlp_category,
-                'source': 'pending'
-            })
+                rewards_data.append({
+                    'category': f"{reward.nlp_category} ({reward.nlp_scope})",
+                    'rate': rate_display,
+                    'limit': reward.extracted_sentence or '',
+                    'category_code': reward.nlp_category,
+                    'source': 'pending'
+                })
 
-        # 卡片模型中沒有圖片欄位，這裡使用 placeholder 圖片
         all_cards_data.append({
             'id': card.id,
             'name': card.name,
@@ -73,35 +76,30 @@ def get_main_data(request):
             'card_network': card.get_card_network_display() if card.card_network else '',
             'foreign_fee': float(card.foreign_transaction_fee) if card.foreign_transaction_fee else 0,
             'image': f'https://via.placeholder.com/300x180.png?text={card.name.replace(" ", "+")}',
-            'rewards': rewards_data[:6]  # 增加顯示數量以包含更多回饋資訊
+            'rewards': rewards_data[:6]
         })
 
-    # 獲取所有不重複的銀行名稱，用於篩選下拉選單
-    banks_data = list(CreditCard.objects.filter(is_active=True).values_list('bank', flat=True).distinct().order_by('bank'))
-    
-    # 將銀行資料轉換為前端需要的格式
-    banks = [{'code': bank.lower().replace(' ', '_'), 'name': bank} for bank in banks_data]
+    # 處理銀行資料（重用已收集的資料）
+    banks = [{
+        'code': bank.lower().replace(' ', '_'), 
+        'name': bank
+    } for bank in sorted(banks_set)]
 
-    # 獲取回饋類別選項 - 專注由 rewards_pendingreward 的 nlp_category 欄位獲取
-    pending_categories = list(PendingReward.objects.exclude(nlp_category__isnull=True).exclude(nlp_category__exact='').values_list('nlp_category', flat=True).distinct())
-    
-    reward_categories_choices = []
+    # 處理回饋類別選項（重用已收集的資料）
     reward_category_map = {}
+    reward_categories_choices = []
     
-    for category in pending_categories:
-        # 為每個類別創建一個唯一的 code 供前端使用
+    for category in sorted(pending_categories_set):
         category_code = category.upper().replace(' ', '_').replace('/', '_')
-        if category_code not in reward_category_map:
-            reward_categories_choices.append((category_code, category))
-            reward_category_map[category_code] = category
+        reward_categories_choices.append((category_code, category))
+        reward_category_map[category_code] = category
 
-    response_data = {
+    return JsonResponse({
         'all_cards_data': all_cards_data,
         'banks': banks,
         'reward_categories_choices': reward_categories_choices,
         'reward_category_map': reward_category_map,
-    }
-    return JsonResponse(response_data, safe=False)
+    }, safe=False)
 
 
 
