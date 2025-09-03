@@ -1,6 +1,5 @@
 /* ========== Chatbot 聊天機器人組件樣式 ========== */
 
-/* Tailwind v4 動畫定義 */
 @theme {
   @keyframes typing {
     0%, 80%, 100% { 
@@ -18,7 +17,7 @@
 
 /* 浮動按鈕 - 右邊，footer 上方 */
 .chatbot-float-btn {
-  @apply fixed bottom-6 right-6 w-14 h-14 text-gray-700 rounded-full z-50 flex items-center justify-center cursor-pointer transition-all duration-200;
+  @apply fixed bottom-6 right-6 w-14 h-14 text-gray-700 rounded-full z-60 flex items-center justify-center cursor-pointer transition-all duration-200;
   @apply bg-[linear-gradient(180deg,#B8F5E6_0%,#34D399_100%)];
   @apply shadow-[0_4px_12px_rgba(52,211,153,0.4)];
   @apply border-2 border-[#34D399];
@@ -35,12 +34,9 @@
 
 /* 聊天視窗容器 */
 .chatbot-window {
-  @apply fixed bottom-24 right-2 w-80 rounded-2xl shadow-2xl z-40 flex flex-col overflow-hidden;
+  @apply fixed bottom-8 right-2 w-70 h-[350px] rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden;
   @apply bg-[linear-gradient(180deg,#B8F5E6_0%,#FFFFFF_100%)];
   @apply border-2 border-[#34D399];
-  height: calc(100vh - 300px);
-  max-height: 500px;
-  min-height: 300px;
 }
 
 /* 聊天視窗標題列 */
@@ -87,12 +83,12 @@
 
 /* 空狀態樣式 */
 .chatbot-empty-state {
-  @apply flex flex-col items-center justify-center h-full text-center p-6 text-gray-500;
+  @apply flex flex-col items-start justify-center h-full text-left p-6 text-gray-500;
 }
 
 /* 訊息氣泡樣式 */
 .message-bubble {
-  @apply max-w-[85%] p-3 rounded-lg break-words mb-0 my-2 mx-4;
+  @apply max-w-[85%] p-3 rounded-lg break-words mb-0 my-2 mx-4 text-xs;
 }
 
 .message-user {
@@ -149,11 +145,3 @@
   }
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
-  .chatbot-window {
-    @apply w-80;
-    height: calc(100vh - 250px);
-    max-height: 450px;
-    min-height: 300px;
-  }
-}
