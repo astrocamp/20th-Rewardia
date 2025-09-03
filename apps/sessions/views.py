@@ -32,5 +32,5 @@ def logout_view(request):
 
     if username:
         UserAuthenticationService.handle_logout_success(request, username)
-
-        return redirect("pages:download")
+    
+        return redirect('pages:main')
