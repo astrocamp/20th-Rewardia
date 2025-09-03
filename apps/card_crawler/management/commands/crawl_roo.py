@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand
 from apps.card_crawler.roo import main_crawler
-import random
 
 
 class Command(BaseCommand):
@@ -8,5 +7,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.stdout.write("🦘開始抓取袋鼠金融信用卡🦘")
-
         main_crawler()
