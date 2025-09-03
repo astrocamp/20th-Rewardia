@@ -49,7 +49,7 @@ def new_card(request):
             messages.success(request, "新增卡片成功")
             return redirect("admins:cards")
         except:
-            messages.success(request, "新增失敗")
+            messages.error(request, "新增失敗")
             return redirect("admins:cards")
     else:
         return render(request, "admins/new_card.html", card_form_data)
