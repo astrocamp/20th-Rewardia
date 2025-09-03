@@ -18,3 +18,11 @@ class CrawledData(models.Model):
 
     def __str__(self):
         return self.card.name
+
+
+class CrawledRecord(models.Model):
+    total_time = models.DecimalField("Total Time", max_digits=8, decimal_places=3)
+    total_cards = models.IntegerField("Total Cards")
+    average_time = models.DecimalField("Average Time", max_digits=8, decimal_places=3)
+    errors = models.JSONField("Failed Cards")
+    created_at = models.DateTimeField("Created At", auto_now_add=True)
