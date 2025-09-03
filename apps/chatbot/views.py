@@ -8,8 +8,6 @@ import google.generativeai as genai
 try:
     genai.configure(api_key=settings.GEMINI_API_KEY)
 except AttributeError:
-    # This prevents the app from crashing if the key is missing on startup.
-    # The view itself will handle the error gracefully.
     pass
 
 
