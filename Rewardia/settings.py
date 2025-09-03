@@ -60,7 +60,7 @@ INSTALLED_APPS = [
     'apps.rewards',
     'apps.sessions',
     'apps.admins',
-    'apps.chatbot',  #gemini客服AI
+    'apps.chatbot',  #Gemini AI robot
     # ------------------------------
     "apps.nlp_validation",
     "apps.card_crawler",
