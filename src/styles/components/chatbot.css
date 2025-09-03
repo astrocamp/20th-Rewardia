@@ -1,12 +1,28 @@
 /* ========== Chatbot 聊天機器人組件樣式 ========== */
+
+/* 浮動按鈕 - 右邊，footer 上方 */
+.chatbot-float-btn {
+  /* 強制定位在右邊，footer 上方 */
+  position: fixed !important;
+  bottom: 80px !important;
+  right: 24px !important;
+  left: auto !important;
+  width: 56px !important;
+  height: 56px !important;
+  background-color: #2060B9 !important;
+  color: white !important;
+  border-radius: 50% !important;
+  z-index: 9999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 4px 12px rgba(32, 96, 185, 0.4) !important;
+  transition: all 0.2s ease !important;
+  border: none !important;
+  cursor: pointer !important;
+}
+
 @layer components {
-  
-  /* 浮動按鈕 - 避免與黑色 footer 衝突 */
-  .chatbot-float-btn {
-    @apply fixed bottom-6 right-6 w-14 h-14 bg-[#2060B9] text-white rounded-full shadow-lg hover:bg-[#1c55a4] transition-all duration-200 flex items-center justify-center z-50;
-    /* 確保在 footer 之上 */
-    box-shadow: 0 4px 12px rgba(32, 96, 185, 0.4);
-  }
   
   .chatbot-float-btn:hover {
     @apply scale-105;
@@ -19,8 +35,21 @@
 
   /* 聊天視窗容器 */
   .chatbot-window {
-    @apply fixed bottom-24 right-6 w-96 h-[500px] bg-white rounded-lg shadow-2xl z-50 flex flex-col overflow-hidden;
-    border: 1px solid #e5e7eb;
+    /* 強制定位在右邊，按鈕上方 */
+    position: fixed !important;
+    bottom: 150px !important;
+    right: 24px !important;
+    left: auto !important;
+    width: 384px !important;
+    height: 500px !important;
+    background-color: white !important;
+    border-radius: 8px !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+    z-index: 9998 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    border: 1px solid #e5e7eb !important;
     transform: translateY(100%) scale(0.8);
     opacity: 0;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -117,10 +146,6 @@
   .chatbot-empty-state {
     @apply flex flex-col items-center justify-center h-full text-center p-6 text-gray-500;
   }
-  
-  .chatbot-empty-icon {
-    @apply w-12 h-12 mb-3 text-gray-400;
-  }
 
   /* 響應式設計 */
   @media (max-width: 640px) {
@@ -130,7 +155,7 @@
     }
     
     .chatbot-float-btn {
-      @apply bottom-20 right-4;
+      @apply bottom-24 right-4;
     }
   }
   
