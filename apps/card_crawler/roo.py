@@ -210,6 +210,9 @@ def main_crawler():
         print(f"失敗: {error}")
 
     finally:
+        print(
+            f"\n總共載入了 {len(processed_urls)} 張卡片\n總測試時間: {time.strftime('%H:%M:%S', time.gmtime(total_time))}\n平均時間 {(total_time / len(test_cases)):.3f} 秒/張\nDone!"
+        )
         driver.quit()
 
 
