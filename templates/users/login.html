@@ -9,7 +9,7 @@
 {% if messages %}
   <div class="space-y-2 mb-4" x-data="auto_dismiss_message" x-show="show">
     {% for message in messages %}
-      <div class="alert alert-{{ message.tags }}" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+      <div class="tw-toast {{ message.tags }}" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
         <span>{{ message }}</span>
       </div>
     {% endfor %}

@@ -68,11 +68,5 @@ class UserRegistrationService:
                     return error.code
         return None
 
-    @staticmethod
-    def _handle_validation_errors(request, form):
-        """處理表單驗證錯誤"""
-        for field, errors in form.errors.items():
-            for error in errors:
-                messages.error(request, str(error))
     
     
