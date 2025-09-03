@@ -116,7 +116,7 @@ def get_card_info(driver, url):
             driver.implicitly_wait(5)
             # 找到navbar和footer之間的所有h4, h5, li, p的元素
             contents = driver.find_elements(
-                locate_with(By.CSS_SELECTOR, "h4,h5,p")
+                locate_with(By.CSS_SELECTOR, "h4,h5,li,p,p:not(li p)")
                 .above({By.XPATH: "//h2[text()='其他推薦信用卡']"})
                 .below({By.TAG_NAME: "h1"})
             )
