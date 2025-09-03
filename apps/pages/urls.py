@@ -8,7 +8,10 @@ urlpatterns = [
     path("", views.main, name="main"),
     path("faq/", views.faq, name="faq"),
     path("calculator/", views.calculator, name="calculator"),
+<<<<<<< HEAD
     path("login/", views.login, name="login"),
+=======
+>>>>>>> d924205 (fixed: 移除main.js中多餘或功能衝突或重複功能的程式碼)
     path("get-cards-by-bank/", views.get_cards_by_bank, name="get_cards_by_bank"),
     path(
         "get-categories-by-card/",

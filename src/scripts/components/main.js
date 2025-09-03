@@ -3,24 +3,19 @@ export default () => ({
   selectedBank: '',
   selectedReward: '',
   searchKeyword: '',
-  displayCards: [],
-  allCards: [],
-  originalCards: [], 
-  loadedCount: 3, 
-  loadIncrement: 1, 
-  isLoading: true, // Set to true initially for loading data
-  isLoadingMore: false, 
+  allCards: [], // 主要卡片資料陣列
+  originalCards: [], // 原始資料備份
+  loadedCount: 9, // 載入的卡片數量（網格9張，列表3張）
+  loadIncrement: 6, // 網格視圖每次載入6張，列表視圖每次載入1張
+  isLoading: true,
+  isLoadingMore: false,
   rewardCategoryMap: {},
-  rewardCategoriesChoices: [], // New property for reward choices
-  banks: [], // New property for banks
+  rewardCategoriesChoices: [],
+  banks: [],
   viewMode: 'grid', // 'grid' for card view (畫面b), 'list' for search results (畫面a)
-  gridCards: [], // Cards to display in grid view
-  gridLoadedCount: 9, // Number of cards loaded in grid view
-  gridLoadIncrement: 6, // Load 6 more cards each time in grid view
   
   // 使用 API 獲取資料進行初始化
   async init() {
-    console.log('Initializing main component, viewMode:', this.viewMode);
     try {
       const response = await fetch('/api/main-data/');
       if (!response.ok) {
@@ -28,172 +23,33 @@ export default () => ({
       }
       const data = await response.json();
       
-      this.originalCards = data.all_cards_data; 
-      this.allCards = [...this.originalCards]; 
+      this.originalCards = data.all_cards_data;
       this.rewardCategoryMap = data.reward_category_map;
-      this.rewardCategoriesChoices = data.reward_categories_choices; // Populate reward choices
-      this.banks = data.banks; // Populate banks from API
+      this.rewardCategoriesChoices = data.reward_categories_choices;
+      this.banks = data.banks;
       
-      this.setupGridView();
-      this.displayRandomCards();
+      this.initializeView();
     } catch (error) {
       console.error("Error fetching initial data:", error);
-      // Handle error, e.g., display an error message to the user
     } finally {
       this.isLoading = false;
     }
   },
   
-  // 設定網格視圖的卡片
-  setupGridView() {
-    console.log('Setting up grid view, allCards length:', this.allCards.length);
-    const shuffled = [...this.allCards].sort(() => 0.5 - Math.random());
-    this.allCards = shuffled; // Update allCards with shuffled order for grid view
-    this.gridLoadedCount = Math.min(9, this.allCards.length);
-    this.updateGridCards();
-    console.log('Grid cards set:', this.gridCards.length);
+  // 初始化視圖（統一的初始化邏輯）
+  initializeView() {
+    this.resetToGridView();
   },
   
-  // 更新網格視圖顯示的卡片
-  updateGridCards() {
-    this.gridCards = this.allCards.slice(0, this.gridLoadedCount);
+  // 重置到網格視圖
+  resetToGridView() {
+    const shuffled = [...this.originalCards].sort(() => 0.5 - Math.random());
+    this.allCards = shuffled;
+    this.loadedCount = Math.min(9, this.allCards.length);
+    this.viewMode = 'grid';
   },
   
-  // 載入更多網格卡片
-  loadMoreGridCards() {
-    if (this.gridLoadedCount >= this.allCards.length) {
-      return;
-    }
-    
-    this.gridLoadedCount = Math.min(this.gridLoadedCount + this.gridLoadIncrement, this.allCards.length);
-    this.updateGridCards();
-  },
-  
-  // 檢查網格視圖是否還有更多卡片
-  hasMoreGridCards() {
-    return this.gridLoadedCount < this.allCards.length;
-  },
-  
-  // 網格視圖滾動監聽處理
-  handleGridScroll(event) {
-    const element = event.target;
-    const threshold = 100;
-    
-    if (element.scrollTop + element.clientHeight >= element.scrollHeight - threshold) {
-      this.loadMoreGridCards();
-    }
-  },
-  
-  // 顯示初始的隨機卡片
-  displayRandomCards() {
-    const shuffled = [...this.allCards].sort(() => 0.5 - Math.random());
-    this.allCards = shuffled; 
-    this.loadedCount = 3;
-    this.displayCards = this.allCards.slice(0, this.loadedCount);
-  },
-  
-  // 銀行選擇變更
-  onBankChange() {
-    console.log('Bank changed:', this.selectedBank);
-    this.performSearch();
-  },
-  
-  // 優惠選擇變更
-  onRewardChange() {
-    console.log('Reward changed:', this.selectedReward);
-    this.performSearch();
-  },
-  
-  // 執行搜尋
-  performSearch() {
-    // Check if any search criteria is active
-    const hasSearchCriteria = this.selectedBank || this.selectedReward || this.searchKeyword.trim();
-    
-    if (!hasSearchCriteria) {
-      // No search criteria - return to grid view
-      this.viewMode = 'grid';
-      this.allCards = [...this.originalCards];
-      this.loadedCount = Math.min(3, this.allCards.length);
-      this.updateDisplayCards();
-      return;
-    }
-    
-    // Switch to list view for search results
-    this.viewMode = 'list';
-    this.isLoading = true;
-    
-    setTimeout(() => {
-      let filteredCards = [...this.originalCards]; 
-      
-      // Filter by bank
-      if (this.selectedBank) {
-        filteredCards = filteredCards.filter(card => 
-          card.bank === this.selectedBank
-        );
-      }
-      
-      // Filter by reward category dropdown
-      if (this.selectedReward) {
-        const selectedCategoryDisplay = this.rewardCategoryMap[this.selectedReward];
-        filteredCards = filteredCards.filter(card =>
-          card.rewards.some(reward =>
-            reward.category.includes(selectedCategoryDisplay)
-          )
-        );
-      }
-
-      // Filter by keyword (fuzzy search on reward category)
-      if (this.searchKeyword && this.searchKeyword.trim() !== '') {
-        const keyword = this.searchKeyword.trim().toLowerCase();
-        filteredCards = filteredCards.filter(card =>
-          card.rewards.some(reward =>
-            reward.category.toLowerCase().includes(keyword)
-          )
-        );
-      }
-
-      // 將符合條件的優惠排到第一個
-      if (this.selectedReward) {
-        filteredCards = filteredCards.map(card => {
-          const selectedCategoryDisplay = this.rewardCategoryMap[this.selectedReward];
-          const matchingRewards = card.rewards.filter(reward =>
-            reward.category.includes(selectedCategoryDisplay)
-          );
-          const otherRewards = card.rewards.filter(reward =>
-            !reward.category.includes(selectedCategoryDisplay)
-          );
-          
-          return {
-            ...card,
-            rewards: [...matchingRewards, ...otherRewards]
-          };
-        });
-      }
-      
-      // 按照優惠數值排序（數值最高的優先）
-      if (this.selectedReward) {
-        filteredCards.sort((a, b) => {
-          const aMaxRate = this.getMaxRewardRate(a, this.selectedReward);
-          const bMaxRate = this.getMaxRewardRate(b, this.selectedReward);
-          return bMaxRate - aMaxRate; 
-        });
-      } else {
-        filteredCards.sort(() => 0.5 - Math.random());
-      }
-      
-      this.allCards = filteredCards; 
-      this.loadedCount = Math.min(3, filteredCards.length); 
-      this.updateDisplayCards();
-      this.isLoading = false;
-    }, 500);
-  },
-  
-  // 更新顯示的卡片
-  updateDisplayCards() {
-    this.displayCards = this.allCards.slice(0, this.loadedCount);
-  },
-  
-  // 載入更多卡片
+  // 載入更多卡片（統一邏輯）
   loadMoreCards() {
     if (this.isLoadingMore || this.loadedCount >= this.allCards.length) {
       return;
@@ -202,25 +58,99 @@ export default () => ({
     this.isLoadingMore = true;
     
     setTimeout(() => {
-      this.loadedCount = Math.min(this.loadedCount + this.loadIncrement, this.allCards.length);
-      this.updateDisplayCards();
+      const increment = this.viewMode === 'grid' ? 6 : 1;
+      this.loadedCount = Math.min(this.loadedCount + increment, this.allCards.length);
       this.isLoadingMore = false;
     }, 300);
   },
   
-  // 檢查是否還有更多卡片可載入
+  // 檢查是否還有更多卡片（統一邏輯）
   hasMoreCards() {
     return this.loadedCount < this.allCards.length;
   },
   
-  // 滾動監聽處理
+  // 滾動監聽處理（統一邏輯）
   handleScroll(event) {
     const element = event.target;
-    const threshold = 100; 
+    const threshold = 100;
     
     if (element.scrollTop + element.clientHeight >= element.scrollHeight - threshold) {
       this.loadMoreCards();
     }
+  },
+  
+  // 銀行選擇變更
+  onBankChange() {
+    this.performSearch();
+  },
+  
+  // 優惠選擇變更
+  onRewardChange() {
+    this.performSearch();
+  },
+  
+  // 執行搜尋
+  performSearch() {
+    const hasSearchCriteria = this.selectedBank || this.selectedReward || this.searchKeyword.trim();
+    
+    if (!hasSearchCriteria) {
+      this.resetToGridView();
+      return;
+    }
+    
+    this.viewMode = 'list';
+    this.isLoading = true;
+    
+    setTimeout(() => {
+      let filteredCards = [...this.originalCards];
+      
+      // 依序套用篩選條件
+      if (this.selectedBank) {
+        filteredCards = filteredCards.filter(card => card.bank === this.selectedBank);
+      }
+      
+      if (this.selectedReward) {
+        const selectedCategoryDisplay = this.rewardCategoryMap[this.selectedReward];
+        filteredCards = filteredCards.filter(card =>
+          card.rewards.some(reward => reward.category.includes(selectedCategoryDisplay))
+        );
+      }
+
+      if (this.searchKeyword?.trim()) {
+        const keyword = this.searchKeyword.trim().toLowerCase();
+        filteredCards = filteredCards.filter(card =>
+          card.rewards.some(reward => reward.category.toLowerCase().includes(keyword))
+        );
+      }
+
+      // 重新排列優惠順序（符合條件的排前面）
+      if (this.selectedReward) {
+        const selectedCategoryDisplay = this.rewardCategoryMap[this.selectedReward];
+        filteredCards = filteredCards.map(card => {
+          const matchingRewards = card.rewards.filter(reward =>
+            reward.category.includes(selectedCategoryDisplay)
+          );
+          const otherRewards = card.rewards.filter(reward =>
+            !reward.category.includes(selectedCategoryDisplay)
+          );
+          
+          return { ...card, rewards: [...matchingRewards, ...otherRewards] };
+        });
+        
+        // 按優惠數值排序
+        filteredCards.sort((a, b) => {
+          const aMaxRate = this.getMaxRewardRate(a, this.selectedReward);
+          const bMaxRate = this.getMaxRewardRate(b, this.selectedReward);
+          return bMaxRate - aMaxRate;
+        });
+      } else {
+        filteredCards.sort(() => 0.5 - Math.random());
+      }
+      
+      this.allCards = filteredCards;
+      this.loadedCount = Math.min(3, filteredCards.length);
+      this.isLoading = false;
+    }, 500);
   },
   
   // 檢查優惠是否符合搜尋條件
