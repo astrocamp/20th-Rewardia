@@ -118,9 +118,21 @@ export default () => ({
 
       if (this.searchKeyword?.trim()) {
         const keyword = this.searchKeyword.trim().toLowerCase();
-        filteredCards = filteredCards.filter(card =>
-          card.rewards.some(reward => reward.category.toLowerCase().includes(keyword))
-        );
+        filteredCards = filteredCards.filter(card => {
+          // 搜尋銀行名稱
+          const bankMatch = card.bank.toLowerCase().includes(keyword);
+          
+          // 搜尋卡片名稱
+          const cardNameMatch = card.name.toLowerCase().includes(keyword);
+          
+          // 搜尋優惠類別
+          const rewardMatch = card.rewards.some(reward => 
+            reward.category.toLowerCase().includes(keyword)
+          );
+          
+          // 只要任一項目匹配就回傳 true
+          return bankMatch || cardNameMatch || rewardMatch;
+        });
       }
 
       // 重新排列優惠順序（符合條件的排前面）
