@@ -101,9 +101,6 @@ class UserRegistrationForm(forms.Form):
         if not re.search(r'[0-9]', password):
             raise ValidationError('Missing number', code='password_missing_number')
         
-        if not re.search(r'[0-9]', password):
-            raise ValidationError('密碼必須包含至少一個數字')
-        
         return password
     
     def clean(self):
@@ -119,9 +116,10 @@ class UserRegistrationForm(forms.Form):
 
     def save(self):
         """創建新用戶並返回用戶對象"""
+        data = self.cleaned_data
         user = User.objects.create_user(
-            username=username,
-            email=email,
-            password=password
+            username=data['username'],
+            email=data['email'],
+            password=data['password']
         )
         return user
