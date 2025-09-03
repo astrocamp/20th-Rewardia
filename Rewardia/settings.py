@@ -51,12 +51,13 @@ INSTALLED_APPS = [
     # ------------------------------
     "debug_toolbar",
     # ------------------------------
-    "apps.pages",
-    "apps.users",
-    "apps.cards",
-    "apps.rewards",
-    "apps.sessions",
-    "apps.admins",
+    'apps.pages',
+    'apps.users',
+    'apps.cards', 
+    'apps.rewards',
+    'apps.sessions',
+    'apps.admins',
+    'apps.chatbot',  #gemini客服AI
     # ------------------------------
     "apps.nlp_validation",
     "apps.card_crawler",
