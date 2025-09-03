@@ -10,7 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.relative_locator import locate_with
 import time
-from apps.card_crawler.models import CrawledData
+from apps.card_crawler.models import CrawledData, CrawledRecord
 from datetime import datetime
 
 failed_cards = {}
@@ -198,6 +198,15 @@ def crawl_roo_cards(driver, cat_urls):
         print(f"Failed or with error: {failed_cards}")
 
 
+def save_crawl_record(data):
+    CrawledRecord.objects.create(
+        total_time=data["total_time"],
+        total_cards=data["total_cards"],
+        average_time=data["average_cards"],
+        errors=data["errors"],
+    )
+
+
 # 寫這個目的是讓瀏覽器只要開一次，不要開開關關
 def main_crawler():
     try:
@@ -206,6 +215,15 @@ def main_crawler():
         category_urls = crawl_roo_urls(driver)
         crawl_roo_cards(driver, category_urls)
         total_time = time.time() - start_time
+
+        crawl_record = {
+            "total_time": total_time,
+            "total_cards": len(processed_urls),
+            "average_time": f"{(total_time / len(processed_urls)):.3f}",
+            "errors": failed_cards,
+        }
+
+        save_crawl_record(crawl_record)
 
     except Exception as error:
         print(f"失敗: {error}")
