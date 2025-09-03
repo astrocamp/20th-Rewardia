@@ -8,7 +8,7 @@
     aria-label="開啟 AI 助理"
     type="button"
   >
-    <!-- AI 機器人圖標 -->
+    <!-- AI 機器人圖 -->
     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
       <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1H5C3.89 1 3 1.89 3 3V7H21M7 10C5.89 10 5 10.89 5 12V22C5 23.11 5.89 24 7 24H17C18.11 24 19 23.11 19 22V12C19 10.89 18.11 10 17 10H7ZM7.5 12H9.5V14H7.5V12ZM14.5 12H16.5V14H14.5V12ZM7.5 15H16.5V16H7.5V15ZM12 17.5C10.07 17.5 8.5 16.43 8.5 15H15.5C15.5 16.43 13.93 17.5 12 17.5Z"/>
     </svg>
@@ -48,10 +48,10 @@
         {% if user.is_authenticated %}
           <p class="text-sm font-medium">Hi, {{ user.first_name|default:user.username }}！</p>
         {% else %}
-          <p class="text-sm">你好！</p>
+          <p class="text-sm">你好</p>
         {% endif %}
-        <p class="text-sm">歡迎來到Rewardia的世界！</p>
-        <p class="text-xs mt-1">想了解關於Rewardia的一切都可以問我喔</p>
+        <p class="text-sm">歡迎來到Rewardia的世界</p>
+        <p class="text-sm">想了解這裡的一切都可以問我喔</p>
       </div>
 
       <!-- 訊息列表 -->
@@ -68,7 +68,7 @@
           </div>
           <!-- 訊息氣泡 -->
           <div 
-            class="message-bubble"
+            class="message-bubble whitespace-pre-wrap"
             :class="message.type === 'user' ? 'message-user' : 'message-ai'"
             x-text="message.content"
           ></div>
@@ -111,17 +111,4 @@
       </div>
     </div>
   </div>
-
-  <!-- 背景遮罩（手機版） -->
-  <div 
-    x-show="isOpen" 
-    @click="closeChat()"
-    class="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
-    x-transition:enter="transition ease-out duration-300"
-    x-transition:enter-start="opacity-0"
-    x-transition:enter-end="opacity-100"
-    x-transition:leave="transition ease-in duration-200"
-    x-transition:leave-start="opacity-100"
-    x-transition:leave-end="opacity-0"
-  ></div>
 </div>
