@@ -1,12 +1,5 @@
 from django.core.management.base import BaseCommand
-from apps.card_crawler.roo import (
-    main_crawler,
-    get_card_info,
-    save_crawl_record,
-    failed_cards,
-)
-from selenium import webdriver
-import time
+from apps.card_crawler.roo import main_crawler
 
 
 class Command(BaseCommand):
@@ -14,4 +7,5 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.stdout.write("🦘開始抓取袋鼠金融信用卡🦘")
+
         main_crawler()

@@ -12,6 +12,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.relative_locator import locate_with
 import time
 from apps.card_crawler.models import CrawledData, CrawledRecord
+from datetime import timedelta
+from django.utils import timezone
 from datetime import datetime
 
 failed_cards = {"failed": []}
@@ -190,9 +192,22 @@ def crawl_roo_cards(driver, cat_urls):
             card_urls = [card.get_attribute("href") for card in card_names]
 
             for card_url in card_urls:
-                get_card_info(driver, card_url)
-                time.sleep(sleep_time)
-                processed_urls.add(card_url)
+                try:
+                    current_card = CrawledData.objects.get(url=card_url)
+                    # 一小時內沒抓過的，就抓取，跳過一小時內抓過的
+                    if timezone.now() - current_card.updated_at > timedelta(hours=1):
+                        get_card_info(driver, card_url)
+                        time.sleep(sleep_time)
+                        processed_urls.add(card_url)
+                    else:
+                        # 就算沒有抓，還是算已經處理過的卡
+                        processed_urls.add(card_url)
+                        print("近一小時已經抓過了。")
+                # 如果這張卡不存在資料庫，那就繼續抓取
+                except CrawledData.DoesNotExist:
+                    get_card_info(driver, card_url)
+                    time.sleep(sleep_time)
+                    processed_urls.add(card_url)
 
         # 排除成功的url，並將沒有被找到的url，設is_active=False
         handle_missing_urls(processed_urls)
@@ -226,6 +241,7 @@ def main_crawler():
 
     except Exception as error:
         print(f"失敗: {error}")
+        breakpoint()
 
     finally:
         total_time = time.time() - start_time
