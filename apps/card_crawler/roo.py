@@ -5,6 +5,7 @@ from selenium.common.exceptions import (
     WebDriverException,
     TimeoutException,
     StaleElementReferenceException,
+    NoSuchElementException,
 )
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -104,20 +105,21 @@ def get_card_info(driver, url):
                     button.click()
 
                     try:
-                        time.sleep(0.5)
-                        answer = driver.find_element(
+                        time.sleep(1)
+                        answers = driver.find_elements(
                             locate_with(By.CLASS_NAME, "answer")
                             .above({By.XPATH: "//h2[text()='其他推薦信用卡']"})
                             .below({By.TAG_NAME: "h1"})
                         )
-
-                        # for answer in answers:
-                        #     # 排出空白的
-                        if answer and len(answer.text) > 1:
-                            crawled_data["content"].append(answer.text)
+                        for answer in answers:
+                            if answer and len(answer.text) > 1:
+                                crawled_data["content"].append(answer.text)
 
                     # 為了忽略element移動找不到的錯誤，因為實際上還是點的到
                     except StaleElementReferenceException:
+                        continue
+
+                    except NoSuchElementException:
                         continue
 
                     except WebDriverException as error:
@@ -132,19 +134,7 @@ def get_card_info(driver, url):
                     print(f"Error fetching button: {error}")
                     button_error = create_error_data(url, error, card_name=card_name)
                     failed_cards["failed"].append(button_error)
-                    print(failed_cards)
 
-            # try:
-            #     # 比較節省時間的等待方式，如果元素在10秒內還沒出現就會回傳錯誤
-            #     WebDriverWait(driver, 10).until(
-            #         EC.visibility_of_all_elements_located(
-            #             (By.CSS_SELECTOR, "h4,h5,li,p:not(li p)")
-            #         )
-            #     )
-            # except TimeoutException as error:
-            #     print("Error fetching elements")
-            #     answer_error = create_error_data(url, error, card_name=card_name)
-            #     failed_cards["failed"].append(answer_error)
             save_data(crawled_data)
         except WebDriverException as error:
             print(f"Card not found: {error}")
@@ -225,13 +215,20 @@ def save_crawl_record(data):
 
 # 寫這個目的是讓瀏覽器只要開一次，不要開開關關
 def main_crawler():
+    options = webdriver.ChromeOptions()
+    options.add_argument("--disable-popup-blocking")
+    options.add_argument("--disable-notifications")
     try:
         start_time = time.time()
-        driver = webdriver.Chrome()
+        driver = webdriver.Chrome(options=options)
         category_urls = crawl_roo_urls(driver)
         crawl_roo_cards(driver, category_urls)
-        total_time = time.time() - start_time
 
+    except Exception as error:
+        print(f"失敗: {error}")
+
+    finally:
+        total_time = time.time() - start_time
         crawl_record = {
             "total_time": total_time,
             "total_cards": len(processed_urls),
@@ -241,12 +238,8 @@ def main_crawler():
 
         save_crawl_record(crawl_record)
 
-    except Exception as error:
-        print(f"失敗: {error}")
-
-    finally:
         print(
-            f"總共載入了 {len(processed_urls)} 張卡片\n失敗卡片數：{len(failed_cards)}\n總測試時間: {time.strftime('%H:%M:%S', time.gmtime(total_time))}\n平均時間 {(total_time / len(processed_urls)):.3f} 秒/張，Done!"
+            f"總共載入了 {len(processed_urls)} 張卡片\n有誤卡片數：{len(failed_cards)}\n總測試時間: {time.strftime('%H:%M:%S', time.gmtime(total_time))}\n平均時間 {(total_time / len(processed_urls)):.3f} 秒/張，Done!"
         )
         driver.quit()
 

@@ -1,5 +1,12 @@
 from django.core.management.base import BaseCommand
-from apps.card_crawler.roo import main_crawler
+from apps.card_crawler.roo import (
+    main_crawler,
+    get_card_info,
+    save_crawl_record,
+    failed_cards,
+)
+from selenium import webdriver
+import time
 
 
 class Command(BaseCommand):
