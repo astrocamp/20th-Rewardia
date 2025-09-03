@@ -13,7 +13,7 @@ import time
 from apps.card_crawler.models import CrawledData
 from datetime import datetime
 
-failed_cards = []
+failed_cards = {}
 processed_urls = set()
 # 仿效真人操作瀏覽器，隨機從0.7-1.4秒之間，挑選暫停秒數
 sleep_time = random.uniform(0.7, 1.4)
@@ -196,22 +196,23 @@ def crawl_roo_cards(driver, cat_urls):
 
     finally:
         print(f"Failed or with error: {failed_cards}")
-        print(f"Processed {len(processed_urls)} cards.")
 
 
 # 寫這個目的是讓瀏覽器只要開一次，不要開開關關
 def main_crawler():
     try:
+        start_time = time.time()
         driver = webdriver.Chrome()
         category_urls = crawl_roo_urls(driver)
         crawl_roo_cards(driver, category_urls)
+        total_time = time.time() - start_time
 
     except Exception as error:
         print(f"失敗: {error}")
 
     finally:
         print(
-            f"\n總共載入了 {len(processed_urls)} 張卡片\n總測試時間: {time.strftime('%H:%M:%S', time.gmtime(total_time))}\n平均時間 {(total_time / len(test_cases)):.3f} 秒/張\nDone!"
+            f"總共載入了 {len(processed_urls)} 張卡片\n失敗卡片數：{len(failed_cards)}\n總測試時間: {time.strftime('%H:%M:%S', time.gmtime(total_time))}\n平均時間 {(total_time / len(processed_urls)):.3f} 秒/張，Done!"
         )
         driver.quit()
 
