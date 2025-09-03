@@ -4,6 +4,7 @@ from apps.nlp_validation.config import NLPConfig
 from apps.cards.models import CreditCard
 from apps.rewards.models import RewardCategory, PendingReward
 from apps.card_crawler.models import CrawledData
+from apps.nlp_validation.models import AnalysisStatistics
 from apps.nlp_validation.processors import (
     AdvancedTextCleaner,
     SmartSentenceSplitter,
@@ -50,8 +51,10 @@ class Command(BaseCommand):
             return
 
         test_cases = [data.content for data in crawled_data]
-
+        
+        # 初始化統計變數
         total_start_time = time.time()
+        error_info = []
 
         for index, test_text in enumerate(test_cases, 1):
             index_start_time = time.time()
@@ -178,7 +181,18 @@ class Command(BaseCommand):
                                         status=PendingReward.Status.PENDING,
                                     )
                                 except Exception as e:
-                                    self.stdout.write(f"PendingReward建立失敗: {e}")
+                                    error_msg = f"PendingReward建立失敗: {e}"
+                                    error_info.append({
+                                        "index": index,
+                                        "type": "PendingReward創建錯誤",
+                                        "message": str(e),
+                                        "details": {
+                                            "nlp_category": result.get('category'),
+                                            "nlp_scope": result.get('scope'),
+                                            "reward_type": result.get('reward_type')
+                                        }
+                                    })
+                                    self.stdout.write(error_msg)
                                     self.stdout.write(
                                         f"nlp_category: '{result['category']}' (len: {len(str(result['category']) if result['category'] else '')})"
                                     )
@@ -194,6 +208,12 @@ class Command(BaseCommand):
                 )
 
             except Exception as e:
+                error_info.append({
+                    "index": index,
+                    "type": "處理錯誤",
+                    "message": str(e),
+                    "text_preview": test_text[:100] + "..." if len(test_text) > 100 else test_text
+                })
                 self.stdout.write(self.style.ERROR(f"處理失敗：{e}"))
                 continue
 
@@ -205,3 +225,19 @@ class Command(BaseCommand):
         )
         self.stdout.write(f"平均時間 {(total_time / len(test_cases)):.3f} 秒/張")
         self.stdout.write(self.style.SUCCESS("所有結果已儲存到 PendingReward 模型"))
+        
+        # 創建分析統計記錄
+        try:
+            average_time = total_time / len(test_cases) if len(test_cases) > 0 else 0
+            
+            AnalysisStatistics.objects.create(
+                total_time=total_time,
+                analyzed_count=len(test_cases),
+                average_time=average_time,
+                errors={"errors": error_info, "error_count": len(error_info)}
+            )
+            
+            self.stdout.write(self.style.SUCCESS("分析統計已記錄"))
+            
+        except Exception as e:
+            self.stdout.write(self.style.ERROR(f"統計記錄建立失敗: {e}"))
