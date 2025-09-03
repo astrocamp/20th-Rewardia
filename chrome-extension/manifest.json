@@ -1,0 +1,10 @@
+{
+  "name": "Rewardia",
+  "description": "信用卡回饋比較網站，一張卡，省下你的每一塊",
+  "version": "1.0",
+  "manifest_version": 3,
+  "action": {
+    "default_popup": "popup/rewardia.html",
+    "default_icon": "images/logo.png"
+  }
+}
