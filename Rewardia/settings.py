@@ -188,7 +188,6 @@ MESSAGE_TAGS = {
     messages.ERROR: "tw-toast tw-error",
 }
 
-<<<<<<< HEAD
 # ================================
 # OAuth 設定區塊
 # ================================
@@ -250,10 +249,8 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
-=======
 CORS_ALLOWED_ORIGINS = [
     "chrome-extension://odiagekokpobofjdlbmfobkbohcljnoe",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
->>>>>>> 7b05802 (feat: 增加其他必要設定和安裝能允許CORS的套件)
