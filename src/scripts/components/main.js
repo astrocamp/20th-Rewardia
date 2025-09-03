@@ -81,11 +81,15 @@ export default () => ({
   
   // 銀行選擇變更
   onBankChange() {
+    // 當使用下拉選單時，清空關鍵字搜尋欄位
+    this.searchKeyword = '';
     this.performSearch();
   },
   
   // 優惠選擇變更
   onRewardChange() {
+    // 當使用下拉選單時，清空關鍵字搜尋欄位
+    this.searchKeyword = '';
     this.performSearch();
   },
   
@@ -117,6 +121,10 @@ export default () => ({
       }
 
       if (this.searchKeyword?.trim()) {
+        // 當使用關鍵字搜尋時，清空其他選擇器
+        this.selectedBank = '';
+        this.selectedReward = '';
+        
         const keyword = this.searchKeyword.trim().toLowerCase();
         filteredCards = filteredCards.filter(card => {
           // 搜尋銀行名稱
