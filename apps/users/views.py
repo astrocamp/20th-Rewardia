@@ -5,6 +5,18 @@ from .services import UserRegistrationService
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
+from rest_framework.authtoken.models import Token
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
+
+# from apps.banks.models import Bank
 from apps.cards.models import CreditCard
 from .models import UserCard
 
@@ -221,6 +233,10 @@ def card_delete(request, card_id):
     return render(request, "users/card_delete_confirm.html", context)
 
 
+# 允許插件獲得token的函數
+@api_view(["GET"])
+@authentication_classes([SessionAuthentication])
+@permission_classes([IsAuthenticated])
 def get_token(request):
     try:
         token = Token.objects.get(user=request.user)
@@ -231,5 +247,8 @@ def get_token(request):
                 "message": "Token retrieved successfully",
             }
         )
-    except:
-        pass
+    except Exception as e:
+        return Response(
+            {"error": "Failed to retrieve token"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
