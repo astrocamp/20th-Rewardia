@@ -51,18 +51,34 @@
         <!-- <svg class="w-12 h-12 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
         </svg> -->
+        {% if user.is_authenticated %}
+          <p class="text-sm font-medium">Hi, {{ user.first_name|default:user.username }}！</p>
+        {% else %}
+          <p class="text-sm">你好！</p>
+        {% endif %}
         <p class="text-sm">歡迎來到Rewardia的世界！</p>
         <p class="text-xs mt-1">想了解關於Rewardia的一切都可以問我喔</p>
       </div>
 
       <!-- 訊息列表 -->
       <template x-for="(message, index) in messages" :key="index">
-        <div class="w-full">
+        <div class="w-full" style="margin-bottom: 1rem !important;">
+          <!-- 發送者標籤 -->
+          <div 
+            :style="message.type === 'user' ? 'text-align: right; margin-right: 1rem; margin-bottom: 0.25rem;' : 'text-align: left; margin-left: 1rem; margin-bottom: 0.25rem;'"
+          >
+            <span 
+              class="text-xs text-gray-500"
+              x-text="message.type === 'user' ? '使用者' : 'Rewardia'"
+              style="font-size: 0.7rem !important; color: #6b7280 !important;"
+            ></span>
+          </div>
+          <!-- 訊息氣泡 -->
           <div 
             class="message-bubble"
             :class="message.type === 'user' ? 'message-user' : 'message-ai'"
             x-text="message.content"
-            :style="message.type === 'user' ? 'background-color: #374151 !important; color: white !important; margin-left: auto !important; margin-right: 1rem !important; max-width: 85% !important; padding: 0.75rem !important; border-radius: 0.5rem !important; word-wrap: break-word !important; margin-bottom: 0.5rem !important;' : 'background-color: white !important; color: #374151 !important; margin-left: 1rem !important; margin-right: auto !important; max-width: 85% !important; padding: 0.75rem !important; border-radius: 0.5rem !important; border: 1px solid #e5e7eb !important; word-wrap: break-word !important; margin-bottom: 0.5rem !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;'"
+            :style="message.type === 'user' ? 'background-color: #374151 !important; color: white !important; margin-left: auto !important; margin-right: 1rem !important; max-width: 85% !important; padding: 0.75rem !important; border-radius: 0.5rem !important; word-wrap: break-word !important; margin-bottom: 0 !important;' : 'background-color: white !important; color: #374151 !important; margin-left: 1rem !important; margin-right: auto !important; max-width: 85% !important; padding: 0.75rem !important; border-radius: 0.5rem !important; border: 1px solid #e5e7eb !important; word-wrap: break-word !important; margin-bottom: 0 !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;'"
           ></div>
         </div>
       </template>
