@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.google",  # OAuth 必要：Google OAuth 提供者
     # ------------------------------
     "rest_framework",
+    "rest_framework.authtoken",
 ]
 
 MIDDLEWARE = [

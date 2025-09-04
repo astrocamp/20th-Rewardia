@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.views.decorators.http import require_POST
 from .forms import UserLoginForm
 from .services import UserAuthenticationService
+from rest_framework.authtoken.models import Token
 
 
 def login_view(request):
@@ -15,6 +16,7 @@ def login_view(request):
         success, user, error_type = UserAuthenticationService.login_user(request, form)
 
         if success:
+            token, created = Token.objects.get_or_create(user=user)
             UserAuthenticationService.handle_login_success(request, user)
             return redirect("users:member_zone")
         else:
@@ -32,5 +34,5 @@ def logout_view(request):
 
     if username:
         UserAuthenticationService.handle_logout_success(request, username)
-    
-        return redirect('pages:main')
+
+        return redirect("pages:main")
