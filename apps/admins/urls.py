@@ -27,6 +27,11 @@ urlpatterns = [
         name="delete_pending_reward",
     ),
     path(
+        "rewards/<int:id>/hard-delete/",
+        views.hard_delete_pending_reward,
+        name="hard_delete_pending_reward",
+    ),
+    path(
         "rewards/<int:id>/edit/", views.edit_pending_reward, name="edit_pending_reward"
     ),
     path(

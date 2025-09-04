@@ -225,6 +225,7 @@ class PendingReward(models.Model):
 
     class Status(models.TextChoices):
         PENDING = "PENDING", "待審核"
+        REVIEWING = "REVIEWING", "審核中"
         APPROVED = "APPROVED", "已通過"
         REJECTED = "REJECTED", "已拒絕"
 
@@ -254,6 +255,9 @@ class PendingReward(models.Model):
         "審核狀態", max_length=10, choices=Status.choices, default=Status.PENDING
     )
 
+    # 軟刪除
+    soft_deleted_at = models.DateTimeField("軟刪除時間", null=True, blank=True)
+    
     # 時間戳記
     created_at = models.DateTimeField("建立時間", auto_now_add=True)
 
@@ -297,3 +301,38 @@ class PendingReward(models.Model):
         """駁回審核"""
         self.status = self.Status.REJECTED
         self.save()
+        
+    def soft_delete(self):
+        """軟刪除 - 移到審核中狀態"""
+        self.soft_deleted_at = timezone.now()
+        self.status = self.Status.REVIEWING
+        self.save()
+    
+    @classmethod
+    def detect_and_soft_delete_duplicates(cls):
+        """檢測並軟刪除重複資料"""
+        from django.db.models import Count
+        
+        # 找出有重複的群組
+        duplicates = cls.objects.filter(
+            status=cls.Status.PENDING
+        ).values(
+            'card_id', 'nlp_category', 'nlp_scope', 'reward_type'
+        ).annotate(
+            count=Count('id')
+        ).filter(count__gt=1)
+        
+        for duplicate_group in duplicates:
+            # 找出這群組中的所有記錄
+            records = cls.objects.filter(
+                card_id=duplicate_group['card_id'],
+                nlp_category=duplicate_group['nlp_category'],
+                nlp_scope=duplicate_group['nlp_scope'],
+                reward_type=duplicate_group['reward_type'],
+                status=cls.Status.PENDING
+            ).order_by('-created_at')  # 最新的在前
+            
+            # 保留最新的，其他軟刪除
+            if records.count() > 1:
+                for record in records[1:]:  # 跳過第一筆（最新的）
+                    record.soft_delete()

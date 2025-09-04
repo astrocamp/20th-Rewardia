@@ -100,6 +100,9 @@ def delete_card(request, id):
 
 def rewards(request):
     """主要的rewards管理頁面"""
+    # 進入頁面時自動執行軟刪除檢測
+    PendingReward.detect_and_soft_delete_duplicates()
+    
     status_filter = request.GET.get("status", "PENDING")
     page = request.GET.get("page", 1)
 
@@ -112,6 +115,7 @@ def rewards(request):
 
     stats = {
         "pending_count": PendingReward.objects.filter(status="PENDING").count(),
+        "reviewing_count": PendingReward.objects.filter(status="REVIEWING").count(),
         "approved_count": PendingReward.objects.filter(status="APPROVED").count(),
         "rejected_count": PendingReward.objects.filter(status="REJECTED").count(),
         "total_count": PendingReward.objects.count(),
@@ -215,6 +219,29 @@ def delete_pending_reward(request, id):
         messages.error(request, f"刪除失敗：{str(e)}")
         return HttpResponse(
             f'<tr><td colspan="8" class="text-red-500">刪除失敗：{str(e)}</td></tr>'
+        )
+
+
+@require_http_methods(["DELETE"])
+def hard_delete_pending_reward(request, id):
+    """硬刪除軟刪除的項目"""
+    pending_reward = get_object_or_404(PendingReward, pk=id)
+    
+    # 只允許硬刪除軟刪除且在審核中狀態的資料
+    if pending_reward.status == 'REVIEWING' and pending_reward.soft_deleted_at:
+        try:
+            pending_reward.delete()
+            messages.success(request, "硬刪除成功")
+            return HttpResponse("")
+        except Exception as e:
+            messages.error(request, f"硬刪除失敗：{str(e)}")
+            return HttpResponse(
+                f'<tr><td colspan="9" class="text-red-500">硬刪除失敗：{str(e)}</td></tr>'
+            )
+    else:
+        messages.error(request, "只能硬刪除軟刪除的資料")
+        return HttpResponse(
+            f'<tr><td colspan="9" class="text-red-500">只能硬刪除軟刪除的資料</td></tr>'
         )
 
 

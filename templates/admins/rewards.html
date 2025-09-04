@@ -2,89 +2,92 @@
 {% block title %}回饋規則管理 - Rewardia{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <!-- 標題和統計 -->
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-4">回饋規則管理</h1>
-
-        <!-- 統計卡片 -->
-        <div class="grid grid-cols- gap-4 mb-6">
-            <div class="bg-yellow-100 border border-yellow-300 rounded-lg p-4">
-                <h3 class="text-yellow-800 font-semibold">待審核</h3>
-                <p class="text-2xl font-bold text-yellow-600">{{ stats.pending_count }}</p>
-            </div>
-            <div class="bg-green-100 border border-green-300 rounded-lg p-4">
-                <h3 class="text-green-800 font-semibold">已通過</h3>
-                <p class="text-2xl font-bold text-green-600">{{ stats.approved_count }}</p>
-            </div>
-            <div class="bg-red-100 border border-red-300 rounded-lg p-4">
-                <h3 class="text-red-800 font-semibold">已拒絕</h3>
-                <p class="text-2xl font-bold text-red-600">{{ stats.rejected_count }}</p>
-            </div>
-            <div class="bg-blue-100 border border-blue-300 rounded-lg p-4">
-                <h3 class="text-blue-800 font-semibold">總計</h3>
-                <p class="text-2xl font-bold text-blue-600">{{ stats.total_count }}</p>
-            </div>
-        </div>
+<div class="p-6 max-w-7xl mx-auto bg-gray-50 min-h-screen">
+    <!-- 標題 -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">回饋規則管理</h1>
+        <p class="text-gray-600">管理信用卡回饋規則的審核與設定</p>
     </div>
 
-    <!-- 分類切換標籤 -->
-    <div class="mb-6">
-        <div class="border-b border-gray-200">
-            <nav class="-mb-px flex space-x-8">
-                <a href="{% url 'admins:rewards' %}?status=PENDING"
-                   class="py-2 px-1 border-b-2 font-medium text-sm {% if current_status == 'PENDING' %}border-yellow-500 text-yellow-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %}">
-                    待審核 ({{ stats.pending_count }})
-                </a>
-                <a href="{% url 'admins:rewards' %}?status=APPROVED"
-                   class="py-2 px-1 border-b-2 font-medium text-sm {% if current_status == 'APPROVED' %}border-green-500 text-green-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %}">
-                    已通過 ({{ stats.approved_count }})
-                </a>
-                <a href="{% url 'admins:rewards' %}?status=REJECTED"
-                   class="py-2 px-1 border-b-2 font-medium text-sm {% if current_status == 'REJECTED' %}border-red-500 text-red-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %}">
-                    已拒絕 ({{ stats.rejected_count }})
-                </a>
-                <a href="{% url 'admins:rewards' %}?status=ALL"
-                   class="py-2 px-1 border-b-2 font-medium text-sm {% if current_status == 'ALL' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %}">
-                    全部 ({{ stats.total_count }})
-                </a>
-            </nav>
+    <!-- 狀態統計按鈕 -->
+    <div class="flex flex-wrap gap-3 mb-6">
+        <a href="{% url 'admins:rewards' %}?status=PENDING"
+           class="px-4 py-2 rounded-lg font-medium transition-all duration-200 {% if current_status == 'PENDING' %}bg-blue-600 text-white shadow-lg scale-105{% else %}bg-white text-gray-700 hover:bg-gray-50 border border-gray-200{% endif %}">
+            待審核 ({{ stats.pending_count }})
+        </a>
+        <a href="{% url 'admins:rewards' %}?status=REVIEWING"
+           class="px-4 py-2 rounded-lg font-medium transition-all duration-200 {% if current_status == 'REVIEWING' %}bg-blue-600 text-white shadow-lg scale-105{% else %}bg-white text-gray-700 hover:bg-gray-50 border border-gray-200{% endif %}">
+            審核中 ({{ stats.reviewing_count }})
+        </a>
+        <a href="{% url 'admins:rewards' %}?status=APPROVED"
+           class="px-4 py-2 rounded-lg font-medium transition-all duration-200 {% if current_status == 'APPROVED' %}bg-blue-600 text-white shadow-lg scale-105{% else %}bg-white text-gray-700 hover:bg-gray-50 border border-gray-200{% endif %}">
+            已通過 ({{ stats.approved_count }})
+        </a>
+        <a href="{% url 'admins:rewards' %}?status=REJECTED"
+           class="px-4 py-2 rounded-lg font-medium transition-all duration-200 {% if current_status == 'REJECTED' %}bg-blue-600 text-white shadow-lg scale-105{% else %}bg-white text-gray-700 hover:bg-gray-50 border border-gray-200{% endif %}">
+            已拒絕 ({{ stats.rejected_count }})
+        </a>
+        <a href="{% url 'admins:rewards' %}?status=ALL"
+           class="px-4 py-2 rounded-lg font-medium transition-all duration-200 {% if current_status == 'ALL' %}bg-blue-600 text-white shadow-lg scale-105{% else %}bg-white text-gray-700 hover:bg-gray-50 border border-gray-200{% endif %}">
+            全部 ({{ stats.total_count }})
+        </a>
+    </div>
+
+    <!-- 回饋描述顯示框 -->
+    <div class="bg-white p-4 rounded-lg shadow-sm mb-6 h-24">
+        <div class="text-sm text-gray-500 mb-2">回饋描述預覽</div>
+        <div id="description-display" class="text-gray-800 bg-gray-50 p-3 rounded h-16 overflow-y-auto">
+            請點選下方列表查看回饋描述詳情...
         </div>
     </div>
 
     <!-- 資料表格 -->
-    <div class="bg-white shadow rounded-lg overflow-hidden">
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
         {% if pending_rewards %}
         <!-- 通知訊息區域 -->
         <div id="messages-container">
             {% include 'layouts/messages.html' %}
         </div>
 
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">信用卡</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">分類</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">範圍</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">回饋率</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">回饋類型</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">信心度</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">狀態</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">建立時間</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                {% for reward in pending_rewards %}
-                    {% include "admins/reward_row.html" %}
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">信用卡</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">分類</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">範圍</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">回饋率</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">回饋類型</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">信心度</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">狀態</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">建立時間</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for reward in pending_rewards %}
+                        {% include "admins/reward_row.html" %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         {% else %}
-        <div class="text-center py-12">
-            <p class="text-gray-500">沒有找到任何資料</p>
+        <div class="text-center py-12 bg-white rounded-lg mt-6">
+            <div class="text-gray-400 text-lg mb-2">沒有找到符合條件的資料</div>
+            <div class="text-gray-500">請嘗試調整狀態篩選</div>
         </div>
         {% endif %}
+    </div>
+
+    <!-- 說明區域 -->
+    <div class="mt-8 bg-blue-50 p-4 rounded-lg">
+        <h3 class="font-medium text-blue-900 mb-2">系統說明</h3>
+        <ul class="text-sm text-blue-800 space-y-1">
+            <li>• <strong>軟刪除機制：</strong>進入頁面時自動比對重複資料 (card_id + nlp_category + nlp_scope + reward_type)</li>
+            <li>• <strong>待審核：</strong>可執行通過、駁回、編輯、刪除操作</li>
+            <li>• <strong>審核中：</strong>軟刪除的資料，只能執行硬刪除操作</li>
+            <li>• <strong>點擊列表：</strong>查看回饋描述詳情，支援hover和toggle效果</li>
+        </ul>
     </div>
 </div>
 
@@ -108,6 +111,40 @@ htmx.on('htmx:afterRequest', function(evt) {
 
 htmx.on('htmx:sendError', function(evt) {
     console.error('HTMX 請求錯誤:', evt.detail);
+});
+
+// 點擊列表顯示回饋描述
+document.addEventListener('click', function(e) {
+    const row = e.target.closest('tr[data-extracted-sentence]');
+    if (row) {
+        // 移除所有其他列的toggle效果
+        document.querySelectorAll('tr[data-extracted-sentence]').forEach(tr => {
+            tr.classList.remove('bg-blue-50', 'border-l-4', 'border-blue-500');
+        });
+        
+        // 添加當前列的toggle效果
+        row.classList.add('bg-blue-50', 'border-l-4', 'border-blue-500');
+        
+        // 顯示回饋描述
+        const extractedSentence = row.getAttribute('data-extracted-sentence');
+        document.getElementById('description-display').textContent = extractedSentence;
+    }
+});
+
+// 添加hover效果
+document.addEventListener('DOMContentLoaded', function() {
+    const rows = document.querySelectorAll('tr[data-extracted-sentence]');
+    rows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            if (!this.classList.contains('bg-blue-50')) {
+                this.classList.add('hover:bg-gray-50');
+            }
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.classList.remove('hover:bg-gray-50');
+        });
+    });
 });
 </script>
 {% endblock %}
