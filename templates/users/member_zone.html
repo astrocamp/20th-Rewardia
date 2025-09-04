@@ -1,168 +1,115 @@
-{% extends 'layouts/default.html' %} {% block title %}會員專區 - Rewardia{%
-endblock %} {% block content %}
+{% extends "layouts/default.html" %}
+
+{% block title %}會員專區 - Rewardia{% endblock %}
+
+{% block content %}
 <section class="calculator-page">
   <div class="calculator-container">
     <!-- 區塊標題：會員專區 -->
     <h2 class="calculator-title">會員專區</h2>
 
     {% if not user.is_authenticated %}
-    <!-- 訪客狀態 (member_guest 內容) -->
-    <div class="member-guest-content">
-      <div class="member-guest-image">
-        <img
-          src="https://github.com/astrocamp/20th-Rewardia/blob/pic/img/user-empty.png?raw=true"
-          loading="eager"
-          alt="會員專區"
-          class="w-full max-w-md mx-auto"
-        />
-      </div>
-
-      <div class="member-guest-text">
-        <p class="member-guest-message">請登入才能使用更多功能</p>
-        <button
-          class="ui-btn ui-btn-primary member-guest-btn"
-          onclick="window.location.href='{% url 'sessions:login' %}'"
-        >
-          立即登入
-        </button>
-      </div>
-    </div>
-
-    {% else %}
-    <!-- 已登入狀態 -->
-    <!-- 會員資料區塊 -->
-    <div class="member-section">
-      <div class="member-section-bg">
-        <div class="member-section-header">
-          <div class="flex items-center gap-3">
-            <svg
-              class="w-6 h-6 text-gray-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="1.5"
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-              />
-            </svg>
-            <h3 class="member-section-title">會員資料</h3>
-          </div>
-          <button class="ui-btn ui-btn-primary">修改密碼</button>
+      <!-- 訪客狀態 (member_guest 內容) -->
+      <div class="member-guest-content">
+        <div class="member-guest-image">
+          <img
+            src="https://github.com/astrocamp/20th-Rewardia/blob/pic/img/user-empty.png?raw=true"
+            loading="eager"
+            alt="會員專區"
+            class="w-full max-w-md mx-auto"
+          />
         </div>
 
-        <div class="member-info-grid">
-          <div class="member-info-item">
-            <span class="member-info-label">帳號</span>
-            <span class="member-info-value">{{ user.username }}</span>
-          </div>
-          <div class="member-info-item">
-            <span class="member-info-label">電子郵件</span>
-            {% if user.email %}
-            <span class="member-info-value">{{ user.email }}</span>
-            {% else %}
-            <span class="member-info-value member-info-empty">未填寫</span>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 我的卡片區塊 -->
-    <div class="member-section">
-      <div class="member-section-bg">
-        <div class="member-section-header">
-          <div class="flex items-center gap-3">
-            <svg
-              class="w-6 h-6 text-gray-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="1.5"
-                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-              />
-            </svg>
-            <h3 class="member-section-title">我的卡片</h3>
-          </div>
-          <a href="{% url 'users:card_new' %}" class="ui-btn ui-btn-primary"
-            >+ 新增卡片</a
+        <div class="member-guest-text">
+          <p class="member-guest-message">請登入才能使用更多功能</p>
+          <button
+            class="ui-btn ui-btn-primary member-guest-btn"
+            onclick="window.location.href='{% url "sessions:login" %}'"
           >
+            立即登入
+          </button>
         </div>
-
-        {% if user_cards %}
-        <!-- 有卡片資料 -->
-        <div class="member-cards-list">
-          {% for user_card in user_cards %}
-          <div class="member-card-item">
-            <div class="member-card-info">
-              <h4 class="member-card-name">{{ user_card.card.bank }} {{ user_card.card.name }}</h4>
-              <p class="member-card-bank">{{ user_card.card.bank }}</p>
-            </div>
-            <div class="member-card-actions">
-              <a
-                href="{% url 'users:card_edit' user_card.id %}"
-                class="ui-btn-small ui-btn-small-dark"
-                >編輯</a
-              >
-              <a
-                href="{% url 'users:card_delete' user_card.id %}"
-                class="ui-btn-small ui-btn-small-gray"
-                >刪除</a
-              >
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-        {% else %}
-        <!-- 沒有卡片資料 -->
-        <div class="member-empty-content">
-          <div class="member-empty-icon">
-            <!-- 文件圖標-->
-            <svg width="80" height="90" viewBox="0 0 80 90" fill="none">
-              <!-- 主文件形狀（圓角矩形） -->
-              <rect width="79.19" height="89.24" rx="8" fill="#E5E7EB" />
-              <!-- 文字行（使用 line 元素） -->
-              <line
-                x1="20.5"
-                y1="38.2"
-                x2="59.5"
-                y2="38.2"
-                stroke="#BEC1C6"
-                stroke-width="7"
-                stroke-linecap="round"
-              />
-              <line
-                x1="20.5"
-                y1="51.2"
-                x2="59.5"
-                y2="51.2"
-                stroke="#BEC1C6"
-                stroke-width="7"
-                stroke-linecap="round"
-              />
-              <line
-                x1="20.5"
-                y1="64.2"
-                x2="59.5"
-                y2="64.2"
-                stroke="#BEC1C6"
-                stroke-width="7"
-                stroke-linecap="round"
-              />
-            </svg>
-          </div>
-          <p class="member-empty-text">目前沒有資料</p>
-        </div>
-        {% endif %}
       </div>
-    </div>
+    {% else %}
+      <!-- 已登入狀態 -->
+      <!-- 會員資料區塊 -->
+      <div class="member-section">
+        <div class="member-section-bg">
+          <div class="member-section-header">
+            <div class="flex items-center gap-3">
+              <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <h3 class="member-section-title">會員資料</h3>
+            </div>
+            <button class="ui-btn ui-btn-primary">修改密碼</button>
+          </div>
 
+          <div class="member-info-grid">
+            <div class="member-info-item">
+              <span class="member-info-label">帳號</span>
+              <span class="member-info-value">{{ user.username }}</span>
+            </div>
+            <div class="member-info-item">
+              <span class="member-info-label">電子郵件</span>
+              {% if user.email %}
+                <span class="member-info-value">{{ user.email }}</span>
+              {% else %}
+                <span class="member-info-value member-info-empty">未填寫</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 我的卡片區塊 -->
+      <div class="member-section">
+        <div class="member-section-bg">
+          <div class="member-section-header">
+            <div class="flex items-center gap-3">
+              <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+              </svg>
+              <h3 class="member-section-title">我的卡片</h3>
+            </div>
+            <a href="{% url 'users:card_new' %}" class="ui-btn ui-btn-primary">+ 新增卡片</a>
+          </div>
+
+          {% if user_cards %}
+            <!-- 有卡片資料 -->
+            <div class="member-cards-list">
+              {% for user_card in user_cards %}
+              <div class="member-card-item">
+                <div class="member-card-info">
+                  <h4 class="member-card-name">{{ user_card.card.bank.name }} {{ user_card.card.name }}</h4>
+                  <p class="member-card-bank">{{ user_card.card.bank.name }}</p>
+                </div>
+                <div class="member-card-actions">
+                  <a href="{% url 'users:card_edit' user_card.id %}" class="ui-btn-small ui-btn-small-dark">編輯</a>
+                  <a href="{% url 'users:card_delete' user_card.id %}" class="ui-btn-small ui-btn-small-gray">刪除</a>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <!-- 沒有卡片資料 -->
+            <div class="member-empty-content">
+              <div class="member-empty-icon">
+                <!-- 文件圖標-->
+                <svg width="80" height="90" viewBox="0 0 80 90" fill="none">
+                  <rect width="79.19" height="89.24" rx="8" fill="#E5E7EB" />
+                  <line x1="20.5" y1="38.2" x2="59.5" y2="38.2" stroke="#BEC1C6" stroke-width="7" stroke-linecap="round" />
+                  <line x1="20.5" y1="51.2" x2="59.5" y2="51.2" stroke="#BEC1C6" stroke-width="7" stroke-linecap="round" />
+                  <line x1="20.5" y1="64.2" x2="59.5" y2="64.2" stroke="#BEC1C6" stroke-width="7" stroke-linecap="round" />
+                </svg>
+              </div>
+              <p class="member-empty-text">目前沒有資料</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
     {% endif %}
   </div>
 </section>
