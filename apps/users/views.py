@@ -219,3 +219,17 @@ def card_delete(request, card_id):
         "user_card": user_card,
     }
     return render(request, "users/card_delete_confirm.html", context)
+
+
+def get_token(request):
+    try:
+        token = Token.objects.get(user=request.user)
+        return Response(
+            {
+                "token": token.key,
+                "user_id": request.user.id,
+                "message": "Token retrieved successfully",
+            }
+        )
+    except:
+        pass
