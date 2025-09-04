@@ -2,196 +2,182 @@
 
 /* 浮動按鈕 - 右邊，footer 上方 */
 .chatbot-float-btn {
-  /* 強制定位在右邊，footer 上方 */
-  position: fixed !important;
-  bottom: 80px !important;
-  right: 24px !important;
-  left: auto !important;
-  width: 56px !important;
-  height: 56px !important;
-  background-color: #2060B9 !important;
-  color: white !important;
-  border-radius: 50% !important;
-  z-index: 9999 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  box-shadow: 0 4px 12px rgba(32, 96, 185, 0.4) !important;
-  transition: all 0.2s ease !important;
-  border: none !important;
-  cursor: pointer !important;
+  @apply fixed bottom-8 right-6 w-14 h-14 text-gray-700 rounded-full z-50 flex items-center justify-center cursor-pointer transition-all duration-200;
+  background: linear-gradient(180deg, #B8F5E6 0%, #34D399 100%);
+  box-shadow: 0 4px 12px rgba(52, 211, 153, 0.4);
+  border: 2px solid #34D399;
 }
 
-@layer components {
-  
-  .chatbot-float-btn:hover {
-    transform: scale(1.05) !important;
-    box-shadow: 0 6px 16px rgba(52, 211, 153, 0.5) !important;
-  }
-  
-  .chatbot-float-btn:active {
-    @apply scale-95;
-  }
+.chatbot-float-btn:hover {
+  @apply scale-105;
+  box-shadow: 0 6px 16px rgba(52, 211, 153, 0.5);
+}
 
-  /* 聊天視窗容器 */
+.chatbot-float-btn:active {
+  @apply scale-95;
+}
+
+/* 聊天視窗容器 */
+.chatbot-window {
+  @apply fixed bottom-20 right-6 w-80 h-96 rounded-2xl shadow-2xl z-40 flex flex-col overflow-hidden;
+  background: linear-gradient(180deg, #B8F5E6 0%, #FFFFFF 100%);
+  border: 2px solid #34D399;
+  transform: translateY(100%) scale(0.8);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chatbot-window.show {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+/* 聊天視窗標題列 */
+.chatbot-header {
+  @apply p-4 flex-shrink-0 flex items-center justify-between;
+  border-bottom: 1px solid rgba(52, 211, 153, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.chatbot-title {
+  @apply text-lg font-semibold text-gray-900 m-0;
+}
+
+.chatbot-close-btn {
+  @apply w-8 h-8 text-gray-600 border-none rounded-md flex items-center justify-center cursor-pointer transition-all duration-200;
+  background: transparent;
+}
+
+.chatbot-close-btn:hover {
+  @apply text-gray-800;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* 聊天訊息區域 */
+.chatbot-messages {
+  @apply flex-1 overflow-y-auto overflow-x-hidden p-4 bg-transparent;
+  min-height: 200px;
+  max-height: calc(100% - 140px);
+  scrollbar-width: thin;
+  scrollbar-color: #34d399 transparent;
+}
+
+/* 自定義滾動條樣式 */
+.chatbot-messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chatbot-messages::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+.chatbot-messages::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-sm;
+}
+
+.chatbot-messages::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400;
+}
+
+/* 空狀態樣式 */
+.chatbot-empty-state {
+  @apply flex flex-col items-center justify-center h-full text-center p-6 text-gray-500;
+}
+
+.chatbot-empty-icon {
+  @apply w-12 h-12 mb-4 text-gray-400;
+}
+
+.chatbot-empty-text {
+  @apply text-sm text-gray-500 m-0;
+}
+
+/* 訊息氣泡樣式 */
+.message-bubble {
+  @apply max-w-[85%] p-3 rounded-lg break-words mb-0;
+  margin: 0.5rem 1rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.message-user {
+  @apply bg-gray-800 text-white rounded-lg;
+  margin-left: auto;
+  margin-right: 1rem;
+}
+
+.message-ai {
+  @apply bg-white text-gray-900 border border-gray-200 rounded-lg;
+  margin-left: 1rem;
+  margin-right: auto;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* 載入指示器 */
+.chatbot-loading {
+  @apply flex items-center gap-2 text-gray-500 text-sm;
+}
+
+.chatbot-typing-dots {
+  @apply flex gap-1;
+}
+
+.chatbot-typing-dot {
+  @apply w-2 h-2 bg-gray-400 rounded-full;
+  animation: typing 1.4s infinite ease-in-out;
+}
+
+.chatbot-typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.chatbot-typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+/* 輸入區域 */
+.chatbot-input-area {
+  @apply p-4 flex-shrink-0 mt-auto;
+  border-top: 1px solid rgba(52, 211, 153, 0.3);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.chatbot-input-form {
+  @apply flex items-center gap-2;
+}
+
+.chatbot-input {
+  @apply flex-1 min-h-10 max-h-30 p-3 border-none rounded-lg bg-white text-gray-700 resize-none outline-none text-sm leading-5 transition-all duration-200;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.chatbot-input:focus {
+  @apply border-blue-500;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.chatbot-send-btn {
+  @apply w-10 h-10 bg-blue-600 text-white border-none rounded-lg flex items-center justify-center cursor-pointer transition-all duration-200 flex-shrink-0;
+}
+
+.chatbot-send-btn:hover {
+  @apply bg-blue-700;
+}
+
+.chatbot-send-btn:disabled {
+  @apply bg-gray-400 cursor-not-allowed;
+}
+
+/* 響應式設計 */
+@media (max-width: 640px) {
   .chatbot-window {
-    /* 強制定位在右邊，按鈕上方 */
-    position: fixed !important;
-    bottom: 150px !important;
-    right: 24px !important;
-    left: auto !important;
-    width: 384px !important;
-    height: 500px !important;
-    background-color: white !important;
-    border-radius: 8px !important;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
-    z-index: 9998 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
-    border: 1px solid #e5e7eb !important;
-    transform: translateY(100%) scale(0.8);
-    opacity: 0;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    @apply w-full h-full bottom-0 right-0 rounded-none;
+    border-radius: 0;
   }
   
-  .chatbot-window.show {
-    transform: translateY(0) scale(1);
-    opacity: 1;
+  .chatbot-float-btn {
+    @apply bottom-24 right-4;
   }
+}
 
-  /* 聊天視窗標題列 */
-  .chatbot-header {
-    @apply bg-transparent text-gray-800 flex items-center justify-between;
-    border-bottom: 1px solid rgba(52, 211, 153, 0.3);
-    background: rgba(255, 255, 255, 0.1);
-    padding: 1rem;
-    flex-shrink: 0;
-  }
-  
-  .chatbot-title {
-    @apply text-lg font-semibold;
-  }
-  
-  .chatbot-close-btn {
-    @apply w-8 h-8 bg-transparent text-gray-600 hover:text-gray-800 hover:bg-white hover:bg-opacity-50 rounded transition-colors duration-200 flex items-center justify-center;
-  }
-
-  /* 聊天訊息區域 */
-  .chatbot-messages {
-    @apply flex-1 overflow-y-auto space-y-3;
-    background: transparent;
-    padding: 1rem;
-    scrollbar-width: thin;
-    scrollbar-color: #34d399 transparent;
-    max-height: calc(100% - 120px);
-  }
-  
-  .chatbot-messages::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  .chatbot-messages::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  
-  .chatbot-messages::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-    border-radius: 3px;
-  }
-
-  /* 訊息氣泡 */
-  .message-bubble {
-    @apply max-w-[85%] p-3 rounded-lg text-sm leading-relaxed;
-    margin: 0.5rem 1rem;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-  }
-  
-  .message-user {
-    @apply bg-gray-800 text-white rounded-lg;
-    margin-left: auto;
-    margin-right: 1rem;
-  }
-  
-  .message-ai {
-    @apply bg-white text-gray-900 border border-gray-200 rounded-lg;
-    margin-left: 1rem;
-    margin-right: auto;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-
-  /* 輸入區域 */
-  .chatbot-input-area {
-    border-top: 1px solid rgba(52, 211, 153, 0.3);
-    background: rgba(255, 255, 255, 0.8);
-    padding: 1rem;
-    flex-shrink: 0;
-  }
-  
-  .chatbot-input-form {
-    @apply flex items-center gap-2;
-  }
-  
-  .chatbot-input {
-    flex: 1 !important;
-    min-height: 40px !important;
-    max-height: 120px !important;
-    padding: 0.75rem !important;
-    border: none !important;
-    border-radius: 0.5rem !important;
-    background-color: white !important;
-    color: #374151 !important;
-    resize: none !important;
-    outline: none !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
-    font-size: 0.875rem !important;
-    line-height: 1.25rem !important;
-    transition: height 0.2s ease !important;
-  }
-  
-  .chatbot-send-btn {
-    @apply w-10 h-10 bg-[#2060B9] text-white rounded-lg hover:bg-[#1c55a4] transition-colors duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed;
-  }
-
-  /* 載入指示器 */
-  .chatbot-loading {
-    @apply flex items-center gap-2 text-gray-500 text-sm;
-  }
-  
-  .chatbot-typing-dots {
-    @apply flex gap-1;
-  }
-  
-  .chatbot-typing-dot {
-    @apply w-2 h-2 bg-gray-400 rounded-full;
-    animation: typing 1.4s infinite ease-in-out;
-  }
-  
-  .chatbot-typing-dot:nth-child(1) { animation-delay: -0.32s; }
-  .chatbot-typing-dot:nth-child(2) { animation-delay: -0.16s; }
-
-  /* 空狀態 */
-  .chatbot-empty-state {
-    @apply flex flex-col items-center justify-center h-full text-center p-6 text-gray-500;
-  }
-
-  /* 響應式設計 */
-  @media (max-width: 640px) {
-    .chatbot-window {
-      @apply w-full h-full bottom-0 right-0 rounded-none;
-      border-radius: 0;
-    }
-    
-    .chatbot-float-btn {
-      @apply bottom-24 right-4;
-    }
-  }
-  
-  @media (min-width: 641px) and (max-width: 1024px) {
-    .chatbot-window {
-      @apply w-80 h-[450px];
-    }
+@media (min-width: 641px) and (max-width: 1024px) {
+  .chatbot-window {
+    @apply w-80 h-[450px];
   }
 }
 
