@@ -248,7 +248,7 @@ def main_crawler():
         crawl_record = {
             "total_time": total_time,
             "total_cards": len(processed_urls),
-            "average_time": f"{(total_time / len(processed_urls)):.3f}",
+            "average_time": total_time / len(processed_urls),
             "errors": failed_cards,
         }
 
