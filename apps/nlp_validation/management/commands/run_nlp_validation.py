@@ -1,5 +1,9 @@
 import time
+import os
 from django.core.management.base import BaseCommand
+from django.utils import timezone
+from django.db import transaction, IntegrityError
+from django.core.exceptions import ValidationError
 from apps.nlp_validation.config import NLPConfig
 from apps.cards.models import CreditCard
 from apps.rewards.models import PendingReward
@@ -19,32 +23,16 @@ def load_config(config_path=None):
     return NLPConfig.load_config()
 
 
-def check_existing_reward(card, nlp_category, nlp_scope, rate):
-    # 只檢查今天是否已有相同的回饋規則
-    from django.utils import timezone
-
-    today = timezone.now().date()
-    existing = PendingReward.objects.filter(
-        card=card,
-        nlp_category=nlp_category,
-        nlp_scope=nlp_scope,
-        created_at__date=today,  # 只檢查今天的記錄
-        status=PendingReward.Status.PENDING,
-    ).first()
-
-    if existing:
-        # 如果回饋率相同，視為重複
-        if (existing.min_rate == rate) or (existing.max_rate == rate):
-            return existing
-
-    return None
-
-
 class Command(BaseCommand):
     def handle(self, *args, **options):
         """主要處理邏輯"""
         self.stdout.write(self.style.SUCCESS("開始 NLP 驗證處理..."))
 
+        with transaction.atomic():
+            self._process_nlp_validation()
+
+    def _process_nlp_validation(self):
+        """實際的 NLP 驗證處理邏輯"""
         config = load_config()
 
         cleaner = AdvancedTextCleaner(config)
@@ -68,9 +56,17 @@ class Command(BaseCommand):
         error_info = []
         credit_card_cache = {}  # 快取已建立的信用卡
 
+        # 預載入今天所有的 PendingReward 避免重複查詢
+        today = timezone.now().date()
+        existing_rewards = {}
+        for reward in PendingReward.objects.filter(
+            created_at__date=today, status=PendingReward.Status.PENDING
+        ).select_related("card"):
+            key = f"{reward.card.id}_{reward.nlp_category}_{reward.nlp_scope}_{reward.min_rate}_{reward.max_rate}"
+            existing_rewards[key] = reward
+
         for index, test_text in enumerate(test_cases, 1):
             index_start_time = time.time()
-            self.stdout.write(f"開始處理：{index}")
 
             try:
                 # 1. 文本清洗
@@ -104,14 +100,20 @@ class Command(BaseCommand):
                                 self.stdout.write(
                                     f"建立新信用卡：{bank_name} {card_name}"
                                 )
-                        except Exception as e:
-                            self.stdout.write(f"CreditCard建立失敗: {e}")
+                        except ValidationError as e:
+                            self.stdout.write(f"CreditCard驗證失敗: {e}")
                             self.stdout.write(
                                 f"bank_name: '{bank_name}' (len: {len(bank_name)})"
                             )
                             self.stdout.write(
                                 f"card_name: '{card_name}' (len: {len(card_name)})"
                             )
+                            continue
+                        except IntegrityError as e:
+                            self.stdout.write(f"CreditCard完整性錯誤: {e}")
+                            continue
+                        except Exception as e:
+                            self.stdout.write(f"CreditCard建立失敗: {e}")
                             continue
 
                 if not credit_card:
@@ -146,8 +148,11 @@ class Command(BaseCommand):
                 if context_sentences:
                     main_sentences = [sent for sent, _ in context_sentences]
                     context_texts = [context for _, context in context_sentences]
-                    # 分批處理避免記憶體問題
-                    batch_size = min(20, len(main_sentences))  # 降低批次大小
+                    # 優化批次處理效能
+
+                    batch_size = int(os.environ.get("NLP_BATCH_SIZE", 50))
+                    batch_size = min(batch_size, len(main_sentences))
+
                     main_docs = list(
                         classifier.nlp.pipe(main_sentences, batch_size=batch_size)
                     )
@@ -156,31 +161,39 @@ class Command(BaseCommand):
                     )
 
                     for j, (sent, context_text) in enumerate(context_sentences, 1):
-                        main_doc = main_docs[j - 1] if j - 1 < len(main_docs) else None
-                        context_doc = (
-                            context_docs[j - 1] if j - 1 < len(context_docs) else None
-                        )
-
-                        # 8. 語義分類
-                        classification = classifier.classify_sentence_cached(
-                            sent, context_text, main_doc, context_doc
-                        )
-                        # 9. 回饋率提取
+                        # 8. 先檢查回饋率（快速過濾）
                         rates = rate_extractor.extract_rates_from_sentence(sent)
+
+                        # 只有找到回饋率才做語義分類
+                        if rates and len(rates) > 0:
+                            main_doc = (
+                                main_docs[j - 1] if j - 1 < len(main_docs) else None
+                            )
+                            context_doc = (
+                                context_docs[j - 1]
+                                if j - 1 < len(context_docs)
+                                else None
+                            )
+
+                            # 9. 語義分類（只對有回饋率的句子）
+                            classification = classifier.classify_sentence_cached(
+                                sent, context_text, main_doc, context_doc
+                            )
+                        else:
+                            # 沒有回饋率，跳過分類
+                            classification = {"matches": []}
+
+                        # 10. 記錄提取結果
                         results_list = rate_extractor.record_extraction_results(
                             sent, classification, rates
                         )
 
-                        # 10. 建立 PendingReward 記錄
+                        # 11. 建立 PendingReward 記錄
                         for result in results_list:
                             if result["rates_found"] > 0:
                                 # 檢查是否已有相同規則 (避免重複)
-                                existing = check_existing_reward(
-                                    credit_card,
-                                    result["category"],
-                                    result["scope"],
-                                    result["min_rate"] or result["max_rate"],
-                                )
+                                reward_key = f"{credit_card.id}_{result['category']}_{result['scope']}_{result['min_rate']}_{result['max_rate']}"
+                                existing = existing_rewards.get(reward_key)
 
                                 if not existing:
                                     try:
@@ -223,8 +236,6 @@ class Command(BaseCommand):
                                         self.stdout.write(
                                             f"reward_type: '{result['reward_type']}' (len: {len(str(result['reward_type']))})"
                                         )
-                                else:
-                                    self.stdout.write(f"跳過今日重複規則：{existing}")
 
                 self.stdout.write(
                     f"=========={index} Done! ====<-{(time.time() - index_start_time):.3f}->===="
