@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",  # OAuth 必要：社交帳號登入核心
     "allauth.socialaccount.providers.google",  # OAuth 必要：Google OAuth 提供者
     # ------------------------------
+    "rest_framework",
 ]
 
 MIDDLEWARE = [
