@@ -42,20 +42,9 @@ export default function chatbot() {
 
     // 開啟聊天視窗
     openChat() {
-      // 小螢幕模式下不允許開啟聊天視窗
-      if (this.isSmallScreen()) {
-        return;
-      }
-      
       this.isOpen = true;
       this.errorMessage = '';
-      
-      // 聚焦到輸入框
-      this.$nextTick(() => {
-        if (this.$refs.messageInput) {
-          this.$refs.messageInput.focus();
-        }
-      });
+      this.focusInput();
     },
 
     // 關閉聊天視窗
@@ -137,11 +126,7 @@ export default function chatbot() {
         this.scrollToBottom();
         
         // 重新聚焦到輸入框
-        this.$nextTick(() => {
-          if (this.$refs.messageInput) {
-            this.$refs.messageInput.focus();
-          }
-        });
+        this.focusInput();
       }
     },
 
@@ -155,24 +140,6 @@ export default function chatbot() {
       });
     },
 
-    // 清空聊天記錄
-    clearMessages() {
-      this.messages = [];
-      this.errorMessage = '';
-    },
-
-    // 格式化時間戳
-    formatTime(timestamp) {
-      return new Date(timestamp).toLocaleTimeString('zh-TW', {
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    },
-
-    // 檢查是否為有效訊息
-    isValidMessage(message) {
-      return message && message.trim().length > 0 && message.trim().length <= 500;
-    },
 
     // 自動調整 textarea 高度
     autoResize(event) {
@@ -191,10 +158,13 @@ export default function chatbot() {
       // Shift+Enter 允許換行（預設行為）
     },
 
-    // 清空聊天記錄
-    clearMessages() {
-      this.messages = [];
-      this.errorMessage = '';
+    // 聚焦到輸入框
+    focusInput() {
+      this.$nextTick(() => {
+        if (this.$refs.messageInput) {
+          this.$refs.messageInput.focus();
+        }
+      });
     }
   }
 }
