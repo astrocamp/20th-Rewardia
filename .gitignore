@@ -18,14 +18,10 @@ public/*
 .pg_service.conf
 .pg_db_pass
 uv.lock
-<<<<<<< HEAD
-<<<<<<< HEAD
-.vscode/
-=======
 
 ..pg_db_pass
 ..pg_service.conf
->>>>>>> 8d1c73d (feat: 新增存取至DB的函式)
-=======
+
 .vscode/
->>>>>>> ccb6275 (feat: crawled_data模型updated_at欄位)
+
+.gitignore
