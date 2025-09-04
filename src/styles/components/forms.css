@@ -48,7 +48,7 @@
 
   /* 錯誤訊息文字顏色 */
   .text-error {
-    color: #dc2626;
+    @apply text-red-600;
   }
   
   .select-wrapper {
