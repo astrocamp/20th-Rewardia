@@ -24,7 +24,6 @@ body {
 }
 
 .navbar {
-  color: #193966;
   position: fixed;
   box-sizing: border-box;
   padding: 0 15px;
@@ -39,11 +38,16 @@ body {
 }
 
 .icon {
+  padding-top: 5px;
+  font-size: 20px;
+}
+
+.icon a {
+  color: #193966;
+  text-decoration: none;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 5px;
-  font-size: 20px;
 }
 
 .navbar span {
