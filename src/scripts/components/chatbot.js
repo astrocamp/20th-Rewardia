@@ -13,16 +13,26 @@ export default function chatbot() {
 
     // 初始化
     init() {
-      // 監聽 ESC 鍵關閉聊天視窗
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && this.isOpen) {
+      // 監聽視窗大小變化，在小螢幕模式下自動關閉聊天視窗
+      window.addEventListener('resize', () => {
+        if (window.innerWidth <= 768 && this.isOpen) {
           this.closeChat();
         }
       });
     },
 
+    // 檢查是否為小螢幕模式
+    isSmallScreen() {
+      return window.innerWidth <= 768;
+    },
+
     // 切換聊天視窗顯示狀態
     toggleChat() {
+      // 小螢幕模式下不允許開啟聊天視窗
+      if (this.isSmallScreen()) {
+        return;
+      }
+      
       if (this.isOpen) {
         this.closeChat();
       } else {
@@ -32,6 +42,11 @@ export default function chatbot() {
 
     // 開啟聊天視窗
     openChat() {
+      // 小螢幕模式下不允許開啟聊天視窗
+      if (this.isSmallScreen()) {
+        return;
+      }
+      
       this.isOpen = true;
       this.errorMessage = '';
       
@@ -174,6 +189,12 @@ export default function chatbot() {
         this.sendMessage();
       }
       // Shift+Enter 允許換行（預設行為）
+    },
+
+    // 清空聊天記錄
+    clearMessages() {
+      this.messages = [];
+      this.errorMessage = '';
     }
   }
 }

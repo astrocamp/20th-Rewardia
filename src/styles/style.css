@@ -42,7 +42,7 @@
 
 @layer components {
   [x-cloak] {
-    display: none !important;
+    @apply hidden;
   }
   
   .fixed-header {
@@ -58,7 +58,7 @@
   }
   
   .banner-spacing {
-    margin-top: 5rem; /* 80px - for download.html and faq.html */
+    @apply mt-45; /* 80px - 標準橫幅上邊距，用於 download.html 和 faq.html */
   }
   
   body .main-container .main-content.banner-hidden {
