@@ -1,79 +1,76 @@
 <!-- 編輯表單行 -->
 <tr id="reward-{{ reward.id }}" class="bg-blue-50">
-    {% if current_status == 'PENDING' %}
-    <td class="px-6 py-4 whitespace-nowrap">
-        <!-- 編輯模式不顯示checkbox -->
-    </td>
-    {% endif %}
-    
     <td class="px-6 py-4 whitespace-nowrap text-sm">
         <div class="flex space-x-2">
             <button 
-                class="bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600"
-                hx-post="{% url 'admins:update_pending_reward' reward.id %}"
-                hx-target="#reward-{{ reward.id }}"
-                hx-swap="outerHTML"
-                hx-include="closest tr">
+            class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm font-medium"
+            style="background-color: #4b5563 !important; color: white !important;"
+            hx-post="{% url 'admins:update_pending_reward' reward.id %}"
+            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+            hx-target="#reward-{{ reward.id }}"
+            hx-swap="outerHTML"
+            hx-include="closest tr">
                 儲存
             </button>
-            <button 
-                class="bg-gray-500 text-white px-2 py-1 rounded text-xs hover:bg-gray-600"
-                hx-get="{% url 'admins:rewards_table' %}?status={{ current_status }}"
-                hx-target="#rewards-table-container"
-                hx-swap="innerHTML">
+            <button
+                class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm font-medium"
+                style="background-color: #4b5563 !important; color: white !important;"
+                hx-get="{% url 'admins:rewards' %}?status={{ current_status }}"
+                hx-target="body"
+                hx-swap="outerHTML">
                 取消
             </button>
         </div>
     </td>
-    
+
     <!-- 不可編輯：信用卡 -->
     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
         {{ reward.card.name }}
     </td>
-    
+
     <!-- 可編輯：分類 -->
     <td class="px-6 py-4 whitespace-nowrap">
-        <input type="text" name="category" value="{{ reward.category }}" 
+        <input type="text" name="nlp_category" value="{{ reward.nlp_category }}"
                class="border border-gray-300 rounded px-2 py-1 text-sm w-full">
     </td>
-    
+
     <!-- 可編輯：範圍 -->
     <td class="px-6 py-4 whitespace-nowrap">
-        <input type="text" name="scope" value="{{ reward.scope }}" 
+        <input type="text" name="nlp_scope" value="{{ reward.nlp_scope }}"
                class="border border-gray-300 rounded px-2 py-1 text-sm w-full">
     </td>
-    
+
     <!-- 可編輯：回饋率 -->
     <td class="px-6 py-4 whitespace-nowrap">
         <div class="flex space-x-1">
-            <input type="number" name="min_rate" value="{{ reward.min_rate|default:'' }}" 
+            <input type="number" name="min_rate" value="{{ reward.min_rate|default:'' }}"
                    step="0.01" placeholder="最低"
                    class="border border-gray-300 rounded px-2 py-1 text-sm w-16">
             <span class="text-gray-500">-</span>
-            <input type="number" name="max_rate" value="{{ reward.max_rate|default:'' }}" 
+            <input type="number" name="max_rate" value="{{ reward.max_rate|default:'' }}"
                    step="0.01" placeholder="最高"
                    class="border border-gray-300 rounded px-2 py-1 text-sm w-16">
         </div>
     </td>
-    
+
     <!-- 可編輯：回饋類型 -->
     <td class="px-6 py-4 whitespace-nowrap">
-        <input type="text" name="reward_type" value="{{ reward.reward_type }}" 
+        <input type="text" name="reward_type" value="{{ reward.reward_type }}"
                class="border border-gray-300 rounded px-2 py-1 text-sm w-full">
     </td>
-    
+
     <!-- 不可編輯：信心度 -->
     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
         {{ reward.confidence }}
     </td>
-    
+
     <!-- 不可編輯：狀態 -->
     <td class="px-6 py-4 whitespace-nowrap">
         <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
             編輯中
         </span>
     </td>
-    
+
     <!-- 不可編輯：建立時間 -->
     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
         {{ reward.created_at|date:"Y/m/d H:i" }}

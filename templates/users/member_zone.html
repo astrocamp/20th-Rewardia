@@ -50,7 +50,7 @@ endblock %} {% block content %}
             </svg>
             <h3 class="member-section-title">會員資料</h3>
           </div>
-          <button class="ui-btn ui-btn-primary">修改資料</button>
+          <button class="ui-btn ui-btn-primary">修改密碼</button>
         </div>
 
         <div class="member-info-grid">
@@ -101,10 +101,8 @@ endblock %} {% block content %}
           {% for user_card in user_cards %}
           <div class="member-card-item">
             <div class="member-card-info">
-              <h4 class="member-card-name">
-                {{ user_card.card.bank.name }}{{ user_card.card.name }}
-              </h4>
-              <p class="member-card-bank">{{ user_card.card.bank.name }}</p>
+              <h4 class="member-card-name">{{ user_card.card.bank }} {{ user_card.card.name }}</h4>
+              <p class="member-card-bank">{{ user_card.card.bank }}</p>
             </div>
             <div class="member-card-actions">
               <a
