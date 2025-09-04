@@ -8,9 +8,6 @@
   <div class="calculator-container">
     <h2 class="calculator-title">優惠試算</h2>
 
-    <!-- 訊息容器 -->
-    <div id="messages-container"></div>
-
     <div class="result-card">
       <div class="result-card-bg">
         <div class="result-content">
@@ -41,8 +38,8 @@
                         hx-trigger="change"
                         hx-include="this">
                   <option value="" selected disabled>請選擇銀行</option>
-                  {% for bank in banks %}
-                  <option value="{{ bank.id }}">{{ bank.name }}</option>
+                  {% for bank_name in banks %}
+                  <option value="{{ bank_name }}">{{ bank_name }}</option>
                   {% endfor %}
                 </select>
 
@@ -77,7 +74,7 @@
                         hx-get="/get-scopes-by-category/"
                         hx-target="#scope_select"
                         hx-trigger="change"
-                        hx-include="this">
+                        hx-include="#card_select,this">
                   <option value="" selected disabled>請先選擇卡片</option>
                 </select>
                 <div class="select-arrow" aria-hidden="true">
@@ -110,7 +107,8 @@
                   hx-post="{% url 'pages:calculate_reward' %}"
                   hx-target="#result_value"
                   hx-include="#calc_form"
-                  hx-trigger="click[document.getElementById('calc_form').checkValidity()]">
+                  hx-trigger="click[document.getElementById('calc_form').checkValidity()]"
+                  hx-on::after-request="scrollToResult()">
               進行試算
           </button>
           <button type="button" class="ui-btn ui-btn-secondary" onclick="clearForm()">清空填寫</button>
@@ -135,6 +133,7 @@
 </section>
 
 <script>
+// 清空表單函數
 function clearForm() {
 // 清空所有表單欄位
 document.getElementById('calc_form').reset();
@@ -151,7 +150,17 @@ categorySelect.innerHTML = '<option value="" selected disabled>請先選擇卡�
 
     // 清空結果顯示
     document.getElementById('result_value').innerHTML = '請選擇欄位進行計算';
-    document.getElementById('messages-container').innerHTML = '';
+}
+
+// 滾動到計算結果區域的函數
+function scrollToResult() {
+    const resultCard = document.querySelector('.result-card');
+    if (resultCard) {
+        resultCard.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+        });
+    }
 }
 </script>
 {% endblock %}

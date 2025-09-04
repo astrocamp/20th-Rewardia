@@ -1,63 +1,63 @@
-<!-- 單行資料，支援HTMX更新 -->
+
+<!-- 單行資料 -->
 <tr id="reward-{{ reward.id }}" class="hover:bg-gray-50">
-    {% if current_status == 'PENDING' %}
-    <td class="px-6 py-4 whitespace-nowrap">
-        <input type="checkbox" name="reward_ids" value="{{ reward.id }}" @change="updateSelectedCount()">
-    </td>
-    {% endif %}
-    
     <!-- 操作按鈕 -->
     <td class="px-6 py-4 whitespace-nowrap text-sm">
         {% if reward.status == 'PENDING' %}
-            <div class="flex space-x-2">
-                <button 
-                    class="bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600"
-                    hx-post="{% url 'admins:approve_pending_reward' reward.id %}"
-                    hx-target="#reward-{{ reward.id }}"
-                    hx-swap="outerHTML">
-                    通過
-                </button>
-                <button 
-                    class="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
-                    hx-post="{% url 'admins:reject_pending_reward' reward.id %}"
-                    hx-target="#reward-{{ reward.id }}"
-                    hx-swap="outerHTML">
-                    駁回
-                </button>
-                <button 
-                    class="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
-                    hx-get="{% url 'admins:edit_pending_reward' reward.id %}"
-                    hx-target="#reward-{{ reward.id }}"
-                    hx-swap="outerHTML">
-                    編輯
+            <div class="flex flex-wrap gap-1">
+            <button 
+            class="inline-block bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs font-bold border-0"
+            style="background-color: #059669 !important; color: white !important;"
+            hx-post="{% url 'admins:approve_pending_reward' reward.id %}"
+            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+            hx-target="#reward-{{ reward.id }}"
+            hx-swap="outerHTML">
+            通過
+            </button>
+            <button 
+            class="inline-block bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs font-bold border-0"
+            style="background-color: #dc2626 !important; color: white !important;"
+            hx-post="{% url 'admins:reject_pending_reward' reward.id %}"
+            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+            hx-target="#reward-{{ reward.id }}"
+                hx-swap="outerHTML">
+                駁回
+            </button>
+            <button 
+            class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs font-bold border-0"
+            style="background-color: #2563eb !important; color: white !important;"
+            hx-get="{% url 'admins:edit_pending_reward' reward.id %}"
+            hx-target="#reward-{{ reward.id }}"
+                hx-swap="outerHTML">
+                編輯
+            </button>
+            <button 
+            class="inline-block bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-xs font-bold border-0"
+            style="background-color: #4b5563 !important; color: white !important;"
+            hx-delete="{% url 'admins:delete_pending_reward' reward.id %}"
+            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+            hx-target="#reward-{{ reward.id }}"
+                hx-swap="outerHTML"
+                    hx-confirm="確定要刪除這個項目嗎？">
+                    刪除
                 </button>
             </div>
         {% elif reward.status == 'APPROVED' %}
-            <span class="text-green-600 font-medium">✓ 已通過</span>
+            <span class="inline-block bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">✓ 已通過</span>
         {% elif reward.status == 'REJECTED' %}
-            <span class="text-red-600 font-medium">✗ 已駁回</span>
+            <span class="inline-block bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">✗ 已駁回</span>
         {% endif %}
-        
-        <!-- 刪除按鈕 -->
-        <button 
-            class="bg-gray-500 text-white px-2 py-1 rounded text-xs hover:bg-gray-600 ml-2"
-            hx-delete="{% url 'admins:delete_pending_reward' reward.id %}"
-            hx-target="#reward-{{ reward.id }}"
-            hx-swap="outerHTML"
-            hx-confirm="確定要刪除這個項目嗎？">
-            刪除
-        </button>
     </td>
-    
+
     <!-- 資料欄位 -->
     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
         {{ reward.card.name }}
     </td>
     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-        {{ reward.category }}
+        {{ reward.nlp_category }}
     </td>
     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-        {{ reward.scope }}
+        {{ reward.nlp_scope }}
     </td>
     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
         {% if reward.min_rate and reward.max_rate %}

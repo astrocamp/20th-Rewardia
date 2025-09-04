@@ -20,15 +20,15 @@
              {
                id: {{ card.id }},
                name: '{{ card.name }}',
-               bankId: {{ card.bank.id }}
+               bankName: '{{ card.bank }}'
              }{% if not forloop.last %},{% endif %}
              {% endfor %}
            ],
            {% if is_edit_mode and user_card %}
-           initialBankId: {{ user_card.card.bank.id }},
+           initialBankName: '{{ user_card.card.bank }}',
            initialCardId: {{ user_card.card.id }}
            {% else %}
-           initialBankId: null,
+           initialBankName: null,
            initialCardId: null
            {% endif %}
          })">
@@ -55,7 +55,7 @@
               </label>
               <div class="relative">
                 <select id="bankSelect"
-                        name="bank_id"
+                        name="bank_name"
                         class="w-full h-12 rounded-lg bg-white border border-[#D1D5DB] px-4 text-gray-900 transition-colors duration-200 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         aria-label="選擇發卡銀行"
                         required
@@ -63,7 +63,7 @@
                         @change="onBankChange()">
                   <option value="" class="text-[#949AA6]">選擇發卡銀行</option>
                   {% for bank in banks %}
-                  <option value="{{ bank.id }}">{{ bank.name }}</option>
+                  <option value="{{ bank.name }}">{{ bank.name }}</option>
                   {% endfor %}
                 </select>
                 <div class="select-arrow" aria-hidden="true"></div>
@@ -84,18 +84,10 @@
                         x-model="selectedCard">
 
                   <!-- Alpine.js 動態產生選項 -->
-                  <template x-if="!selectedBank">
-                    <option value="" selected disabled class="text-[#949AA6]">請先選擇發卡銀行</option>
-                  </template>
-
-                  <template x-if="selectedBank && availableCards.length === 0">
-                    <option value="" selected disabled class="text-[#949AA6]">該銀行暫無可選卡片</option>
-                  </template>
-
-                  <template x-if="selectedBank && availableCards.length > 0">
-                    <option value="" disabled class="text-[#949AA6]">選擇卡片</option>
-                  </template>
-
+                  <option value="" selected disabled class="text-[#949AA6]" x-show="!selectedBank">請先選擇發卡銀行</option>
+                  <option value="" selected disabled class="text-[#949AA6]" x-show="selectedBank && availableCards.length === 0">該銀行暫無可選卡片</option>
+                  <option value="" disabled class="text-[#949AA6]" x-show="selectedBank && availableCards.length > 0">選擇卡片</option>
+                  
                   <template x-for="card in availableCards" :key="card.id">
                     <option :value="card.id" x-text="card.name"></option>
                   </template>

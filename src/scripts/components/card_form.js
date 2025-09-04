@@ -1,5 +1,5 @@
 export default (config = {}) => ({
-  selectedBank: config.initialBankId || '',
+  selectedBank: config.initialBankName || '',
   selectedCard: config.initialCardId || '',
   allCards: config.allCards || [],
   availableCards: [],
@@ -20,9 +20,9 @@ export default (config = {}) => ({
     }
   },
 
-  filterCardsByBank(bankId) {
+  filterCardsByBank(bankName) {
     this.availableCards = this.allCards.filter(card => {
-      return card.bankId.toString() === bankId.toString();
+      return card.bankName === bankName;
     });
   }
 });
