@@ -5,20 +5,17 @@ from io import StringIO
 
 @shared_task
 def crawl_roo_task():
-    output = StringIO()
+    from celery.utils.log import get_task_logger
 
-    try:
-        call_command("crawl_roo", stdout=output, stderr=output)
+    logger = get_task_logger(__name__)
+    with StringIO() as output:
+        try:
+            call_command("crawl_roo", stdout=output, stderr=output)
 
-        result = output.getvalue()
-        return {"status": "success", "message": "爬蟲完成", "output": result}
+            result = output.getvalue()
+            logger.info("爬蟲任務成功完成。")
+            return {"status": "success", "message": "爬蟲完成", "output": result}
 
-    except Exception as e:
-        return {
-            "status": "error",
-            "message": f"爬蟲失敗: {str(e)}",
-            "output": output.getvalue(),
-        }
-
-    finally:
-        output.close()
+        except Exception as e:
+            logger.error(f"爬蟲任務失敗: {e}\n輸出:\n{output.getvalue()}")
+            raise
