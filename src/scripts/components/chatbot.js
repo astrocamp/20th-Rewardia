@@ -1,9 +1,3 @@
-/**
- * Chatbot Alpine.js 組件
- * 處理 AI 聊天機器人的互動邏輯
- */
-
-// 不再需要 marked，直接使用純文字
 
 // 文字清理函數 - 移除 HTML 標籤但保留換行
 function sanitizeText(text) {
