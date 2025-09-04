@@ -48,45 +48,44 @@ class RewardCategory(models.Model):
     created_at = models.DateTimeField("建立時間", auto_now_add=True)
     updated_at = models.DateTimeField("更新時間", auto_now=True)
 
+    class Meta:
+        db_table = "reward_categories"
+        verbose_name = "回饋分類規則"
+        verbose_name_plural = "回饋分類規則"
+        ordering = ["card", "-max_rate"]
+        indexes = [
+            models.Index(fields=["card", "category"], name="rewards_card_category_idx"),
+            models.Index(fields=["is_active"], name="rewards_active_idx"),
+            models.Index(
+                fields=["min_rate", "max_rate"], name="rewards_rate_range_idx"
+            ),
+        ]
+        unique_together = [["card", "category", "scope"]]
 
-class Meta:
-    db_table = "reward_categories"
-    verbose_name = "回饋分類規則"
-    verbose_name_plural = "回饋分類規則"
-    ordering = ["card", "-max_rate"]
-    indexes = [
-        models.Index(fields=["card", "category"], name="rewards_card_category_idx"),
-        models.Index(fields=["is_active"], name="rewards_active_idx"),
-        models.Index(fields=["min_rate", "max_rate"], name="rewards_rate_range_idx"),
-    ]
-    unique_together = [["card", "category", "scope"]]
-
-
-def __str__(self):
-    if self.min_rate is not None and self.max_rate is not None:
-        if self.min_rate == self.max_rate:
+    def __str__(self):
+        if self.min_rate is not None and self.max_rate is not None:
+            if self.min_rate == self.max_rate:
+                rate_display = f"{self.min_rate:.2f}%"
+            else:
+                rate_display = f"{self.min_rate:.2f}-{self.max_rate:.2f}%"
+        elif self.min_rate is not None:
             rate_display = f"{self.min_rate:.2f}%"
+        elif self.max_rate is not None:
+            rate_display = f"{self.max_rate:.2f}%"
         else:
-            rate_display = f"{self.min_rate:.2f}-{self.max_rate:.2f}%"
-    elif self.min_rate is not None:
-        rate_display = f"{self.min_rate:.2f}%"
-    elif self.max_rate is not None:
-        rate_display = f"{self.max_rate:.2f}%"
-    else:
-        rate_display = "未知回饋率"
+            rate_display = "未知回饋率"
 
-    return f"{self.card.name} - {self.category}/{self.scope}: {rate_display}"
+        return f"{self.card.name} - {self.category}/{self.scope}: {rate_display}"
 
-
-@property
-def effective_rate(self):
-    """有效回饋率 - 取最高值"""
-    if self.max_rate is not None:
-        return self.max_rate
-    elif self.min_rate is not None:
-        return self.min_rate
-    else:
-        return Decimal("0")
+    @property
+    def effective_rate(self):
+        """有效回饋率 - 取最高值"""
+        if self.max_rate is not None:
+            return self.max_rate
+        elif self.min_rate is not None:
+            return self.min_rate
+        else:
+            return Decimal("0")
 
     # def __str__(self):
     #     """顯示格式：信用卡名 - 分類/範圍: 回饋率"""
@@ -238,8 +237,8 @@ class PendingReward(models.Model):
     )
 
     # NLP 提取資料
-    category = models.CharField("NLP分類", max_length=50)
-    scope = models.CharField("NLP範圍", max_length=50)
+    nlp_category = models.CharField("NLP分類", max_length=50)
+    nlp_scope = models.CharField("NLP範圍", max_length=50)
     extracted_sentence = models.TextField("提取句子")
     confidence = models.DecimalField("信心度", max_digits=4, decimal_places=3)
     min_rate = models.DecimalField(
@@ -271,7 +270,9 @@ class PendingReward(models.Model):
 
     def __str__(self):
         rate_display = self.min_rate or self.max_rate or "未知"
-        return f"{self.card.name} - {self.category}/{self.scope}: {rate_display}%"
+        return (
+            f"{self.card.name} - {self.nlp_category}/{self.nlp_scope}: {rate_display}%"
+        )
 
     def approve_and_create_reward_category(self):
         """通過審核並建立RewardCategory"""
@@ -282,8 +283,8 @@ class PendingReward(models.Model):
             # 建立新的RewardCategory
             reward_category = RewardCategory.objects.create(
                 card=self.card,
-                category=self.category,
-                scope=self.scope,
+                category=self.nlp_category,
+                scope=self.nlp_scope,
                 min_rate=self.min_rate,
                 max_rate=self.max_rate,
                 reward_type=self.reward_type,

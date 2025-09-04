@@ -47,6 +47,6 @@ class RewardCalculatorForm(forms.Form):
     def clean_amount_input(self):
         """額外驗證金額範圍"""
         amount = self.cleaned_data["amount_input"]
-        if amount > 1000000:  # 限制最大金額100萬
+        if amount > 1000000:
             raise forms.ValidationError("單筆消費金額不能超過1,000,000元")
         return amount

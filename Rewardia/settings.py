@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     # ------------------------------
     "debug_toolbar",
     # ------------------------------
-    # "apps.pages",
+    "apps.pages",
     "apps.users",
     "apps.cards",
     "apps.rewards",

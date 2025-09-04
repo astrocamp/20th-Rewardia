@@ -111,42 +111,34 @@ def delete_card(request, id):
 
 
 def rewards(request):
-    return render(request, "admins/rewards.html")
-
-
-def rewards(request):
-    """主要的rewards管理頁面 - 替換原本的空函數"""
-    status_filter = request.GET.get("status", "PENDING")
-    page = request.GET.get("page", 1)
+    """主要的rewards管理頁面"""
+    status_filter = request.GET.get('status', 'PENDING')
+    page = request.GET.get('page', 1)
 
     # 根據狀態過濾
-    if status_filter == "ALL":
+    if status_filter == 'ALL':
         pending_rewards = PendingReward.objects.all()
     else:
         pending_rewards = PendingReward.objects.filter(status=status_filter)
 
     # 排序：最新的在前面
-    pending_rewards = pending_rewards.order_by("-created_at")
-
-    # 分頁處理
-    paginator = Paginator(pending_rewards, 20)  # 每頁20筆
-    page_obj = paginator.get_page(page)
+    pending_rewards = pending_rewards.order_by('-created_at')
 
     # 統計數量
     stats = {
-        "pending_count": PendingReward.objects.filter(status="PENDING").count(),
-        "approved_count": PendingReward.objects.filter(status="APPROVED").count(),
-        "rejected_count": PendingReward.objects.filter(status="REJECTED").count(),
-        "total_count": PendingReward.objects.count(),
+        'pending_count': PendingReward.objects.filter(status='PENDING').count(),
+        'approved_count': PendingReward.objects.filter(status='APPROVED').count(),
+        'rejected_count': PendingReward.objects.filter(status='REJECTED').count(),
+        'total_count': PendingReward.objects.count(),
     }
 
     return render(
         request,
         "admins/rewards.html",
         {
-            "pending_rewards": page_obj,
-            "current_status": status_filter,
-            "stats": stats,
+            'pending_rewards': pending_rewards,
+            'current_status': status_filter,
+            'stats': stats,
         },
     )
 
@@ -169,6 +161,34 @@ def rewards_table(request):
         {
             "pending_rewards": pending_rewards,
             "current_status": status_filter,
+        },
+    )
+
+
+@require_http_methods(["POST"])
+def approve_pending_reward(request, id):
+    """通過審核"""
+    pending_reward = get_object_or_404(PendingReward, pk=id)
+
+    if pending_reward.status == PendingReward.Status.PENDING:
+        try:
+            reward_category = pending_reward.approve_and_create_reward_category()
+            if reward_category:
+                messages.success(request, f"通過審核：{pending_reward}")
+            else:
+                messages.error(request, "審核通過失敗")
+        except Exception as e:
+            messages.error(request, f"審核失敗：{str(e)}")
+    else:
+        messages.warning(request, "此項目已經處理過了")
+
+    # 返回更新後的行
+    return render(
+        request,
+        "admins/reward_row.html",
+        {
+            "reward": pending_reward,
+            "current_status": request.GET.get("status", "PENDING"),
         },
     )
 
@@ -243,6 +263,47 @@ def delete_pending_reward(request, id):
 
 
 @require_http_methods(["POST"])
+def reject_pending_reward(request, id):
+    """駁回審核"""
+    pending_reward = get_object_or_404(PendingReward, pk=id)
+
+    if pending_reward.status == PendingReward.Status.PENDING:
+        try:
+            pending_reward.reject()
+            messages.success(request, f"駁回審核：{pending_reward}")
+        except Exception as e:
+            messages.error(request, f"駁回失敗：{str(e)}")
+    else:
+        messages.warning(request, "此項目已經處理過了")
+
+    # 返回更新後的行
+    return render(
+        request,
+        "admins/reward_row.html",
+        {
+            "reward": pending_reward,
+            "current_status": request.GET.get("status", "PENDING"),
+        },
+    )
+
+
+@require_http_methods(["DELETE"])
+def delete_pending_reward(request, id):
+    """刪除待審核項目"""
+    pending_reward = get_object_or_404(PendingReward, pk=id)
+
+    try:
+        pending_reward.delete()
+        messages.success(request, "刪除成功")
+        return HttpResponse("")  # 空響應，表示該行要被移除
+    except Exception as e:
+        messages.error(request, f"刪除失敗：{str(e)}")
+        return HttpResponse(
+            f'<tr><td colspan="8" class="text-red-500">刪除失敗：{str(e)}</td></tr>'
+        )
+
+
+@require_http_methods(["POST"])
 def batch_approve_rewards(request):
     """批量通過審核"""
     reward_ids = request.POST.getlist("reward_ids")
@@ -250,6 +311,76 @@ def batch_approve_rewards(request):
     if not reward_ids:
         messages.warning(request, "請選擇要處理的項目")
         return redirect("admins:rewards")
+
+
+@require_http_methods(["POST"])
+def approve_pending_reward(request, id):
+    """通過審核"""
+    pending_reward = get_object_or_404(PendingReward, pk=id)
+
+    if pending_reward.status == PendingReward.Status.PENDING:
+        try:
+            reward_category = pending_reward.approve_and_create_reward_category()
+            if reward_category:
+                messages.success(request, f"通過審核：{pending_reward}")
+            else:
+                messages.error(request, "審核通過失敗")
+        except Exception as e:
+            messages.error(request, f"審核失敗：{str(e)}")
+            print(f"Approve error: {e}")  # 斷點調試
+    else:
+        messages.warning(request, "此項目已經處理過了")
+
+    # 返回更新後的行
+    return render(
+        request,
+        "admins/reward_row.html",
+        {
+            "reward": pending_reward,
+            "current_status": request.GET.get("status", "PENDING"),
+        },
+    )
+
+
+@require_http_methods(["POST"])
+def reject_pending_reward(request, id):
+    """駁回審核"""
+    pending_reward = get_object_or_404(PendingReward, pk=id)
+
+    if pending_reward.status == PendingReward.Status.PENDING:
+        try:
+            pending_reward.reject()
+            messages.success(request, f"駁回審核：{pending_reward}")
+        except Exception as e:
+            messages.error(request, f"駁回失敗：{str(e)}")
+    else:
+        messages.warning(request, "此項目已經處理過了")
+
+    # 返回更新後的行
+    return render(
+        request,
+        "admins/reward_row.html",
+        {
+            "reward": pending_reward,
+            "current_status": request.GET.get("status", "PENDING"),
+        },
+    )
+
+
+@require_http_methods(["DELETE"])
+def delete_pending_reward(request, id):
+    """刪除待審核項目"""
+    pending_reward = get_object_or_404(PendingReward, pk=id)
+
+    try:
+        pending_reward.delete()
+        messages.success(request, "刪除成功")
+        return HttpResponse("")  # 空響應，表示該行要被移除
+    except Exception as e:
+        messages.error(request, f"刪除失敗：{str(e)}")
+        return HttpResponse(
+            f'<tr><td colspan="8" class="text-red-500">刪除失敗：{str(e)}</td></tr>'
+        )
 
     success_count = 0
     error_count = 0
@@ -323,8 +454,12 @@ def update_pending_reward(request, id):
 
     try:
         # 更新可編輯欄位
-        pending_reward.category = request.POST.get("category", pending_reward.category)
-        pending_reward.scope = request.POST.get("scope", pending_reward.scope)
+        pending_reward.nlp_category = request.POST.get(
+            "nlp_category", pending_reward.nlp_category
+        )
+        pending_reward.nlp_scope = request.POST.get(
+            "nlp_scope", pending_reward.nlp_scope
+        )
 
         min_rate = request.POST.get("min_rate")
         if min_rate:

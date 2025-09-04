@@ -1,5 +1,4 @@
-{% extends 'layouts/default.html' %}
-
+{% extends 'admins/default.html' %}
 {% block title %}回饋規則管理 - Rewardia{% endblock %}
 
 {% block content %}
@@ -7,9 +6,9 @@
     <!-- 標題和統計 -->
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-800 mb-4">回饋規則管理</h1>
-        
+
         <!-- 統計卡片 -->
-        <div class="grid grid-cols-4 gap-4 mb-6">
+        <div class="grid grid-cols- gap-4 mb-6">
             <div class="bg-yellow-100 border border-yellow-300 rounded-lg p-4">
                 <h3 class="text-yellow-800 font-semibold">待審核</h3>
                 <p class="text-2xl font-bold text-yellow-600">{{ stats.pending_count }}</p>
@@ -33,70 +32,82 @@
     <div class="mb-6">
         <div class="border-b border-gray-200">
             <nav class="-mb-px flex space-x-8">
-                <button 
-                    class="py-2 px-1 border-b-2 font-medium text-sm {% if current_status == 'PENDING' %}border-yellow-500 text-yellow-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %}"
-                    hx-get="{% url 'admins:rewards_table' %}?status=PENDING"
-                    hx-target="#rewards-table-container"
-                    hx-push-url="{% url 'admins:rewards' %}?status=PENDING">
+                <a href="{% url 'admins:rewards' %}?status=PENDING"
+                   class="py-2 px-1 border-b-2 font-medium text-sm {% if current_status == 'PENDING' %}border-yellow-500 text-yellow-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %}">
                     待審核 ({{ stats.pending_count }})
-                </button>
-                <button 
-                    class="py-2 px-1 border-b-2 font-medium text-sm {% if current_status == 'APPROVED' %}border-green-500 text-green-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %}"
-                    hx-get="{% url 'admins:rewards_table' %}?status=APPROVED"
-                    hx-target="#rewards-table-container"
-                    hx-push-url="{% url 'admins:rewards' %}?status=APPROVED">
+                </a>
+                <a href="{% url 'admins:rewards' %}?status=APPROVED"
+                   class="py-2 px-1 border-b-2 font-medium text-sm {% if current_status == 'APPROVED' %}border-green-500 text-green-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %}">
                     已通過 ({{ stats.approved_count }})
-                </button>
-                <button 
-                    class="py-2 px-1 border-b-2 font-medium text-sm {% if current_status == 'REJECTED' %}border-red-500 text-red-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %}"
-                    hx-get="{% url 'admins:rewards_table' %}?status=REJECTED"
-                    hx-target="#rewards-table-container"
-                    hx-push-url="{% url 'admins:rewards' %}?status=REJECTED">
+                </a>
+                <a href="{% url 'admins:rewards' %}?status=REJECTED"
+                   class="py-2 px-1 border-b-2 font-medium text-sm {% if current_status == 'REJECTED' %}border-red-500 text-red-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %}">
                     已拒絕 ({{ stats.rejected_count }})
-                </button>
-                <button 
-                    class="py-2 px-1 border-b-2 font-medium text-sm {% if current_status == 'ALL' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %}"
-                    hx-get="{% url 'admins:rewards_table' %}?status=ALL"
-                    hx-target="#rewards-table-container"
-                    hx-push-url="{% url 'admins:rewards' %}?status=ALL">
+                </a>
+                <a href="{% url 'admins:rewards' %}?status=ALL"
+                   class="py-2 px-1 border-b-2 font-medium text-sm {% if current_status == 'ALL' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %}">
                     全部 ({{ stats.total_count }})
-                </button>
+                </a>
             </nav>
         </div>
     </div>
 
-    <!-- 批量操作按鈕 -->
-    {% if current_status == 'PENDING' %}
-    <div class="mb-4" x-data="{ selectedCount: 0 }" x-show="selectedCount > 0">
-        <form method="POST" class="flex gap-2">
-            {% csrf_token %}
-            <input type="hidden" name="reward_ids" x-model="getSelectedIds()">
-            <button 
-                type="submit" 
-                formaction="{% url 'admins:batch_approve_rewards' %}"
-                class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-                批量通過 (<span x-text="selectedCount"></span>)
-            </button>
-            <button 
-                type="submit" 
-                formaction="{% url 'admins:batch_reject_rewards' %}"
-                class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
-                批量駁回 (<span x-text="selectedCount"></span>)
-            </button>
-        </form>
-    </div>
-    {% endif %}
+    <!-- 資料表格 -->
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+        {% if pending_rewards %}
+        <!-- 通知訊息區域 -->
+        <div id="messages-container">
+            {% include 'layouts/messages.html' %}
+        </div>
 
-    <!-- 表格容器 -->
-    <div id="rewards-table-container">
-        {% include "admins/rewards_table.html" %}
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">信用卡</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">分類</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">範圍</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">回饋率</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">回饋類型</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">信心度</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">狀態</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">建立時間</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for reward in pending_rewards %}
+                    {% include "admins/reward_row.html" %}
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="text-center py-12">
+            <p class="text-gray-500">沒有找到任何資料</p>
+        </div>
+        {% endif %}
     </div>
 </div>
 
+<!-- 確保HTMX正常載入 -->
+<script src="https://unpkg.com/htmx.org@1.9.10"></script>
 <script>
-function getSelectedIds() {
-    const checkboxes = document.querySelectorAll('input[name="reward_ids"]:checked');
-    return Array.from(checkboxes).map(cb => cb.value);
+// 檢查HTMX是否載入
+if (typeof htmx === 'undefined') {
+    console.error('HTMX 未正常載入！');
+} else {
+    console.log('HTMX 已正常載入');
 }
+
+// HTMX事件監聽
+htmx.on('htmx:afterRequest', function(evt) {
+    console.log('請求完成:', evt.detail);
+    if (evt.detail.xhr.status !== 200) {
+        console.error('請求失敗:', evt.detail.xhr.status, evt.detail.xhr.responseText);
+    }
+});
+
+htmx.on('htmx:sendError', function(evt) {
+    console.error('HTMX 請求錯誤:', evt.detail);
+});
 </script>
 {% endblock %}

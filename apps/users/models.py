@@ -18,10 +18,10 @@ class UserCard(models.Model):
         "cards.CreditCard",
         on_delete=models.CASCADE,
         related_name="users",
-        verbose_name="Credit Card",  # 信用卡
+        verbose_name="Credit Card",
     )
     nickname = models.CharField(
-        "Card Nickname",  # 卡片暱稱
+        "Card Nickname",
         max_length=50,
         blank=True,
         null=True,
@@ -29,12 +29,12 @@ class UserCard(models.Model):
     )
     added_date = models.DateTimeField("Added Date", auto_now_add=True)  # 新增日期
     is_primary = models.BooleanField(
-        "Primary Card",  # 主要卡片
+        "Primary Card",
         default=False,
         help_text="用戶的主要推薦卡片",
     )
 
-    is_active = models.BooleanField("Is Active", default=True)  # 啟用狀態
+    is_active = models.BooleanField("Is Active", default=True)
 
     class Meta:
         db_table = "user_cards"

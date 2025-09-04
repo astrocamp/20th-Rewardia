@@ -32,15 +32,18 @@ def prepare_card_form_context(
     user_card=None, is_edit_mode=False, include_selected_bank=False
 ):
     # 基本的context資料
-    # banks = Bank.objects.filter(is_active=True).only("id", "name", "code")
     cards = (
-        CreditCard.objects.filter(is_active=True)
-        .select_related("bank")
-        .only("id", "name", "bank__id", "bank__name")
+        CreditCard.objects.all()
+        .only("id", "name", "bank")
     )
+    
+    # 只取得真正有卡片的銀行列表
+    banks_with_cards = cards.values_list('bank', flat=True).distinct().order_by('bank')
+    # 轉換成模板期望的格式
+    banks = [{'id': i+1, 'name': bank} for i, bank in enumerate(banks_with_cards)]
 
     context = {
-        # "banks": banks,
+        "banks": banks,
         "cards": cards,
         "user_card": user_card,
         "is_edit_mode": is_edit_mode,
@@ -55,46 +58,42 @@ def prepare_card_form_context(
     return context
 
 
-@login_required
 def member_zone(request):
     context = {}
 
     if request.user.is_authenticated:
-        # 獲取用戶的卡片資料
-        user_cards = request.user.user_cards.select_related("card", "card__bank").all()
+        user_cards = request.user.user_cards.select_related("card").all()
         context["user_cards"] = user_cards
 
     return render(request, "users/member_zone.html", context)
 
 
-# API 端點：根據銀行 ID 返回該銀行的所有信用卡（JSON 格式，給 Alpine.js 用）
-# def get_cards_by_bank(request, bank_id):
-# try:
-# bank = Bank.objects.get(id=bank_id, is_active=True)
+# API 端點：根據銀行名稱返回該銀行的所有信用卡（JSON 格式，給 Alpine.js 用）
+def get_cards_by_bank(request, bank_name):
+    try:
+        # 取得該銀行的所有啟用信用卡
+        cards = (
+            CreditCard.objects.filter(bank=bank_name)
+            .only("id", "name")
+            .order_by("name")
+        )
 
-# 取得該銀行的所有啟用信用卡
-# cards = (
-#     # CreditCard.objects.filter(bank=bank, is_active=True)
-#     .only("id", "name")
-#     .order_by("name")
-# )
+        # 轉換為 JSON 格式
+        cards_data = [{"id": card.id, "name": card.name} for card in cards]
 
-# 轉換為 JSON 格式
-# cards_data = [{"id": card.id, "name": card.name} for card in cards]
+        return JsonResponse(
+            {
+                "success": True,
+                "bank_name": bank_name,
+                "cards": cards_data,
+                "message": f"載入 {bank_name} 的 {len(cards_data)} 張信用卡",
+            }
+        )
 
-# return JsonResponse(
-#     {
-#         "success": True,
-#         "bank_name": bank.name,
-#         "cards": cards_data,
-#         "message": f"載入 {bank.name} 的 {len(cards_data)} 張信用卡",
-#     }
-# )
-
-# except Bank.DoesNotExist:
-#     return JsonResponse(
-#         {"success": False, "cards": [], "message": "找不到指定的銀行"}, status=404
-#     )
+    except Exception as e:
+        return JsonResponse(
+            {"success": False, "cards": [], "message": "找不到指定的銀行"}, status=404
+        )
 
 
 @login_required
@@ -116,11 +115,11 @@ def card_form(request, card_id=None):
 
     elif request.method == "POST":
         # 取得表單資料
-        bank_id = request.POST.get("bank_id")
+        bank_name = request.POST.get("bank_name")
         card_id_from_form = request.POST.get("card_id")
 
         # 檢查資料完整性
-        if not bank_id or not card_id_from_form:
+        if not bank_name or not card_id_from_form:
             messages.error(request, "請選擇銀行和卡片")
             # 使用輔助函式重新準備表單資料
             context = prepare_card_form_context(
@@ -131,10 +130,10 @@ def card_form(request, card_id=None):
             return render(request, "users/card_form.html", context)
 
         try:
-            selected_card = CreditCard.objects.get(id=card_id_from_form, is_active=True)
+            selected_card = CreditCard.objects.get(id=card_id_from_form)
 
             # 檢查卡片是否真的屬於選的銀行
-            if str(selected_card.bank.id) != bank_id:
+            if selected_card.bank != bank_name:
                 messages.error(request, "選擇的卡片與銀行不符！")
                 # 使用輔助函式重新準備表單資料
                 context = prepare_card_form_context(
@@ -167,7 +166,7 @@ def card_form(request, card_id=None):
                 user_card.save()
                 messages.success(
                     request,
-                    f"成功更新為 {selected_card.bank.name} {selected_card.name}！",
+                    f"成功更新為 {selected_card.bank} {selected_card.name}！",
                 )
             else:
                 # 新增模式：檢查重複 + 創建新卡片
@@ -188,7 +187,7 @@ def card_form(request, card_id=None):
                 )
                 messages.success(
                     request,
-                    f"成功新增 {selected_card.bank.name} {selected_card.name}！",
+                    f"成功新增 {selected_card.bank} {selected_card.name}！",
                 )
 
             return redirect("users:member_zone")
@@ -212,7 +211,7 @@ def card_delete(request, card_id):
 
     if request.method == "POST":
         # 處理刪除請求
-        card_name = f"{user_card.card.bank.name} {user_card.card.name}"
+        card_name = f"{user_card.card.bank} {user_card.card.name}"
         user_card.delete()
         messages.success(request, f"成功刪除 {card_name}！")
         return redirect("users:member_zone")
