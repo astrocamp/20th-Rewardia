@@ -32,7 +32,7 @@ def chat_api(request):
                 return JsonResponse({'error': 'Message is required'}, status=400)
 
             # --- Call Gemini API ---
-            model = genai.GenerativeModel('gemini-pro')
+            model = genai.GenerativeModel('gemini-2.0-flash')
             gemini_response = model.generate_content(message)
             response_message = gemini_response.text
             # -----------------------

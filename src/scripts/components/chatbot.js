@@ -157,6 +157,23 @@ export default function chatbot() {
     // 檢查是否為有效訊息
     isValidMessage(message) {
       return message && message.trim().length > 0 && message.trim().length <= 500;
+    },
+
+    // 自動調整 textarea 高度
+    autoResize(event) {
+      const textarea = event.target;
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    },
+
+    // 處理鍵盤事件
+    handleKeyDown(event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        // Enter 鍵發送訊息
+        event.preventDefault();
+        this.sendMessage();
+      }
+      // Shift+Enter 允許換行（預設行為）
     }
   }
 }

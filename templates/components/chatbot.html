@@ -7,11 +7,11 @@
     :class="{ 'opacity-0 pointer-events-none': isOpen }"
     aria-label="開啟 AI 助理"
     type="button"
-    style="position: fixed !important; bottom: 80px !important; right: 24px !important; left: auto !important; width: 56px !important; height: 56px !important; background-color: #2060B9 !important; color: white !important; border-radius: 50% !important; z-index: 9999 !important; display: flex !important; align-items: center !important; justify-content: center !important; box-shadow: 0 4px 12px rgba(32, 96, 185, 0.4) !important; transition: all 0.2s ease !important; border: none !important; cursor: pointer !important;"
+    style="position: fixed !important; bottom: 30px !important; right: 24px !important; left: auto !important; width: 56px !important; height: 56px !important; background: linear-gradient(180deg, #B8F5E6 0%, #34D399 100%) !important; color: #374151 !important; border-radius: 50% !important; z-index: 9999 !important; display: flex !important; align-items: center !important; justify-content: center !important; box-shadow: 0 4px 12px rgba(52, 211, 153, 0.4) !important; transition: all 0.2s ease !important; border: 2px solid #34D399 !important; cursor: pointer !important;"
   >
-    <!-- 聊天圖標 -->
-    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+    <!-- AI 機器人圖標 -->
+    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1H5C3.89 1 3 1.89 3 3V7H21M7 10C5.89 10 5 10.89 5 12V22C5 23.11 5.89 24 7 24H17C18.11 24 19 23.11 19 22V12C19 10.89 18.11 10 17 10H7ZM7.5 12H9.5V14H7.5V12ZM14.5 12H16.5V14H14.5V12ZM7.5 15H16.5V16H7.5V15ZM12 17.5C10.07 17.5 8.5 16.43 8.5 15H15.5C15.5 16.43 13.93 17.5 12 17.5Z"/>
     </svg>
   </button>
 
@@ -26,24 +26,17 @@
     x-transition:leave="transition ease-in duration-200"
     x-transition:leave-start="opacity-100 transform translate-y-0 scale-100"
     x-transition:leave-end="opacity-0 transform translate-y-full scale-75"
-    style="position: fixed !important; bottom: 50px !important; right: 24px !important; left: auto !important; width: 184px !important; height: 200px !important; background-color: white !important; border-radius: 8px !important; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important; z-index: 9998 !important; display: flex !important; flex-direction: column !important; overflow: hidden !important; border: 1px solid #e5e7eb !important;"
+    style="position: fixed !important; bottom: 50px !important; right: 24px !important; left: auto !important; width: 300px !important; height: 400px !important; background: linear-gradient(180deg, #B8F5E6 0%, #FFFFFF 100%) !important; border-radius: 16px !important; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important; z-index: 9998 !important; display: flex !important; flex-direction: column !important; overflow: hidden !important; border: 2px solid #34D399 !important;"
   >
     <!-- 標題列 -->
-    <div class="chatbot-header">
-      <div class="flex items-center gap-3">
-        <!-- AI 圖標 -->
-        <div class="w-8 h-8 bg-[#2060B9] rounded-full flex items-center justify-center">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.847a4.5 4.5 0 003.09 3.09L15.75 12l-2.847.813a4.5 4.5 0 00-3.09 3.091zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"/>
-          </svg>
-        </div>
-        <h3 class="chatbot-title">AI 助理</h3>
-      </div>
+    <div class="chatbot-header" style="padding: 1rem !important; flex-shrink: 0 !important; border-bottom: 1px solid rgba(52, 211, 153, 0.3) !important; background: rgba(255, 255, 255, 0.1) !important; display: flex !important; align-items: center !important; justify-content: space-between !important;">
+      <h3 class="chatbot-title" style="margin: 0 !important; font-size: 1.125rem !important; font-weight: 600 !important;">Rewardia 助理</h3>
       <button 
         @click="closeChat()" 
         class="chatbot-close-btn"
         aria-label="關閉聊天視窗"
         type="button"
+        style="width: 32px !important; height: 32px !important; background: transparent !important; color: #6b7280 !important; border: none !important; border-radius: 0.25rem !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; transition: all 0.2s ease !important;"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -52,23 +45,24 @@
     </div>
 
     <!-- 訊息區域 -->
-    <div class="chatbot-messages" x-ref="messagesContainer">
+    <div class="chatbot-messages" x-ref="messagesContainer" style="flex: 1 !important; overflow-y: auto !important; overflow-x: hidden !important; padding: 1rem !important; background: transparent !important; min-height: 200px !important; max-height: calc(100% - 140px) !important;">
       <!-- 空狀態 -->
       <div x-show="messages.length === 0" class="chatbot-empty-state">
-        <svg class="w-12 h-12 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- <svg class="w-12 h-12 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
-        </svg>
-        <p class="text-sm">歡迎使用 AI 助理！</p>
-        <p class="text-xs mt-1">有什麼問題都可以問我</p>
+        </svg> -->
+        <p class="text-sm">歡迎來到Rewardia的世界！</p>
+        <p class="text-xs mt-1">想了解關於Rewardia的一切都可以問我喔</p>
       </div>
 
       <!-- 訊息列表 -->
       <template x-for="(message, index) in messages" :key="index">
-        <div class="flex" :class="message.type === 'user' ? 'justify-end' : 'justify-start'">
+        <div class="w-full">
           <div 
             class="message-bubble"
             :class="message.type === 'user' ? 'message-user' : 'message-ai'"
             x-text="message.content"
+            :style="message.type === 'user' ? 'background-color: #374151 !important; color: white !important; margin-left: auto !important; margin-right: 1rem !important; max-width: 85% !important; padding: 0.75rem !important; border-radius: 0.5rem !important; word-wrap: break-word !important; margin-bottom: 0.5rem !important;' : 'background-color: white !important; color: #374151 !important; margin-left: 1rem !important; margin-right: auto !important; max-width: 85% !important; padding: 0.75rem !important; border-radius: 0.5rem !important; border: 1px solid #e5e7eb !important; word-wrap: break-word !important; margin-bottom: 0.5rem !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;'"
           ></div>
         </div>
       </template>
@@ -77,7 +71,7 @@
       <div x-show="isLoading" class="flex justify-start">
         <div class="message-bubble message-ai">
           <div class="chatbot-loading">
-            <span>AI 正在思考</span>
+            <span>正在思考</span>
             <div class="chatbot-typing-dots">
               <div class="chatbot-typing-dot"></div>
               <div class="chatbot-typing-dot"></div>
@@ -89,10 +83,9 @@
     </div>
 
     <!-- 輸入區域 -->
-    <div class="chatbot-input-area">
+    <div class="chatbot-input-area" style="padding: 1rem !important; flex-shrink: 0 !important; border-top: 1px solid rgba(52, 211, 153, 0.3) !important; background: rgba(255, 255, 255, 0.8) !important; margin-top: auto !important;">
       <form @submit.prevent="sendMessage()" class="chatbot-input-form">
-        <input 
-          type="text"
+        <textarea
           x-model="currentMessage"
           :disabled="isLoading"
           placeholder="輸入您的問題..."
@@ -100,7 +93,11 @@
           maxlength="500"
           autocomplete="off"
           x-ref="messageInput"
-        />
+          rows="1"
+          @input="autoResize($event)"
+          @keydown="handleKeyDown($event)"
+          style="flex: 1 !important; min-height: 40px !important; max-height: 120px !important; padding: 0.75rem !important; border: none !important; border-radius: 0.5rem !important; background-color: white !important; color: #374151 !important; resize: none !important; outline: none !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important; font-size: 0.875rem !important; line-height: 1.25rem !important;"
+        ></textarea>
         <button 
           type="submit"
           :disabled="isLoading || !currentMessage.trim()"
@@ -108,9 +105,9 @@
           aria-label="發送訊息"
         >
           <!-- 發送圖標 -->
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <!-- <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-          </svg>
+          </svg> -->
         </button>
       </form>
       
