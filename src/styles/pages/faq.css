@@ -15,9 +15,7 @@
   }
 
   .faq-feature-number {
-    @apply w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center text-3xl font-bold mr-4;
-    font-family: "Kulim Park", sans-serif;
-    line-height: 0.98;
+    @apply w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center text-3xl font-bold font-sans leading-tight mr-4;
   }
 
   .faq-feature-content {
@@ -25,15 +23,11 @@
   }
 
   .faq-feature-title {
-    @apply text-xl sm:text-2xl lg:text-3xl font-bold text-black text-left;
-    font-family: "Kulim Park", sans-serif;
-    line-height: 1.15;
+    @apply text-xl sm:text-2xl lg:text-3xl font-bold text-black font-sans leading-normal text-left;
   }
 
   .faq-category-title {
-    @apply text-2xl font-bold text-muted mb-6 bg-transparent p-0 cursor-default;
-    font-family: "Inter", sans-serif;
-    line-height: 1.21;
+    @apply text-2xl font-bold text-muted mb-6 font-sans leading-relaxed bg-transparent p-0 cursor-default;
   }
 
   .faq-qa-list {
@@ -49,9 +43,7 @@
   }
 
   .faq-question-text {
-    @apply text-lg font-bold text-dark-gray flex-1 pr-4 cursor-default;
-    font-family: "Inter", sans-serif;
-    line-height: 1.21;
+    @apply text-lg font-bold text-dark-gray flex-1 pr-4 font-sans leading-relaxed cursor-default;
   }
 
   .faq-toggle-btn {
@@ -79,7 +71,7 @@
   }
 
   .faq-answer-text {
-    @apply text-lg text-gray-700 font-sans leading-6;
+    @apply text-lg text-dark-gray font-sans leading-6;
   }
 
   /* ========== Responsive Styles for FAQ Page ========== */

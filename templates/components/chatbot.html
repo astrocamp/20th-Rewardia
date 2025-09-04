@@ -7,7 +7,6 @@
     :class="{ 'opacity-0 pointer-events-none': isOpen }"
     aria-label="開啟 AI 助理"
     type="button"
-    style="position: fixed !important; bottom: 30px !important; right: 24px !important; left: auto !important; width: 56px !important; height: 56px !important; background: linear-gradient(180deg, #B8F5E6 0%, #34D399 100%) !important; color: #374151 !important; border-radius: 50% !important; z-index: 9999 !important; display: flex !important; align-items: center !important; justify-content: center !important; box-shadow: 0 4px 12px rgba(52, 211, 153, 0.4) !important; transition: all 0.2s ease !important; border: 2px solid #34D399 !important; cursor: pointer !important;"
   >
     <!-- AI 機器人圖標 -->
     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -26,17 +25,15 @@
     x-transition:leave="transition ease-in duration-200"
     x-transition:leave-start="opacity-100 transform translate-y-0 scale-100"
     x-transition:leave-end="opacity-0 transform translate-y-full scale-75"
-    style="position: fixed !important; bottom: 50px !important; right: 24px !important; left: auto !important; width: 300px !important; height: 400px !important; background: linear-gradient(180deg, #B8F5E6 0%, #FFFFFF 100%) !important; border-radius: 16px !important; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important; z-index: 9998 !important; display: flex !important; flex-direction: column !important; overflow: hidden !important; border: 2px solid #34D399 !important;"
   >
     <!-- 標題列 -->
-    <div class="chatbot-header" style="padding: 1rem !important; flex-shrink: 0 !important; border-bottom: 1px solid rgba(52, 211, 153, 0.3) !important; background: rgba(255, 255, 255, 0.1) !important; display: flex !important; align-items: center !important; justify-content: space-between !important;">
-      <h3 class="chatbot-title" style="margin: 0 !important; font-size: 1.125rem !important; font-weight: 600 !important;">Rewardia 助理</h3>
+    <div class="chatbot-header">
+      <h3 class="chatbot-title">Rewardia 助理</h3>
       <button 
         @click="closeChat()" 
         class="chatbot-close-btn"
         aria-label="關閉聊天視窗"
         type="button"
-        style="width: 32px !important; height: 32px !important; background: transparent !important; color: #6b7280 !important; border: none !important; border-radius: 0.25rem !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; transition: all 0.2s ease !important;"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -45,7 +42,7 @@
     </div>
 
     <!-- 訊息區域 -->
-    <div class="chatbot-messages" x-ref="messagesContainer" style="flex: 1 !important; overflow-y: auto !important; overflow-x: hidden !important; padding: 1rem !important; background: transparent !important; min-height: 200px !important; max-height: calc(100% - 140px) !important;">
+    <div class="chatbot-messages" x-ref="messagesContainer">
       <!-- 空狀態 -->
       <div x-show="messages.length === 0" class="chatbot-empty-state">
         <!-- <svg class="w-12 h-12 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -62,15 +59,14 @@
 
       <!-- 訊息列表 -->
       <template x-for="(message, index) in messages" :key="index">
-        <div class="w-full" style="margin-bottom: 1rem !important;">
+        <div class="w-full mb-4">
           <!-- 發送者標籤 -->
           <div 
-            :style="message.type === 'user' ? 'text-align: right; margin-right: 1rem; margin-bottom: 0.25rem;' : 'text-align: left; margin-left: 1rem; margin-bottom: 0.25rem;'"
+            :class="message.type === 'user' ? 'text-right mr-4 mb-1' : 'text-left ml-4 mb-1'"
           >
             <span 
               class="text-xs text-gray-500"
               x-text="message.type === 'user' ? '使用者' : 'Rewardia'"
-              style="font-size: 0.7rem !important; color: #6b7280 !important;"
             ></span>
           </div>
           <!-- 訊息氣泡 -->
@@ -78,7 +74,6 @@
             class="message-bubble"
             :class="message.type === 'user' ? 'message-user' : 'message-ai'"
             x-text="message.content"
-            :style="message.type === 'user' ? 'background-color: #374151 !important; color: white !important; margin-left: auto !important; margin-right: 1rem !important; max-width: 85% !important; padding: 0.75rem !important; border-radius: 0.5rem !important; word-wrap: break-word !important; margin-bottom: 0 !important;' : 'background-color: white !important; color: #374151 !important; margin-left: 1rem !important; margin-right: auto !important; max-width: 85% !important; padding: 0.75rem !important; border-radius: 0.5rem !important; border: 1px solid #e5e7eb !important; word-wrap: break-word !important; margin-bottom: 0 !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;'"
           ></div>
         </div>
       </template>
@@ -99,7 +94,7 @@
     </div>
 
     <!-- 輸入區域 -->
-    <div class="chatbot-input-area" style="padding: 1rem !important; flex-shrink: 0 !important; border-top: 1px solid rgba(52, 211, 153, 0.3) !important; background: rgba(255, 255, 255, 0.8) !important; margin-top: auto !important;">
+    <div class="chatbot-input-area">
       <form @submit.prevent="sendMessage()" class="chatbot-input-form">
         <textarea
           x-model="currentMessage"
@@ -112,7 +107,6 @@
           rows="1"
           @input="autoResize($event)"
           @keydown="handleKeyDown($event)"
-          style="flex: 1 !important; min-height: 40px !important; max-height: 120px !important; padding: 0.75rem !important; border: none !important; border-radius: 0.5rem !important; background-color: white !important; color: #374151 !important; resize: none !important; outline: none !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important; font-size: 0.875rem !important; line-height: 1.25rem !important;"
         ></textarea>
         <button 
           type="submit"

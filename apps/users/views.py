@@ -59,6 +59,7 @@ def member_zone(request):
     context = {}
 
     if request.user.is_authenticated:
+        # 獲取用戶的卡片資料
         user_cards = request.user.user_cards.select_related("card").all()
         context["user_cards"] = user_cards
 
