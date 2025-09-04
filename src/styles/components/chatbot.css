@@ -13,31 +13,7 @@
     }
   }
   
-  @keyframes chatbot-slide-up {
-    from {
-      transform: translateY(100%) scale(0.75);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0) scale(1);
-      opacity: 1;
-    }
-  }
-  
-  @keyframes chatbot-slide-down {
-    from {
-      transform: translateY(0) scale(1);
-      opacity: 1;
-    }
-    to {
-      transform: translateY(100%) scale(0.75);
-      opacity: 0;
-    }
-  }
-  
   --animate-typing: typing 1.4s infinite ease-in-out;
-  --animate-chatbot-slide-up: chatbot-slide-up 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --animate-chatbot-slide-down: chatbot-slide-down 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* 浮動按鈕 - 右邊，footer 上方 */
@@ -59,18 +35,12 @@
 
 /* 聊天視窗容器 */
 .chatbot-window {
-  @apply fixed bottom-110 right-2 w-80 rounded-2xl shadow-2xl z-40 flex flex-col overflow-hidden;
+  @apply fixed bottom-24 right-2 w-80 rounded-2xl shadow-2xl z-40 flex flex-col overflow-hidden;
   @apply bg-[linear-gradient(180deg,#B8F5E6_0%,#FFFFFF_100%)];
   @apply border-2 border-[#34D399];
-  @apply [transform:translateY(100%)_scale(0.8)] opacity-0;
-  @apply transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)];
-  height: calc(100vh - 200px);
-  max-height: 600px;
-  min-height: 400px;
-}
-
-.chatbot-window.show {
-  @apply translate-y-0 scale-100 opacity-100;
+  height: calc(100vh - 300px);
+  max-height: 500px;
+  min-height: 300px;
 }
 
 /* 聊天視窗標題列 */
@@ -120,18 +90,9 @@
   @apply flex flex-col items-center justify-center h-full text-center p-6 text-gray-500;
 }
 
-.chatbot-empty-icon {
-  @apply w-12 h-12 mb-4 text-gray-400;
-}
-
-.chatbot-empty-text {
-  @apply text-sm text-gray-500 m-0;
-}
-
 /* 訊息氣泡樣式 */
 .message-bubble {
   @apply max-w-[85%] p-3 rounded-lg break-words mb-0 my-2 mx-4;
-  @apply break-words;
 }
 
 .message-user {
@@ -191,8 +152,8 @@
 @media (min-width: 769px) and (max-width: 1024px) {
   .chatbot-window {
     @apply w-80;
-    height: calc(100vh - 180px);
-    max-height: 500px;
-    min-height: 350px;
+    height: calc(100vh - 250px);
+    max-height: 450px;
+    min-height: 300px;
   }
 }

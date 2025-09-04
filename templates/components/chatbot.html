@@ -1,5 +1,5 @@
 <!-- AI 聊天機器人組件 -->
-<div x-data="chatbot" x-cloak>
+<div x-data="chatbot()" x-init="username = '{% if user.is_authenticated %}{{ user.first_name|default:user.username }}{% else %}使用者{% endif %}'" x-cloak>
   <!-- 浮動按鈕 -->
   <button 
     @click="toggleChat()" 
@@ -45,9 +45,6 @@
     <div class="chatbot-messages" x-ref="messagesContainer">
       <!-- 空狀態 -->
       <div x-show="messages.length === 0" class="chatbot-empty-state">
-        <!-- <svg class="w-12 h-12 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
-        </svg> -->
         {% if user.is_authenticated %}
           <p class="text-sm font-medium">Hi, {{ user.first_name|default:user.username }}！</p>
         {% else %}
@@ -66,7 +63,7 @@
           >
             <span 
               class="text-xs text-gray-500"
-              x-text="message.type === 'user' ? '使用者' : 'Rewardia'"
+              x-text="message.type === 'user' ? username : 'Rewardia'"
             ></span>
           </div>
           <!-- 訊息氣泡 -->
