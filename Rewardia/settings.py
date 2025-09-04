@@ -29,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-rjptsy-s2@ssc(j4jj0=8+tykyt^^r&dfxx^z#%%1t_psw++=!"
 
 # Gemini API Key
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -54,22 +54,13 @@ INSTALLED_APPS = [
     # ------------------------------
     "debug_toolbar",
     # ------------------------------
-<<<<<<< HEAD
-    'apps.pages',
-    'apps.users',
-    'apps.cards', 
-    'apps.rewards',
-    'apps.sessions',
-    'apps.admins',
-    'apps.chatbot',  #Gemini AI robot
-=======
     "apps.pages",
     "apps.users",
     "apps.cards",
     "apps.rewards",
     "apps.sessions",
     "apps.admins",
->>>>>>> c8aa005 (feat: 建置chrome extension的基本資料和檔案)
+    "apps.chatbot",  # Gemini AI robot
     # ------------------------------
     "apps.nlp_validation",
     "apps.card_crawler",
