@@ -9,7 +9,10 @@ await fetch(token_url, {
 })
   .then((resp) => resp.json())
   .then((data) => {
+    console.log(data);
     if (data.token) {
       chrome.storage.local.set({ authToken: data.token });
+    } else {
+      chrome.storage.local.remove("authToken");
     }
   });
