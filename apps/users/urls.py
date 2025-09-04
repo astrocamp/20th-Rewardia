@@ -14,5 +14,5 @@ urlpatterns = [
         views.get_cards_by_bank,
         name="api_cards_by_bank",
     ),
-    path("api/users/get-token", views.get_token, name="get_token"),
+    path("api/get-token", views.get_token, name="get_token"),
 ]
