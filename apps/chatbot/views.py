@@ -3,6 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 import json
 import google.generativeai as genai
+from .services import ChatbotDataService, ChatbotResponseBuilder
 
 # Configure the Gemini API with the key from Django settings
 try:
@@ -14,7 +15,7 @@ except AttributeError:
 @csrf_exempt
 def chat_api(request):
     """
-    API endpoint to handle chat requests.
+    AI 助理 API 端點，整合知識庫和資料庫查詢功能
     """
     if request.method == 'POST':
         # Check if the API key is configured
@@ -29,13 +30,29 @@ def chat_api(request):
             if not message:
                 return JsonResponse({'error': 'Message is required'}, status=400)
 
+            # 建構包含資料庫資訊的上下文提示詞
+            context_prompt = ChatbotResponseBuilder.build_context_prompt(message, request.user)
+            
+            # 組合完整的提示詞
+            full_prompt = f"{context_prompt}\n\n## 用戶問題\n{message}\n\n請根據以上資訊回答用戶的問題："
+
             # --- Call Gemini API ---
             model = genai.GenerativeModel('gemini-2.0-flash')
-            gemini_response = model.generate_content(message)
+            gemini_response = model.generate_content(full_prompt)
             response_message = gemini_response.text
+            
+            # 驗證 Gemini 回應是否包含虛假的卡片名稱
+            validated_response = ChatbotResponseBuilder.validate_response(
+                response_message, message, request.user
+            )
+            
+            # 根據用戶問題增強回應內容
+            enhanced_response = ChatbotResponseBuilder.enhance_response_with_data(
+                validated_response, message, request.user
+            )
             # -----------------------
 
-            return JsonResponse({'response': response_message})
+            return JsonResponse({'response': enhanced_response})
 
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON format'}, status=400)
