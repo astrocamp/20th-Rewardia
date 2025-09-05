@@ -1,76 +1,66 @@
 <!-- 單行資料 -->
-<tr id="reward-{{ reward.id }}" 
+<tr id="reward-{{ reward.id }}"
     class="cursor-pointer transition-all duration-200 {% if reward.soft_deleted_at %}opacity-60{% endif %}"
     data-extracted-sentence="{{ reward.extracted_sentence }}">
-    
+
     <!-- 操作按鈕 -->
-    <td class="px-6 py-4 whitespace-nowrap text-sm">
+    <td class="px-4 py-4 whitespace-nowrap text-sm">
         {% if reward.status == 'PENDING' %}
-            <div class="flex gap-2">
-                <button 
-                    class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                    title="通過"
+            <div class="flex flex-wrap gap-1">
+                <button
+                    class="inline-block bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs font-bold border-0"
+                    style="background-color: #059669 !important; color: white !important;"
                     hx-post="{% url 'admins:approve_pending_reward' reward.id %}"
                     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                     hx-target="#reward-{{ reward.id }}"
                     hx-swap="outerHTML">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
+                    通過
                 </button>
-                <button 
-                    class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                    title="駁回"
+                <button
+                    class="inline-block bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs font-bold border-0"
+                    style="background-color: #dc2626 !important; color: white !important;"
                     hx-post="{% url 'admins:reject_pending_reward' reward.id %}"
                     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                     hx-target="#reward-{{ reward.id }}"
                     hx-swap="outerHTML">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
+                    駁回
                 </button>
-                <button 
-                    class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                    title="編輯"
+                <button
+                    class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs font-bold border-0"
+                    style="background-color: #2563eb !important; color: white !important;"
                     hx-get="{% url 'admins:edit_pending_reward' reward.id %}"
                     hx-target="#reward-{{ reward.id }}"
                     hx-swap="outerHTML">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                    </svg>
+                    編輯
                 </button>
-                <button 
-                    class="p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
-                    title="刪除"
+                <button
+                    class="inline-block bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-xs font-bold border-0"
+                    style="background-color: #4b5563 !important; color: white !important;"
                     hx-delete="{% url 'admins:delete_pending_reward' reward.id %}"
                     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                     hx-target="#reward-{{ reward.id }}"
                     hx-swap="outerHTML"
                     hx-confirm="確定要刪除這個項目嗎？">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                    </svg>
+                    刪除
                 </button>
             </div>
         {% elif reward.status == 'REVIEWING' and reward.soft_deleted_at %}
-            <div class="flex gap-2">
-                <button 
-                    class="p-2 text-red-800 hover:bg-red-100 rounded-lg transition-colors"
-                    title="硬刪除"
-                    hx-delete="{% url 'admins:hard_delete_pending_reward' reward.id %}"
+            <div class="flex gap-1">
+                <button
+                    class="inline-block bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-xs font-bold border-0"
+                    style="background-color: #4b5563 !important; color: white !important;"
+                    hx-delete="{% url 'admins:delete_pending_reward' reward.id %}"
                     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                     hx-target="#reward-{{ reward.id }}"
                     hx-swap="outerHTML"
-                    hx-confirm="確定要永久刪除這個項目嗎？此操作無法復原！">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.728-.833-2.464 0L4.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                    </svg>
+                    hx-confirm="確定要刪除這個項目嗎？">
+                    刪除
                 </button>
             </div>
         {% elif reward.status == 'REVIEWING' %}
             <div class="opacity-50 pointer-events-none">
                 <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
-                    審核中 (無法操作)
+                    審核中
                 </span>
             </div>
         {% elif reward.status == 'APPROVED' %}
@@ -85,16 +75,16 @@
     </td>
 
     <!-- 資料欄位 -->
-    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+    <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
         {{ reward.card.name }}
     </td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
         {{ reward.nlp_category }}
     </td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
         {{ reward.nlp_scope }}
     </td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
         {% if reward.min_rate and reward.max_rate %}
             {% if reward.min_rate == reward.max_rate %}
                 {{ reward.min_rate }}%
@@ -109,23 +99,23 @@
             未知
         {% endif %}
     </td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
         {{ reward.reward_type }}
     </td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
         <div class="flex items-center">
             <div class="w-2 h-2 rounded-full mr-2 {% if reward.confidence >= 90 %}bg-green-500{% elif reward.confidence >= 80 %}bg-yellow-500{% else %}bg-red-500{% endif %}"></div>
             {{ reward.confidence }}%
         </div>
     </td>
-    <td class="px-6 py-4 whitespace-nowrap">
+    <td class="px-4 py-4 whitespace-nowrap">
         {% if reward.status == 'PENDING' %}
             <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
                 待審核
             </span>
         {% elif reward.status == 'REVIEWING' %}
             <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
-                審核中{% if reward.soft_deleted_at %} (軟刪除){% endif %}
+                審核中{% if reward.soft_deleted_at %}{% endif %}
             </span>
         {% elif reward.status == 'APPROVED' %}
             <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
@@ -137,7 +127,7 @@
             </span>
         {% endif %}
     </td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
         {{ reward.created_at|date:"Y/m/d H:i" }}
     </td>
 </tr>

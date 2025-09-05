@@ -4,11 +4,6 @@ from .forms import UserLoginForm
 from .services import UserAuthenticationService
 
 
-def register_view(request):
-    # 先回傳一個簡單頁面，之後再做表單
-    return render(request, "sessions/register.html")
-
-
 def login_view(request):
     """用戶登入視圖"""
 

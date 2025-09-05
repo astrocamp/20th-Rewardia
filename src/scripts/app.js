@@ -7,6 +7,7 @@ import faq from "./components/faq.js";
 import login from "./components/login.js";
 import subscribe from "./components/subscribe.js";
 
+
 window.Alpine = Alpine;
 
 Alpine.data("toast_fadeout", message);

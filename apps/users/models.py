@@ -46,6 +46,13 @@ class UserCard(models.Model):
             models.Index(fields=["user", "is_active"], name="user_cards_active_idx"),
         ]
 
+    def save(self, *args, **kwargs):
+        if self.is_primary:
+            UserCard.objects.filter(user=self.user, is_primary=True).exclude(
+                pk=self.pk
+            ).update(is_primary=False)
+        super().save(*args, **kwargs)
+
     def __str__(self):
         display_name = self.nickname or self.card.name
         return f"{self.user.username} - {display_name}"

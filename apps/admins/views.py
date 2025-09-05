@@ -26,25 +26,19 @@ def cards(request):
 
 def new_card(request):
     banks = CreditCard.Bank
-    card_networks = CreditCard.CardNetwork
-    card_types = CreditCard.CardType
     card_form_data = {
-        "card_networks": card_networks,
-        "card_types": card_types,
+        "banks": banks,
     }
 
     if request.method == "POST":
         name = request.POST.get("card")
-        bank_id = request.POST["bank"]
-
-        card_network = request.POST["network"]
-        card_type = request.POST["card_type"]
+        bank = request.POST["bank"]
         is_active = request.POST.get("is_active") == "on"
 
         try:
-            new_card = CreditCard.objects.create(
-                card_network=card_network,
-                card_type=card_type,
+            CreditCard.objects.create(
+                name=name,
+                bank=bank,
                 is_active=is_active,
             )
             messages.success(request, "新增卡片成功")
@@ -59,14 +53,12 @@ def new_card(request):
 @require_http_methods(["GET"])
 def edit_card(request, id):
     card = get_object_or_404(CreditCard, pk=id)
-    card_networks = CreditCard.CardNetwork
-    card_types = CreditCard.CardType
+    banks = CreditCard.Bank
     return render(
         request,
         "admins/edit_card_row.html",
         {
-            "card_networks": card_networks,
-            "card_types": card_types,
+            "banks": banks,
             "card": card,
         },
     )
@@ -76,15 +68,10 @@ def edit_card(request, id):
 def update_card(request, id):
     card = get_object_or_404(CreditCard, pk=id)
     card.name = request.POST.get("card_edit")
-
-    bank_id = request.POST["bank_edit"]
-
-    card.card_network = request.POST["network_edit"]
-    card.card_type = request.POST["card_type_edit"]
-
+    card.bank = request.POST["bank_edit"]
     card.is_active = request.POST.get("is_active_edit") == "on"
     card.save()
-    print(reverse("admins:cards"))
+
     messages.success(request, "更新成功")
     url = reverse("admins:cards") + f"#card-{id}"
     return redirect(url)
@@ -102,7 +89,7 @@ def rewards(request):
     """主要的rewards管理頁面"""
     # 進入頁面時自動執行軟刪除檢測
     PendingReward.detect_and_soft_delete_duplicates()
-    
+
     status_filter = request.GET.get("status", "PENDING")
     page = request.GET.get("page", 1)
 
@@ -226,9 +213,9 @@ def delete_pending_reward(request, id):
 def hard_delete_pending_reward(request, id):
     """硬刪除軟刪除的項目"""
     pending_reward = get_object_or_404(PendingReward, pk=id)
-    
+
     # 只允許硬刪除軟刪除且在審核中狀態的資料
-    if pending_reward.status == 'REVIEWING' and pending_reward.soft_deleted_at:
+    if pending_reward.status == "REVIEWING" and pending_reward.soft_deleted_at:
         try:
             pending_reward.delete()
             messages.success(request, "硬刪除成功")

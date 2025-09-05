@@ -37,39 +37,7 @@
         </select>
       </div>
 
-      <div class="field-group">
-        <label for="network_edit" class="field-label">發卡機構</label>
-        <select
-          id="network_edit"
-          class="ui-input"
-          name="network_edit"
-          required
-        >
-          <option value="{{card.card_network}}" selected>{{card.card_network}}</option>
-          {%for card_network in card_networks%}
-          {%if card_network != card.card_network %}
-          <option value="{{card_network}}">{{card_network}}</option>
-          {%endif%}
-          {%endfor%}
-        </select>
-      </div>
 
-      <div class="field-group">
-        <label for="card_type_edit" class="field-label">卡片等級</label>
-        <select
-          id="card_type_edit"
-          class="ui-input"
-          name="card_type_edit"
-          required
-        >
-          <option value="{{card.card_type}}" selected>{{card.card_type}}</option>
-          {%for card_type in card_types%}
-          {%if card_type != card.card_type %}
-          <option value="{{card_type}}">{{card_type}}</option>
-          {%endif%}
-          {%endfor%}
-        </select>
-      </div>
 
 
       <div class="field-group flex flex-row items-center">
