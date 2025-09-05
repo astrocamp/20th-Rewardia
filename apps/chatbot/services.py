@@ -173,13 +173,52 @@ class ChatbotDataService:
 
 class ChatbotResponseBuilder:
     """AI 助理回應建構器"""
-    
+
+    # 動態產生一份包含所有銀行關鍵字的列表
+    _bank_related_keywords = ['信用卡', '卡', '銀行', '信託'] + [
+        keyword 
+        for bank_config in ChatbotDataService.BANK_MAPPING.values() 
+        for keyword in bank_config['keywords']
+    ]
+
+    @staticmethod
+    def analyze_user_intent(user_message):
+        """分析使用者意圖，回傳結構化意圖物件"""
+        
+        # 預設意圖結構
+        intent = {
+            "banks": [],
+            "categories": [],
+            "is_comparison": "比較" in user_message,
+            "is_listing_banks": ("銀行" in user_message and ("列出" in user_message or "哪些" in user_message or "條列式" in user_message)),
+            "has_reward_keyword": "回饋" in user_message,
+            "has_card_keyword": "信用卡" in user_message or "卡" in user_message,
+            "raw_message": user_message
+        }
+
+        # 找出訊息中提及的銀行
+        for standard_name, config in ChatbotDataService.BANK_MAPPING.items():
+            for keyword in config['keywords']:
+                if keyword in user_message:
+                    if standard_name not in intent["banks"]:
+                        intent["banks"].append(standard_name)
+                    break 
+        
+        # 找出訊息中提及的消費類別
+        # 注意：這裡會執行一次DB查詢，若有效能考量可考慮快取
+        for category in ChatbotDataService.get_reward_categories():
+            if category in user_message:
+                if category not in intent["categories"]:
+                    intent["categories"].append(category)
+            
+        return intent
+
     @staticmethod
     def validate_response(response, user_message, user=None):
         """驗證 AI 回應是否包含虛假的卡片名稱"""
         try:
-            # 如果回應包含銀行相關內容，進行驗證
-            if any(bank in user_message for bank in ['信用卡', '卡', '銀行', '信託', '中信', '富邦', '台新', '玉山', '國泰', '星展', '永豐', '聯邦']):
+            # 改為使用動態產生的列表
+            if any(keyword in user_message for keyword in ChatbotResponseBuilder._bank_related_keywords):
                 # 獲取所有真實的卡片名稱
                 all_cards = ChatbotDataService.get_all_active_cards()
                 real_card_names = {card['name'] for card in all_cards}
@@ -193,8 +232,10 @@ class ChatbotResponseBuilder:
                     if line.strip().startswith('-'):
                         card_name = line.strip()[1:].strip()
                         # 檢查是否是真實的卡片名稱（支援部分匹配）
-                        is_real_card = any(real_name in card_name or card_name in real_name 
-                                         for real_name in real_card_names)
+                        is_real_card = any(
+                            real_name in card_name or card_name in real_name
+                            for real_name in real_card_names
+                        )
                         if is_real_card:
                             validated_lines.append(line)
                         else:
@@ -203,32 +244,17 @@ class ChatbotResponseBuilder:
                     else:
                         validated_lines.append(line)
                 
-                # 如果驗證後沒有有效的卡片列表，使用資料庫資料
-                if not any(line.strip().startswith('-') for line in validated_lines):
-                    # 檢查是否詢問特定銀行的信用卡
-                    for standard_name, config in ChatbotDataService.BANK_MAPPING.items():
-                        for keyword in config['keywords']:
-                            if keyword in user_message:
-                                cards = ChatbotDataService.get_cards_by_bank(standard_name)
-                                if cards:
-                                    validated_lines.append(f"\n{standard_name} 的信用卡：")
-                                    for card in cards:
-                                        validated_lines.append(f"- {card['name']}")
-                                break
-                        if any(line.strip().startswith('-') for line in validated_lines):
-                            break
-                
                 return '\n'.join(validated_lines)
             
             return response
         except Exception as e:
             return response
+
     
     @staticmethod
-    def build_context_prompt(user_message, user=None):
-        """建構包含資料庫資訊的上下文提示詞"""
+    def build_context_prompt(intent, user=None):
+        """根據分析後的意圖建構上下文提示詞"""
         
-        # 基礎系統提示詞
         context = SYSTEM_PROMPT
         
         # 添加用戶資訊
@@ -244,352 +270,95 @@ class ChatbotResponseBuilder:
                         context += " [主要卡片]"
                     context += "\n"
         
-        # 動態獲取資料庫資訊
+        # 添加通用資料庫資訊 (可考慮快取)
         context += f"\n\n## 可查詢的資料庫資訊\n"
-        
-        # 動態獲取銀行列表
         banks = ChatbotDataService.get_supported_banks()
         context += f"支援的銀行:\n"
-        for bank in banks[:10]:
-            context += f"- {bank}\n"
-        if len(banks) > 10:
-            context += f"- 等共 {len(banks)} 家銀行\n"
+        for bank in banks[:10]: context += f"- {bank}\n"
+        if len(banks) > 10: context += f"- 等共 {len(banks)} 家銀行\n"
         
-        # 動態獲取回饋類別
         categories = ChatbotDataService.get_reward_categories()
         context += f"消費類別:\n"
-        for category in categories[:10]:
-            context += f"- {category}\n"
-        if len(categories) > 10:
-            context += f"- 等共 {len(categories)} 個類別\n"
+        for category in categories[:10]: context += f"- {category}\n"
+        if len(categories) > 10: context += f"- 等共 {len(categories)} 個類別\n"
         
-        # 動態獲取信用卡總數
         total_cards = CreditCard.objects.filter(is_active=True).count()
         context += f"可用信用卡: 共 {total_cards} 張\n"
         
-        # 如果用戶詢問特定銀行的信用卡，直接提供該銀行的卡片資料
-        matched_banks = []
-        
-        # 使用統一的銀行映射配置檢查關鍵字
-        for standard_name, config in ChatbotDataService.BANK_MAPPING.items():
-            for keyword in config['keywords']:
-                if keyword in user_message and ("信用卡" in user_message or "卡" in user_message):
-                    if standard_name not in matched_banks:  # 避免重複添加
-                        matched_banks.append(standard_name)
-                    break
-        
-        # 檢查是否詢問特定回饋類別
-        mentioned_categories = []
-        for category in ChatbotDataService.get_reward_categories():
-            if category in user_message and category not in mentioned_categories:
-                mentioned_categories.append(category)
-        
-        # 為所有匹配的銀行提供卡片資料
-        for bank in matched_banks:
-            if mentioned_categories:
-                # 如果詢問特定回饋類別，只提供有該回饋的卡片
-                context += f"\n\n## {bank} 的信用卡：\n"
-                for category in mentioned_categories:
-                    rewards = ChatbotDataService.get_cards_by_category(category)
-                    bank_rewards = [r for r in rewards if bank in r['bank']]
-                    if bank_rewards:
-                        context += f"\n### {category} 回饋：\n"
-                        for reward in bank_rewards:
-                            if reward['min_rate'] and reward['max_rate']:
-                                rate_display = f"{reward['min_rate']}%-{reward['max_rate']}%"
-                            elif reward['max_rate']:
-                                rate_display = f"{reward['max_rate']}%"
-                            elif reward['min_rate']:
-                                rate_display = f"{reward['min_rate']}%"
-                            else:
-                                rate_display = "未知"
-                            
-                            context += f"- {reward['card_name']}: {rate_display} {reward['reward_type']}"
-                            if reward['nlp_scope']:
-                                context += f" ({reward['nlp_scope']})"
-                            context += "\n"
-                    else:
-                        context += f"- 暫無 {category} 回饋的卡片\n"
-                break  # 只處理第一個匹配的銀行，避免重複
-            else:
-                # 如果沒有詢問特定回饋類別，提供所有卡片
-                cards = ChatbotDataService.get_cards_by_bank(bank)
-                if cards:
+        # 根據意圖添加特定上下文
+        if intent["banks"] and intent["has_card_keyword"]:
+            for bank in intent["banks"]:
+                # 如果同時問了類別，提供該銀行在該類別的回饋
+                if intent["categories"]:
                     context += f"\n\n## {bank} 的信用卡：\n"
-                    for card in cards[:5]:
-                        # 只顯示卡片名稱，不添加銀行名稱前綴
-                        context += f"- {card['name']}\n"
+                    for category in intent["categories"]:
+                        rewards = ChatbotDataService.get_cards_by_category(category)
+                        bank_rewards = [r for r in rewards if bank in r['bank']]
+                        if bank_rewards:
+                            context += f"\n### {category} 回饋：\n"
+                            for reward in bank_rewards:
+                                rate = f"{reward.get('min_rate', '') or ''}-{reward.get('max_rate', '') or ''}".strip('-')
+                                rate_display = f"{rate}%" if rate else "未知"
+                                context += f"- {reward['card_name']}: {rate_display} {reward['reward_type']}\n"
+                        else:
+                            context += f"- 暫無 {category} 回饋的卡片\n"
+                else:
+                    # 否則，提供該銀行的卡片列表
+                    cards = ChatbotDataService.get_cards_by_bank(bank)
+                    if cards:
+                        context += f"\n\n## {bank} 的信用卡：\n"
+                        for card in cards[:5]: context += f"- {card['name']}\n"
                 
-                # 如果用戶詢問回饋相關內容或比較，也提供回饋資料
-                if "回饋" in user_message or "比較" in user_message:
+                # 如果意圖包含回饋或比較，也提供回饋資料
+                if intent["has_reward_keyword"] or intent["is_comparison"]:
                     rewards = PendingReward.objects.filter(card__bank__icontains=bank)
                     if rewards.exists():
                         context += f"\n\n## {bank} 的消費回饋：\n"
-                        for reward in rewards[:5]:  # 只顯示前5個回饋
-                            if reward.min_rate and reward.max_rate:
-                                rate_display = f"{reward.min_rate}%-{reward.max_rate}%"
-                            elif reward.max_rate:
-                                rate_display = f"{reward.max_rate}%"
-                            elif reward.min_rate:
-                                rate_display = f"{reward.min_rate}%"
-                            else:
-                                rate_display = "未知"
-                            
-                            context += f"- {reward.card.name}: {reward.nlp_category} {rate_display} {reward.reward_type}"
-                            if reward.nlp_scope:
-                                context += f" ({reward.nlp_scope})"
-                            context += "\n"
-                    else:
-                        context += f"\n\n## {bank} 的消費回饋：\n- 目前沒有提供消費回饋\n"
+                        for reward in rewards[:5]:
+                            rate = f"{reward.min_rate or ''}-{reward.max_rate or ''}".strip('-')
+                            rate_display = f"{rate}%" if rate else "未知"
+                            context += f"- {reward.card.name}: {reward.nlp_category} {rate_display} {reward.reward_type}\n"
         
         # 添加知識庫資訊
         context += f"\n\n## Rewardia 平台資訊\n"
         context += f"主要功能: {', '.join(REWARDIA_KNOWLEDGE_BASE['website_info']['main_features'])}\n"
         
         return context
-    
+
     @staticmethod
-    def enhance_response_with_data(response, user_message, user=None):
-        """根據用戶問題增強回應內容"""
+    def enhance_response_with_data(response, intent, user=None):
+        """根據意圖增強 AI 回應"""
         
-        # 如果用戶詢問銀行列表（排除詢問特定銀行卡片的情況）
-        if ("銀行" in user_message and ("列出" in user_message or "哪些" in user_message or "條列式" in user_message) 
-            and not any(card_name in user_message for card_name in ['CUBE卡', 'momo卡', 'U Bear卡', 'LINE Pay卡', 'J 卡', 'J卡'])):
+        # 如果意圖是列出銀行，但回應中沒有，則補充
+        if intent["is_listing_banks"] and "銀行" not in response:
             banks = ChatbotDataService.get_supported_banks()
-            if not response or "銀行" not in response:
-                response = "Rewardia 支援以下銀行：\n"
-                for bank in banks[:10]:
-                    response += f"- {bank}\n"
-                if len(banks) > 10:
-                    response += f"- 等共 {len(banks)} 家銀行\n"
+            response = "Rewardia 支援以下銀行：\n"
+            for bank in banks[:10]: response += f"- {bank}\n"
+            if len(banks) > 10: response += f"- 等共 {len(banks)} 家銀行\n"
+            return response # 直接回傳，因為這是主要意圖
+
+        # 如果意圖是查詢特定銀行的卡片，但回應中沒有條列式內容，則補充
+        if intent["banks"] and not intent["has_reward_keyword"] and not intent["is_comparison"]:
+            # 檢查回應是否已經包含條列式內容
+            if not any(line.strip().startswith('-') for line in response.split('\n')):
+                for bank in intent["banks"]:
+                    cards = ChatbotDataService.get_cards_by_bank(bank)
+                    if cards:
+                        response += f"\n\n{bank} 的信用卡：\n"
+                        for card in cards[:5]: response += f"- {card['name']}\n"
         
-        # 如果用戶詢問比較
-        if "比較" in user_message:
-            # 找出用戶要比較的銀行和卡片組合
-            bank_card_pairs = []
-            for standard_name, config in ChatbotDataService.BANK_MAPPING.items():
-                for keyword in config['keywords']:
-                    if keyword in user_message:
-                        # 檢查該銀行名稱後面是否跟著卡片名稱
-                        bank_index = user_message.find(keyword)
-                        if bank_index != -1:
-                            # 在銀行名稱後面尋找卡片名稱
-                            after_bank = user_message[bank_index + len(keyword):]
-                            # 查找常見的卡片名稱
-                            card_names = ['CUBE卡', 'momo卡', 'U Bear卡', 'LINE Pay卡', 'J 卡', 'J卡']
-                            for card_name in card_names:
-                                if card_name in after_bank:
-                                    bank_card_pairs.append((standard_name, card_name))
-                                    break
-                        break
-            
-            if bank_card_pairs:
-                response = "比較結果：\n\n"
-                for bank, card_name in bank_card_pairs:
-                    # 查詢該銀行的指定卡片回饋資料
-                    rewards = PendingReward.objects.filter(
-                        card__bank__icontains=bank,
-                        card__name__icontains=card_name
-                    )
-                    if rewards.exists():
-                        response += f"{bank} {card_name} 回饋：\n"
-                        for reward in rewards:
-                            if reward.min_rate and reward.max_rate:
-                                rate_display = f"{reward.min_rate}%-{reward.max_rate}%"
-                            elif reward.max_rate:
-                                rate_display = f"{reward.max_rate}%"
-                            elif reward.min_rate:
-                                rate_display = f"{reward.min_rate}%"
-                            else:
-                                rate_display = "未知"
-                            
-                            response += f"{reward.nlp_category} {rate_display} {reward.reward_type}"
-                            if reward.nlp_scope:
-                                response += f" ({reward.nlp_scope})"
-                            response += "\n"
-                    else:
-                        response += f"{bank} {card_name} 目前沒有回饋資訊。\n\n"
-        
-        # 如果用戶詢問特定銀行是否有回饋
-        elif "回饋" in user_message:
-            # 檢查 Gemini 是否已經提供了回饋資訊（必須包含具體的回饋資料）
-            has_reward_info = (any(keyword in response.lower() for keyword in ['cashback', 'points', '%']) or 
-                              ('回饋' in response.lower() and any(keyword in response.lower() for keyword in ['%', 'cashback', 'points'])))
-            
-            if not has_reward_info:
-                for standard_name, config in ChatbotDataService.BANK_MAPPING.items():
-                    for keyword in config['keywords']:
-                        if keyword in user_message:
-                            # 查詢該銀行的回饋資料
-                            rewards = PendingReward.objects.filter(card__bank__icontains=keyword)
-                            if rewards.exists():
-                                if not response or f"{standard_name} 提供以下消費回饋" not in response:
-                                    # 檢查是否詢問特定卡片
-                                    mentioned_cards = [card_name for card_name in ['CUBE卡', 'momo卡', 'U Bear卡', 'LINE Pay卡', 'J 卡', 'J卡'] if card_name in user_message]
-                                    
-                                    if mentioned_cards:
-                                        response += f"\n\n{standard_name} 提供以下消費回饋：\n"
-                                        for card_name in mentioned_cards:
-                                            card_rewards = rewards.filter(card__name__icontains=card_name)
-                                            for reward in card_rewards:
-                                                if reward.min_rate and reward.max_rate:
-                                                    rate_display = f"{reward.min_rate}%-{reward.max_rate}%"
-                                                elif reward.max_rate:
-                                                    rate_display = f"{reward.max_rate}%"
-                                                elif reward.min_rate:
-                                                    rate_display = f"{reward.min_rate}%"
-                                                else:
-                                                    rate_display = "未知"
-                                                
-                                                response += f"- {reward.card.name}: {reward.nlp_category} {rate_display} {reward.reward_type}"
-                                                if reward.nlp_scope:
-                                                    response += f" ({reward.nlp_scope})"
-                                                response += "\n"
-                                    else:
-                                        # 沒有指定卡片，顯示所有回饋
-                                        response += f"\n\n{standard_name} 提供以下消費回饋：\n"
-                                        for reward in rewards[:5]:  # 只顯示前5個回饋
-                                            if reward.min_rate and reward.max_rate:
-                                                rate_display = f"{reward.min_rate}%-{reward.max_rate}%"
-                                            elif reward.max_rate:
-                                                rate_display = f"{reward.max_rate}%"
-                                            elif reward.min_rate:
-                                                rate_display = f"{reward.min_rate}%"
-                                            else:
-                                                rate_display = "未知"
-                                            
-                                            response += f"- {reward.card.name}: {reward.nlp_category} {rate_display} {reward.reward_type}"
-                                            if reward.nlp_scope:
-                                                response += f" ({reward.nlp_scope})"
-                                            response += "\n"
-                            else:
-                                if not response or standard_name not in response:
-                                    response += f"\n\n{standard_name} 目前沒有提供消費回饋。\n"
-                            break
-                    if "回饋" in response:
-                        break
-        
-        # 如果用戶詢問特定銀行的卡片，且原始回應中沒有詳細的卡片列表
-        # 但只有在不是詢問回饋相關問題時才添加信用卡列表
-        if "回饋" not in user_message and "比較" not in user_message:
-            for bank in ChatbotDataService.get_supported_banks():
-                if bank in user_message:
-                    # 檢查是否已經有該銀行的具體卡片列表（不是只有標題）
-                    has_bank_cards = any([
-                        f"- {bank}" in response,  # 有條列式列表
-                        f"* {bank}" in response,  # 有星號列表
-                        f"{bank}" in response and "卡" in response and ("-" in response or "*" in response)  # 有列表符號
-                    ])
-                    
-                    # 如果沒有該銀行的卡片列表，才添加
-                    if not has_bank_cards:
-                        cards = ChatbotDataService.get_cards_by_bank(bank)
-                        if cards:
-                            response += f"\n\n{bank} 的信用卡：\n"
-                            for card in cards[:5]:
-                                # 只顯示卡片名稱，不添加銀行名稱前綴
-                                response += f"- {card['name']}\n"
-                    break
-        
-        # 如果用戶詢問特定消費類別的回饋，且沒有指定特定銀行
-        mentioned_banks = [bank for bank in ChatbotDataService.get_supported_banks() if bank in user_message]
-        if not mentioned_banks:  # 只有在沒有指定特定銀行時，才顯示所有銀行的最佳回饋
-            for category in ChatbotDataService.get_reward_categories():
-                if category in user_message:
+        # 如果意圖是查詢特定類別的回饋，但沒有指定銀行，且回應不完整，則補充
+        if intent["categories"] and not intent["banks"]:
+            if not any(line.strip().startswith('-') for line in response.split('\n')):
+                for category in intent["categories"]:
                     rewards = ChatbotDataService.get_cards_by_category(category)
                     if rewards:
                         response += f"\n\n{category} 消費的最佳回饋卡片：\n"
                         for reward in rewards:
-                            # 顯示回饋率範圍
-                            if reward['min_rate'] and reward['max_rate']:
-                                rate_display = f"{reward['min_rate']}%-{reward['max_rate']}%"
-                            elif reward['max_rate']:
-                                rate_display = f"{reward['max_rate']}%"
-                            elif reward['min_rate']:
-                                rate_display = f"{reward['min_rate']}%"
-                            else:
-                                rate_display = "未知"
-                            
-                            response += f"- {reward['bank']} {reward['card_name']}: {rate_display} {reward['reward_type']}"
-                            if reward['nlp_scope']:
-                                response += f" ({reward['nlp_scope']})"
-                            response += "\n"
-                    break
-        
-        # 如果用戶詢問特定卡片的回饋比較，提供相關回饋資料
-        if "回饋" in user_message and "比較" in user_message:
-            # 嘗試識別用戶詢問的特定卡片
-            mentioned_cards = []
-            for bank in ChatbotDataService.get_supported_banks():
-                if bank in user_message:
-                    cards = ChatbotDataService.get_cards_by_bank(bank)
-                    for card in cards:
-                        card_name = card['name']
-                        # 檢查卡片名稱是否在用戶問題中被提及
-                        if card_name in user_message or any(word in user_message for word in card_name.split()):
-                            mentioned_cards.append({
-                                'bank': card['bank'],
-                                'name': card_name,
-                                'full_name': f"{card['bank']} {card_name}"
-                            })
-            
-            if mentioned_cards:
-                response += f"\n\n指定卡片回饋比較：\n"
-                # 查詢這些特定卡片的回饋資料
-                for card in mentioned_cards:
-                    response += f"\n{card['full_name']}：\n"
-                    # 查詢該卡片在各個消費類別的回饋
-                    card_rewards = []
-                    for category in ChatbotDataService.get_reward_categories():
-                        rewards = ChatbotDataService.get_cards_by_category(category)
-                        for reward in rewards:
-                            if (reward['bank'] in card['bank'] and 
-                                reward['card_name'] in card['name']):
-                                card_rewards.append({
-                                    'category': category,
-                                    'reward': reward
-                                })
-                    
-                    if card_rewards:
-                        for item in card_rewards[:5]:  # 只顯示前5個類別
-                            reward = item['reward']
-                            if reward['min_rate'] and reward['max_rate']:
-                                rate_display = f"{reward['min_rate']}%-{reward['max_rate']}%"
-                            elif reward['max_rate']:
-                                rate_display = f"{reward['max_rate']}%"
-                            elif reward['min_rate']:
-                                rate_display = f"{reward['min_rate']}%"
-                            else:
-                                rate_display = "未知"
-                            
-                            response += f"- {item['category']}: {rate_display} {reward['reward_type']}"
-                            if reward['nlp_scope']:
-                                response += f" ({reward['nlp_scope']})"
-                            response += "\n"
-                    else:
-                        response += "- 暫無回饋資料\n"
-            else:
-                # 如果無法識別特定卡片，提供一般回饋比較
-                main_categories = ['電商', '交通運輸', '百貨公司', '加油站', '旅遊']
-                response += f"\n\n主要消費類別回饋比較：\n"
-                
-                for category in main_categories:
-                    rewards = ChatbotDataService.get_cards_by_category(category)
-                    if rewards:
-                        response += f"\n{category} 消費：\n"
-                        for reward in rewards[:2]:
-                            if reward['min_rate'] and reward['max_rate']:
-                                rate_display = f"{reward['min_rate']}%-{reward['max_rate']}%"
-                            elif reward['max_rate']:
-                                rate_display = f"{reward['max_rate']}%"
-                            elif reward['min_rate']:
-                                rate_display = f"{reward['min_rate']}%"
-                            else:
-                                rate_display = "未知"
-                            
-                            response += f"- {reward['bank']} {reward['card_name']}: {rate_display} {reward['reward_type']}"
-                            if reward['nlp_scope']:
-                                response += f" ({reward['nlp_scope']})"
-                            response += "\n"
+                            rate = f"{reward.get('min_rate', '') or ''}-{reward.get('max_rate', '') or ''}".strip('-')
+                            rate_display = f"{rate}%" if rate else "未知"
+                            response += f"- {reward['bank']} {reward['card_name']}: {rate_display} {reward['reward_type']}\n"
+
+        # 其他增強邏輯可以根據需要繼續添加... 
         
         return response
