@@ -1,16 +1,18 @@
+<!DOCTYPE html>
 <html>
-  <meta charset="UTF-8" />
-  <link rel="stylesheet" href="reset.css" />
-  <link rel="stylesheet" href="rewardia.css" />
-  <link rel="stylesheet" href="login.css" />
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
-    integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-  />
-  <script type="module" src="rewardia.js"></script>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="reset.css" />
+    <link rel="stylesheet" href="rewardia.css" />
+    <link rel="stylesheet" href="login.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+      integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
   <body>
     <header class="header">
       <div class="logo">REWARDIA</div>
@@ -19,11 +21,11 @@
       </div>
     </header>
     <div class="account_content">
-      <div class="login_img">
-        <i class="fa-solid fa-gifts"></i>
-      </div>
-      <div class="login_btn">
-        <a href=""><button>立即登入/註冊</button></a>
+      <div class="login_view">
+        <div class="login_img"><i class="fa-solid fa-gifts"></i></div>
+        <a target="_blank" href="http://localhost:8000/sessions/login"
+          ><button class="btn login_btn">立即登入/註冊</button></a
+        >
       </div>
     </div>
     <nav class="navbar">
@@ -53,4 +55,5 @@
       </div>
     </nav>
   </body>
+  <script type="module" src="account.js"></script>
 </html>

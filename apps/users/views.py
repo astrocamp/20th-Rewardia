@@ -244,6 +244,7 @@ def get_token(request):
             {
                 "token": token.key,
                 "user_id": request.user.id,
+                "username": request.user.username,
                 "message": "Token retrieved successfully",
             }
         )

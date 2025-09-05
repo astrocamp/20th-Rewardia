@@ -1,3 +1,8 @@
+:root {
+  --primary_color: #111827;
+  --secondary_color: #2060b9;
+}
+
 body {
   height: 600px;
   width: 400px;
@@ -7,7 +12,7 @@ body {
   height: 60px;
   width: 100%;
   box-sizing: border-box;
-  background-color: #193966;
+  background-color: var(--primary_color);
   padding: 0 15px;
   display: flex;
   flex-direction: row;
@@ -34,7 +39,7 @@ body {
   flex-direction: row;
   align-items: center;
   justify-content: space-around;
-  box-shadow: 0px 0px 5px rgb(0, 0, 0, 0.5);
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
 }
 
 .icon {
@@ -43,7 +48,7 @@ body {
 }
 
 .icon a {
-  color: #193966;
+  color: var(--primary_color);
   text-decoration: none;
   display: flex;
   flex-direction: column;
