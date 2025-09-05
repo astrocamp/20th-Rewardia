@@ -36,26 +36,6 @@
         />
       </div>
 
-      <div class="field-group">
-        <label for="network" class="field-label required">發卡機構</label>
-        <select id="network" class="ui-select" name="network" required>
-          <option value="" selected disabled>請選擇發卡機構</option>
-          {%for card_network in card_networks%}
-          <option value="{{card_network}}">{{card_network}}</option>
-          {%endfor%}
-        </select>
-      </div>
-
-      <div class="field-group">
-        <label for="card_type" class="field-label required">卡片等級</label>
-        <select id="card_type" class="ui-select" name="card_type" required>
-          <option value="" selected disabled>請選擇卡片等級</option>
-          {%for card_type in card_types%}
-          <option value="{{card_type}}">{{card_type}}</option>
-          {%endfor%}
-        </select>
-      </div>
-
       <div class="field-group flex flex-row items-center">
         <label for="is_active" class="field-label">發行中？</label>
         <input
