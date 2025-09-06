@@ -5,11 +5,7 @@ from django.contrib import messages
 from django.views.decorators.http import require_POST, require_http_methods
 from django.http import HttpResponse
 from apps.rewards.models import PendingReward, RewardCategory
-from django.db.models import Q
-from django.core.paginator import Paginator
-
-
-# Create your views here.
+from django.db.models import Q, Count
 
 
 # 卡片頁面
@@ -87,11 +83,9 @@ def delete_card(request, id):
 
 def rewards(request):
     """主要的rewards管理頁面"""
-    # 進入頁面時自動執行軟刪除檢測
     PendingReward.detect_and_soft_delete_duplicates()
 
-    status_filter = request.GET.get("status", "PENDING")
-    page = request.GET.get("page", 1)
+    status_filter = request.GET.get("status", PendingReward.Status.PENDING)
 
     if status_filter == "ALL":
         pending_rewards = PendingReward.objects.all()
@@ -100,13 +94,13 @@ def rewards(request):
 
     pending_rewards = pending_rewards.order_by("-created_at")
 
-    stats = {
-        "pending_count": PendingReward.objects.filter(status="PENDING").count(),
-        "reviewing_count": PendingReward.objects.filter(status="REVIEWING").count(),
-        "approved_count": PendingReward.objects.filter(status="APPROVED").count(),
-        "rejected_count": PendingReward.objects.filter(status="REJECTED").count(),
-        "total_count": PendingReward.objects.count(),
-    }
+    stats = PendingReward.objects.aggregate(
+        pending_count=Count("id", filter=Q(status=PendingReward.Status.PENDING)),
+        reviewing_count=Count("id", filter=Q(status=PendingReward.Status.REVIEWING)),
+        approved_count=Count("id", filter=Q(status=PendingReward.Status.APPROVED)),
+        rejected_count=Count("id", filter=Q(status=PendingReward.Status.REJECTED)),
+        total_count=Count("id"),
+    )
 
     return render(
         request,
@@ -121,8 +115,8 @@ def rewards(request):
 
 @require_http_methods(["GET"])
 def rewards_table(request):
-    """HTMX專用：返回表格內容"""
-    status_filter = request.GET.get("status", "PENDING")
+    """HTMX：返回表格內容"""
+    status_filter = request.GET.get("status", PendingReward.Status.PENDING)
 
     if status_filter == "ALL":
         pending_rewards = PendingReward.objects.all()
@@ -164,7 +158,7 @@ def approve_pending_reward(request, id):
         "admins/reward_row.html",
         {
             "reward": pending_reward,
-            "current_status": request.GET.get("status", "PENDING"),
+            "current_status": request.GET.get("status", PendingReward.Status.PENDING),
         },
     )
 
@@ -188,7 +182,7 @@ def reject_pending_reward(request, id):
         "admins/reward_row.html",
         {
             "reward": pending_reward,
-            "current_status": request.GET.get("status", "PENDING"),
+            "current_status": request.GET.get("status", PendingReward.Status.PENDING),
         },
     )
 
@@ -215,7 +209,10 @@ def hard_delete_pending_reward(request, id):
     pending_reward = get_object_or_404(PendingReward, pk=id)
 
     # 只允許硬刪除軟刪除且在審核中狀態的資料
-    if pending_reward.status == "REVIEWING" and pending_reward.soft_deleted_at:
+    if (
+        pending_reward.status == PendingReward.Status.REVIEWING
+        and pending_reward.soft_deleted_at
+    ):
         try:
             pending_reward.delete()
             messages.success(request, "硬刪除成功")
@@ -226,70 +223,10 @@ def hard_delete_pending_reward(request, id):
                 f'<tr><td colspan="9" class="text-red-500">硬刪除失敗：{str(e)}</td></tr>'
             )
     else:
-        messages.error(request, "只能硬刪除軟刪除的資料")
+        messages.error(request, "無法刪除此項目，只能刪除重複的項目")
         return HttpResponse(
-            f'<tr><td colspan="9" class="text-red-500">只能硬刪除軟刪除的資料</td></tr>'
+            f'<tr><td colspan="9" class="text-red-500">無法刪除此項目，只能刪除重複的項目</td></tr>'
         )
-
-
-@require_http_methods(["POST"])
-def batch_approve_rewards(request):
-    """批量通過審核"""
-    reward_ids = request.POST.getlist("reward_ids")
-
-    if not reward_ids:
-        messages.warning(request, "請選擇要處理的項目")
-        return redirect("admins:rewards")
-
-    success_count = 0
-    error_count = 0
-
-    for reward_id in reward_ids:
-        try:
-            pending_reward = PendingReward.objects.get(pk=reward_id, status="PENDING")
-            pending_reward.approve_and_create_reward_category()
-            success_count += 1
-        except PendingReward.DoesNotExist:
-            error_count += 1
-        except Exception:
-            error_count += 1
-
-    if success_count > 0:
-        messages.success(request, f"成功通過 {success_count} 項審核")
-    if error_count > 0:
-        messages.error(request, f"{error_count} 項處理失敗")
-
-    return redirect("admins:rewards")
-
-
-@require_http_methods(["POST"])
-def batch_reject_rewards(request):
-    """批量駁回審核"""
-    reward_ids = request.POST.getlist("reward_ids")
-
-    if not reward_ids:
-        messages.warning(request, "請選擇要處理的項目")
-        return redirect("admins:rewards")
-
-    success_count = 0
-    error_count = 0
-
-    for reward_id in reward_ids:
-        try:
-            pending_reward = PendingReward.objects.get(pk=reward_id, status="PENDING")
-            pending_reward.reject()
-            success_count += 1
-        except PendingReward.DoesNotExist:
-            error_count += 1
-        except Exception:
-            error_count += 1
-
-    if success_count > 0:
-        messages.success(request, f"成功駁回 {success_count} 項審核")
-    if error_count > 0:
-        messages.error(request, f"{error_count} 項處理失敗")
-
-    return redirect("admins:rewards")
 
 
 @require_http_methods(["GET"])
@@ -312,7 +249,6 @@ def update_pending_reward(request, id):
     pending_reward = get_object_or_404(PendingReward, pk=id)
 
     try:
-        # 更新可編輯欄位
         pending_reward.nlp_category = request.POST.get(
             "nlp_category", pending_reward.nlp_category
         )
@@ -338,12 +274,11 @@ def update_pending_reward(request, id):
     except Exception as e:
         messages.error(request, f"更新失敗：{str(e)}")
 
-    # 返回更新後的行
     return render(
         request,
         "admins/reward_row.html",
         {
             "reward": pending_reward,
-            "current_status": request.GET.get("status", "PENDING"),
+            "current_status": request.GET.get("status", PendingReward.Status.PENDING),
         },
     )

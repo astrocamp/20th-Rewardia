@@ -1,10 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from .data.faq_content import FAQ_DATA
 from apps.cards.models import CreditCard
 from apps.rewards.models import RewardCategory
-from django.http import HttpResponse, JsonResponse
-from django.contrib import messages
-from django.db.models import Q
+from django.http import HttpResponse
 
 
 def download(request):
@@ -12,9 +10,8 @@ def download(request):
 
 
 def calculator(request):
-    # 暫時移除 is_active 限制，因為資料庫中的值是 NULL
     banks = (
-        CreditCard.objects.all()
+        CreditCard.objects.filter(is_active=True)
         .values_list("bank", flat=True)
         .distinct()
         .order_by("bank")
@@ -32,17 +29,18 @@ def get_cards_by_bank(request):
     bank_name = request.GET.get("bank_select")
 
     if bank_name:
-        # 根據銀行名稱找到該銀行的所有信用卡（暫時移除 is_active 限制）
-        cards = CreditCard.objects.filter(bank=bank_name).order_by("name")
+        cards = CreditCard.objects.filter(bank=bank_name, is_active=True).order_by(
+            "name"
+        )
 
         # 產生 HTML 選項
-        options_html = '<option value="" selected disabled>請選擇卡片</option>'
+        options_html = '<option value="" selected disabled>請先選擇銀行，再選擇卡片</option>'
         for card in cards:
             options_html += f'<option value="{card.id}">{card.name}</option>'
 
         return HttpResponse(options_html)
 
-    return HttpResponse('<option value="" selected disabled>請選擇卡片</option>')
+    return HttpResponse('<option value="" selected disabled>請先選擇銀行，再選擇卡片</option>')
 
 
 # HTMX 用的 API - 根據卡片取得消費類別
@@ -58,13 +56,13 @@ def get_categories_by_card(request):
             .order_by("category")
         )
 
-        options_html = '<option value="" selected disabled>請選擇消費類別</option>'
+        options_html = '<option value="" selected disabled>請先選擇卡片</option>'
         for category in categories:
             options_html += f'<option value="{category["category"]}">{category["category"]}</option>'
 
         return HttpResponse(options_html)
 
-    return HttpResponse('<option value="" selected disabled>請選擇消費類別</option>')
+    return HttpResponse('<option value="" selected disabled>請先選擇卡片</option>')
 
 
 # HTMX 用的 API - 根據類別取得消費種類
@@ -81,7 +79,7 @@ def get_scopes_by_category(request):
             .order_by("scope")
         )
 
-        options_html = '<option value="" selected disabled>請選擇消費種類</option>'
+        options_html = '<option value="" selected disabled>請先選擇消費類別</option>'
         for scope in scopes:
             options_html += (
                 f'<option value="{scope["scope"]}">{scope["scope"]}</option>'
@@ -89,7 +87,7 @@ def get_scopes_by_category(request):
 
         return HttpResponse(options_html)
 
-    return HttpResponse('<option value="" selected disabled>請選擇消費種類</option>')
+    return HttpResponse('<option value="" selected disabled>請先選擇消費類別</option>')
 
 
 def faq(request):
@@ -106,91 +104,81 @@ def login(request):
 
 
 def calculate_reward(request):
-    """計算信用卡回饋 - 使用真實資料"""
+    """計算信用卡回饋 - 使用 Django Form 驗證"""
     if request.method == "POST":
-        try:
-            # 取得表單資料
-            card_id = request.POST.get("card_select")
-            category_name = request.POST.get("category_select")
-            scope_name = request.POST.get("scope_select")
-            amount = request.POST.get("amount_input")
+        from .forms import RewardCalculatorForm
 
-            # 驗證資料
-            if not all([card_id, category_name, scope_name, amount]):
-                return HttpResponse("""
-                    <div class="result-error">請填寫完整資訊</div>
-                """)
+        form = RewardCalculatorForm(request.POST)
 
-            amount = float(amount)
-            if amount <= 0:
-                return HttpResponse("""
-                    <div class="result-error">請輸入正確的消費金額</div>
-                """)
+        if form.is_valid():
+            card_id = form.cleaned_data["card_select"]
+            category_name = form.cleaned_data["category_select"]
+            scope_name = form.cleaned_data["scope_select"]
+            amount = form.cleaned_data["amount_input"]
 
-            # 取得卡片資訊（暫時移除 is_active 限制）
-            card = CreditCard.objects.get(id=card_id)
-
-            # 資料庫找到對應的回饋規則（暫時移除 is_active 限制）
             try:
-                reward_rule = RewardCategory.objects.get(
-                    card_id=card_id, category=category_name, scope=scope_name
-                )
+                # ✅ 取得活躍的卡片資訊
+                card = CreditCard.objects.get(id=card_id, is_active=True)
 
-                # 計算回饋金額
-                min_rate = reward_rule.min_rate
-                max_rate = reward_rule.max_rate
-
-                # 四種情況的判斷邏輯
-                if not min_rate and not max_rate:
-                    # 都沒有資料
-                    result = "資料不足無法計算"
-
-                elif min_rate and not max_rate:
-                    # 只有最低回饋率
-                    reward_amount = amount * float(min_rate) / 100
-                    result = (
-                        f"最低{min_rate}% 回饋，回饋金額：{reward_amount:.0f} 元/點數"
+                # 資料庫找到對應的回饋規則（暫時移除 is_active 限制）
+                try:
+                    reward_rule = RewardCategory.objects.get(
+                        card_id=card_id, category=category_name, scope=scope_name
                     )
 
-                elif not min_rate and max_rate:
-                    # 只有最高回饋率
-                    reward_amount = amount * float(max_rate) / 100
-                    result = (
-                        f"最高{max_rate}% 回饋，回饋金額：{reward_amount:.0f} 元/點數"
-                    )
+                    min_rate = reward_rule.min_rate
+                    max_rate = reward_rule.max_rate
 
-                else:
-                    # 兩個都有
-                    if min_rate == max_rate:
-                        reward_amount = amount * float(min_rate) / 100
-                        result = (
-                            f"{min_rate}% 回饋，回饋金額：{reward_amount:.0f} 元/點數"
-                        )
+                    if not min_rate and not max_rate:
+                        # 都沒有資料
+                        result = "資料不足無法計算"
+
+                    elif min_rate and not max_rate:
+                        # 只有最低回饋率
+                        reward_amount = amount * min_rate / 100
+                        result = f"最低{min_rate}% 回饋，回饋金額：{reward_amount:.0f} 元/點數"
+
+                    elif not min_rate and max_rate:
+                        # 只有最高回饋率
+                        reward_amount = amount * max_rate / 100
+                        result = f"最高{max_rate}% 回饋，回饋金額：{reward_amount:.0f} 元/點數"
+
                     else:
-                        min_reward = amount * float(min_rate) / 100
-                        max_reward = amount * float(max_rate) / 100
-                        result = f"最低{min_rate}% ~ 最高{max_rate}% 回饋，回饋金額：{min_reward:.0f} ~ {max_reward:.0f} 元/點數"
+                        # 兩個都有
+                        if min_rate == max_rate:
+                            reward_amount = amount * min_rate / 100
+                            result = f"{min_rate}% 回饋，回饋金額：{reward_amount:.0f} 元/點數"
+                        else:
+                            min_reward = amount * min_rate / 100
+                            max_reward = amount * max_rate / 100
+                            result = f"最低{min_rate}% ~ 最高{max_rate}% 回饋，回饋金額：{min_reward:.0f} ~ {max_reward:.0f} 元/點數"
 
-                return HttpResponse(f"""
-                    <div class="result-success">{result}</div>
-                """)
+                    return HttpResponse(f"""
+                        <div class="result-success">{result}</div>
+                    """)
 
-            except RewardCategory.DoesNotExist:
+                except RewardCategory.DoesNotExist:
+                    return HttpResponse("""
+                        <div class="result-warning">找不到對應的回饋資訊</div>
+                    """)
+
+            except CreditCard.DoesNotExist:
                 return HttpResponse("""
-                    <div class="result-warning">找不到對應的回饋資訊</div>
+                    <div class="result-error">找不到指定的信用卡</div>
                 """)
+            except Exception as e:
+                return HttpResponse(f"""
+                    <div class="result-error">計算錯誤：{str(e)}</div>
+                """)
+        else:
+            error_messages = []
+            for field, errors in form.errors.items():
+                for error in errors:
+                    error_messages.append(error)
 
-        except CreditCard.DoesNotExist:
-            return HttpResponse("""
-                <div class="result-error">找不到指定的信用卡</div>
-            """)
-        except ValueError:
-            return HttpResponse("""
-                <div class="result-error">金額格式不正確</div>
-            """)
-        except Exception as e:
+            error_text = "、".join(error_messages)
             return HttpResponse(f"""
-                <div class="result-error">計算錯誤：{str(e)}</div>
+                <div class="result-error">{error_text}</div>
             """)
 
     return HttpResponse("""

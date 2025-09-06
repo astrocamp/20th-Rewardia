@@ -39,12 +39,4 @@ urlpatterns = [
         views.update_pending_reward,
         name="update_pending_reward",
     ),
-    path(
-        "rewards/batch-approve/",
-        views.batch_approve_rewards,
-        name="batch_approve_rewards",
-    ),
-    path(
-        "rewards/batch-reject/", views.batch_reject_rewards, name="batch_reject_rewards"
-    ),
 ]

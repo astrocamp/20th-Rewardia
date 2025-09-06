@@ -5,18 +5,16 @@ from apps.cards.models import CreditCard
 class RewardCalculatorForm(forms.Form):
     """回饋計算表單"""
 
-    bank_select = forms.IntegerField(
-        required=True, error_messages={"required": "請選擇銀行"}
+    bank_select = forms.CharField(
+        max_length=100, required=True, error_messages={"required": "請選擇銀行"}
     )
 
     card_select = forms.IntegerField(
         required=True, error_messages={"required": "請選擇信用卡"}
     )
 
-    category_select = forms.ChoiceField(
-        choices=[("ONLINE", "網購"), ("CVS", "超商"), ("GAS", "加油")],
-        required=True,
-        error_messages={"required": "請選擇消費類別"},
+    category_select = forms.CharField(
+        max_length=50, required=True, error_messages={"required": "請選擇消費類別"}
     )
 
     scope_select = forms.CharField(
@@ -50,3 +48,11 @@ class RewardCalculatorForm(forms.Form):
         if amount > 1000000:
             raise forms.ValidationError("單筆消費金額不能超過1,000,000元")
         return amount
+
+    def clean_bank_select(self):
+        """驗證銀行名稱"""
+        bank_name = self.cleaned_data["bank_select"]
+
+        if not CreditCard.objects.filter(bank=bank_name, is_active=True).exists():
+            raise forms.ValidationError("選擇的銀行沒有可用的信用卡")
+        return bank_name
