@@ -49,11 +49,11 @@
   .fixed-header {
     @apply fixed top-0 left-0 right-0 z-50;
   }
-  
+
   .top-banner-container {
     @apply relative z-10;
   }
-  
+
   .banner-close-btn {
     @apply hover:bg-gray-700 rounded transition-colors duration-200;
   }
@@ -90,7 +90,7 @@
       padding: 20px 21px 32px 21px;
       min-height: 407px;
     }
-  
+
     .add-card-actions {
       @apply mt-[52px];
     }
@@ -100,11 +100,11 @@
       padding: 20px 15px 30px 15px;
       min-height: auto;
     }
-  
+
     .add-card-actions {
       @apply flex-col gap-4 mt-8;
     }
-  
+
     .add-card-actions .ui-btn {
       @apply w-full h-12;
     }

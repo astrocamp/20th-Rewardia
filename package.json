@@ -19,6 +19,7 @@
     "esbuild": "^0.25.9"
   },
   "dependencies": {
+    "@tailwindcss/cli": "^4.1.12",
     "tailwindcss": "^4.1.13",
     "alpinejs": "^3.14.9",
     "braintree-web-drop-in": "^1.45.1",
