@@ -12,8 +12,8 @@
 
   .btn-blue {
     @apply text-white border-blue-600 hover:bg-blue-700 transition-colors duration-200;
-    background-color: #2060B9;
-    border-color: #2060B9;
+    background-color: #2060b9;
+    border-color: #2060b9;
   }
 
   .btn-white-outline {
