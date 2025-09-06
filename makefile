@@ -35,8 +35,8 @@ sqlinstall_2:
 	createuser -s postgres && psql -U postgres
 
 restart:
-	npm i && uv run
+	npm i && uv sync &&uv run python -m spacy download zh_core_web_md
 # 	npm i; uv run (for windows 電腦用--因為無法使用原提供的restart指令)
 
 ins_spacy:
-	uv pip install pip && uv run python -m spacy download zh_core_web_md
+	uv run python -m spacy download zh_core_web_md
