@@ -25,7 +25,7 @@
              {% endfor %}
            ],
            {% if is_edit_mode and user_card %}
-           initialBankName: '{{ user_card.card.bank }}',
+           initialBankName: '{{ user_card.card.bank}}',
            initialCardId: {{ user_card.card.id }}
            {% else %}
            initialBankName: null,
@@ -87,7 +87,7 @@
                   <option value="" selected disabled class="text-[#949AA6]" x-show="!selectedBank">請先選擇發卡銀行</option>
                   <option value="" selected disabled class="text-[#949AA6]" x-show="selectedBank && availableCards.length === 0">該銀行暫無可選卡片</option>
                   <option value="" disabled class="text-[#949AA6]" x-show="selectedBank && availableCards.length > 0">選擇卡片</option>
-                  
+
                   <template x-for="card in availableCards" :key="card.id">
                     <option :value="card.id" x-text="card.name"></option>
                   </template>
@@ -122,4 +122,5 @@
     </div>
   </div>
 </section>
+
 {% endblock %}
