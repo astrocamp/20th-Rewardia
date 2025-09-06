@@ -5,71 +5,79 @@
   .faq-feature-card {
     @apply bg-gray-50 rounded-lg relative overflow-hidden min-h-[327px];
   }
-  
+
   .faq-feature-bg {
     @apply w-full h-[320px] bg-gray-200 rounded-t-lg;
   }
-  
+
   .faq-feature-image-placeholder {
     @apply w-full h-full bg-gray-200 rounded-t-lg;
   }
-  
+
   .faq-feature-number {
-    @apply w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center text-3xl font-bold font-sans leading-tight mr-4;
+    @apply w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center text-3xl font-bold mr-4;
+    font-family: "Kulim Park", sans-serif;
+    line-height: 0.98;
   }
-  
+
   .faq-feature-content {
     @apply bg-white flex flex-row items-start pt-4 pl-0 pr-6 pb-6;
   }
-  
+
   .faq-feature-title {
-    @apply text-xl sm:text-2xl lg:text-3xl font-bold text-black font-sans leading-normal text-left;
+    @apply text-xl sm:text-2xl lg:text-3xl font-bold text-black text-left;
+    font-family: "Kulim Park", sans-serif;
+    line-height: 1.15;
   }
-  
+
   .faq-category-title {
-    @apply text-2xl font-bold text-gray-500 mb-6 font-sans leading-relaxed bg-transparent p-0 cursor-default;
+    @apply text-2xl font-bold text-muted mb-6 bg-transparent p-0 cursor-default;
+    font-family: "Inter", sans-serif;
+    line-height: 1.21;
   }
-  
+
   .faq-qa-list {
     @apply space-y-4;
   }
-  
+
   .faq-qa-item {
     @apply bg-white rounded-lg border border-gray-300 overflow-hidden min-h-[60px];
   }
-  
+
   .faq-question {
     @apply flex items-center justify-between p-4 transition-colors duration-200 min-h-[60px] cursor-default;
   }
-  
+
   .faq-question-text {
-    @apply text-lg font-bold text-gray-700 flex-1 pr-4 font-sans leading-relaxed cursor-default;
+    @apply text-lg font-bold text-dark-gray flex-1 pr-4 cursor-default;
+    font-family: "Inter", sans-serif;
+    line-height: 1.21;
   }
-  
+
   .faq-toggle-btn {
     @apply w-16 h-16 bg-white flex items-center justify-center transition-all duration-200 cursor-pointer border-none outline-none;
   }
-  
+
   .faq-toggle-btn:hover {
     @apply bg-gray-50;
   }
-  
+
   .faq-arrow-icon {
     @apply w-5 h-5 text-black transition-transform duration-300;
   }
-  
+
   .rotate-180 {
     transform: rotate(180deg);
   }
-  
+
   .faq-answer {
     @apply p-4 border-t border-gray-300 bg-white min-h-[20px];
   }
-  
+
   .faq-answer.hidden {
     @apply hidden;
   }
-  
+
   .faq-answer-text {
     @apply text-lg text-gray-700 font-sans leading-6;
   }
@@ -79,27 +87,27 @@
     .faq-feature-card {
       @apply min-h-[280px];
     }
-    
+
     .faq-feature-bg {
       @apply h-[200px];
     }
-    
+
     .faq-feature-content {
       @apply pt-3 pl-0 pr-4 pb-4;
     }
-    
+
     .faq-feature-number {
       @apply w-10 h-10 text-2xl min-w-10 min-h-10 mr-3;
     }
-    
+
     .faq-question {
       @apply p-4 min-h-[50px];
     }
-    
+
     .faq-toggle-btn {
       @apply w-14 h-14;
     }
-    
+
     .faq-answer {
       @apply p-4 min-h-[15px];
     }
@@ -109,15 +117,15 @@
     .faq-feature-card {
       @apply min-h-[300px];
     }
-    
+
     .faq-feature-bg {
       @apply h-[220px];
     }
-    
+
     .faq-feature-content {
       @apply p-5 pt-4 pl-0 pr-0;
     }
-    
+
     .faq-feature-number {
       @apply w-11 h-11 text-2xl min-w-11 min-h-11 mr-4;
     }
@@ -127,15 +135,15 @@
     .faq-feature-card {
       @apply min-h-auto h-auto;
     }
-    
+
     .faq-feature-bg {
       @apply h-auto aspect-[1.5/1];
     }
-    
+
     .faq-feature-content {
       @apply p-6 pt-4 pl-0;
     }
-    
+
     .faq-feature-number {
       @apply w-12 h-12 text-3xl min-w-12 min-h-12 mr-4;
     }
