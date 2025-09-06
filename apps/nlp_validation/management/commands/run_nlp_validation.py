@@ -94,6 +94,7 @@ class Command(BaseCommand):
                                 bank=bank_name,
                                 defaults={"is_active": False},
                             )
+                            print(bank_name)
                             # 加入快取
                             credit_card_cache[card_key] = credit_card
                             if created:

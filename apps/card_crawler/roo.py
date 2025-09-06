@@ -40,7 +40,7 @@ def save_data(data):
 # 將不存在於roo.cash且存在於我們db的url，設為刪除狀態
 def handle_missing_urls(urls):
     CrawledData.objects.filter(is_active=True).exclude(url__in=urls).update(
-        is_active=False, deleted_at=datetime.now()
+        is_active=False, deleted_at=timezone.now()
     )
 
 
@@ -195,14 +195,14 @@ def crawl_roo_cards(driver, cat_urls):
                 try:
                     current_card = CrawledData.objects.get(url=card_url)
                     # 一小時內沒抓過的，就抓取，跳過一小時內抓過的
-                    if timezone.now() - current_card.updated_at > timedelta(hours=1):
+                    if timezone.now() - current_card.updated_at > timedelta(hours=24):
                         get_card_info(driver, card_url)
                         time.sleep(sleep_time)
                         processed_urls.add(card_url)
                     else:
                         # 就算沒有抓，還是算已經處理過的卡
                         processed_urls.add(card_url)
-                        print("近一小時已經抓過了。")
+                        print("一天內已經抓過了。")
                 # 如果這張卡不存在資料庫，那就繼續抓取
                 except CrawledData.DoesNotExist:
                     get_card_info(driver, card_url)
@@ -233,6 +233,19 @@ def main_crawler():
     options = webdriver.ChromeOptions()
     options.add_argument("--disable-popup-blocking")
     options.add_argument("--disable-notifications")
+    # options.add_argument("--headless=new")
+    options.add_argument("--disable-images")
+    options.add_argument("--disable-plugins")
+    options.add_argument("--disable-extensions")
+    options.add_argument("--window-size=160,120")
+    options.add_argument("--disable-web-security")
+    options.add_argument("--disable-features=VizDisplayCompositor")
+    options.add_argument("--disable-backgrounding-occluded-windows")
+    options.add_argument("--disable-renderer-backgrounding")
+    options.add_argument("--disable-background-timer-throttling")
+    options.add_argument("--memory-pressure-off")
+    options.add_argument("--aggressive-cache-discard")
+    options.add_argument("--disable-background-networking")
     try:
         start_time = time.time()
         driver = webdriver.Chrome(options=options)
@@ -245,18 +258,28 @@ def main_crawler():
 
     finally:
         total_time = time.time() - start_time
+        # 防止除零錯誤
+        average_time = (
+            total_time / len(processed_urls) if len(processed_urls) > 0 else 0
+        )
+
         crawl_record = {
             "total_time": total_time,
             "total_cards": len(processed_urls),
-            "average_time": total_time / len(processed_urls),
+            "average_time": average_time,
             "errors": failed_cards,
         }
 
         save_crawl_record(crawl_record)
 
-        print(
-            f"總共載入了 {len(processed_urls)} 張卡片\n有誤卡片數：{len(failed_cards)}\n總測試時間: {time.strftime('%H:%M:%S', time.gmtime(total_time))}\n平均時間 {(total_time / len(processed_urls)):.3f} 秒/張，Done!"
-        )
+        if len(processed_urls) > 0:
+            print(
+                f"總共載入了 {len(processed_urls)} 張卡片\n有誤卡片數：{len(failed_cards)}\n總測試時間: {time.strftime('%H:%M:%S', time.gmtime(total_time))}\n平均時間 {average_time:.3f} 秒/張，Done!"
+            )
+        else:
+            print(
+                f"沒有處理任何卡片\n有誤卡片數：{len(failed_cards)}\n總測試時間: {time.strftime('%H:%M:%S', time.gmtime(total_time))}\n無法計算平均時間，Done!"
+            )
         driver.quit()
 
 

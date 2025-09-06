@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",  # OAuth 必要：allauth 需要 sites framework 來管理多站點
     # ------------------------------
     "django_celery_results",
-    # "kombu.transport.django"
+    "django_celery_beat",
     # ------------------------------
     "debug_toolbar",
     # ------------------------------
@@ -232,15 +232,11 @@ CELERY_TIMEZONE = "Asia/Taipei"
 
 
 CELERY_BEAT_SCHEDULE = {
-    # 每天早上 8 點執行爬蟲
-    "daily-crawl-roo": {
-        "task": "apps.card_crawler.tasks.crawl_roo_task",
-        "schedule": crontab(hour=8, minute=0),
-    },
-    # 每天早上 9 點執行 NLP 分析（爬蟲完成後1小時）
-    "daily-nlp-analysis": {
+    # 每天早上 8 點執行爬蟲（完成後自動執行 NLP 分析）
+    "daily-crawl-and-nlp": {
+        # "task": "apps.card_crawler.tasks.crawl_roo_task",
         "task": "apps.nlp_validation.tasks.run_nlp_validation_task",
-        "schedule": crontab(hour=9, minute=0),
+        "schedule": crontab(hour=14, minute=6),
     },
 }
 
