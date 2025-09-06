@@ -70,7 +70,7 @@
           <div 
             class="message-bubble whitespace-pre-wrap"
             :class="message.type === 'user' ? 'message-user' : 'message-ai'"
-            x-html="message.type === 'ai' ? message.content.replace(/\n/g, '<br>') : message.content"
+            x-text="message.content"
           ></div>
         </div>
       </template>

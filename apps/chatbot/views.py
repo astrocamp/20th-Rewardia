@@ -1,9 +1,15 @@
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from asgiref.sync import sync_to_async
 from django.conf import settings
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.http import require_http_methods
 import json
+import logging
 import google.generativeai as genai
-from .services import ChatbotDataService, ChatbotResponseBuilder
+from .services import ChatbotResponseBuilder
+
+# 設定日誌記錄器
+logger = logging.getLogger(__name__)
 
 # Configure the Gemini API with the key from Django settings
 try:
@@ -11,55 +17,80 @@ try:
 except AttributeError:
     pass
 
+def get_gemini_response_sync(prompt):
+    """
+    A synchronous wrapper for the Gemini API call to isolate it from the async context.
+    """
+    try:
+        model = genai.GenerativeModel('gemini-2.0-flash')
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        logger.error(f"Gemini API call failed: {str(e)}")
+        raise
 
-@csrf_exempt
-def chat_api(request):
+def build_full_prompt(context_prompt, message):
+    """
+    組合完整的提示詞
+    """
+    return f"{context_prompt}\n\n## 用戶問題\n{message}\n\n請根據以上資訊回答用戶的問題："
+
+@csrf_protect
+@require_http_methods(["POST"])
+async def chat_api(request):
     """
     AI 助理 API 端點
     """
     if request.method == 'POST':
         # Check if the API key is configured
         if not settings.GEMINI_API_KEY:
+            logger.error("Gemini API key not configured")
             return JsonResponse({'error': 'Gemini API 金鑰未配置'}, status=500)
 
         try:
-            # Parse the JSON data from the request body
-            data = json.loads(request.body)
+            # Parse request data
+            body = request.body
+            data = json.loads(body)
             message = data.get('message')
 
             if not message:
                 return JsonResponse({'error': '訊息內容為必填'}, status=400)
 
-            # 1. 分析使用者意圖
-            intent = ChatbotResponseBuilder.analyze_user_intent(message)
-
-            # 2. 根據意圖建構上下文提示詞
-            context_prompt = ChatbotResponseBuilder.build_context_prompt(intent, request.user)
+            # Get user_id if authenticated
+            user_id = request.user.id if request.user.is_authenticated else None
             
-            # 組合完整的提示詞
-            full_prompt = f"{context_prompt}\n\n## 用戶問題\n{message}\n\n請根據以上資訊回答用戶的問題："
+            # Get conversation history
+            conversation_history = data.get('conversation_history', [])
 
-            # 3. 呼叫 Gemini API
-            model = genai.GenerativeModel('gemini-2.0-flash')
-            gemini_response = model.generate_content(full_prompt)
-            response_message = gemini_response.text
+            # 1. Asynchronously analyze user intent with conversation history
+            intent = await sync_to_async(ChatbotResponseBuilder.analyze_user_intent, thread_sensitive=True)(message, conversation_history)
+
+            # 2. Asynchronously build context prompt with conversation history
+            context_prompt = await sync_to_async(ChatbotResponseBuilder.build_context_prompt_with_history, thread_sensitive=True)(intent, user_id, conversation_history)
             
-            # 4. 驗證回應
-            validated_response = ChatbotResponseBuilder.validate_response(
-                response_message, message, request.user
+            # 3. Build full prompt
+            full_prompt = build_full_prompt(context_prompt, message)
+
+            # 4. Call Gemini API
+            response_message = await sync_to_async(get_gemini_response_sync, thread_sensitive=False)(full_prompt)
+            
+            # 5. Validate response
+            validated_response = await sync_to_async(ChatbotResponseBuilder.validate_response, thread_sensitive=True)(
+                response_message, message, user_id
             )
             
-            # 5. 根據意圖增強回應
-            enhanced_response = ChatbotResponseBuilder.enhance_response_with_data(
-                validated_response, intent, request.user
+            # 6. Enhance response
+            enhanced_response = await sync_to_async(ChatbotResponseBuilder.enhance_response_with_data, thread_sensitive=True)(
+                validated_response, intent, user_id
             )
 
             return JsonResponse({'response': enhanced_response})
 
         except json.JSONDecodeError:
+            logger.warning("Invalid JSON format in chatbot request")
             return JsonResponse({'error': '無效的 JSON 格式'}, status=400)
         except Exception as e:
-            # Catch potential errors from the Gemini API call and return a generic error
+            logger.error(f"Chatbot API Error: {str(e)}", exc_info=True)
             return JsonResponse({'error': 'AI 服務暫時無法使用，請稍後再試'}, status=500)
 
     # If the request method is not POST, return an error

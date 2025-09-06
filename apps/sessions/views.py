@@ -23,8 +23,8 @@ def login_view(request):
             UserAuthenticationService.handle_login_failure(request, error_type, form)
     else:
         form = UserLoginForm()
-
-    return render(request, "users/login.html", {"form": form})
+    
+    return render(request, 'users/login.html', {'form': form, 'hide_chatbot': True})
 
 
 @require_POST

@@ -37,7 +37,7 @@ def register(request):
     else:
         form = UserRegistrationForm()
 
-    return render(request, "users/register.html", {"form": form})
+    return render(request, "users/register.html", {"form": form, "hide_chatbot": True})
 
 
 def prepare_card_form_context(
