@@ -31,13 +31,13 @@ def register(request):
 def prepare_card_form_context(
     user_card=None, is_edit_mode=False, include_selected_bank=False
 ):
-    # 基本的context資料
-    cards = CreditCard.objects.all().only("id", "name", "bank")
+    # 取得所有活躍的卡片
+    cards = CreditCard.objects.filter(is_active=True).only("id", "name", "bank")
 
-    # 只取得真正有卡片的銀行列表
-    banks_with_cards = cards.values_list("bank", flat=True).distinct().order_by("bank")
+    # 取得所有有卡片的銀行名稱 (去重複)
+    bank_names = cards.values_list("bank", flat=True).distinct().order_by("bank")
     # 轉換成模板期望的格式
-    banks = [{"id": i + 1, "name": bank} for i, bank in enumerate(banks_with_cards)]
+    banks = [{"name": bank_name} for bank_name in bank_names if bank_name]
 
     context = {
         "banks": banks,

@@ -1,28 +1,31 @@
 export default (config = {}) => ({
-  selectedBank: config.initialBankName || '',
-  selectedCard: config.initialCardId || '',
+  selectedBank: config.initialBankName || "",
+  selectedCard: config.initialCardId || "",
   allCards: config.allCards || [],
   availableCards: [],
 
   init() {
-    if (this.selectedBank) {
-      this.filterCardsByBank(this.selectedBank);
-    }
+    this.updateAvailableCards(this.selectedBank);
   },
 
   onBankChange() {
-    if (this.selectedBank) {
-      this.selectedCard = '';
-      this.filterCardsByBank(this.selectedBank);
-    } else {
-      this.availableCards = [];
-      this.selectedCard = '';
-    }
+    this.updateAvailableCards(this.selectedBank);
   },
 
-  filterCardsByBank(bankName) {
-    this.availableCards = this.allCards.filter(card => {
-      return card.bankName === bankName;
-    });
-  }
+  updateAvailableCards(bankName) {
+    if (!bankName) {
+      this.availableCards = [];
+      this.selectedCard = "";
+      return;
+    }
+
+    this.availableCards = this.allCards.filter(
+      (card) => card.bankName === bankName
+    );
+
+    // 防呆：如果目前選中的卡不屬於新銀行 → 清空
+    if (!this.availableCards.some((card) => card.id === this.selectedCard)) {
+      this.selectedCard = "";
+    }
+  },
 });
