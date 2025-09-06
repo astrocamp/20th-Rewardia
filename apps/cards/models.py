@@ -28,7 +28,7 @@ class CreditCard(models.Model):
         美國 = "美國運通"
         渣打 = "渣打"
         陽信 = "陽信"
-        Bank = "LINE Bank"
+        LineBank = "Line Bank"
         將來 = "將來"
         元大 = "元大"
         台中 = "台中"
@@ -57,8 +57,12 @@ class CreditCard(models.Model):
         super().save(*args, **kwargs)
 
     def format_bank_name(self, bank_name):
-        if re.search(r"(合作?金?庫)", bank_name):
-            return "合庫"
+        # if re.search("Bank", bank_name):
+        #     return "Line Bank"
+        if re.search("一銀", bank_name):
+            return "第一"
+        if re.search("美國", bank_name):
+            return "美國通運"
         if bank_name not in CreditCard.Bank.values:
             return "無"
         return bank_name
