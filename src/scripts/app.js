@@ -1,21 +1,26 @@
 import Alpine from "alpinejs";
 import "htmx.org";
-import message from "./components/message.js";
-import cardForm from "./components/card_form.js";
-import register from "./components/register.js";
-import faq from "./components/faq.js";
-import login from "./components/login.js";
-import subscribe from "./components/subscribe.js";
+
+// Import all components
+import './components/header.js';
 import chatbot from "./components/chatbot.js";
+import mainSearchComponent from './components/main.js';
+import cardFormComponent from './components/card_form.js';
+import faqComponent from './components/faq.js';
+import loginComponent from './components/login.js';
+import messageComponent from './components/message.js';
+import registerComponent from './components/register.js';
+import subscribeComponent from './components/subscribe.js';
 
 window.Alpine = Alpine;
 
-Alpine.data("toast_fadeout", message);
-Alpine.data("card_form", cardForm);
-Alpine.data("register_form", register);
-Alpine.data("faq_accordion", faq);
-Alpine.data("login_form", login);
-Alpine.data("subscribe_form", subscribe);
+Alpine.data('main_search', mainSearchComponent);
+Alpine.data('card_form', cardFormComponent);
+Alpine.data('faq_accordion', faqComponent);
+Alpine.data('login_form', loginComponent);
+Alpine.data('register_form', registerComponent);
+Alpine.data('subscribe_form', subscribeComponent);
+Alpine.data("toast_fadeout", messageComponent);
 Alpine.data("chatbot", chatbot);
 
 Alpine.start();

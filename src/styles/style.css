@@ -26,12 +26,14 @@
 @import "./components/buttons.css";
 @import "./components/forms.css";
 @import "./components/chatbot.css";
+@import "./components/header.css";
 @import "./pages/calculator.css";
 @import "./pages/download.css";
 @import "./pages/faq.css";
 @import "./pages/member-zone.css";
 @import "./pages/register.css";
 @import "./pages/main.css";
+@import "./components/banner.css";
 
 @layer base {
   :root {
