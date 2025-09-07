@@ -100,6 +100,9 @@ class Command(BaseCommand):
                                 self.stdout.write(
                                     f"建立新信用卡：{bank_name} {card_name}"
                                 )
+                            else:
+                                self.stdout.write(f"已經有 {bank_name} {card_name}")
+
                         except ValidationError as e:
                             self.stdout.write(f"CreditCard驗證失敗: {e}")
                             self.stdout.write(
@@ -125,16 +128,34 @@ class Command(BaseCommand):
                 # 5. 過濾回饋相關句子
                 filtered = filter_obj.filter_reward_sentences(sentences)
 
-                # 6. 去重處理
+                # 6. 語義去重處理
                 unique_filtered = []
-                seen_hashes = set()
+                deduplication_threshold = config["settings"]["deduplication_threshold"]
 
-                if filtered:
-                    for sentence in filtered:
-                        sentence_hash = hash(sentence)
-                        if sentence_hash not in seen_hashes:
+                if not filtered:
+                    unique_filtered = []
+                else:
+                    # 批次處理所有句子的向量
+                    filtered_docs = list(classifier.nlp.pipe(filtered, batch_size=50))
+                    sentence_to_doc = dict(zip(filtered, filtered_docs))
+
+                    for sentence, sentence_doc in zip(filtered, filtered_docs):
+                        is_duplicate = False
+
+                        for existing in unique_filtered:
+                            existing_doc = sentence_to_doc[existing]
+
+                            if sentence_doc.has_vector and existing_doc.has_vector:
+                                similarity = sentence_doc.similarity(existing_doc)
+                                if similarity >= deduplication_threshold:
+                                    is_duplicate = True
+                                    break
+                            elif sentence == existing:
+                                is_duplicate = True
+                                break
+
+                        if not is_duplicate:
                             unique_filtered.append(sentence)
-                            seen_hashes.add(sentence_hash)
 
                 # 7. 處理每個句子
                 context_sentences = []
