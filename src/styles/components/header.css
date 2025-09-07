@@ -1,0 +1,14 @@
+
+.header-sticky {
+  @apply fixed top-0 left-0 right-0 w-full z-40;
+  animation: slide-down 0.3s ease-out;
+}
+
+@keyframes slide-down {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}

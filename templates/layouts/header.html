@@ -1,6 +1,6 @@
-<header class="fixed-header bg-white border-b border-gray-200 shadow-sm">
+<header class="fixed-header bg-white border-b border-gray-200 shadow-sm" x-data="header()" @scroll.window="handleScroll()">
   <!-- Top Banner -->
-  <div class="top-banner-container">
+  <div class="top-banner-container" x-ref="topBanner" x-show="topBannerVisible" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
     <div id="top-banner" class="bg-gray-900 text-white py-3 sm:py-4">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- 手機：左右兩欄（icon / 按鈕+關閉）; sm+：三欄（左空白 / 中內容 / 右X） -->
@@ -29,7 +29,7 @@
           </div>
 
           <!-- 右側關閉：手機 & 桌機都顯示，靠最右 -->
-          <button class="banner-close-btn justify-self-end p-1 inline-flex" aria-label="關閉">
+          <button class="banner-close-btn justify-self-end p-1 inline-flex" aria-label="關閉" @click.prevent="closeTopBanner()">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
