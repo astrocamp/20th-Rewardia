@@ -5,16 +5,29 @@ document.addEventListener('alpine:init', () => {
 
         init() {
             this.$nextTick(() => {
-                // Get the height of the banner to know when to hide it
                 this.topBannerHeight = this.$refs.topBanner?.offsetHeight || 0;
-                // Run scroll check on init in case the page is already scrolled
                 this.handleScroll();
+            });
+
+            // Watch for the banner visibility to change
+            this.$watch('topBannerVisible', (isVisible) => {
+                const targetElement = document.querySelector('.banner-spacing');
+                if (!targetElement) return;
+
+                if (isVisible) {
+                    // This part of the logic won't be triggered in the current flow,
+                    // but it is good practice to handle reverting the style.
+                    targetElement.style.marginTop = '';
+                } else {
+                    // Apply the new, smaller margin when banner is hidden
+                    targetElement.style.transition = 'margin-top 0.3s ease-in-out';
+                    targetElement.style.marginTop = '130px';
+                }
             });
         },
 
         handleScroll() {
-            // If the banner is currently shown and the user scrolls past its height, hide it.
-            // Once hidden, it stays hidden because this condition will no longer be met.
+            // This function only ever sets topBannerVisible to false, it never reverts.
             if (this.topBannerVisible && window.scrollY > this.topBannerHeight) {
                 this.topBannerVisible = false;
             }
