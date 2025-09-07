@@ -46,6 +46,10 @@
 @import "./utilities/toasts.css";
 @import "./utilities/animations.css";
 
+/* Import utility styles */
+@import "./utilities/toasts.css";
+@import "./utilities/animations.css";
+
 @layer base {
   :root {
     --p: 0 0% 0%;
