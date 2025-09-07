@@ -225,60 +225,38 @@ class SemanticClassifier:
         if self.smart_expansion_enabled:
             self._expand_all_keywords()
 
-    def find_semantic_match(self, text, threshold=None):
-        """使用語義相似度找最佳category 和 scope"""
+    def find_semantic_matches(
+        self, text, text_doc=None, threshold=None, return_all=True
+    ):
+        """統一的語義匹配方法，支援快取和單/多重匹配"""
         if threshold is None:
             threshold = self.similarity_threshold
 
-        text_doc = self.nlp(text)
-        best_category = None
-        best_scope = None
-        best_score = 0
+        # 使用預先計算的向量或重新計算
+        if text_doc is None:
+            text_doc = self.nlp(text)
 
-        for category, scopes in self.category_scope_seeds.items():
-            for scope, seeds in scopes.items():
-                for seed in seeds:
-                    if seed in text:
-                        # 直接匹配
-                        return category, scope, self.confidence_scores["direct_match"]
-
-                    # 相似度匹配
-                    seed_doc = self.nlp(seed)
-                    if text_doc.has_vector and seed_doc.has_vector:
-                        similarity = text_doc.similarity(seed_doc)
-                        if similarity > threshold and similarity > best_score:
-                            best_score = similarity
-                            best_category = category
-                            best_scope = scope
-
-        return best_category, best_scope, best_score
-
-    def find_all_semantic_matches(self, text, threshold=None):
-        """找出可能匹配支援多分類"""
-        if threshold is None:
-            threshold = self.similarity_threshold
-
-        text_doc = self.nlp(text)
         direct_matches = []
         semantic_matches = []
 
-        # 組合詞
+        # 特殊組合詞處理
         if "國內外" in text or "國內國外" in text:
-            direct_matches.append(
-                {
-                    "category": "一般消費",
-                    "scope": "國內",
-                    "confidence": self.confidence_scores["direct_match"],
-                }
-            )
-            direct_matches.append(
-                {
-                    "category": "一般消費",
-                    "scope": "海外",
-                    "confidence": self.confidence_scores["direct_match"],
-                }
+            direct_matches.extend(
+                [
+                    {
+                        "category": "一般消費",
+                        "scope": "國內",
+                        "confidence": self.confidence_scores["direct_match"],
+                    },
+                    {
+                        "category": "一般消費",
+                        "scope": "海外",
+                        "confidence": self.confidence_scores["direct_match"],
+                    },
+                ]
             )
 
+        # 遍歷所有類別範圍
         for category, scopes in self.category_scope_seeds.items():
             for scope, seeds in scopes.items():
                 best_score_for_this_scope = 0
@@ -297,10 +275,10 @@ class SemanticClassifier:
                         matched_directly = True
                         break
 
-                    # 相似度匹配
-                    if not matched_directly:
+                    # 語義相似度匹配
+                    if not matched_directly and text_doc.has_vector:
                         seed_doc = self.nlp(seed)
-                        if text_doc.has_vector and seed_doc.has_vector:
+                        if seed_doc.has_vector:
                             similarity = text_doc.similarity(seed_doc)
                             if (
                                 similarity > threshold
@@ -308,7 +286,7 @@ class SemanticClassifier:
                             ):
                                 best_score_for_this_scope = similarity
 
-                # 沒直接匹配但有語義匹配加入語義匹配
+                # 沒有直接匹配但有語義匹配
                 if not matched_directly and best_score_for_this_scope > 0:
                     semantic_matches.append(
                         {
@@ -318,14 +296,14 @@ class SemanticClassifier:
                         }
                     )
 
-        # 直接匹配>語義匹配
+        # 選擇結果
         if direct_matches:
             all_matches = direct_matches
         else:
-            # >0.8
+            # 只保留高信心度的語義匹配
             all_matches = [m for m in semantic_matches if m["confidence"] > 0.8]
 
-        # 移除重複category+scope
+        # 去重處理
         seen = set()
         unique_matches = []
         for match in all_matches:
@@ -334,11 +312,17 @@ class SemanticClassifier:
                 seen.add(key)
                 unique_matches.append(match)
 
-        all_matches = unique_matches
+        # 按信心度排序
+        unique_matches.sort(key=lambda x: x["confidence"], reverse=True)
 
-        # 信心度排序
-        all_matches.sort(key=lambda x: x["confidence"], reverse=True)
-        return all_matches
+        if return_all:
+            return unique_matches
+        else:
+            # 返回最佳單一匹配（向後相容）
+            if unique_matches:
+                best = unique_matches[0]
+                return best["category"], best["scope"], best["confidence"]
+            return None, None, 0
 
     def _expand_all_keywords(self):
         """擴展關鍵詞"""
@@ -403,20 +387,22 @@ class SemanticClassifier:
 
         return None, None
 
-    def classify_sentence(self, sentence, context_text=None):
-        """多重 category/scope 分類"""
+    def classify_sentence(
+        self, sentence, context_text=None, sentence_doc=None, context_doc=None
+    ):
+        """統一的句子分類方法，自動判斷是否使用快取向量"""
         all_matches = []
 
-        # 主句匹配
-        matches = self.find_all_semantic_matches(sentence)
+        # 主句匹配（自動使用快取向量如果有的話）
+        matches = self.find_semantic_matches(sentence, sentence_doc)
         all_matches.extend(matches)
 
         # 參考前後文
         if len(all_matches) == 0 and context_text:
-            context_matches = self.find_all_semantic_matches(context_text)
+            context_matches = self.find_semantic_matches(context_text, context_doc)
             all_matches.extend(context_matches)
 
-        # 試自動擴展 主句>context
+        # 自動擴展規則匹配
         if not all_matches:
             category, scope = self.auto_expand_category_keywords(sentence)
             if category:
@@ -438,7 +424,7 @@ class SemanticClassifier:
                         }
                     )
 
-        # 預設None
+        # 預設未分類
         if not all_matches:
             all_matches.append(
                 {
@@ -452,148 +438,6 @@ class SemanticClassifier:
             "matches": all_matches,
             "sentence": sentence,
         }
-
-    def classify_sentence_cached(
-        self, sentence, context_text=None, main_doc=None, context_doc=None
-    ):
-        """向量分類"""
-        all_matches = []
-
-        # 找匹配
-        matches = self.find_all_semantic_matches_cached(sentence, main_doc)
-        all_matches.extend(matches)
-
-        # 參考前後文
-        if len(all_matches) == 0 and context_text and context_doc:
-            context_matches = self.find_all_semantic_matches_cached(
-                context_text, context_doc
-            )
-            all_matches.extend(context_matches)
-
-        # 自動擴展 主句>context
-        if not all_matches:
-            category, scope = self.auto_expand_category_keywords(sentence)
-            if category:
-                all_matches.append(
-                    {
-                        "category": category,
-                        "scope": scope,
-                        "confidence": self.confidence_scores["auto_expand"],
-                    }
-                )
-            elif context_text:
-                category, scope = self.auto_expand_category_keywords(context_text)
-                if category:
-                    all_matches.append(
-                        {
-                            "category": category,
-                            "scope": scope,
-                            "confidence": self.confidence_scores["auto_expand"],
-                        }
-                    )
-
-        # 設為預設None
-        if not all_matches:
-            all_matches.append(
-                {
-                    "category": None,
-                    "scope": None,
-                    "confidence": self.confidence_scores["default_classification"],
-                }
-            )
-
-        return {
-            "matches": all_matches,
-            "sentence": sentence,
-        }
-
-    def find_all_semantic_matches_cached(self, text, text_doc=None, threshold=None):
-        """使用向量語義匹配"""
-        if threshold is None:
-            threshold = self.similarity_threshold
-
-        if text_doc is None:
-            text_doc = self.nlp(text)
-
-        direct_matches = []
-        semantic_matches = []
-
-        if "國內外" in text or "國內國外" in text:
-            direct_matches.append(
-                {
-                    "category": "一般消費",
-                    "scope": "國內",
-                    "confidence": self.confidence_scores["direct_match"],
-                }
-            )
-            direct_matches.append(
-                {
-                    "category": "一般消費",
-                    "scope": "海外",
-                    "confidence": self.confidence_scores["direct_match"],
-                }
-            )
-
-        for category, scopes in self.category_scope_seeds.items():
-            for scope, seeds in scopes.items():
-                best_score_for_this_scope = 0
-                matched_directly = False
-
-                for seed in seeds:
-                    if seed in text:
-                        # 直接匹配
-                        direct_matches.append(
-                            {
-                                "category": category,
-                                "scope": scope,
-                                "confidence": self.confidence_scores["direct_match"],
-                            }
-                        )
-                        matched_directly = True
-                        break
-
-                    # 相似度匹配
-                    if not matched_directly and text_doc.has_vector:
-                        seed_doc = self.nlp(seed)
-                        if seed_doc.has_vector:
-                            similarity = text_doc.similarity(seed_doc)
-                            if (
-                                similarity > threshold
-                                and similarity > best_score_for_this_scope
-                            ):
-                                best_score_for_this_scope = similarity
-
-                # 沒直接匹配有語義匹配加語義候選
-                if not matched_directly and best_score_for_this_scope > 0:
-                    semantic_matches.append(
-                        {
-                            "category": category,
-                            "scope": scope,
-                            "confidence": best_score_for_this_scope,
-                        }
-                    )
-
-        # 直接匹配>信心度匹配
-        if direct_matches:
-            all_matches = direct_matches
-        else:
-            # >0.8
-            all_matches = [m for m in semantic_matches if m["confidence"] > 0.8]
-
-        # 除重複 category+scope
-        seen = set()
-        unique_matches = []
-        for match in all_matches:
-            key = (match["category"], match["scope"])
-            if key not in seen:
-                seen.add(key)
-                unique_matches.append(match)
-
-        all_matches = unique_matches
-
-        # 信心度排序
-        all_matches.sort(key=lambda x: x["confidence"], reverse=True)
-        return all_matches
 
 
 class BankCardExtractor:
@@ -855,7 +699,7 @@ def test_processors():
             main_doc = main_docs[j - 1] if j - 1 < len(main_docs) else None
             context_doc = context_docs[j - 1] if j - 1 < len(context_docs) else None
 
-            classification = classifier.classify_sentence_cached(
+            classification = classifier.classify_sentence(
                 sent, context_text, main_doc, context_doc
             )
             rates = rate_extractor.extract_rates_from_sentence(sent)

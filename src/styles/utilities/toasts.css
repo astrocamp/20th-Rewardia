@@ -1,0 +1,37 @@
+/* Toast notification styles */
+@layer utilities {
+  .tw-toast {
+    @apply bg-white text-gray-900 rounded-xl shadow px-4 py-3 text-sm ring-1 ring-black/5;
+  }
+  .tw-toast svg {
+    @apply text-gray-700;
+  }
+
+  .tw-success {
+    @apply bg-green-50 text-green-800;
+  }
+  .tw-success svg {
+    @apply text-green-600;
+  }
+
+  .tw-error {
+    @apply bg-red-50 text-red-800;
+  }
+  .tw-error svg {
+    @apply text-red-600;
+  }
+
+  .tw-warn {
+    @apply bg-yellow-50 text-yellow-900;
+  }
+  .tw-warn svg {
+    @apply text-yellow-600;
+  }
+
+  .tw-info {
+    @apply bg-blue-50 text-blue-800;
+  }
+  .tw-info svg {
+    @apply text-blue-600;
+  }
+}
