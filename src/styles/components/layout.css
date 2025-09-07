@@ -1,0 +1,22 @@
+/* Global layout styles */
+@layer components {
+  .fixed-header {
+    @apply fixed top-0 left-0 right-0 z-50;
+  }
+
+  .top-banner-container {
+    @apply relative z-10;
+  }
+
+  .banner-close-btn {
+    @apply hover:bg-gray-700 rounded transition-colors duration-200;
+  }
+
+  .banner-spacing {
+    margin-top: 5rem; /* 80px - for download.html and faq.html */
+  }
+
+  body .main-container .main-content.banner-hidden {
+    margin-top: 80px;
+  }
+}

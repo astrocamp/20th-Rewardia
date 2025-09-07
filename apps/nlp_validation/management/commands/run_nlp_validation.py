@@ -94,7 +94,6 @@ class Command(BaseCommand):
                                 bank=bank_name,
                                 defaults={"is_active": False},
                             )
-                            print(bank_name)
                             # 加入快取
                             credit_card_cache[card_key] = credit_card
                             if created:
@@ -177,7 +176,7 @@ class Command(BaseCommand):
                             )
 
                             # 9. 語義分類（只對有回饋率的句子）
-                            classification = classifier.classify_sentence_cached(
+                            classification = classifier.classify_sentence(
                                 sent, context_text, main_doc, context_doc
                             )
                         else:
