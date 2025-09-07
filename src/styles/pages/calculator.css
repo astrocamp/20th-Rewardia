@@ -3,7 +3,7 @@
 @layer components {
   /* ========== Calculator Page Layout ========== */
   .calculator-page {
-    @apply bg-white mt-20 pb-20;
+      @apply bg-white mt-50 pb-20;
   }
   body.banner-visible .calculator-page {
     @apply mt-10;
