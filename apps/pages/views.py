@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .data.faq_content import FAQ_DATA
 from apps.cards.models import CreditCard
-from apps.rewards.models import PendingReward, RewardCategory
+from apps.rewards.models import RewardCategory
 from django.http import HttpResponse, JsonResponse # Added JsonResponse
 from django.db.models import Prefetch
 import json
@@ -18,78 +18,62 @@ def main(request):
 def get_main_data(request):
     # 使用 prefetch_related 優化查詢，避免 N+1 問題
     cards = CreditCard.objects.filter(is_active=True).prefetch_related(
-        'reward_categories',  # 預取已確認回饋
-        'pending_rewards'     # 預取待審核回饋
+        'reward_categories'  # 預取回饋分類
     ).order_by('bank', 'name')
 
     # 一次性獲取所有需要的資料
     banks_set = set()
-    pending_categories_set = set()
+    reward_categories_set = set()
     all_cards_data = []
     
     for card in cards:
         banks_set.add(card.bank)
         rewards_data = []
         
-        # 處理已確認的回饋類別
-        for reward in card.reward_categories.all():
-            limit_parts = []
-            if reward.max_spending:
-                limit_parts.append(f"上限 ${reward.max_spending:,.0f}")
-            if reward.requires_activation:
-                limit_parts.append("需登錄")
-            if reward.is_rotating:
-                limit_parts.append("季度輪替")
+        # 處理回饋分類
+        for reward in card.reward_categories.filter(is_active=True):
+            reward_categories_set.add(reward.category)
+            
+            # 處理回饋率顯示
+            rate_display = "N/A"
+            if reward.min_rate is not None and reward.max_rate is not None:
+                if reward.min_rate == reward.max_rate:
+                    rate_display = f"{reward.min_rate}%"
+                else:
+                    rate_display = f"{reward.min_rate}%-{reward.max_rate}%"
+            elif reward.min_rate is not None:
+                rate_display = f"{reward.min_rate}%"
+            elif reward.max_rate is not None:
+                rate_display = f"{reward.max_rate}%"
                 
             rewards_data.append({
-                'category': reward.get_category_display(),
-                'rate': f"{reward.rate}%",
-                'limit': " ".join(limit_parts),
+                'category': reward.category,
+                'scope': reward.scope,
+                'rate': rate_display,
+                'reward_type': reward.reward_type,
                 'category_code': reward.category,
                 'source': 'confirmed'
             })
-        
-        # 處理待審核回饋
-        for reward in card.pending_rewards.all():
-            if reward.nlp_category:
-                pending_categories_set.add(reward.nlp_category)
-                
-                rate_display = "N/A"
-                if reward.max_rate is not None:
-                    rate_display = f"{reward.max_rate}%"
-                elif reward.min_rate is not None:
-                    rate_display = f"{reward.min_rate}%"
-
-                rewards_data.append({
-                    'category': f"{reward.nlp_category} ({reward.nlp_scope})",
-                    'rate': rate_display,
-                    'limit': reward.extracted_sentence or '',
-                    'category_code': reward.nlp_category,
-                    'source': 'pending'
-                })
 
         all_cards_data.append({
             'id': card.id,
             'name': card.name,
             'bank': card.bank,
-            'card_type': card.get_card_type_display() if card.card_type else '',
-            'card_network': card.get_card_network_display() if card.card_network else '',
-            'foreign_fee': float(card.foreign_transaction_fee) if card.foreign_transaction_fee else 0,
             'image': f'https://via.placeholder.com/300x180.png?text={card.name.replace(" ", "+")}',
             'rewards': rewards_data[:6]
         })
 
-    # 處理銀行資料（重用已收集的資料）
+    # 處理銀行資料
     banks = [{
         'code': bank.lower().replace(' ', '_'), 
         'name': bank
     } for bank in sorted(banks_set)]
 
-    # 處理回饋類別選項（重用已收集的資料）
+    # 處理回饋類別選項
     reward_category_map = {}
     reward_categories_choices = []
     
-    for category in sorted(pending_categories_set):
+    for category in sorted(reward_categories_set):
         category_code = category.upper().replace(' ', '_').replace('/', '_')
         reward_categories_choices.append((category_code, category))
         reward_category_map[category_code] = category

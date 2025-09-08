@@ -133,9 +133,11 @@ export default () => ({
           // 搜尋卡片名稱
           const cardNameMatch = card.name.toLowerCase().includes(keyword);
           
-          // 搜尋優惠類別
+          // 搜尋回饋分類的 category、scope、reward_type
           const rewardMatch = card.rewards.some(reward => 
-            reward.category.toLowerCase().includes(keyword)
+            reward.category.toLowerCase().includes(keyword) ||
+            reward.scope.toLowerCase().includes(keyword) ||
+            reward.reward_type.toLowerCase().includes(keyword)
           );
           
           // 只要任一項目匹配就回傳 true
@@ -192,9 +194,15 @@ export default () => ({
     
     const rates = matchingRewards.map(reward => {
       const rateStr = reward.rate;
-      const percentMatch = rateStr.match(/(\d+\.?\d*)%/);
-      if (percentMatch) {
-        return parseFloat(percentMatch[1]);
+      // 處理區間格式 "1.5%-3.0%" 或單一格式 "2.0%"
+      const rangeMatch = rateStr.match(/(\d+\.?\d*)-(\d+\.?\d*)%/);
+      const singleMatch = rateStr.match(/(\d+\.?\d*)%/);
+      
+      if (rangeMatch) {
+        // 取區間的最大值
+        return Math.max(parseFloat(rangeMatch[1]), parseFloat(rangeMatch[2]));
+      } else if (singleMatch) {
+        return parseFloat(singleMatch[1]);
       }
       return 0;
     });
