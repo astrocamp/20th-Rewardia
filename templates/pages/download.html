@@ -1,40 +1,53 @@
-{% extends 'layouts/default.html' %}
-
-{% block title %}下載專區 - Rewardia{% endblock %}
-
-{% block content %}
+{% extends 'layouts/default.html' %} {% block title %} 下載專區 - Rewardia
+{%endblock %} {% block content %}
 <!-- 主要橫幅區域 -->
-<section class="relative mx-4 sm:mx-6 lg:mx-10 mb-4 sm:mb-6 lg:mb-8 banner-spacing overflow-hidden" 
-         x-bind:class="{ 
+<section class="relative mx-4 sm:mx-6 lg:mx-10 mb-4 sm:mb-6 lg:mb-8 banner-spacing overflow-hidden"
+         x-bind:class="{
            'banner-hidden': !$store.banner.visible,
            'banner-transitioning': $store.banner.isTransitioning
          }">
   <!-- 頁面標題 - 在 banner 圖上方 -->
   <div class="mb-4 sm:mb-6">
-    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black">下載專區</h2>
+    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black">
+      下載專區
+    </h2>
   </div>
-  
+
   <!-- Banner 圖區域 -->
-  <div class="relative h-[300px] sm:h-[350px] lg:h-[400px] overflow-hidden rounded-lg">
+  <div
+    class="relative h-[300px] sm:h-[350px] lg:h-[400px] overflow-hidden rounded-lg"
+  >
     <!-- 背景圖片 -->
     <div class="absolute inset-0">
-      <img src="https://github.com/astrocamp/20th-Rewardia/blob/pic/img/download-index.png?raw=true"       
+      <img
+        src="https://github.com/astrocamp/20th-Rewardia/blob/pic/img/download-index.png?raw=true"
         loading="eager"
-        alt="Rewardia Background" 
-        class="w-full h-full object-cover object-[75%_9%]">
+        alt="Rewardia Background"
+        class="w-full h-full object-cover object-[75%_9%]"
+      />
     </div>
-    
+
     <!-- 內容區域 - 限制在左半邊 -->
     <div class="relative z-10 flex items-center h-full download-banner-content">
       <div class="text-white px-4 sm:px-8 lg:px-12">
-        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 lg:mb-8 leading-tight tracking-wide">
+        <h1
+          class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 lg:mb-8 leading-tight tracking-wide"
+        >
           每次購物都能獲得現金回饋
         </h1>
         <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 lg:gap-6">
-          <a href="#" id="chrome-download" class="download-btn-primary download-btn-banner">
+          <a
+            href="#"
+            id="chrome-download"
+            class="download-btn-primary download-btn-banner"
+          >
             免費新增至 Chrome
           </a>
-          <a href="#" id="app-download" class="download-btn-secondary download-btn-banner">
+          <a
+            href="#"
+            id="app-download"
+            class="download-btn-secondary download-btn-banner"
+          >
             新增到桌面應用
           </a>
         </div>
@@ -45,51 +58,79 @@
 
 <!-- 關於 Rewardia 區塊 -->
 <section class="mx-4 sm:mx-6 lg:mx-10 my-8 sm:my-12 lg:my-16">
-  <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-8 sm:mb-12 lg:mb-16 text-left font-kulim-park leading-tight-custom">關於 Rewardia</h2>
-  
+  <h2
+    class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-8 sm:mb-12 lg:mb-16 text-left font-kulim-park leading-tight"
+  >
+    關於 Rewardia
+  </h2>
+
   <!-- Chrome 擴充插件 -->
   <div class="download-section-simple">
-    <div class="flex flex-col lg:flex-row items-start lg:items-center gap-6 sm:gap-8">
+    <div
+      class="flex flex-col lg:flex-row items-start lg:items-center gap-6 sm:gap-8"
+    >
       <!-- 左側圖片區域 -->
       <div class="flex-shrink-0 w-full lg:w-auto">
-        <div class="w-full sm:w-[279px] h-[253px] bg-gray-200 rounded-lg overflow-hidden download-image-simple">
-          <img src="https://github.com/astrocamp/20th-Rewardia/blob/pic/img/download-chrome.jpg?raw=true" 
-            alt="Chrome 擴充插件" 
-            class="w-full h-full object-cover object-center">
+        <div
+          class="w-full sm:w-[279px] h-[253px] bg-gray-200 rounded-lg overflow-hidden download-image-simple"
+        >
+          <img
+            src="https://github.com/astrocamp/20th-Rewardia/blob/pic/img/download-chrome.jpg?raw=true"
+            alt="Chrome 擴充插件"
+            class="w-full h-full object-cover object-center"
+          />
         </div>
       </div>
       <!-- 右側文字區域 -->
       <div class="flex-1 space-y-4 sm:space-y-6">
-        <h3 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-3 sm:mb-4 font-kulim-park leading-tight-custom">Chrome 擴充插件</h3>
-        <p class="text-muted leading-relaxed text-sm sm:text-base font-normal mb-6 sm:mb-8 font-inter leading-[1.5625]">
-          使用 Rewardia 優惠比價小幫手，在您瀏覽網頁時自動偵測購物機會，即時推薦最適合的信用卡，讓您不錯過任何優惠回饋。支援各大電商平台，包括 PChome、momo、蝦皮等，讓您的每次網購都能獲得最大回饋。
+        <h3
+          class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-3 sm:mb-4 font-kulim-park leading-tight"
+        >
+          Chrome 擴充插件
+        </h3>
+        <p
+          class="text-muted leading-relaxed text-sm sm:text-base font-normal mb-6 sm:mb-8 font-inter leading-[1.5625]"
+        >
+          使用 Rewardia
+          優惠比價小幫手，在您瀏覽網頁時自動偵測購物機會，即時推薦最適合的信用卡，讓您不錯過任何優惠回饋。支援各大電商平台，包括
+          PChome、momo、蝦皮等，讓您的每次網購都能獲得最大回饋。
         </p>
-        <button class="download-btn-chrome">
-          免費新增至 Chrome
-        </button>
+        <button class="download-btn-chrome">免費新增至 Chrome</button>
       </div>
     </div>
   </div>
-  
+
   <!-- APP 應用 -->
   <div class="download-section-simple">
-    <div class="flex flex-col lg:flex-row items-start lg:items-center gap-6 sm:gap-8">
+    <div
+      class="flex flex-col lg:flex-row items-start lg:items-center gap-6 sm:gap-8"
+    >
       <!-- 左側圖片區域 -->
       <div class="flex-shrink-0 w-full lg:w-auto">
-        <div class="w-full sm:w-[279px] h-[253px] bg-gray-200 rounded-lg overflow-hidden download-image-simple">
-          <img src="https://github.com/astrocamp/20th-Rewardia/blob/pic/img/download-app.jpg?raw=true" alt="APP 應用"
-            class="w-full h-full object-cover object-center">
+        <div
+          class="w-full sm:w-[279px] h-[253px] bg-gray-200 rounded-lg overflow-hidden download-image-simple"
+        >
+          <img
+            src="https://github.com/astrocamp/20th-Rewardia/blob/pic/img/download-app.jpg?raw=true"
+            alt="APP 應用"
+            class="w-full h-full object-cover object-center"
+          />
         </div>
       </div>
       <!-- 右側文字區域 -->
       <div class="flex-1 space-y-4 sm:space-y-6">
-        <h3 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-3 sm:mb-4 font-kulim-park leading-tight-custom">APP 應用</h3>
-        <p class="text-muted leading-relaxed text-sm sm:text-base font-normal mb-6 sm:mb-8 font-inter leading-[1.5625]">
-          下載 Rewardia 手機應用程式，隨時隨地查看信用卡優惠資訊，掃描實體商家條碼即可獲得即時回饋建議。支援離線使用，讓您在沒有網路的情況下也能查詢歷史優惠記錄，是您出門購物的最佳助手。
+        <h3
+          class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-3 sm:mb-4 font-kulim-park leading-tight"
+        >
+          APP 應用
+        </h3>
+        <p
+          class="text-muted leading-relaxed text-sm sm:text-base font-normal mb-6 sm:mb-8 font-inter leading-[1.5625]"
+        >
+          下載 Rewardia
+          手機應用程式，隨時隨地查看信用卡優惠資訊，掃描實體商家條碼即可獲得即時回饋建議。支援離線使用，讓您在沒有網路的情況下也能查詢歷史優惠記錄，是您出門購物的最佳助手。
         </p>
-        <button class="download-btn-app">
-          免費新增至 APP 應用
-        </button>
+        <button class="download-btn-app">免費新增至 APP 應用</button>
       </div>
     </div>
   </div>
@@ -97,56 +138,86 @@
 
 <!-- 下載說明區塊 -->
 <section class="mx-4 sm:mx-6 lg:mx-10 my-8 sm:my-12 lg:my-16">
-  <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-8 sm:mb-12 text-left">下載說明</h2>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+  <h2
+    class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-8 sm:mb-12 text-left"
+  >
+    下載說明
+  </h2>
+  <div
+    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8"
+  >
     <!-- 說明卡片 1 -->
     <div class="download-feature-card-simple">
       <div class="download-feature-image-simple">
         <div class="text-center p-4 sm:p-6">
-          <div class="w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+          <div
+            class="w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4"
+          >
             {% include 'components/icon.html' with name="smart-recommend" size="w-6 h-6 sm:w-8 sm:h-8" class="text-blue-600" %}
           </div>
-          <h4 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">智慧推薦系統</h4>
+          <h4 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+            智慧推薦系統
+          </h4>
         </div>
       </div>
       <div class="p-4 sm:p-6">
-        <h4 class="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3">智慧推薦系統</h4>
+        <h4
+          class="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3"
+        >
+          智慧推薦系統
+        </h4>
         <p class="text-sm sm:text-base text-gray-600 leading-relaxed">
           根據您的消費習慣和商家類型，自動推薦最適合的信用卡，讓您每次購物都能獲得最大回饋。
         </p>
       </div>
     </div>
-    
+
     <!-- 說明卡片 2 -->
     <div class="download-feature-card-simple">
       <div class="download-feature-image-simple">
         <div class="text-center p-4 sm:p-6">
-          <div class="w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+          <div
+            class="w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4"
+          >
             {% include 'components/icon.html' with name="real-time-offer" size="w-6 h-6 sm:w-8 sm:h-8" class="text-green-600" %}
           </div>
-          <h4 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">即時優惠提醒</h4>
+          <h4 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+            即時優惠提醒
+          </h4>
         </div>
       </div>
       <div class="p-4 sm:p-6">
-        <h4 class="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3">即時優惠提醒</h4>
+        <h4
+          class="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3"
+        >
+          即時優惠提醒
+        </h4>
         <p class="text-sm sm:text-base text-gray-600 leading-relaxed">
           購物時自動偵測商家優惠，即時提醒您使用最適合的信用卡，不錯過任何回饋機會。
         </p>
       </div>
     </div>
-    
+
     <!-- 說明卡片 3 -->
     <div class="download-feature-card-simple sm:col-span-2 lg:col-span-1">
       <div class="download-feature-image-simple">
         <div class="text-center p-4 sm:p-6">
-          <div class="w-12 h-12 sm:w-16 sm:h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+          <div
+            class="w-12 h-12 sm:w-16 sm:h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4"
+          >
             {% include 'components/icon.html' with name="consumption-analysis" size="w-6 h-6 sm:w-8 sm:h-8" class="text-purple-600" %}
           </div>
-          <h4 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">消費分析報告</h4>
+          <h4 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+            消費分析報告
+          </h4>
         </div>
       </div>
       <div class="p-4 sm:p-6">
-        <h4 class="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3">消費分析報告</h4>
+        <h4
+          class="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3"
+        >
+          消費分析報告
+        </h4>
         <p class="text-sm sm:text-base text-gray-600 leading-relaxed">
           詳細分析您的消費模式，提供個人化的信用卡建議，幫助您做出最聰明的消費決策。
         </p>

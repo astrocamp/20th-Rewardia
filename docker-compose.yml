@@ -1,0 +1,72 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: rewardia-postgres
+    environment:
+      POSTGRES_DB: rewardia_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - rewardia-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: rewardia-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - rewardia-network
+
+  selenium-firefox:
+    image: selenium/standalone-firefox:latest
+    container_name: rewardia-selenium
+    ports:
+      - "4444:4444"
+      - "7900:7900" # VNC viewer port
+    environment:
+      - SE_VNC_NO_PASSWORD=1
+      - SE_SCREEN_WIDTH=1920
+      - SE_SCREEN_HEIGHT=1080
+    volumes:
+      - /dev/shm:/dev/shm
+    networks:
+      - rewardia-network
+    restart: unless-stopped
+
+  rewardia:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rewardia-app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+      - selenium-firefox
+    environment:
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+    volumes:
+      - ./public:/app/public
+      - app_logs:/var/log/supervisor
+    networks:
+      - rewardia-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  app_logs:
+
+networks:
+  rewardia-network:
+    driver: bridge

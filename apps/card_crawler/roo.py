@@ -53,6 +53,15 @@ def create_error_data(url, error, card_name=None):
     }
 
 
+def find_card_buttons(driver):
+    """查找信用卡頁面的按鈕"""
+    return driver.find_elements(
+        locate_with(By.CSS_SELECTOR, "button[type='button']")
+        .below({By.TAG_NAME: "h1"})
+        .above({By.XPATH: "//h2[text()='其他推薦信用卡']"})
+    )
+
+
 # 抓一張卡的function
 def get_card_info(driver, url):
     try:
@@ -85,26 +94,27 @@ def get_card_info(driver, url):
 
         except WebDriverException as error:
             find_card_error = create_error_data(url, error)
-            failed_cards.append(find_card_error)
+            failed_cards["failed"].append(find_card_error)
             print(f"Error fetching card: {error}")
 
         try:
             # 找到navbar和footer之間的所有button
-            buttons = driver.find_elements(
-                locate_with(By.CSS_SELECTOR, "button[type='button']")
-                .below({By.TAG_NAME: "h1"})
-                .above({By.XPATH: "//h2[text()='其他推薦信用卡']"})
-            )
+            buttons = find_card_buttons(driver)
 
             # 點選這些button，讓他們展開，因為資訊隱藏在裡面
-            for button in buttons:
+            for i, button in enumerate(buttons):
                 try:
-                    driver.execute_script(
-                        "arguments[0].scrollIntoView({block: 'center'});", button
-                    )
-                    time.sleep(0.5)
-                    # 改成一個一個點按鈕好像比較有效，也比較不會漏點
-                    button.click()
+                    # 重新查找按鈕元素避免 stale reference
+                    current_buttons = find_card_buttons(driver)
+                    if i < len(current_buttons):
+                        current_button = current_buttons[i]
+                        driver.execute_script(
+                            "arguments[0].scrollIntoView({block: 'center'});",
+                            current_button,
+                        )
+                        time.sleep(0.5)
+                        # 使用 JavaScript 點擊避免元素被遮擋
+                        driver.execute_script("arguments[0].click();", current_button)
 
                     try:
                         time.sleep(1)
@@ -129,8 +139,10 @@ def get_card_info(driver, url):
                         tags_error = create_error_data(url, error, card_name=card_name)
                         failed_cards["failed"].append(tags_error)
 
-                    # 打開了，再把它關起來
-                    button.click()
+                    # 打開了，再把它關起來，重新查找按鈕避免 stale reference
+                    close_buttons = find_card_buttons(driver)
+                    if i < len(close_buttons):
+                        driver.execute_script("arguments[0].click();", close_buttons[i])
 
                 except WebDriverException as error:
                     print(f"Error fetching button: {error}")
@@ -163,12 +175,33 @@ def crawl_roo_urls(driver):
         driver.implicitly_wait(5)
 
         try:
+            # 等待頁面完全載入
+            time.sleep(1)
+
             categories = driver.find_elements(
                 By.CSS_SELECTOR, "a[type='button'][rel='opener']"
             )
-            categories_urls = [
-                category.get_attribute("href") for category in categories
-            ]
+
+            # 立即提取所有 href 避免 stale element
+            categories_urls = []
+            for i, category in enumerate(categories):
+                try:
+                    href = category.get_attribute("href")
+                    if href:
+                        categories_urls.append(href)
+                except Exception as e:
+                    print(f"Error getting href for category {i}: {e}")
+                    # 重新找元素
+                    try:
+                        fresh_categories = driver.find_elements(
+                            By.CSS_SELECTOR, "a[type='button'][rel='opener']"
+                        )
+                        if i < len(fresh_categories):
+                            href = fresh_categories[i].get_attribute("href")
+                            if href:
+                                categories_urls.append(href)
+                    except:
+                        continue
 
             return categories_urls
 
@@ -230,25 +263,35 @@ def save_crawl_record(data):
 
 # 寫這個目的是讓瀏覽器只要開一次，不要開開關關
 def main_crawler():
-    options = webdriver.ChromeOptions()
-    options.add_argument("--disable-popup-blocking")
-    options.add_argument("--disable-notifications")
-    # options.add_argument("--headless=new")
-    options.add_argument("--disable-images")
-    options.add_argument("--disable-plugins")
-    options.add_argument("--disable-extensions")
-    options.add_argument("--window-size=160,120")
-    options.add_argument("--disable-web-security")
-    options.add_argument("--disable-features=VizDisplayCompositor")
-    options.add_argument("--disable-backgrounding-occluded-windows")
-    options.add_argument("--disable-renderer-backgrounding")
-    options.add_argument("--disable-background-timer-throttling")
-    options.add_argument("--memory-pressure-off")
-    options.add_argument("--aggressive-cache-discard")
-    options.add_argument("--disable-background-networking")
+    options = webdriver.FirefoxOptions()
+    options.add_argument("--headless")
+    options.add_argument("--width=1920")
+    options.add_argument("--height=1080")
+    options.set_preference("browser.cache.disk.enable", False)
+    options.set_preference("browser.cache.memory.enable", False)
+    options.set_preference("browser.sessionhistory.max_total_viewers", 0)
+    options.set_preference("browser.display.use_system_colors", False)
+    options.set_preference("extensions.enabled", False)
+    options.set_preference("extensions.autoDisableScopes", 14)
+    options.set_preference("network.http.use-cache", False)
+    options.set_preference("network.dns.disableIPv6", True)
+    options.set_preference("dom.ipc.processCount", 1)
+    options.set_preference("browser.tabs.remote.autostart", False)
+    options.set_preference("dom.webdriver.enabled", False)
+    options.set_preference("useAutomationExtension", False)
+    options.set_preference("webdriver.load.strategy", "unstable")
+    options.set_preference(
+        "general.useragent.override",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0",
+    )
+
     try:
         start_time = time.time()
-        driver = webdriver.Chrome(options=options)
+        # 使用遠端 Selenium Grid
+        driver = webdriver.Remote(
+            command_executor="http://rewardia-selenium:4444", options=options
+        )
+        # driver = webdriver.Firefox(options=options)
         category_urls = crawl_roo_urls(driver)
         crawl_roo_cards(driver, category_urls)
 

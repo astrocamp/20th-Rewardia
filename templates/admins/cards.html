@@ -4,28 +4,27 @@
   x-bind:class="{ 'banner-hidden': !$store.banner.visible }"
 >
   <div class="my-4 sm:mb-6 flex flex-row items-center">
-    <h2 id="card_database_title" class="text-2xl sm:text-2xl lg:text-2xl font-bold text-black">
+    <h2
+      id="card_database_title"
+      class="text-2xl sm:text-2xl lg:text-2xl font-bold text-black"
+    >
       卡片資料庫
     </h2>
 
     <div id="new_card_button">
       <button
-      hx-get="{% url 'admins:new_card' %}"
-      hx-target="#form_container"
-      hx-swap="innerHTML"
-      hx-disabled-elt="this"
-      class="ui-btn ui-btn-primary cursor-pointer mx-4 my-4">
-      <a href="#card_database_title">
-        新增卡片
-      </a>
-
+        hx-get="{% url 'admins:new_card' %}"
+        hx-target="#form_container"
+        hx-swap="innerHTML"
+        hx-disabled-elt="this"
+        class="ui-btn ui-btn-primary cursor-pointer mx-4 my-4"
+      >
+        <a href="#card_database_title"> 新增卡片 </a>
       </button>
     </div>
   </div>
 
   <div id="form_container"></div>
-
-
 
   <div id="cards_db" class="overflow-x-auto">
     <table class="table table-zebra w-full">
@@ -42,9 +41,7 @@
       </thead>
       <tbody id="card_body">
         <!-- row 1 -->
-        {%for card in cards%}
-          {%include 'admins/card_row.html'%}
-        {%endfor%}
+        {%for card in cards%} {%include 'admins/card_row.html'%} {%endfor%}
       </tbody>
     </table>
   </div>

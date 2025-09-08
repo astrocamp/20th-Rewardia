@@ -12,6 +12,9 @@
 </head>
 <body x-data="header()" @scroll.window="handleScroll()">
 
+    <main class="calculator-page">
+      {% include 'layouts/messages.html' %} {% block content %} {% endblock %}
+    </main>
 
   {% include 'layouts/header.html' %}
 

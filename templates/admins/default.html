@@ -19,10 +19,8 @@
   <body>
     {% include 'admins/admin_header.html' %}
 
-    <main>
-      {% include 'layouts/messages.html' %}
-      {% block content %}
-      {% endblock %}
+    <main class="pt-20">
+      {% include 'layouts/messages.html' %} {% block content %} {% endblock %}
     </main>
 
     {% include 'layouts/footer.html' %}
