@@ -156,16 +156,53 @@ export default () => ({
             !reward.category.includes(selectedCategoryDisplay)
           );
           
-          return { ...card, rewards: [...matchingRewards, ...otherRewards] };
+          // 對符合條件的回饋進行去重和排序
+          const deduplicatedMatchingRewards = this.deduplicateRewardsByCategory(matchingRewards);
+          
+          return { ...card, rewards: [...deduplicatedMatchingRewards, ...otherRewards] };
         });
         
-        // 按優惠數值排序
+        // 按優惠數值排序（最高到最低）
         filteredCards.sort((a, b) => {
           const aMaxRate = this.getMaxRewardRate(a, this.selectedReward);
           const bMaxRate = this.getMaxRewardRate(b, this.selectedReward);
           return bMaxRate - aMaxRate;
         });
+      } else if (this.searchKeyword?.trim()) {
+        // 關鍵字搜尋時，對每張卡片的回饋進行去重和排序
+        const keyword = this.searchKeyword.trim().toLowerCase();
+        filteredCards = filteredCards.map(card => {
+          const deduplicatedRewards = this.deduplicateRewardsByCategory(card.rewards);
+          
+          // 優先顯示符合搜尋條件的回饋
+          const matchingRewards = deduplicatedRewards.filter(reward => 
+            reward.category.toLowerCase().includes(keyword) ||
+            reward.scope.toLowerCase().includes(keyword) ||
+            reward.reward_type.toLowerCase().includes(keyword)
+          );
+          const otherRewards = deduplicatedRewards.filter(reward => 
+            !reward.category.toLowerCase().includes(keyword) &&
+            !reward.scope.toLowerCase().includes(keyword) &&
+            !reward.reward_type.toLowerCase().includes(keyword)
+          );
+          
+          return { ...card, rewards: [...matchingRewards, ...otherRewards] };
+        });
+        
+        // 按符合搜尋條件的最高回饋率排序
+        filteredCards.sort((a, b) => {
+          const aMaxRate = this.getMaxRewardRateFromMatchingRewards(a, keyword);
+          const bMaxRate = this.getMaxRewardRateFromMatchingRewards(b, keyword);
+          return bMaxRate - aMaxRate;
+        });
       } else {
+        // 沒有篩選條件時，對每張卡片的回饋進行去重和排序
+        filteredCards = filteredCards.map(card => {
+          const deduplicatedRewards = this.deduplicateRewardsByCategory(card.rewards);
+          return { ...card, rewards: deduplicatedRewards };
+        });
+        
+        // 隨機排列
         filteredCards.sort(() => 0.5 - Math.random());
       }
       
@@ -195,7 +232,7 @@ export default () => ({
     const rates = matchingRewards.map(reward => {
       const rateStr = reward.rate;
       // 處理區間格式 "1.5%-3.0%" 或單一格式 "2.0%"
-      const rangeMatch = rateStr.match(/(\d+\.?\d*)-(\d+\.?\d*)%/);
+      const rangeMatch = rateStr.match(/(\d+\.?\d*)%-(\d+\.?\d*)%/);
       const singleMatch = rateStr.match(/(\d+\.?\d*)%/);
       
       if (rangeMatch) {
@@ -208,5 +245,127 @@ export default () => ({
     });
     
     return Math.max(...rates);
+  },
+  
+  // 獲取卡片所有回饋中的最高數值（用於關鍵字搜尋排序）
+  getMaxRewardRateFromAllRewards(card) {
+    if (!card.rewards || card.rewards.length === 0) return 0;
+    
+    const rates = card.rewards.map(reward => {
+      const rateStr = reward.rate;
+      // 處理區間格式 "1.5%-3.0%" 或單一格式 "2.0%"
+      const rangeMatch = rateStr.match(/(\d+\.?\d*)%-(\d+\.?\d*)%/);
+      const singleMatch = rateStr.match(/(\d+\.?\d*)%/);
+      
+      if (rangeMatch) {
+        // 取區間的最大值
+        return Math.max(parseFloat(rangeMatch[1]), parseFloat(rangeMatch[2]));
+      } else if (singleMatch) {
+        return parseFloat(singleMatch[1]);
+      }
+      return 0;
+    });
+    
+    return Math.max(...rates);
+  },
+  
+  // 獲取卡片符合搜尋條件的回饋中的最高數值
+  getMaxRewardRateFromMatchingRewards(card, keyword) {
+    if (!card.rewards || card.rewards.length === 0) return 0;
+    
+    const matchingRewards = card.rewards.filter(reward => 
+      reward.category.toLowerCase().includes(keyword) ||
+      reward.scope.toLowerCase().includes(keyword) ||
+      reward.reward_type.toLowerCase().includes(keyword)
+    );
+    
+    if (matchingRewards.length === 0) return 0;
+    
+    const rates = matchingRewards.map(reward => {
+      const rateStr = reward.rate;
+      const rangeMatch = rateStr.match(/(\d+\.?\d*)%-(\d+\.?\d*)%/);
+      const singleMatch = rateStr.match(/(\d+\.?\d*)%/);
+      
+      if (rangeMatch) {
+        return Math.max(parseFloat(rangeMatch[1]), parseFloat(rangeMatch[2]));
+      } else if (singleMatch) {
+        return parseFloat(singleMatch[1]);
+      }
+      return 0;
+    });
+    
+    return Math.max(...rates);
+  },
+  
+  // 根據類別+範圍去重回饋項目，保留數值最高的
+  deduplicateRewardsByCategory(rewards) {
+    if (!rewards || rewards.length === 0) return [];
+    
+    // 按類別+範圍組合分組
+    const groupedRewards = {};
+    
+    rewards.forEach(reward => {
+      const key = `${reward.category}-${reward.scope}`;
+      if (!groupedRewards[key]) {
+        groupedRewards[key] = [];
+      }
+      groupedRewards[key].push(reward);
+    });
+    
+    // 對每個類別+範圍組合，保留數值最高的回饋
+    const deduplicatedRewards = [];
+    
+    Object.keys(groupedRewards).forEach(key => {
+      const categoryRewards = groupedRewards[key];
+      
+      // 計算每個回饋的數值
+      const rewardsWithRates = categoryRewards.map(reward => {
+        const rateStr = reward.rate;
+        const rangeMatch = rateStr.match(/(\d+\.?\d*)-(\d+\.?\d*)%/);
+        const singleMatch = rateStr.match(/(\d+\.?\d*)%/);
+        
+        let rate = 0;
+        if (rangeMatch) {
+          // 取區間的最大值
+          rate = Math.max(parseFloat(rangeMatch[1]), parseFloat(rangeMatch[2]));
+        } else if (singleMatch) {
+          rate = parseFloat(singleMatch[1]);
+        }
+        
+        return { ...reward, calculatedRate: rate };
+      });
+      
+      // 按數值排序，取最高的
+      rewardsWithRates.sort((a, b) => b.calculatedRate - a.calculatedRate);
+      const bestReward = rewardsWithRates[0];
+      
+      // 移除 calculatedRate 屬性
+      delete bestReward.calculatedRate;
+      deduplicatedRewards.push(bestReward);
+    });
+    
+    // 按數值排序（最高到最低）
+    deduplicatedRewards.sort((a, b) => {
+      const aRate = this.getRewardRate(a);
+      const bRate = this.getRewardRate(b);
+      return bRate - aRate;
+    });
+    
+    return deduplicatedRewards;
+  },
+  
+  // 獲取單一回饋的數值
+  getRewardRate(reward) {
+    const rateStr = reward.rate;
+    const rangeMatch = rateStr.match(/(\d+\.?\d*)%-(\d+\.?\d*)%/);
+    const singleMatch = rateStr.match(/(\d+\.?\d*)%/);
+    
+    if (rangeMatch) {
+      // 取區間的最大值
+      return Math.max(parseFloat(rangeMatch[1]), parseFloat(rangeMatch[2]));
+    } else if (singleMatch) {
+      return parseFloat(singleMatch[1]);
+    }
+    return 0;
   }
 });

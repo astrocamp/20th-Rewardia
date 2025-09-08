@@ -60,7 +60,7 @@ def get_main_data(request):
             'name': card.name,
             'bank': card.bank,
             'image': f'https://via.placeholder.com/300x180.png?text={card.name.replace(" ", "+")}',
-            'rewards': rewards_data[:6]
+            'rewards': rewards_data
         })
 
     # 處理銀行資料
