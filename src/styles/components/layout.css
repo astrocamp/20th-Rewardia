@@ -4,6 +4,10 @@
     @apply fixed top-0 left-0 right-0 z-50;
   }
 
+  .header-spacer {
+    @apply h-[140px] w-full pointer-events-none;
+  }
+
   .top-banner-container {
     @apply relative z-10;
   }

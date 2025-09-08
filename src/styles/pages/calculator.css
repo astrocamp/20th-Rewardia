@@ -57,7 +57,7 @@
   /* ========== Disclaimer Section ========== */
   .disclaimer-section {
     @apply mt-6 rounded-lg bg-gray-200 p-5;
-    @apply bg-bg-light-alt; /* As per Figma */
+    background-color: theme("colors.bg-light-alt"); /* As per Figma */
   }
 
   .disclaimer-list {

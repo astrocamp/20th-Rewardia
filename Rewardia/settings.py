@@ -30,7 +30,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["207.148.91.3", "localhost", "127.0.0.1"]
 
 LOGIN_URL = "/sessions/login"
 
@@ -166,6 +166,9 @@ STATICFILES_DIRS = [
     BASE_DIR / "public",
 ]
 
+# Static files will be collected here for production
+STATIC_ROOT = BASE_DIR / "build"
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -228,7 +231,7 @@ SOCIALACCOUNT_PROVIDERS = {
 
 # -----------Celery------------
 
-CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_BROKER_URL = "redis://rewardia-redis:6379/0"
 CELERY_RESULT_BACKEND = "django-db"
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
@@ -239,9 +242,8 @@ CELERY_TIMEZONE = "Asia/Taipei"
 CELERY_BEAT_SCHEDULE = {
     # 每天早上 8 點執行爬蟲（完成後自動執行 NLP 分析）
     "daily-crawl-and-nlp": {
-        # "task": "apps.card_crawler.tasks.crawl_roo_task",
-        "task": "apps.nlp_validation.tasks.run_nlp_validation_task",
-        "schedule": crontab(hour=14, minute=6),
+        "task": "apps.card_crawler.tasks.crawl_roo_task",
+        "schedule": crontab(hour=8, minute=0),
     },
 }
 

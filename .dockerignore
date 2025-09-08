@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 開發工具
+.git/
+.gitignore
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 文檔
+*.md
+README*
+前置作業.md
+
+# UV/pip
+uv.lock
+pip-log.txt
+
+# 環境檔案
+.env
+.env.local
+.env.production
+
+# 建構相關
+src/
+build/
+makefile
+Makefile
+
+# 測試檔案
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 暫存檔案
+*.tmp
+.DS_Store
+Thumbs.db

@@ -30,9 +30,6 @@ class AdvancedTextCleaner:
     def normalize_percentage_terms(self, text):
         """統一百分比"""
         text = re.sub(r"百分之(\d+\.?\d*)", r"\1%", text)
-        text = re.sub(r"百分之二點五", "2.5%", text)
-        text = re.sub(r"百分之三", "3%", text)
-        text = re.sub(r"百分之五", "5%", text)
         text = re.sub(r"(\d+\.?\d*)趴", r"\1%", text)
         # 分離的百分比
         text = re.sub(r"(\d+\.?\d*)\s*\n\s*%", r"\1%", text)

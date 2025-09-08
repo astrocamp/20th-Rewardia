@@ -1,1 +1,1 @@
-localhost:5432:rewardia_db:帳號:密碼
+rewardia-postgres:5432:rewardia_db:帳號:密碼

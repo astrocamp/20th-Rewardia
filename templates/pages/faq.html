@@ -4,8 +4,8 @@
 
 {% block content %}
 <!-- 主要橫幅區域 -->
-<section class="relative mx-4 sm:mx-6 lg:mx-10 mb-4 sm:mb-6 lg:mb-8 banner-spacing overflow-hidden" 
-         x-bind:class="{ 
+<section class="relative mx-4 sm:mx-6 lg:mx-10 mb-4 sm:mb-6 lg:mb-8 banner-spacing overflow-hidden"
+         x-bind:class="{
            'banner-hidden': !$store.banner.visible,
            'banner-transitioning': $store.banner.isTransitioning
          }">
@@ -13,17 +13,17 @@
   <div class="mb-4 sm:mb-6">
     <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black">關於功能</h2>
   </div>
-  
+
   <!-- Banner 圖區域 -->
   <div class="relative h-[300px] sm:h-[350px] lg:h-[400px] overflow-hidden rounded-lg">
     <!-- 背景圖片 -->
     <div class="absolute inset-0">
-      <img src="https://github.com/astrocamp/20th-Rewardia/blob/pic/img/about-index.png?raw=true" 
-        alt="Rewardia Background" 
+      <img src="https://github.com/astrocamp/20th-Rewardia/blob/pic/img/about-index.png?raw=true"
+        alt="Rewardia Background"
         loading="eager"
         class="w-full h-full object-cover object-center">
     </div>
-    
+
     <!-- 內容區域 - 限制在左半邊 -->
     <div class="relative z-10 flex items-center h-full">
       <div class="text-white px-4 sm:px-8 lg:px-12 w-full lg:w-1/2">
@@ -45,10 +45,10 @@
 
 <!-- 功能特色區塊 -->
 <section class="mx-4 sm:mx-6 lg:mx-10 my-8 sm:my-12 lg:my-16">
-  <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-8 sm:mb-12 lg:mb-16 text-center font-kulim-park leading-tight-custom">
+  <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-8 sm:mb-12 lg:mb-16 text-center font-kulim-park leading-tight">
     Rewardia 優惠計算回饋小幫手的 3 種方式
   </h2>
-  
+
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 lg:gap-16 lg:px-16">
     <!-- 功能卡片 1 -->
     <div class="faq-feature-card">
@@ -63,7 +63,7 @@
         </h3>
       </div>
     </div>
-    
+
     <!-- 功能卡片 2 -->
     <div class="faq-feature-card">
       <div class="faq-feature-bg">
@@ -77,7 +77,7 @@
         </h3>
       </div>
     </div>
-    
+
     <!-- 功能卡片 3 -->
     <div class="faq-feature-card">
       <div class="faq-feature-bg">
@@ -97,7 +97,7 @@
 <!-- Q&A 常見問題區塊 -->
 <section class="mx-4 sm:mx-6 lg:mx-10 my-8 sm:my-12 lg:my-16" x-data="faq_accordion()">
   <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-8 sm:mb-12 text-left font-kulim-park leading-tight-custom">Q&A</h2>
-  
+
   <div class="bg-gray-50 rounded-lg p-5 sm:p-6 lg:p-8">
     {% for category in faq_categories %}
     <!-- {{ category.title }} 分類 -->
@@ -105,7 +105,7 @@
       <div class="faq-category-title">
         {{ category.title }}
       </div>
-      
+
       <div class="faq-qa-list">
         {% for item in category.items %}
         {% include 'components/faq-item.html' with item_id=item.id question_text=item.question answer_text=item.answer %}
