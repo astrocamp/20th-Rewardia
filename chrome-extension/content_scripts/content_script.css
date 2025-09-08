@@ -1,0 +1,72 @@
+:root {
+  --primary_color: #111827;
+  --secondary_color: #2060b9;
+}
+
+.hide_popup {
+  display: none;
+}
+
+.popup {
+  color: white;
+  width: 340px;
+  height: 371px;
+  background: linear-gradient(135deg, #111827 0%, #2060b9 100%);
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 999999;
+  border-radius: 16px;
+  font-family: "Kulim Park", sans-serif;
+  font-size: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-content: center;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  font-weight: 700;
+}
+
+.center_img {
+  width: 200px;
+  align-self: center;
+}
+
+.center_img img {
+}
+
+.close_btn {
+  cursor: pointer;
+}
+
+.text {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.popup_btn {
+  border: none;
+  color: white;
+  background-color: var(--primary_color);
+  font-weight: bold;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s;
+  padding: 10px;
+  width: 200px;
+}
+
+.popup_btn:hover {
+  background-color: #1c55a4;
+  transition: all 0.3s;
+}
