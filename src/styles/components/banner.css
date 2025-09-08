@@ -1,0 +1,35 @@
+/* Banner 動態間距樣式 */
+@layer utilities {
+  /* Banner spacing 動態調整 */
+  .banner-spacing {
+    @apply transition-all duration-300 ease-in-out;
+    @apply mt-50; /* 預設狀態：banner 可見時，需要較大間距 */
+  }
+  
+  /* Banner 隱藏時的間距調整 */
+  .banner-spacing.banner-hidden {
+    @apply mt-32; /* banner 隱藏時，需要較小間距 */
+  }
+
+  /* Auth spacing 動態調整 */
+  .auth-spacing {
+    @apply transition-all duration-300 ease-in-out;
+    @apply pt-40; /* 預設狀態：banner 可見時的間距 */
+  }
+  
+  /* Banner 隱藏時的間距調整 */
+  .auth-spacing.banner-hidden {
+    @apply pt-24; /* banner 隱藏時，減少到 6rem */
+  }
+
+  /* Calculator spacing 動態調整 */
+  .calculator-spacing {
+    @apply transition-all duration-300 ease-in-out;
+    @apply mt-50; /* 預設狀態：banner 可見時，需要較大間距 */
+  }
+  
+  /* Banner 隱藏時的間距調整 */
+  .calculator-spacing.banner-hidden {
+    @apply mt-32; /* banner 隱藏時，需要較小間距 */
+  }
+}
