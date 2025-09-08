@@ -1,37 +1,28 @@
 {% load static%}
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
-<head>
-  <meta charset="UTF-8">
-  <meta name="csrf-token" content="{{ csrf_token }}">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rewardia</title>
-  {%load static%}
-  <link rel="stylesheet" href="{% static 'styles/style.css' %}">
-  <script type="module" src="{% static 'scripts/app.js' %}"></script>
-</head>
-<body x-data="header()" @scroll.window="handleScroll()">
-
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="csrf-token" content="{{ csrf_token }}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rewardia</title>
+    {%load static%}
+    <link rel="stylesheet" href="{% static 'styles/style.css' %}" />
+    <script type="module" src="{% static 'scripts/app.js' %}"></script>
+  </head>
+  <body x-data="header()" @scroll.window="handleScroll()">
     <main class="calculator-page">
       {% include 'layouts/messages.html' %} {% block content %} {% endblock %}
     </main>
 
-  {% include 'layouts/header.html' %}
+    {% include 'layouts/header.html' %}
 
-  <main>
-    {% include 'layouts/messages.html' %}
-    {% block content %}
-    {% endblock %}
-  </main>
+    <main>
+      {% include 'layouts/messages.html' %} {% block content %} {% endblock %}
+    </main>
 
-  <!-- AI 聊天機器人組件 - 不在登入和註冊頁面顯示 -->
-  {% if not hide_chatbot %}
-    {% include 'components/chatbot.html' %}
-  {% endif %}
-
-  {% include 'layouts/footer.html' %}
-
-
-
-</body>
+    <!-- AI 聊天機器人組件 - 不在登入和註冊頁面顯示 -->
+    {% if not hide_chatbot %} {% include 'components/chatbot.html' %} {% endif
+    %} {% include 'layouts/footer.html' %}
+  </body>
 </html>
