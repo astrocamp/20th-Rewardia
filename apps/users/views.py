@@ -248,7 +248,7 @@ def get_token(request):
                 "message": "Token retrieved successfully",
             }
         )
-    except:
+    except Token.DoesNotExist:
         return Response(
             {"error": "Failed to retrieve token"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,

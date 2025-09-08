@@ -22,7 +22,7 @@ function show_rewardia_popup() {
   </div>`;
 
   document.body.appendChild(popup);
-  const close_btn = document.querySelector(".close_btn");
+  const close_btn = popup.querySelector(".close_btn");
   close_btn.addEventListener("click", function () {
     popup.remove();
     sessionStorage.setItem("close_popup", "true");
