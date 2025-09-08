@@ -1,6 +1,6 @@
 .header-sticky {
   @apply fixed top-0 left-0 right-0 w-full z-40;
-  animation: slide-down 0.3s ease-out;
+  animation: slide-down 1s ease-out;
 }
 
 @keyframes slide-down {
