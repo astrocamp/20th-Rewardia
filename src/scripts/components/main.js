@@ -2,6 +2,7 @@
 export default () => ({
   selectedBank: '',
   selectedReward: '',
+  selectedMerchant: '',
   searchKeyword: '',
   allCards: [], // 主要卡片資料陣列
   originalCards: [], // 原始資料備份
@@ -12,6 +13,7 @@ export default () => ({
   rewardCategoryMap: {},
   rewardCategoriesChoices: [],
   banks: [],
+  merchants: [],
   viewMode: 'grid', // 'grid' for card view (畫面b), 'list' for search results (畫面a)
   
   // 使用 API 獲取資料進行初始化
@@ -27,6 +29,7 @@ export default () => ({
       this.rewardCategoryMap = data.reward_category_map;
       this.rewardCategoriesChoices = data.reward_categories_choices;
       this.banks = data.banks;
+      this.merchants = data.merchants;
       
       this.initializeView();
     } catch (error) {
@@ -92,10 +95,17 @@ export default () => ({
     this.searchKeyword = '';
     this.performSearch();
   },
+
+  // 店家選擇變更
+  onMerchantChange() {
+    // 當使用下拉選單時，清空關鍵字搜尋欄位
+    this.searchKeyword = '';
+    this.performSearch();
+  },
   
   // 執行搜尋
   performSearch() {
-    const hasSearchCriteria = this.selectedBank || this.selectedReward || this.searchKeyword.trim();
+    const hasSearchCriteria = this.selectedBank || this.selectedReward || this.selectedMerchant || this.searchKeyword.trim();
     
     if (!hasSearchCriteria) {
       this.resetToGridView();
@@ -119,10 +129,17 @@ export default () => ({
         );
       }
 
+      if (this.selectedMerchant) {
+        filteredCards = filteredCards.filter(card =>
+          card.rewards.some(reward => reward.scope === this.selectedMerchant)
+        );
+      }
+
       if (this.searchKeyword?.trim()) {
         // 當使用關鍵字搜尋時，清空其他選擇器
         this.selectedBank = '';
         this.selectedReward = '';
+        this.selectedMerchant = '';
         
         const keyword = this.searchKeyword.trim().toLowerCase();
         filteredCards = filteredCards.filter(card => {
@@ -163,6 +180,28 @@ export default () => ({
         filteredCards.sort((a, b) => {
           const aMaxRate = this.getMaxRewardRate(a, this.selectedReward);
           const bMaxRate = this.getMaxRewardRate(b, this.selectedReward);
+          return bMaxRate - aMaxRate;
+        });
+      } else if (this.selectedMerchant) {
+        // 店家搜尋時，對每張卡片的回饋進行去重和排序
+        filteredCards = filteredCards.map(card => {
+          const deduplicatedRewards = this.deduplicateRewardsByCategory(card.rewards);
+          
+          // 優先顯示符合搜尋條件的回饋
+          const matchingRewards = deduplicatedRewards.filter(reward => 
+            reward.scope === this.selectedMerchant
+          );
+          const otherRewards = deduplicatedRewards.filter(reward => 
+            reward.scope !== this.selectedMerchant
+          );
+          
+          return { ...card, rewards: [...matchingRewards, ...otherRewards] };
+        });
+        
+        // 按符合搜尋條件的最高回饋率排序
+        filteredCards.sort((a, b) => {
+          const aMaxRate = this.getMaxRewardRateFromMerchant(a, this.selectedMerchant);
+          const bMaxRate = this.getMaxRewardRateFromMerchant(b, this.selectedMerchant);
           return bMaxRate - aMaxRate;
         });
       } else if (this.searchKeyword?.trim()) {
@@ -231,6 +270,20 @@ export default () => ({
     
     const matchingRewards = card.rewards.filter(reward => 
       this.isRewardMatchingKeyword(reward, keyword)
+    );
+    
+    if (matchingRewards.length === 0) return 0;
+    
+    const rates = matchingRewards.map(reward => this.getRewardRate(reward));
+    return Math.max(...rates);
+  },
+
+  // 獲取卡片符合店家搜尋條件的回饋中的最高數值
+  getMaxRewardRateFromMerchant(card, merchant) {
+    if (!card.rewards || card.rewards.length === 0) return 0;
+    
+    const matchingRewards = card.rewards.filter(reward => 
+      reward.scope === merchant
     );
     
     if (matchingRewards.length === 0) return 0;

@@ -25,6 +25,7 @@ def get_main_data(request):
     # 一次性獲取所有需要的資料
     banks_set = set()
     reward_categories_set = set()
+    merchants_set = set()
     all_cards_data = []
     
     for card in cards:
@@ -34,6 +35,7 @@ def get_main_data(request):
         # 處理回饋分類
         for reward in card.reward_categories.filter(is_active=True):
             reward_categories_set.add(reward.category)
+            merchants_set.add(reward.scope)
             
             # 處理回饋率顯示
             min_rate, max_rate = reward.min_rate, reward.max_rate
@@ -78,9 +80,14 @@ def get_main_data(request):
         reward_categories_choices.append((category_code, category))
         reward_category_map[category_code] = category
 
+    # 處理店家選項
+    merchants = [{'code': merchant.lower().replace(' ', '_'), 'name': merchant} 
+                 for merchant in sorted(merchants_set)]
+
     return JsonResponse({
         'all_cards_data': all_cards_data,
         'banks': banks,
+        'merchants': merchants,
         'reward_categories_choices': reward_categories_choices,
         'reward_category_map': reward_category_map,
     }, safe=False)

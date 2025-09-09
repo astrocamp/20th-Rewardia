@@ -255,6 +255,23 @@
     .reward-item {
       @apply flex-col items-start;
     }
+    
+    /* 搜尋欄位在小螢幕上的布局調整 */
+    .search-form-container {
+      @apply grid grid-cols-2 gap-0;
+    }
+    
+    .search-form-container > div {
+      @apply border-r border-b border-gray-200;
+    }
+    
+    .search-form-container > div:last-child {
+      @apply border-r-0;
+    }
+    
+    .search-form-container > div:nth-child(2n) {
+      @apply border-r-0;
+    }
   }
   
   @media (min-width: 641px) and (max-width: 1024px) {
