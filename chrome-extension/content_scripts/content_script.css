@@ -26,30 +26,27 @@
   align-content: center;
 }
 
-.header {
+.popup_header {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
 }
 
-.logo {
+.popup_logo {
   font-weight: 700;
 }
 
-.center_img {
+.popup_center_img {
   width: 200px;
   align-self: center;
 }
 
-.center_img img {
-}
-
-.close_btn {
+.popup_close_btn {
   cursor: pointer;
 }
 
-.text {
+.popup_text {
   margin-bottom: 20px;
   text-align: center;
 }

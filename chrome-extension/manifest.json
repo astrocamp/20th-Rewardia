@@ -16,7 +16,7 @@
 
  "content_scripts": [
    {
-     "matches": ["*://24h.pchome.com.tw/*"],
+     "matches": ["*://24h.pchome.com.tw/*","*://www.momoshop.com.tw/*"],
      "css": ["content_scripts/content_script.css"],
      "js": ["content_scripts/content_script.js"]
    }
