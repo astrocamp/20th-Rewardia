@@ -104,21 +104,32 @@ def calculator(request):
     return render(request, "pages/calculator.html", context)
 
 
+# 共用的選項生成函數
+def _generate_options_html(default_text, items, value_field, text_field):
+    """生成 HTML 選項的共用函數"""
+    options_html = f'<option value="" selected disabled>{default_text}</option>'
+    for item in items:
+        if isinstance(item, dict):
+            value = item[value_field]
+            text = item[text_field]
+        else:
+            value = getattr(item, value_field)
+            text = getattr(item, text_field)
+        options_html += f'<option value="{value}">{text}</option>'
+    return options_html
+
 # HTMX 用的 API - 根據銀行取得卡片
 def get_cards_by_bank(request):
     bank_name = request.GET.get("bank_select")
 
     if bank_name:
-        cards = CreditCard.objects.filter(bank=bank_name, is_active=True).order_by(
+        cards = CreditCard.objects.filter(bank=bank_name, is_active=True).order_by("name")
+        return HttpResponse(_generate_options_html(
+            "請先選擇銀行，再選擇卡片", 
+            cards, 
+            "id", 
             "name"
-        )
-
-        # 產生 HTML 選項
-        options_html = '<option value="" selected disabled>請先選擇銀行，再選擇卡片</option>'
-        for card in cards:
-            options_html += f'<option value="{card.id}">{card.name}</option>'
-
-        return HttpResponse(options_html)
+        ))
 
     return HttpResponse('<option value="" selected disabled>請先選擇銀行，再選擇卡片</option>')
 
@@ -136,11 +147,12 @@ def get_categories_by_card(request):
             .order_by("category")
         )
 
-        options_html = '<option value="" selected disabled>請先選擇卡片</option>'
-        for category in categories:
-            options_html += f'<option value="{category["category"]}">{category["category"]}</option>'
-
-        return HttpResponse(options_html)
+        return HttpResponse(_generate_options_html(
+            "請先選擇卡片", 
+            categories, 
+            "category", 
+            "category"
+        ))
 
     return HttpResponse('<option value="" selected disabled>請先選擇卡片</option>')
 
@@ -159,13 +171,12 @@ def get_scopes_by_category(request):
             .order_by("scope")
         )
 
-        options_html = '<option value="" selected disabled>請先選擇消費類別</option>'
-        for scope in scopes:
-            options_html += (
-                f'<option value="{scope["scope"]}">{scope["scope"]}</option>'
-            )
-
-        return HttpResponse(options_html)
+        return HttpResponse(_generate_options_html(
+            "請先選擇消費類別", 
+            scopes, 
+            "scope", 
+            "scope"
+        ))
 
     return HttpResponse('<option value="" selected disabled>請先選擇消費類別</option>')
 
