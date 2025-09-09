@@ -56,8 +56,14 @@ async def chat_api(request):
             if not message:
                 return JsonResponse({'error': '訊息內容為必填'}, status=400)
 
-            # Get user_id if authenticated
-            user_id = request.user.id if request.user.is_authenticated else None
+            # Get user_id if authenticated (using sync_to_async to handle async context)
+            def get_user_id_sync():
+                try:
+                    return request.user.id if request.user.is_authenticated else None
+                except:
+                    return None
+            
+            user_id = await sync_to_async(get_user_id_sync, thread_sensitive=False)()
             
             # Get conversation history
             conversation_history = data.get('conversation_history', [])
