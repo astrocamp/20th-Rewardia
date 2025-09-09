@@ -58,10 +58,7 @@ async def chat_api(request):
 
             # Get user_id if authenticated (using sync_to_async to handle async context)
             def get_user_id_sync():
-                try:
-                    return request.user.id if request.user.is_authenticated else None
-                except:
-                    return None
+                return request.user.id if request.user.is_authenticated else None
             
             user_id = await sync_to_async(get_user_id_sync, thread_sensitive=False)()
             
