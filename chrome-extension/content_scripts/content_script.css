@@ -7,10 +7,12 @@
   display: none;
 }
 
-.popup {
+.rewardia_popup {
   color: white;
-  width: 340px;
-  height: 371px;
+  min-width: 340px;
+  max-width: 340px;
+  max-width: 371px;
+  max-height: 371px;
   background: linear-gradient(135deg, #2b52a6 0%, #8bd0ff 100%);
   position: fixed;
   top: 20px;
@@ -42,6 +44,10 @@
   align-self: center;
 }
 
+.popup_center_img img {
+  width: 200px;
+}
+
 .popup_close_btn {
   cursor: pointer;
 }
@@ -49,6 +55,10 @@
 .popup_text {
   margin-bottom: 20px;
   text-align: center;
+}
+
+.popup_text button {
+  font-size: 14px;
 }
 
 .popup_btn {
@@ -60,7 +70,7 @@
   cursor: pointer;
   transition: all 0.3s;
   padding: 10px;
-  width: 200px;
+  min-width: 250px;
 }
 
 .popup_btn:hover {
