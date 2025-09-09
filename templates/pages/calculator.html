@@ -6,7 +6,10 @@
 
 {% block content %}
 <section class="calculator-page calculator-spacing" 
-         x-bind:class="{ 'banner-hidden': !$store.banner.visible }">
+         x-bind:class="{ 
+           'banner-hidden': !$store.banner.visible,
+           'banner-transitioning': $store.banner.isTransitioning
+         }">
   <div class="calculator-container">
     <h2 class="calculator-title">優惠試算</h2>
 

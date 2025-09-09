@@ -114,7 +114,10 @@
 {% endcomment %}
 {% if component == "page-container" %}
 <div class="min-h-screen bg-gray-50 pb-24 auth-spacing" 
-     x-bind:class="{ 'banner-hidden': !$store.banner.visible }">
+     x-bind:class="{ 
+       'banner-hidden': !$store.banner.visible,
+       'banner-transitioning': $store.banner.isTransitioning
+     }">
   <div class="max-w-lg mx-auto px-4 sm:px-6 lg:px-8">
     <div class="bg-white rounded-lg shadow-lg overflow-hidden">
       <!-- 頁面標題 -->

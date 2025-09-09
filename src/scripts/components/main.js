@@ -34,8 +34,6 @@ export default () => ({
       this.initializeView();
     } catch (error) {
       console.error("Error fetching initial data:", error);
-    } finally {
-      // 初始化完成
     }
   },
   
@@ -287,13 +285,14 @@ export default () => ({
     }, 500);
   },
   
-  // 檢查優惠是否符合搜尋條件
-  isMatchingReward(reward) {
-    if (!this.selectedReward) return false;
-    const selectedCategoryDisplay = this.rewardCategoryMap[this.selectedReward];
-    return reward.category.includes(selectedCategoryDisplay);
-  },
   
+  // 通用的獲取最高回饋率方法
+  getMaxRewardRateFromRewards(rewards) {
+    if (!rewards || rewards.length === 0) return 0;
+    const rates = rewards.map(reward => this.getRewardRate(reward));
+    return Math.max(...rates);
+  },
+
   // 獲取卡片在特定優惠類型下的最高數值
   getMaxRewardRate(card, selectedRewardCode) {
     if (!selectedRewardCode) return 0;
@@ -301,44 +300,27 @@ export default () => ({
     const matchingRewards = card.rewards.filter(reward =>
       reward.category.includes(selectedCategoryDisplay)
     );
-    
-    if (matchingRewards.length === 0) return 0;
-    
-    const rates = matchingRewards.map(reward => this.getRewardRate(reward));
-    return Math.max(...rates);
+    return this.getMaxRewardRateFromRewards(matchingRewards);
   },
   
   // 獲取卡片符合搜尋條件的回饋中的最高數值
   getMaxRewardRateFromMatchingRewards(card, keyword) {
-    if (!card.rewards || card.rewards.length === 0) return 0;
-    
     const matchingRewards = card.rewards.filter(reward => 
       this.isRewardMatchingKeyword(reward, keyword)
     );
-    
-    if (matchingRewards.length === 0) return 0;
-    
-    const rates = matchingRewards.map(reward => this.getRewardRate(reward));
-    return Math.max(...rates);
+    return this.getMaxRewardRateFromRewards(matchingRewards);
   },
 
   // 獲取卡片符合店家搜尋條件的回饋中的最高數值
   getMaxRewardRateFromMerchant(card, merchant) {
-    if (!card.rewards || card.rewards.length === 0) return 0;
-    
     const matchingRewards = card.rewards.filter(reward => 
       reward.scope === merchant
     );
-    
-    if (matchingRewards.length === 0) return 0;
-    
-    const rates = matchingRewards.map(reward => this.getRewardRate(reward));
-    return Math.max(...rates);
+    return this.getMaxRewardRateFromRewards(matchingRewards);
   },
 
   // 獲取卡片符合特定店家且特定優惠類別的回饋中的最高數值
   getMaxRewardRateFromMerchantAndCategory(card, merchant, selectedRewardCode) {
-    if (!card.rewards || card.rewards.length === 0) return 0;
     if (!selectedRewardCode) return 0;
     
     const selectedCategoryDisplay = this.rewardCategoryMap[selectedRewardCode];
@@ -347,11 +329,7 @@ export default () => ({
     const matchingRewards = card.rewards.filter(reward => 
       reward.scope === merchant && reward.category.includes(selectedCategoryDisplay)
     );
-    
-    if (matchingRewards.length === 0) return 0;
-    
-    const rates = matchingRewards.map(reward => this.getRewardRate(reward));
-    return Math.max(...rates);
+    return this.getMaxRewardRateFromRewards(matchingRewards);
   },
   
   // 根據類別+範圍去重回饋項目，保留數值最高的
@@ -373,26 +351,16 @@ export default () => ({
     const deduplicatedRewards = [];
     
     Object.values(groupedRewards).forEach(categoryRewards => {
-      // 計算每個回饋的數值
-      const rewardsWithRates = categoryRewards.map(reward => {
-        const rate = this.getRewardRate(reward);
-        return { ...reward, calculatedRate: rate };
+      // 直接使用 getMaxRewardRateFromRewards 來獲取最佳回饋
+      const bestReward = categoryRewards.reduce((best, current) => {
+        return this.getRewardRate(current) > this.getRewardRate(best) ? current : best;
       });
-      
-      // 按數值排序，取最高的
-      rewardsWithRates.sort((a, b) => b.calculatedRate - a.calculatedRate);
-      const bestReward = rewardsWithRates[0];
-      
-      // 移除 calculatedRate 屬性
-      delete bestReward.calculatedRate;
       deduplicatedRewards.push(bestReward);
     });
     
     // 按數值排序（最高到最低）
     deduplicatedRewards.sort((a, b) => {
-      const aRate = this.getRewardRate(a);
-      const bRate = this.getRewardRate(b);
-      return bRate - aRate;
+      return this.getRewardRate(b) - this.getRewardRate(a);
     });
     
     return deduplicatedRewards;
