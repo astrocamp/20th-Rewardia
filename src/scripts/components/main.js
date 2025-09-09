@@ -134,9 +134,7 @@ export default () => ({
           
           // 搜尋回饋分類的 category、scope、reward_type
           const rewardMatch = card.rewards.some(reward => 
-            reward.category.toLowerCase().includes(keyword) ||
-            reward.scope.toLowerCase().includes(keyword) ||
-            reward.reward_type.toLowerCase().includes(keyword)
+            this.isRewardMatchingKeyword(reward, keyword)
           );
           
           // 只要任一項目匹配就回傳 true
@@ -175,14 +173,10 @@ export default () => ({
           
           // 優先顯示符合搜尋條件的回饋
           const matchingRewards = deduplicatedRewards.filter(reward => 
-            reward.category.toLowerCase().includes(keyword) ||
-            reward.scope.toLowerCase().includes(keyword) ||
-            reward.reward_type.toLowerCase().includes(keyword)
+            this.isRewardMatchingKeyword(reward, keyword)
           );
           const otherRewards = deduplicatedRewards.filter(reward => 
-            !reward.category.toLowerCase().includes(keyword) &&
-            !reward.scope.toLowerCase().includes(keyword) &&
-            !reward.reward_type.toLowerCase().includes(keyword)
+            !this.isRewardMatchingKeyword(reward, keyword)
           );
           
           return { ...card, rewards: [...matchingRewards, ...otherRewards] };
@@ -231,22 +225,12 @@ export default () => ({
     return Math.max(...rates);
   },
   
-  // 獲取卡片所有回饋中的最高數值（用於關鍵字搜尋排序）
-  getMaxRewardRateFromAllRewards(card) {
-    if (!card.rewards || card.rewards.length === 0) return 0;
-    
-    const rates = card.rewards.map(reward => this.getRewardRate(reward));
-    return Math.max(...rates);
-  },
-  
   // 獲取卡片符合搜尋條件的回饋中的最高數值
   getMaxRewardRateFromMatchingRewards(card, keyword) {
     if (!card.rewards || card.rewards.length === 0) return 0;
     
     const matchingRewards = card.rewards.filter(reward => 
-      reward.category.toLowerCase().includes(keyword) ||
-      reward.scope.toLowerCase().includes(keyword) ||
-      reward.reward_type.toLowerCase().includes(keyword)
+      this.isRewardMatchingKeyword(reward, keyword)
     );
     
     if (matchingRewards.length === 0) return 0;
@@ -273,9 +257,7 @@ export default () => ({
     // 對每個類別+範圍組合，保留數值最高的回饋
     const deduplicatedRewards = [];
     
-    Object.keys(groupedRewards).forEach(key => {
-      const categoryRewards = groupedRewards[key];
-      
+    Object.values(groupedRewards).forEach(categoryRewards => {
       // 計算每個回饋的數值
       const rewardsWithRates = categoryRewards.map(reward => {
         const rate = this.getRewardRate(reward);
@@ -301,6 +283,14 @@ export default () => ({
     return deduplicatedRewards;
   },
   
+  // 檢查回饋是否符合關鍵字搜尋條件
+  isRewardMatchingKeyword(reward, keyword) {
+    const lowerKeyword = keyword.toLowerCase();
+    return reward.category.toLowerCase().includes(lowerKeyword) ||
+           reward.scope.toLowerCase().includes(lowerKeyword) ||
+           reward.reward_type.toLowerCase().includes(lowerKeyword);
+  },
+
   // 獲取單一回饋的數值
   getRewardRate(reward) {
     const rateStr = reward.rate;
