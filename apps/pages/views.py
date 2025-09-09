@@ -4,6 +4,7 @@ from apps.cards.models import CreditCard
 from apps.rewards.models import RewardCategory
 from django.http import HttpResponse, JsonResponse # Added JsonResponse
 from django.db.models import Prefetch
+from django.utils.html import escape
 import json
 
 
@@ -35,16 +36,15 @@ def get_main_data(request):
             reward_categories_set.add(reward.category)
             
             # 處理回饋率顯示
-            rate_display = "N/A"
-            if reward.min_rate is not None and reward.max_rate is not None:
-                if reward.min_rate == reward.max_rate:
-                    rate_display = f"{reward.min_rate}%"
-                else:
-                    rate_display = f"{reward.min_rate}%-{reward.max_rate}%"
-            elif reward.min_rate is not None:
-                rate_display = f"{reward.min_rate}%"
-            elif reward.max_rate is not None:
-                rate_display = f"{reward.max_rate}%"
+            min_rate, max_rate = reward.min_rate, reward.max_rate
+            if min_rate is None and max_rate is None:
+                rate_display = "N/A"
+            elif min_rate == max_rate or max_rate is None:
+                rate_display = f"{min_rate}%"
+            elif min_rate is None:
+                rate_display = f"{max_rate}%"
+            else:
+                rate_display = f"{min_rate}%-{max_rate}%"
                 
             rewards_data.append({
                 'category': reward.category,
@@ -107,14 +107,14 @@ def calculator(request):
 # 共用的選項生成函數
 def _generate_options_html(default_text, items, value_field, text_field):
     """生成 HTML 選項的共用函數"""
-    options_html = f'<option value="" selected disabled>{default_text}</option>'
+    options_html = f'<option value="" selected disabled>{escape(default_text)}</option>'
     for item in items:
         if isinstance(item, dict):
-            value = item[value_field]
-            text = item[text_field]
+            value = escape(item[value_field])
+            text = escape(item[text_field])
         else:
-            value = getattr(item, value_field)
-            text = getattr(item, text_field)
+            value = escape(getattr(item, value_field))
+            text = escape(getattr(item, text_field))
         options_html += f'<option value="{value}">{text}</option>'
     return options_html
 
