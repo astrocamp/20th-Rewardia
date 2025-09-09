@@ -1,4 +1,4 @@
-const token_url = "http://localhost:8000/users/api/get-token";
+const token_url = "http://localhost:8000/users/api/get_token";
 const member_zone = "http://localhost:8000/users/member";
 let loggedin = false;
 
