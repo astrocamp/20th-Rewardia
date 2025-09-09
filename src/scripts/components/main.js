@@ -5,9 +5,9 @@ export default () => ({
   searchKeyword: '',
   allCards: [], // 主要卡片資料陣列
   originalCards: [], // 原始資料備份
-  loadedCount: 9, // 載入的卡片數量（網格9張，列表3張）
-  loadIncrement: 6, // 網格視圖每次載入6張，列表視圖每次載入1張
-  isLoading: true,
+  loadedCount: 9, // 載入的卡片數量（網格9張）
+  gridLoadIncrement: 6, // 網格視圖每次載入6張
+  listLoadIncrement: 1, // 列表視圖每次載入1張
   isLoadingMore: false,
   rewardCategoryMap: {},
   rewardCategoriesChoices: [],
@@ -32,7 +32,7 @@ export default () => ({
     } catch (error) {
       console.error("Error fetching initial data:", error);
     } finally {
-      this.isLoading = false;
+      // 初始化完成
     }
   },
   
@@ -58,7 +58,7 @@ export default () => ({
     this.isLoadingMore = true;
     
     setTimeout(() => {
-      const increment = this.viewMode === 'grid' ? 6 : 1;
+      const increment = this.viewMode === 'grid' ? this.gridLoadIncrement : this.listLoadIncrement;
       this.loadedCount = Math.min(this.loadedCount + increment, this.allCards.length);
       this.isLoadingMore = false;
     }, 300);
@@ -103,7 +103,6 @@ export default () => ({
     }
     
     this.viewMode = 'list';
-    this.isLoading = true;
     
     setTimeout(() => {
       let filteredCards = [...this.originalCards];
@@ -208,7 +207,6 @@ export default () => ({
       
       this.allCards = filteredCards;
       this.loadedCount = Math.min(3, filteredCards.length);
-      this.isLoading = false;
     }, 500);
   },
   
@@ -229,21 +227,7 @@ export default () => ({
     
     if (matchingRewards.length === 0) return 0;
     
-    const rates = matchingRewards.map(reward => {
-      const rateStr = reward.rate;
-      // 處理區間格式 "1.5%-3.0%" 或單一格式 "2.0%"
-      const rangeMatch = rateStr.match(/(\d+\.?\d*)%-(\d+\.?\d*)%/);
-      const singleMatch = rateStr.match(/(\d+\.?\d*)%/);
-      
-      if (rangeMatch) {
-        // 取區間的最大值
-        return Math.max(parseFloat(rangeMatch[1]), parseFloat(rangeMatch[2]));
-      } else if (singleMatch) {
-        return parseFloat(singleMatch[1]);
-      }
-      return 0;
-    });
-    
+    const rates = matchingRewards.map(reward => this.getRewardRate(reward));
     return Math.max(...rates);
   },
   
@@ -251,21 +235,7 @@ export default () => ({
   getMaxRewardRateFromAllRewards(card) {
     if (!card.rewards || card.rewards.length === 0) return 0;
     
-    const rates = card.rewards.map(reward => {
-      const rateStr = reward.rate;
-      // 處理區間格式 "1.5%-3.0%" 或單一格式 "2.0%"
-      const rangeMatch = rateStr.match(/(\d+\.?\d*)%-(\d+\.?\d*)%/);
-      const singleMatch = rateStr.match(/(\d+\.?\d*)%/);
-      
-      if (rangeMatch) {
-        // 取區間的最大值
-        return Math.max(parseFloat(rangeMatch[1]), parseFloat(rangeMatch[2]));
-      } else if (singleMatch) {
-        return parseFloat(singleMatch[1]);
-      }
-      return 0;
-    });
-    
+    const rates = card.rewards.map(reward => this.getRewardRate(reward));
     return Math.max(...rates);
   },
   
@@ -281,19 +251,7 @@ export default () => ({
     
     if (matchingRewards.length === 0) return 0;
     
-    const rates = matchingRewards.map(reward => {
-      const rateStr = reward.rate;
-      const rangeMatch = rateStr.match(/(\d+\.?\d*)%-(\d+\.?\d*)%/);
-      const singleMatch = rateStr.match(/(\d+\.?\d*)%/);
-      
-      if (rangeMatch) {
-        return Math.max(parseFloat(rangeMatch[1]), parseFloat(rangeMatch[2]));
-      } else if (singleMatch) {
-        return parseFloat(singleMatch[1]);
-      }
-      return 0;
-    });
-    
+    const rates = matchingRewards.map(reward => this.getRewardRate(reward));
     return Math.max(...rates);
   },
   
@@ -320,18 +278,7 @@ export default () => ({
       
       // 計算每個回饋的數值
       const rewardsWithRates = categoryRewards.map(reward => {
-        const rateStr = reward.rate;
-        const rangeMatch = rateStr.match(/(\d+\.?\d*)-(\d+\.?\d*)%/);
-        const singleMatch = rateStr.match(/(\d+\.?\d*)%/);
-        
-        let rate = 0;
-        if (rangeMatch) {
-          // 取區間的最大值
-          rate = Math.max(parseFloat(rangeMatch[1]), parseFloat(rangeMatch[2]));
-        } else if (singleMatch) {
-          rate = parseFloat(singleMatch[1]);
-        }
-        
+        const rate = this.getRewardRate(reward);
         return { ...reward, calculatedRate: rate };
       });
       
