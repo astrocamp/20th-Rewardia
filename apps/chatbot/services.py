@@ -1,4 +1,5 @@
 # Chatbot 資料庫查詢服務
+import logging
 from django.db.models import Q, Value, DecimalField
 from django.db.models.functions import Coalesce
 from apps.cards.models import CreditCard
@@ -6,6 +7,9 @@ from apps.rewards.models import RewardCategory
 from apps.users.models import UserCard, User
 from apps.chatbot.knowledge_base import REWARDIA_KNOWLEDGE_BASE, SYSTEM_PROMPT
 from apps.chatbot.config import BANK_MAPPING, COMMON_KEYWORDS, PERSONAL_QUERY_KEYWORDS, REWARD_TYPE_KEYWORDS
+
+# 設定日誌記錄器
+logger = logging.getLogger(__name__)
 
 
 class ChatbotDataService:
@@ -64,6 +68,7 @@ class ChatbotDataService:
             ).values('name', 'bank')
             return list(cards)
         except Exception as e:
+            logger.error(f"Error in get_cards_by_bank for bank '{bank_name}': {str(e)}", exc_info=True)
             return []
     
     @staticmethod
@@ -91,6 +96,7 @@ class ChatbotDataService:
                 })
             return result
         except Exception as e:
+            logger.error(f"Error in get_cards_by_category for category '{category}': {str(e)}", exc_info=True)
             return []
     
     @staticmethod
@@ -100,6 +106,7 @@ class ChatbotDataService:
             cards = CreditCard.objects.filter(is_active=True).values('name', 'bank')
             return list(cards)
         except Exception as e:
+            logger.error(f"Error in get_all_active_cards: {str(e)}", exc_info=True)
             return []
     
     @staticmethod
@@ -120,7 +127,8 @@ class ChatbotDataService:
                 'is_primary'
             )
             return list(user_cards)
-        except (User.DoesNotExist, Exception):
+        except (User.DoesNotExist, Exception) as e:
+            logger.error(f"Error in get_user_cards for user_id '{user_id}': {str(e)}", exc_info=True)
             return []
     
     @staticmethod
@@ -145,7 +153,8 @@ class ChatbotDataService:
                     'reward_type': reward.reward_type
                 })
             return result
-        except Exception:
+        except Exception as e:
+            logger.error(f"Error in get_card_rewards_by_category for card '{card_name}' and category '{category}': {str(e)}", exc_info=True)
             return []
     
     @staticmethod
@@ -168,7 +177,8 @@ class ChatbotDataService:
                     'reward_type': reward.reward_type
                 })
             return result
-        except Exception:
+        except Exception as e:
+            logger.error(f"Error in get_card_all_rewards for card '{card_name}': {str(e)}", exc_info=True)
             return []
     
     
@@ -191,6 +201,7 @@ class ChatbotDataService:
                 ).values_list('combined_category', flat=True).distinct()
                 ChatbotDataService._cached_categories = list(categories)
             except Exception as e:
+                logger.error(f"Error in get_reward_categories: {str(e)}", exc_info=True)
                 ChatbotDataService._cached_categories = []
         return ChatbotDataService._cached_categories
     
@@ -218,6 +229,7 @@ class ChatbotDataService:
             
             return sorted(normalized_banks)
         except Exception as e:
+            logger.error(f"Error in get_supported_banks: {str(e)}", exc_info=True)
             return []
 
 
