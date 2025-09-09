@@ -4,6 +4,7 @@ document.addEventListener('alpine:init', () => {
         visible: true,
         height: 0,
         isInitialized: false,
+        isTransitioning: false,
 
         init() {
             // 檢查 localStorage 中的關閉狀態
@@ -12,13 +13,25 @@ document.addEventListener('alpine:init', () => {
         },
 
         close() {
+            this.isTransitioning = true;
             this.visible = false;
             localStorage.setItem('bannerClosed', 'true');
+            
+            // 動畫完成後移除 transitioning 狀態
+            setTimeout(() => {
+                this.isTransitioning = false;
+            }, 300);
         },
 
         reset() {
+            this.isTransitioning = true;
             this.visible = true;
             localStorage.removeItem('bannerClosed');
+            
+            // 動畫完成後移除 transitioning 狀態
+            setTimeout(() => {
+                this.isTransitioning = false;
+            }, 300);
         }
     });
 

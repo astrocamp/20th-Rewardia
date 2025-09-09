@@ -5,7 +5,10 @@
 {% block content %}
 <!-- 主要橫幅區域 (Banner) -->
 <section class="relative mx-4 sm:mx-6 lg:mx-10 mb-4 sm:mb-6 lg:mb-8 banner-spacing overflow-hidden" 
-         x-bind:class="{ 'banner-hidden': !$store.banner.visible }">
+         x-bind:class="{ 
+           'banner-hidden': !$store.banner.visible,
+           'banner-transitioning': $store.banner.isTransitioning
+         }">
   <!-- 頁面標題 - 在 banner 圖上方 -->
   <div class="mb-4 sm:mb-6">
     <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black">首頁</h2>
