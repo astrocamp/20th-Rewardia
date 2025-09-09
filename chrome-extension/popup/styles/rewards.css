@@ -1,0 +1,40 @@
+.rewards_content {
+  padding-top: 80px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.reward {
+  margin: 20px 0;
+  height: 70px;
+  display: flex;
+  flex-direction: row;
+  background-color: #f3f4f6;
+  border-radius: 20px;
+  transition: all 0.3s ease-in-out;
+}
+
+.reward:hover {
+  background-color: #374151;
+  color: white;
+  transition: all 0.2s ease-in-out;
+}
+
+.reward_text {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+h1 {
+  font-size: 20px;
+}
+
+h2 {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+span {
+  font-size: 14px;
+}
