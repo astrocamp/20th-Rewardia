@@ -49,7 +49,7 @@
   <!-- 搜尋區域 -->
   <div class="mb-8">
     <div class="bg-white rounded-lg shadow-sm border border-gray-300 overflow-hidden">
-      <div class="flex flex-col sm:flex-row">
+      <div class="flex flex-col sm:flex-row search-form-container">
         <!-- 選擇銀行 -->
         <div class="flex-1 border-b sm:border-b-0 sm:border-r border-gray-200">
           <select x-model="selectedBank" @change="onBankChange" class="horizontal-search-select search-select-height search-select-padding">
@@ -66,6 +66,16 @@
             <option value="">選擇優惠類別</option>
             <template x-for="[code, display] in rewardCategoriesChoices" :key="code">
               <option :value="code" x-text="display"></option>
+            </template>
+          </select>
+        </div>
+        
+        <!-- 選擇店家 -->
+        <div class="flex-1 border-b sm:border-b-0 sm:border-r border-gray-200">
+          <select x-model="selectedMerchant" @change="onMerchantChange" class="horizontal-search-select search-select-height search-select-padding">
+            <option value="">選擇店家</option>
+            <template x-for="merchant in merchants" :key="merchant.code">
+              <option :value="merchant.name" x-text="merchant.name"></option>
             </template>
           </select>
         </div>
