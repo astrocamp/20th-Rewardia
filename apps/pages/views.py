@@ -81,8 +81,7 @@ def get_main_data(request):
         reward_category_map[category_code] = category
 
     # 處理店家選項
-    merchants = [{'code': merchant.lower().replace(' ', '_'), 'name': merchant} 
-                 for merchant in sorted(merchants_set)]
+    merchants = [{'code': merchant.lower().replace(' ', '_'), 'name': merchant} for merchant in sorted(merchants_set)]
 
     return JsonResponse({
         'all_cards_data': all_cards_data,
@@ -186,6 +185,40 @@ def get_scopes_by_category(request):
         ))
 
     return HttpResponse('<option value="" selected disabled>請先選擇消費類別</option>')
+
+
+# API - 根據優惠類別獲取對應的店家列表
+def get_merchants_by_category(request):
+    """根據優惠類別獲取對應的店家列表"""
+    category_code = request.GET.get("category_code")
+    
+    if category_code:
+        # 直接查詢所有回饋類別來建立映射
+        reward_categories = RewardCategory.objects.filter(is_active=True).values_list('category', flat=True).distinct()
+        
+        # 建立類別代碼到類別名稱的映射
+        reward_category_map = {}
+        for category in reward_categories:
+            category_code_mapped = category.upper().replace(' ', '_').replace('/', '_')
+            reward_category_map[category_code_mapped] = category
+        
+        # 獲取實際的類別名稱
+        category_name = reward_category_map.get(category_code)
+        
+        if category_name:
+            # 查詢該類別下的所有店家
+            merchants = RewardCategory.objects.filter(
+                category=category_name,
+                is_active=True
+            ).values_list('scope', flat=True).distinct().order_by('scope')
+            
+            merchants_list = [{'code': merchant.lower().replace(' ', '_'), 'name': merchant} for merchant in merchants]
+            
+            return JsonResponse({
+                'merchants': merchants_list
+            })
+    
+    return JsonResponse({'merchants': []})
 
 
 def faq(request):
