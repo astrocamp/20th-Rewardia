@@ -35,11 +35,11 @@ class NLPConfig:
                     "華信",
                     "機票",
                 ],
+                "KKday": ["KKday", "kkday", "KKDay"],
+                "Klook": ["Klook", "klook"],
                 "旅行社": [
                     "旅行社",
                     "旅遊",
-                    "klook",
-                    "kkday",
                     "雄獅",
                     "可樂",
                     "東南",
@@ -89,9 +89,19 @@ class NLPConfig:
                 "機票、機場接送、貴賓室": ["機場", "貴賓室", "接送", "龍騰出行"],
             },
             "網購": {
+                "Coupang": ["coupang", "酷澎"],
                 "蝦皮購物": ["蝦皮", "shopee", "蝦皮購物"],
                 "momo購物": ["momo", "富邦momo", "momo購物", "momo網", "momo購物網"],
-                "pchome": ["pchome", "pc home", "露天", "pc商店街", "pchome24h"],
+                "pchome": [
+                    "pchome",
+                    "pc home",
+                    "pc商店街",
+                    "pchome24h",
+                    "PChome",
+                    "PCHome",
+                    "PChome 24h購物",
+                    "PChome 24h",
+                ],
                 "其他平台": [
                     "網購",
                     "電商",
@@ -116,9 +126,9 @@ class NLPConfig:
                     "linepay",
                 ],
                 "大眾運輸": ["高鐵", "台鐵", "捷運", "公車", "客運"],
+                "Uber": ["Uber", "uber", "UBER"],
                 "計程車/租車": [
                     "計程車",
-                    "uber",
                     "yoxi",
                     "台灣大車隊",
                     "irent",
@@ -130,7 +140,8 @@ class NLPConfig:
             },
             "餐飲美食": {
                 "國內餐廳": ["餐廳", "餐飲", "美食", "用餐"],
-                "咖啡廳": ["星巴克", "starbucks", "路易莎", "cama"],
+                "咖啡廳": ["路易莎", "cama"],
+                "星巴克": ["星巴克", "星巴克咖啡", "starbucks", "Starbucks"],
                 "速食": [
                     "麥當勞",
                     "mcdonald's",
@@ -143,6 +154,9 @@ class NLPConfig:
                 ],
             },
             "百貨/量販/超商": {
+                "誠品": ["誠品"],
+                "新光三越": ["新光三越"],
+                "SOGO": ["sogo", "sogo百貨", "遠東sogo"],
                 "百貨公司": ["百貨", "新光三越", "sogo", "遠東百貨", "微風", "101"],
                 "量販超市": [
                     "全聯",
@@ -157,26 +171,21 @@ class NLPConfig:
                     "costco",
                     "好市多",
                 ],
+                "7-11": ["7-11", "711", "7-ELEVEN"],
+                "全家": ["全家", "全家便利商店", "FamilyMart", "familymart"],
                 "便利超商": [
-                    "7-11",
-                    "711",
                     "セブン-イレブン",
                     "小七",
                     "統一超商",
-                    "全家",
-                    "familymart",
                     "ファミリーマート",
                     "萊爾富",
                     "okmart",
                     "ok超商",
                 ],
+                "康是美": ["康是美", "cosmed"],
+                "寶雅": ["寶雅", "poya"],
+                "屈臣氏": ["屈臣氏", "watsons"],
                 "藥妝美妝": [
-                    "屈臣氏",
-                    "watsons",
-                    "康是美",
-                    "cosmed",
-                    "寶雅",
-                    "poya",
                     "松本清",
                     "マツモトキヨシ",
                     "大國藥妝",
@@ -186,11 +195,10 @@ class NLPConfig:
                 ],
             },
             "生活娛樂": {
+                "Netflix": ["netflix", "網飛"],
+                "Spotify": ["spotify"],
                 "影音串流": [
-                    "netflix",
-                    "網飛",
                     "disney+",
-                    "spotify",
                     "youtube premium",
                     "kkbox",
                 ],
@@ -213,7 +221,8 @@ class NLPConfig:
             },
             "餐飲/外送": {
                 "foodpanda": ["foodpanda", "熊貓", "panda", "胖達", "胖達幣"],
-                "其他外送": ["外送", "送餐", "美食外送", "uber eats", "ubereats"],
+                "Uber Eats": ["uber eats", "ubereats"],
+                "其他外送": ["外送", "送餐", "美食外送"],
             },
             "指定通路": {
                 "依活動檔期": ["指定", "活動", "檔期", "特定通路", "專屬", "精選"]
@@ -275,6 +284,7 @@ class NLPConfig:
             "points": [
                 "點",
                 "p幣",
+                "P 幣",
                 "蝦幣",
                 "胖達幣",
                 "豐點",
