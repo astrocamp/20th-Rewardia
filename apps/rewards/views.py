@@ -1,9 +1,9 @@
 # Create your views here.
 from rest_framework import viewsets
-from .serializers import RewardSerializer
-from .models import RewardCategory
+from apps.rewards.serializers import RewardSerializer
+from apps.rewards.models import RewardCategory
 
 
 class RewardViewSet(viewsets.ModelViewSet):
-    queryset = RewardCategory.objects.all().order_by("-max-rate")
+    queryset = RewardCategory.objects.all().order_by("-max_rate")
     serializer_class = RewardSerializer
