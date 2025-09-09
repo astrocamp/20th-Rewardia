@@ -90,9 +90,21 @@ export default () => ({
   },
   
   // 優惠選擇變更
-  onRewardChange() {
+  async onRewardChange() {
     // 當使用下拉選單時，清空關鍵字搜尋欄位
     this.searchKeyword = '';
+    
+    // 清空店家選擇
+    this.selectedMerchant = '';
+    
+    // 如果選擇了優惠類別，動態載入對應的店家選項
+    if (this.selectedReward) {
+      await this.loadMerchantsByCategory();
+    } else {
+      // 如果沒有選擇優惠類別，恢復所有店家選項
+      this.restoreAllMerchants();
+    }
+    
     this.performSearch();
   },
 
@@ -159,29 +171,61 @@ export default () => ({
         });
       }
 
-      // 重新排列優惠順序（符合條件的排前面）
-      if (this.selectedReward) {
-        const selectedCategoryDisplay = this.rewardCategoryMap[this.selectedReward];
-        filteredCards = filteredCards.map(card => {
-          const matchingRewards = card.rewards.filter(reward =>
-            reward.category.includes(selectedCategoryDisplay)
-          );
-          const otherRewards = card.rewards.filter(reward =>
-            !reward.category.includes(selectedCategoryDisplay)
-          );
-          
-          // 對符合條件的回饋進行去重和排序
-          const deduplicatedMatchingRewards = this.deduplicateRewardsByCategory(matchingRewards);
-          
-          return { ...card, rewards: [...deduplicatedMatchingRewards, ...otherRewards] };
-        });
+        // 重新排列優惠順序（符合條件的排前面）
+        if (this.selectedReward) {
+          const selectedCategoryDisplay = this.rewardCategoryMap[this.selectedReward];
+          filteredCards = filteredCards.map(card => {
+            let matchingRewards, otherRewards;
+            
+            if (this.selectedMerchant) {
+              // 如果同時選擇了優惠類別和店家，優先顯示同時符合兩個條件的回饋
+              const bothMatchingRewards = card.rewards.filter(reward =>
+                reward.category.includes(selectedCategoryDisplay) && reward.scope === this.selectedMerchant
+              );
+              const categoryOnlyRewards = card.rewards.filter(reward =>
+                reward.category.includes(selectedCategoryDisplay) && reward.scope !== this.selectedMerchant
+              );
+              const otherRewards = card.rewards.filter(reward =>
+                !reward.category.includes(selectedCategoryDisplay)
+              );
+              
+              // 對符合條件的回饋進行去重和排序
+              const deduplicatedBothMatching = this.deduplicateRewardsByCategory(bothMatchingRewards);
+              const deduplicatedCategoryOnly = this.deduplicateRewardsByCategory(categoryOnlyRewards);
+              
+              return { ...card, rewards: [...deduplicatedBothMatching, ...deduplicatedCategoryOnly, ...otherRewards] };
+            } else {
+              // 只選擇優惠類別時，按原來的邏輯處理
+              matchingRewards = card.rewards.filter(reward =>
+                reward.category.includes(selectedCategoryDisplay)
+              );
+              otherRewards = card.rewards.filter(reward =>
+                !reward.category.includes(selectedCategoryDisplay)
+              );
+              
+              // 對符合條件的回饋進行去重和排序
+              const deduplicatedMatchingRewards = this.deduplicateRewardsByCategory(matchingRewards);
+              
+              return { ...card, rewards: [...deduplicatedMatchingRewards, ...otherRewards] };
+            }
+          });
         
         // 按優惠數值排序（最高到最低）
-        filteredCards.sort((a, b) => {
-          const aMaxRate = this.getMaxRewardRate(a, this.selectedReward);
-          const bMaxRate = this.getMaxRewardRate(b, this.selectedReward);
-          return bMaxRate - aMaxRate;
-        });
+        if (this.selectedMerchant) {
+          // 如果同時選擇了優惠類別和店家，以該店家的回饋率排序
+          filteredCards.sort((a, b) => {
+            const aMaxRate = this.getMaxRewardRateFromMerchantAndCategory(a, this.selectedMerchant, this.selectedReward);
+            const bMaxRate = this.getMaxRewardRateFromMerchantAndCategory(b, this.selectedMerchant, this.selectedReward);
+            return bMaxRate - aMaxRate;
+          });
+        } else {
+          // 只選擇優惠類別時，按優惠類別的回饋率排序
+          filteredCards.sort((a, b) => {
+            const aMaxRate = this.getMaxRewardRate(a, this.selectedReward);
+            const bMaxRate = this.getMaxRewardRate(b, this.selectedReward);
+            return bMaxRate - aMaxRate;
+          });
+        }
       } else if (this.selectedMerchant) {
         // 店家搜尋時，對每張卡片的回饋進行去重和排序
         filteredCards = filteredCards.map(card => {
@@ -291,6 +335,24 @@ export default () => ({
     const rates = matchingRewards.map(reward => this.getRewardRate(reward));
     return Math.max(...rates);
   },
+
+  // 獲取卡片符合特定店家且特定優惠類別的回饋中的最高數值
+  getMaxRewardRateFromMerchantAndCategory(card, merchant, selectedRewardCode) {
+    if (!card.rewards || card.rewards.length === 0) return 0;
+    if (!selectedRewardCode) return 0;
+    
+    const selectedCategoryDisplay = this.rewardCategoryMap[selectedRewardCode];
+    if (!selectedCategoryDisplay) return 0;
+    
+    const matchingRewards = card.rewards.filter(reward => 
+      reward.scope === merchant && reward.category.includes(selectedCategoryDisplay)
+    );
+    
+    if (matchingRewards.length === 0) return 0;
+    
+    const rates = matchingRewards.map(reward => this.getRewardRate(reward));
+    return Math.max(...rates);
+  },
   
   // 根據類別+範圍去重回饋項目，保留數值最高的
   deduplicateRewardsByCategory(rewards) {
@@ -357,5 +419,39 @@ export default () => ({
       return parseFloat(singleMatch[1]);
     }
     return 0;
+  },
+
+  // 根據優惠類別載入對應的店家選項
+  async loadMerchantsByCategory() {
+    try {
+      const response = await fetch(`/api/merchants-by-category/?category_code=${this.selectedReward}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      
+      // 更新店家選項
+      this.merchants = data.merchants || [];
+    } catch (error) {
+      console.error("Error loading merchants by category:", error);
+      // 發生錯誤時恢復所有店家選項
+      this.restoreAllMerchants();
+    }
+  },
+
+  // 恢復所有店家選項
+  async restoreAllMerchants() {
+    try {
+      const response = await fetch('/api/main-data/');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      
+      // 恢復所有店家選項
+      this.merchants = data.merchants || [];
+    } catch (error) {
+      console.error("Error restoring all merchants:", error);
+    }
   }
 });

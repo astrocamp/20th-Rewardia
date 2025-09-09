@@ -9,18 +9,6 @@ function sanitizeText(text) {
     .trim(); // 移除首尾空白
 }
 
-// 不再需要 marked，直接使用純文字
-
-// 文字清理函數 - 移除 HTML 標籤但保留換行
-function sanitizeText(text) {
-  return text
-    .replace(/<br\s*\/?>/gi, '\n') // 將 <br> 轉換為換行
-    .replace(/<\/p>/gi, '\n\n') // 將 </p> 轉換為雙換行
-    .replace(/<[^>]*>/g, '') // 移除所有其他 HTML 標籤
-    .replace(/\n\s*\n\s*\n/g, '\n\n') // 清理多餘的換行
-    .trim(); // 移除首尾空白
-}
-
 // 常數定義
 const CONSTANTS = {
   STORAGE_KEY: 'chatbot_memory',
