@@ -1,6 +1,8 @@
-const get_rewards = "http://localhost:8000/api/rewards/";
+async function get_rewards(merchant) {
+  const url = `http://localhost:8000/api/rewards/${merchant}`;
 
-const response = await fetch(get_rewards);
-const data = await response.json();
+  const response = await fetch(get_rewards);
+  const data = await response.json();
 
-console.log(data);
+  return data;
+}
