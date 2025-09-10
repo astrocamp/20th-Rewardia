@@ -1,7 +1,7 @@
 .rewardia_popup {
   color: white;
-  min-width: 300px;
-  max-width: 300px;
+  min-width: 320px;
+  max-width: 320px;
   max-height: 60px;
   background: linear-gradient(135deg, #2b52a6 0%, #8bd0ff 100%);
   position: fixed;
@@ -25,6 +25,12 @@
 .rewardia_popup:hover {
   background: linear-gradient(135deg, #24458d 0%, #74aed6 100%);
   cursor: pointer;
+}
+
+.popup_left {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 .popup_logo {
