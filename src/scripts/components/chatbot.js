@@ -16,13 +16,31 @@ const CONSTANTS = {
   MAX_HISTORY_LENGTH: 50,
   SAVE_THROTTLE_DELAY: 300,
   DUPLICATE_MESSAGE_THRESHOLD: 3000, // 3秒防重複
-  TEXTAREA_MAX_HEIGHT: 120
+  TEXTAREA_MAX_HEIGHT: 120,
+  // 視窗預設設定
+  DEFAULT_WINDOW: {
+    width: 280, // w-70 = 280px
+    height: 350,
+    right: 8, // right-2 = 8px
+    bottom: 32 // bottom-8 = 32px
+  }
 };
+
+// 輔助函數：創建預設視窗狀態
+function createDefaultWindowState() {
+  return {
+    width: CONSTANTS.DEFAULT_WINDOW.width,
+    height: CONSTANTS.DEFAULT_WINDOW.height,
+    right: CONSTANTS.DEFAULT_WINDOW.right,
+    bottom: CONSTANTS.DEFAULT_WINDOW.bottom
+  };
+}
 
 // 假存檔（使用 sessionStorage 作為備份）
 let chatbotMemory = {
   messages: [],
-  isOpen: false
+  isOpen: false,
+  windowState: createDefaultWindowState()
 };
 
 // 節流控制
@@ -44,20 +62,24 @@ function loadFromSession() {
           timestamp: new Date(msg.timestamp)
         }));
         chatbotMemory.isOpen = data.isOpen;
+        // 載入視窗狀態，如果沒有則使用預設值
+        chatbotMemory.windowState = data.windowState || createDefaultWindowState();
       } else {
         console.warn('聊天記錄資料格式不正確，重置為預設值');
         chatbotMemory.messages = [];
         chatbotMemory.isOpen = false;
+        chatbotMemory.windowState = createDefaultWindowState();
       }
     }
   } catch (e) {
     console.warn('無法載入聊天記錄:', e);
     chatbotMemory.messages = [];
     chatbotMemory.isOpen = false;
+    chatbotMemory.windowState = createDefaultWindowState();
   }
 }
 
-// 儲存到 sessionStorage（節流版本）
+// 儲存到 sessionStorage
 function saveToSession() {
   // 清除之前的節流計時器
   if (saveThrottleTimer) {
@@ -93,10 +115,16 @@ export default function chatbot() {
     currentMessage: '',
     messages: chatbotMemory.messages,
     errorMessage: '',
+    // 視窗狀態
+    windowState: chatbotMemory.windowState,
+    isDragging: false,
+    isResizing: false,
+    dragOffset: { x: 0, y: 0 },
+    // IME 輸入法狀態
+    isComposing: false,
 
     // 初始化
     init() {
-      // 不需要額外的監聽器，讓 CSS 完全控制小螢幕的顯示
     },
 
     // 儲存到記憶體和 sessionStorage
@@ -105,6 +133,7 @@ export default function chatbot() {
       const limitedMessages = this.messages.slice(-CONSTANTS.MAX_HISTORY_LENGTH);
       chatbotMemory.messages = [...limitedMessages];
       chatbotMemory.isOpen = this.isOpen;
+      chatbotMemory.windowState = { ...this.windowState };
       saveToSession(); // 同時儲存到 sessionStorage
     },
 
@@ -129,6 +158,8 @@ export default function chatbot() {
     closeChat() {
       this.isOpen = false;
       this.errorMessage = '';
+      // 關閉視窗時重置為預設大小和位置
+      this.windowState = createDefaultWindowState();
       this.saveToMemory();
     },
 
@@ -257,12 +288,26 @@ export default function chatbot() {
 
     // 處理鍵盤事件
     handleKeyDown(event) {
-      if (event.key === 'Enter' && !event.shiftKey) {
-        // Enter 鍵發送訊息
+      if (event.key === 'Enter' && !event.shiftKey && !this.isComposing) {
+        // Enter 鍵發送訊息（只有在非輸入法組合狀態下）
         event.preventDefault();
         this.sendMessage();
       }
       // Shift+Enter 允許換行（預設行為）
+    },
+
+    // IME 輸入法事件處理
+    handleCompositionStart(event) {
+      this.isComposing = true;
+    },
+
+    handleCompositionEnd(event) {
+      this.isComposing = false;
+      // 在某些瀏覽器中，compositionend 事件可能在 keydown 之後觸發
+      // 使用 setTimeout 確保狀態正確更新
+      setTimeout(() => {
+        this.isComposing = false;
+      }, 0);
     },
 
     // 聚焦到輸入框
@@ -272,6 +317,92 @@ export default function chatbot() {
           this.$refs.messageInput.focus();
         }
       });
-    }
+    },
+
+    // === 拖拽功能（Alpine.js 方式）===
+    startDrag(event) {
+      this.isDragging = true;
+      // 記錄起始位置偏移
+      this.dragOffset.x = event.clientX - (window.innerWidth - this.windowState.right - this.windowState.width);
+      this.dragOffset.y = event.clientY - (window.innerHeight - this.windowState.bottom - this.windowState.height);
+      event.preventDefault();
+    },
+
+    handleDrag(event) {
+      if (!this.isDragging) return;
+      
+      // 計算新位置（從右下角定位）
+      const newLeft = event.clientX - this.dragOffset.x;
+      const newTop = event.clientY - this.dragOffset.y;
+      const newRight = window.innerWidth - newLeft - this.windowState.width;
+      const newBottom = window.innerHeight - newTop - this.windowState.height;
+      
+      // 限制在視窗範圍內
+      this.windowState.right = Math.max(0, Math.min(window.innerWidth - this.windowState.width, newRight));
+      this.windowState.bottom = Math.max(0, Math.min(window.innerHeight - this.windowState.height, newBottom));
+      
+      this.saveToMemory();
+    },
+
+    stopDrag() {
+      this.isDragging = false;
+    },
+
+    // === 調整大小功能（Alpine.js 方式）===
+    startResize(event) {
+      this.isResizing = true;
+      event.preventDefault();
+      event.stopPropagation(); // 防止觸發拖拽
+    },
+
+    handleResize(event) {
+      if (!this.isResizing) return;
+      
+      // 計算視窗左上角位置（基於當前的 right/bottom 值）
+      const windowLeft = window.innerWidth - this.windowState.right - this.windowState.width;
+      const windowTop = window.innerHeight - this.windowState.bottom - this.windowState.height;
+      
+      // 計算新大小（從左上角到滑鼠位置）
+      const newWidth = Math.max(250, event.clientX - windowLeft);
+      const newHeight = Math.max(300, event.clientY - windowTop);
+      
+      // 設定最大尺寸限制（預設大小的兩倍）
+      const maxAllowedWidth = CONSTANTS.DEFAULT_WINDOW.width * 2;  // 280 * 2 = 560px
+      const maxAllowedHeight = CONSTANTS.DEFAULT_WINDOW.height * 2; // 350 * 2 = 700px
+      
+      // 計算可用空間（考慮螢幕邊界和尺寸限制）
+      const maxWidth = Math.min(
+        window.innerWidth - windowLeft,  // 螢幕右邊界限制
+        maxAllowedWidth                  // 尺寸限制
+      );
+      const maxHeight = Math.min(
+        window.innerHeight - windowTop,  // 螢幕下邊界限制
+        maxAllowedHeight                 // 尺寸限制
+      );
+      
+      // 即時更新視窗大小（確保不超出限制）
+      this.windowState.width = Math.min(maxWidth, newWidth);
+      this.windowState.height = Math.min(maxHeight, newHeight);
+    },
+
+    stopResize() {
+      this.isResizing = false;
+      // 調整大小結束時保存
+      this.saveToMemory();
+    },
+
+      // 取得視窗樣式（計算屬性方式）
+      get windowStyle() {
+        // 將 right/bottom 轉換為 left/top 以便直觀調整大小
+        const left = window.innerWidth - this.windowState.right - this.windowState.width;
+        const top = window.innerHeight - this.windowState.bottom - this.windowState.height;
+        
+        return {
+          width: `${this.windowState.width}px`,
+          height: `${this.windowState.height}px`,
+          left: `${Math.max(0, left)}px`,
+          top: `${Math.max(0, top)}px`
+        };
+      }
   }
 }
