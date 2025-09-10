@@ -37,6 +37,7 @@ async function show_rewardia_popup() {
     chrome.runtime.sendMessage({
       action: "open_extension",
     });
+    popup.remove();
   });
 
   setTimeout(() => {
