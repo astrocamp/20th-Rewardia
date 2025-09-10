@@ -14,7 +14,6 @@ if (
 
 async function show_rewardia_popup() {
   const popup = document.createElement("div");
-
   popup.className = "rewardia_popup";
   popup.innerHTML = `<div class="popup_left">
   <div class="popup_logo"><img src="${chrome.runtime.getURL(

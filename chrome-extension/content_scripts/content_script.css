@@ -43,6 +43,11 @@
   width: 100%;
 }
 
+.rewardia_popup:hover {
+  background: linear-gradient(135deg, #24458d 0%, #74aed6 100%);
+  cursor: pointer;
+}
+
 .popup_text {
   font-size: 14px;
   margin-left: 10px;
