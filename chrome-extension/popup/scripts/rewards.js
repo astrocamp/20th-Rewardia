@@ -15,6 +15,8 @@ async function get_current_url() {
   return tab.url;
 }
 
+let card_count;
+
 async function return_cards(merchant) {
   const cards = await get_rewards(merchant);
 
@@ -25,7 +27,7 @@ async function return_cards(merchant) {
           <span>最高${card.max_rate}%回饋</span>
         </div>
       </div>`;
-    console.log(card_reward);
+
     rewards_content.insertAdjacentHTML("beforeend", card_reward);
   });
 }
@@ -34,4 +36,8 @@ const cur_url = await get_current_url();
 
 if (cur_url.includes("momo")) {
   await return_cards("momo購物");
+}
+
+if (cur_url.includes("pchome")) {
+  await return_cards("pchome");
 }
