@@ -14,7 +14,7 @@ if (
 function show_rewardia_popup() {
   // Simple popup for testing
   const popup = document.createElement("div");
-  popup.className = "popup";
+  popup.className = "rewardia_popup";
   popup.innerHTML = `<div class="popup_header">
   <div class="popup_logo">REWARDIA</div>
   <div class="popup_close_btn">X</div>
