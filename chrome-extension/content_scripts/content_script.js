@@ -1,11 +1,3 @@
-if (window.location.hostname.includes("24h.pchome.com.tw")) {
-  const close_popup = sessionStorage.getItem("close_popup");
-
-  if (!close_popup) {
-    show_rewardia_popup();
-  }
-}
-
 const current_host = window.location.hostname;
 
 if (
