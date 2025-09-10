@@ -33,14 +33,27 @@
 
 /* 聊天視窗容器 */
 .chatbot-window {
-  @apply fixed bottom-8 right-2 w-70 h-[350px] rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden;
+  @apply fixed rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden;
   @apply bg-[linear-gradient(180deg,#B8F5E6_0%,#FFFFFF_100%)];
   @apply border-2 border-[#34D399];
+  @apply min-w-[250px] min-h-[300px] select-none transition-none;
+  /* 預設大小和位置由 JavaScript 動態設定 */
+}
+
+/* 拖拽狀態樣式 */
+.chatbot-window.dragging {
+  @apply cursor-move;
+}
+
+/* 調整大小狀態樣式 */
+.chatbot-window.resizing {
+  @apply cursor-se-resize;
 }
 
 /* 聊天視窗標題列 */
 .chatbot-header {
   @apply p-4 flex-shrink-0 flex items-center justify-between border-b border-emerald-300/30 bg-white/10;
+  @apply cursor-move; /* 標題列可拖拽 */
 }
 
 .chatbot-title {
@@ -87,7 +100,7 @@
 
 /* 訊息氣泡樣式 */
 .message-bubble {
-  @apply max-w-[85%] p-3 rounded-lg break-words mb-0 my-2 mx-4 text-xs;
+  @apply max-w-[85%] p-3 rounded-lg break-words mb-0 my-2 mx-4 text-sm;
 }
 
 .message-user {
@@ -133,6 +146,17 @@
 .chatbot-input:focus {
   @apply border-blue-500;
   @apply shadow-[0_0_0_3px_rgba(59,130,246,0.1)];
+}
+
+/* 調整大小控制 */
+.chatbot-resize-handle {
+  @apply absolute bottom-0 right-0 w-6 h-6 cursor-se-resize;
+  @apply flex items-center justify-center text-gray-400 hover:text-gray-600;
+  @apply transition-colors duration-200;
+}
+
+.chatbot-resize-handle:hover {
+  @apply bg-white/50 rounded-tl-lg;
 }
 
 /* 響應式設計 */
