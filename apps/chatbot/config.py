@@ -25,13 +25,89 @@ BANK_MAPPING = {
         'keywords': ['星展'],
         'display_name': '星展'
     },
-    '永豐': {
-        'keywords': ['永豐'],
-        'display_name': '永豐'
+    '永豐銀行': {
+        'keywords': ['永豐銀行', '永豐'],
+        'display_name': '永豐銀行'
     },
-    '聯邦': {
-        'keywords': ['聯邦'],
-        'display_name': '聯邦'
+    '聯邦銀行': {
+        'keywords': ['聯邦銀行', '聯邦'],
+        'display_name': '聯邦銀行'
+    },
+    '滙豐銀行': {
+        'keywords': ['滙豐銀行', '滙豐'],
+        'display_name': '滙豐銀行'
+    },
+    '第一銀行': {
+        'keywords': ['第一銀行', '第一'],
+        'display_name': '第一銀行'
+    },
+    '合作金庫': {
+        'keywords': ['合作金庫', '合庫'],
+        'display_name': '合作金庫'
+    },
+    '兆豐銀行': {
+        'keywords': ['兆豐銀行', '兆豐'],
+        'display_name': '兆豐銀行'
+    },
+    '遠東銀行': {
+        'keywords': ['遠東銀行', '遠東'],
+        'display_name': '遠東銀行'
+    },
+    '凱基銀行': {
+        'keywords': ['凱基銀行', '凱基'],
+        'display_name': '凱基銀行'
+    },
+    '樂天銀行': {
+        'keywords': ['樂天銀行', '樂天'],
+        'display_name': '樂天銀行'
+    },
+    '彰化銀行': {
+        'keywords': ['彰化銀行', '彰化'],
+        'display_name': '彰化銀行'
+    },
+    '華南銀行': {
+        'keywords': ['華南銀行', '華南'],
+        'display_name': '華南銀行'
+    },
+    '新光銀行': {
+        'keywords': ['新光銀行', '新光'],
+        'display_name': '新光銀行'
+    },
+    '上海商銀': {
+        'keywords': ['上海商銀', '上海'],
+        'display_name': '上海商銀'
+    },
+    '美國運通': {
+        'keywords': ['美國運通', '美國'],
+        'display_name': '美國運通'
+    },
+    '渣打銀行': {
+        'keywords': ['渣打銀行', '渣打'],
+        'display_name': '渣打銀行'
+    },
+    '陽信銀行': {
+        'keywords': ['陽信銀行', '陽信'],
+        'display_name': '陽信銀行'
+    },
+    'Line Bank': {
+        'keywords': ['Line Bank', 'LineBank'],
+        'display_name': 'Line Bank'
+    },
+    '將來銀行': {
+        'keywords': ['將來銀行', '將來'],
+        'display_name': '將來銀行'
+    },
+    '元大銀行': {
+        'keywords': ['元大銀行', '元大'],
+        'display_name': '元大銀行'
+    },
+    '台中銀行': {
+        'keywords': ['台中銀行', '台中'],
+        'display_name': '台中銀行'
+    },
+    '王道銀行': {
+        'keywords': ['王道銀行', '王道'],
+        'display_name': '王道銀行'
     }
 }
 

@@ -11,13 +11,15 @@ import json
 def download(request):
     return render(request, "pages/download.html")
 
-
 def main(request):
     return render(request, "pages/main.html")
 
+def faq(request):
+    context = {"faq_categories": FAQ_DATA["categories"]}
+    return render(request, "pages/faq.html", context)
+
 
 def get_main_data(request):
-    # 使用 prefetch_related 優化查詢，避免 N+1 問題
     cards = CreditCard.objects.filter(is_active=True).prefetch_related(
         'reward_categories'  # 預取回饋分類
     ).order_by('bank', 'name')
@@ -92,23 +94,38 @@ def get_main_data(request):
     }, safe=False)
 
 
-
-
-
-def calculator(request):
-    banks = (
-        CreditCard.objects.filter(is_active=True)
-        .values_list("bank", flat=True)
-        .distinct()
-        .order_by("bank")
-    )
-
-    context = {
-        "banks": banks,
-    }
-
-    return render(request, "pages/calculator.html", context)
-
+# API - 根據優惠類別獲取對應的店家列表
+def get_merchants_by_category(request):
+    """根據優惠類別獲取對應的店家列表"""
+    category_code = request.GET.get("category_code")
+    
+    if category_code:
+        # 直接查詢所有回饋類別來建立映射
+        reward_categories = RewardCategory.objects.filter(is_active=True).values_list('category', flat=True).distinct()
+        
+        # 建立類別代碼到類別名稱的映射
+        reward_category_map = {}
+        for category in reward_categories:
+            category_code_mapped = category.upper().replace(' ', '_').replace('/', '_')
+            reward_category_map[category_code_mapped] = category
+        
+        # 獲取實際的類別名稱
+        category_name = reward_category_map.get(category_code)
+        
+        if category_name:
+            # 查詢該類別下的所有店家
+            merchants = RewardCategory.objects.filter(
+                category=category_name,
+                is_active=True
+            ).values_list('scope', flat=True).distinct().order_by('scope')
+            
+            merchants_list = [{'code': merchant.lower().replace(' ', '_'), 'name': merchant} for merchant in merchants]
+            
+            return JsonResponse({
+                'merchants': merchants_list
+            })
+    
+    return JsonResponse({'merchants': []})
 
 # 共用的選項生成函數
 def _generate_options_html(default_text, items, value_field, text_field):
@@ -123,6 +140,20 @@ def _generate_options_html(default_text, items, value_field, text_field):
             text = escape(getattr(item, text_field))
         options_html += f'<option value="{value}">{text}</option>'
     return options_html
+
+
+
+def calculator(request):
+    banks = (
+        CreditCard.objects.filter(is_active=True)
+        .values_list("bank", flat=True)
+        .distinct()
+        .order_by("bank")
+    )
+    context = {
+        "banks": banks,
+    }
+    return render(request, "pages/calculator.html", context)
 
 # HTMX 用的 API - 根據銀行取得卡片
 def get_cards_by_bank(request):
@@ -187,43 +218,6 @@ def get_scopes_by_category(request):
     return HttpResponse('<option value="" selected disabled>請先選擇消費類別</option>')
 
 
-# API - 根據優惠類別獲取對應的店家列表
-def get_merchants_by_category(request):
-    """根據優惠類別獲取對應的店家列表"""
-    category_code = request.GET.get("category_code")
-    
-    if category_code:
-        # 直接查詢所有回饋類別來建立映射
-        reward_categories = RewardCategory.objects.filter(is_active=True).values_list('category', flat=True).distinct()
-        
-        # 建立類別代碼到類別名稱的映射
-        reward_category_map = {}
-        for category in reward_categories:
-            category_code_mapped = category.upper().replace(' ', '_').replace('/', '_')
-            reward_category_map[category_code_mapped] = category
-        
-        # 獲取實際的類別名稱
-        category_name = reward_category_map.get(category_code)
-        
-        if category_name:
-            # 查詢該類別下的所有店家
-            merchants = RewardCategory.objects.filter(
-                category=category_name,
-                is_active=True
-            ).values_list('scope', flat=True).distinct().order_by('scope')
-            
-            merchants_list = [{'code': merchant.lower().replace(' ', '_'), 'name': merchant} for merchant in merchants]
-            
-            return JsonResponse({
-                'merchants': merchants_list
-            })
-    
-    return JsonResponse({'merchants': []})
-
-
-def faq(request):
-    context = {"faq_categories": FAQ_DATA["categories"]}
-    return render(request, "pages/faq.html", context)
 
 
 def calculate_reward(request):

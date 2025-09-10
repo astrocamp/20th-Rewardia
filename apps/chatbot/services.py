@@ -214,20 +214,15 @@ class ChatbotDataService:
             # 過濾掉 "無" 和空值
             banks = [bank for bank in banks if bank and bank != "無"]
             
-            # 使用統一的銀行映射配置進行標準化
-            normalized_banks = []
-            for bank in banks:
-                # 找到對應的標準銀行名稱
-                normalized_bank = bank
-                for standard_name, config in BANK_MAPPING.items():
-                    if bank in config['keywords']:
-                        normalized_bank = standard_name
-                        break
-                
-                if normalized_bank not in normalized_banks:
-                    normalized_banks.append(normalized_bank)
+            # 除錯：記錄原始銀行資料
+            logger.info(f"原始銀行資料: {list(banks)}")
             
-            return sorted(normalized_banks)
+            # 簡化版本：直接回傳所有銀行，不進行映射
+            # 這樣可以確保所有資料庫中的銀行都會被顯示
+            result = sorted(list(set(banks)))  # 去重並排序
+            
+            logger.info(f"最終銀行列表: {result}")
+            return result
         except Exception as e:
             logger.error(f"Error in get_supported_banks: {str(e)}", exc_info=True)
             return []
@@ -692,6 +687,4 @@ class ChatbotResponseBuilder:
                             rate_display = ChatbotDataService._format_reward_rate_from_dict(reward)
                             response += f"- {reward['bank']} {reward['card_name']}: {rate_display} {reward['reward_type']}\n"
 
-        # 其他增強邏輯可以根據需要繼續添加... 
-        
         return response
