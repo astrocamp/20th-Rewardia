@@ -19,13 +19,13 @@
              {% for card in cards %}
              {
                id: {{ card.id }},
-               name: '{{ card.name }}',
-               bankName: '{{ card.bank }}'
+               name: '{{ card.name|escapejs }}',
+               bankName: '{{ card.bank|escapejs }}'
              }{% if not forloop.last %},{% endif %}
              {% endfor %}
            ],
            {% if is_edit_mode and user_card %}
-           initialBankName: '{{ user_card.card.bank}}',
+           initialBankName: '{{ user_card.card.bank|escapejs }}',
            initialCardId: {{ user_card.card.id }}
            {% else %}
            initialBankName: null,
