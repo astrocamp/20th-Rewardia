@@ -436,7 +436,7 @@ class ChatbotResponseBuilder:
             card_name = None
             bank_name = None
             
-            # 從用戶訊息中提取卡片名稱
+            # 從用戶訊息中提取銀行名稱
             for bank, config in BANK_MAPPING.items():
                 for keyword in config['keywords']:
                     if keyword in user_message:
@@ -445,25 +445,45 @@ class ChatbotResponseBuilder:
                 if bank_name:
                     break
             
-            # 提取卡片名稱（如 CUBE卡、momo卡 等）
-            card_keywords = ["CUBE卡", "momo卡", "LINE Pay卡", "U Bear卡", "J卡", "KOKO卡"]
-            for keyword in card_keywords:
-                if keyword in user_message:
-                    card_name = keyword
+            # 動態提取卡片名稱：從資料庫中所有卡片名稱進行匹配
+            all_cards = ChatbotDataService.get_all_active_cards()
+            for card in all_cards:
+                card_full_name = card['name']
+                # 檢查完整卡片名稱是否在用戶訊息中
+                if card_full_name in user_message:
+                    card_name = card_full_name
+                    break
+                # 檢查卡片名稱的關鍵部分（去除銀行名稱前綴）
+                card_key_part = card_full_name.replace(card['bank'], '').strip()
+                if card_key_part and card_key_part in user_message:
+                    card_name = card_full_name
                     break
             
-            if card_name and bank_name:
-                context += f"\n### 查詢 {bank_name} {card_name} 的優惠：\n"
+            # 如果沒有找到完整匹配，嘗試部分匹配
+            if not card_name and bank_name:
+                for card in all_cards:
+                    if bank_name in card['bank']:
+                        # 檢查卡片名稱是否包含用戶訊息中的關鍵字
+                        card_words = card['name'].split()
+                        for word in card_words:
+                            if len(word) > 2 and word in user_message:
+                                card_name = card['name']
+                                break
+                        if card_name:
+                            break
+            
+            if card_name:
+                context += f"\n### 查詢 {card_name} 的優惠：\n"
                 # 查詢該卡片的回饋資料
                 rewards = ChatbotDataService._get_reward_queryset_with_sorting().filter(
-                    Q(card__bank__icontains=bank_name) & Q(card__name__icontains=card_name)
+                    card__name=card_name
                 )
                 if rewards.exists():
                     for reward in rewards:
                         rate_display = ChatbotDataService._format_reward_rate(reward.min_rate, reward.max_rate)
-                        context += f"- {reward.category}: {rate_display} {reward.reward_type}\n"
+                        context += f"- {reward.category}/{reward.scope}: {rate_display} {reward.reward_type}\n"
                 else:
-                    context += f"- 資料庫中沒有 {bank_name} {card_name} 的回饋資料\n"
+                    context += f"- 資料庫中沒有 {card_name} 的回饋資料\n"
             else:
                 context += f"- 無法識別具體的卡片名稱，請提供更詳細的資訊\n"
 
@@ -551,6 +571,59 @@ class ChatbotResponseBuilder:
         # 未登入防護：偵測個人查詢關鍵字但沒有 user_id 時，直接回覆尚未登入
         if (not user_id) and any(keyword in user_message for keyword in PERSONAL_QUERY_KEYWORDS):
             return "你尚未登入"
+        
+        # 處理特定卡片優惠問題（優先處理）
+        if intent.get("is_card_benefit_question", False):
+            # 動態提取卡片名稱
+            all_cards = ChatbotDataService.get_all_active_cards()
+            card_name = None
+            
+            # 從資料庫中所有卡片名稱進行匹配
+            for card in all_cards:
+                card_full_name = card['name']
+                # 檢查完整卡片名稱是否在用戶訊息中
+                if card_full_name in user_message:
+                    card_name = card_full_name
+                    break
+                # 檢查卡片名稱的關鍵部分（去除銀行名稱前綴）
+                card_key_part = card_full_name.replace(card['bank'], '').strip()
+                if card_key_part and card_key_part in user_message:
+                    card_name = card_full_name
+                    break
+            
+            # 如果沒有找到完整匹配，嘗試部分匹配
+            if not card_name:
+                for bank, config in BANK_MAPPING.items():
+                    for keyword in config['keywords']:
+                        if keyword in user_message:
+                            # 在該銀行的卡片中尋找匹配
+                            for card in all_cards:
+                                if bank in card['bank']:
+                                    card_words = card['name'].split()
+                                    for word in card_words:
+                                        if len(word) > 2 and word in user_message:
+                                            card_name = card['name']
+                                            break
+                                    if card_name:
+                                        break
+                            if card_name:
+                                break
+                    if card_name:
+                        break
+            
+            if card_name:
+                # 查詢該卡片的回饋資料
+                rewards = ChatbotDataService.get_card_all_rewards(card_name)
+                if rewards:
+                    response = f"{card_name}的回饋：\n"
+                    for reward in rewards:
+                        rate_display = ChatbotDataService._format_reward_rate_from_dict(reward)
+                        response += f"- {reward['category']}/{reward['scope']}: {rate_display} {reward['reward_type']}\n"
+                    return response
+                else:
+                    return f"{card_name}目前沒有回饋資料。"
+            else:
+                return "無法識別您詢問的卡片名稱，請提供更詳細的資訊。"
         
         # 已登入使用者的個人化查詢優先處理
         if user_id:
