@@ -15,16 +15,11 @@ function show_rewardia_popup() {
   // Simple popup for testing
   const popup = document.createElement("div");
   popup.className = "rewardia_popup";
-  popup.innerHTML = `<div class="popup_header">
-  <div class="popup_logo">REWARDIA</div>
-  <div class="popup_close_btn">X</div>
-  </div>
-  <div class="popup_center_img">
-    <img src="${chrome.runtime.getURL("images/treasure.png")}" alt="" />
-  </div>
-  <div class="popup_text">
-    <button class="popup_btn">偵測到信用卡，由此詳細</button>
-  </div>`;
+  popup.innerHTML = `<div class="popup_logo"><img src="${chrome.runtime.getURL(
+    "images/logo.png"
+  )}"></div>
+  <div class="popup_text">偵測到信用卡，點此通知查看</div>
+  <div class="popup_close_btn">X</div>`;
 
   document.body.appendChild(popup);
   const close_btn = popup.querySelector(".popup_close_btn");
