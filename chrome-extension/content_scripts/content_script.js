@@ -43,7 +43,7 @@ async function show_rewardia_popup() {
 
   setTimeout(() => {
     popup.remove();
-  }, 8000);
+  }, 3000);
 }
 
 if (current_url == "http://localhost:8000/users/member/") {
