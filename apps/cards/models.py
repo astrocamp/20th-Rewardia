@@ -42,7 +42,7 @@ class CreditCard(models.Model):
     bank = models.CharField("銀行名稱", max_length=15)
     image = models.ImageField(
         "信用卡圖片", 
-        upload_to='credit_cards/',
+        upload_to='brad/credit_cards/',
         blank=True,
         null=True,
         validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])]
@@ -67,13 +67,29 @@ class CreditCard(models.Model):
         # 先執行父類的 save 方法
         super().save(*args, **kwargs)
         
-        # 如果有上傳圖片，進行處理
+        # 手動上傳圖片到 S3
+        if self.image:
+            try:
+                from apps.cards.storage import MediaStorage
+                storage = MediaStorage()
+                
+                # 讀取圖片內容
+                self.image.seek(0)
+                image_content = self.image.read()
+                
+                # 手動上傳到 S3
+                from django.core.files.base import ContentFile
+                content = ContentFile(image_content)
+                storage.save(self.image.name, content)
+                
+            except Exception as e:
+                print(f"圖片上傳到 S3 失敗: {e}")
+        
+        # 圖片處理：調整大小、格式轉換、壓縮
         if self.image:
             self.resize_image()
 
     def format_bank_name(self, bank_name):
-        # if re.search("Bank", bank_name):
-        #     return "Line Bank"
         if re.search("一銀", bank_name):
             return "第一"
         if re.search("美國", bank_name):
@@ -83,22 +99,29 @@ class CreditCard(models.Model):
         return bank_name
 
     def resize_image(self):
-        """自訂圖片處理：調整大小、格式轉換、壓縮"""
+        """圖片處理：調整大小、格式轉換、壓縮"""
         if self.image:
             try:
-                # 開啟圖片
-                img = Image.open(self.image.path)
+                from django.conf import settings
+                if getattr(settings, 'USE_S3', False):
+                    # 使用 S3 時，從 BytesIO 讀取
+                    from io import BytesIO
+                    self.image.seek(0)
+                    image_data = self.image.read()
+                    img = Image.open(BytesIO(image_data))
+                else:
+                    # 本地儲存時，使用檔案路徑
+                    img = Image.open(self.image.path)
                 
-                # 設定目標尺寸（可自訂）
+                # 設定目標尺寸
                 target_width = 300
                 target_height = 180
                 
                 # 保持比例調整大小
                 img.thumbnail((target_width, target_height), Image.Resampling.LANCZOS)
                 
-                # 轉換為 RGB 模式（確保相容性）
+                # 轉換為 RGB 模式
                 if img.mode in ('RGBA', 'LA', 'P'):
-                    # 創建白色背景
                     background = Image.new('RGB', img.size, (255, 255, 255))
                     if img.mode == 'P':
                         img = img.convert('RGBA')
@@ -107,13 +130,29 @@ class CreditCard(models.Model):
                 elif img.mode != 'RGB':
                     img = img.convert('RGB')
                 
-                # 儲存處理後的圖片（JPEG 格式，品質 85%）
-                img.save(
-                    self.image.path, 
-                    'JPEG', 
-                    quality=85,  # 壓縮品質 (1-100)
-                    optimize=True  # 優化檔案大小
-                )
+                # 儲存處理後的圖片
+                if getattr(settings, 'USE_S3', False):
+                    # S3 儲存
+                    from io import BytesIO
+                    from django.core.files.base import ContentFile
+                    output = BytesIO()
+                    img.save(output, 'JPEG', quality=85, optimize=True)
+                    output.seek(0)
+                    content = ContentFile(output.getvalue())
+                    self.image.save(
+                        self.image.name,
+                        content,
+                        save=True
+                    )
+                else:
+                    # 本地儲存
+                    img.save(
+                        self.image.path, 
+                        'JPEG', 
+                        quality=85,
+                        optimize=True
+                    )
                 
+                    
             except Exception as e:
                 print(f"圖片處理錯誤: {e}")
