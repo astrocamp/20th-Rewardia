@@ -1,5 +1,8 @@
 from django.db import models
+from django.core.validators import FileExtensionValidator
+from PIL import Image
 import re
+import os
 
 
 class CreditCard(models.Model):
@@ -37,6 +40,13 @@ class CreditCard(models.Model):
 
     name = models.CharField("信用卡名稱", max_length=50)
     bank = models.CharField("銀行名稱", max_length=15)
+    image = models.ImageField(
+        "信用卡圖片", 
+        upload_to='credit_cards/',
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])]
+    )
     is_active = models.BooleanField("Is Active", default=True)
     created_at = models.DateTimeField("Created At", auto_now_add=True)
     updated_at = models.DateTimeField("Updated At", auto_now=True)
@@ -54,7 +64,12 @@ class CreditCard(models.Model):
 
     def save(self, *args, **kwargs):
         self.bank = self.format_bank_name(self.bank)
+        # 先執行父類的 save 方法
         super().save(*args, **kwargs)
+        
+        # 如果有上傳圖片，進行處理
+        if self.image:
+            self.resize_image()
 
     def format_bank_name(self, bank_name):
         # if re.search("Bank", bank_name):
@@ -66,3 +81,39 @@ class CreditCard(models.Model):
         if bank_name not in CreditCard.Bank.values:
             return "無"
         return bank_name
+
+    def resize_image(self):
+        """自訂圖片處理：調整大小、格式轉換、壓縮"""
+        if self.image:
+            try:
+                # 開啟圖片
+                img = Image.open(self.image.path)
+                
+                # 設定目標尺寸（可自訂）
+                target_width = 300
+                target_height = 180
+                
+                # 保持比例調整大小
+                img.thumbnail((target_width, target_height), Image.Resampling.LANCZOS)
+                
+                # 轉換為 RGB 模式（確保相容性）
+                if img.mode in ('RGBA', 'LA', 'P'):
+                    # 創建白色背景
+                    background = Image.new('RGB', img.size, (255, 255, 255))
+                    if img.mode == 'P':
+                        img = img.convert('RGBA')
+                    background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+                    img = background
+                elif img.mode != 'RGB':
+                    img = img.convert('RGB')
+                
+                # 儲存處理後的圖片（JPEG 格式，品質 85%）
+                img.save(
+                    self.image.path, 
+                    'JPEG', 
+                    quality=85,  # 壓縮品質 (1-100)
+                    optimize=True  # 優化檔案大小
+                )
+                
+            except Exception as e:
+                print(f"圖片處理錯誤: {e}")
