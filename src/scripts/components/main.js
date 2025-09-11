@@ -374,6 +374,22 @@ export default () => ({
            reward.reward_type.toLowerCase().includes(lowerKeyword);
   },
 
+  // 檢查回饋是否符合當前搜尋條件（用於高亮顯示）
+  isMatchingReward(reward) {
+    if (this.selectedReward) {
+      const selectedCategoryDisplay = this.rewardCategoryMap[this.selectedReward];
+      return reward.category.includes(selectedCategoryDisplay);
+    }
+    if (this.selectedMerchant) {
+      return reward.scope === this.selectedMerchant;
+    }
+    if (this.searchKeyword?.trim()) {
+      const keyword = this.searchKeyword.trim().toLowerCase();
+      return this.isRewardMatchingKeyword(reward, keyword);
+    }
+    return false;
+  },
+
   // 獲取單一回饋的數值
   getRewardRate(reward) {
     const rateStr = reward.rate;
