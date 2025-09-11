@@ -1,4 +1,5 @@
 const current_host = window.location.hostname;
+const current_url = window.location.href;
 
 if (
   current_host == "24h.pchome.com.tw" ||
@@ -23,6 +24,7 @@ async function show_rewardia_popup() {
   <div class="popup_close_btn">X</div>`;
   document.body.appendChild(popup);
 
+  const popup_left = popup.querySelector(".popup_left");
   const close_btn = popup.querySelector(".popup_close_btn");
   const rewardia_popup = document.querySelector(".rewardia_popup");
 
@@ -32,7 +34,7 @@ async function show_rewardia_popup() {
   });
 
   // 一個可以叫插件做事情的訊息，寄到background.js
-  rewardia_popup.addEventListener("click", function () {
+  popup_left.addEventListener("click", function () {
     chrome.runtime.sendMessage({
       action: "open_extension",
     });
@@ -42,4 +44,10 @@ async function show_rewardia_popup() {
   setTimeout(() => {
     popup.remove();
   }, 8000);
+}
+
+if (current_url == "http://localhost:8000/users/member/") {
+  chrome.runtime.sendMessage({
+    action: "open_loggedin",
+  });
 }
