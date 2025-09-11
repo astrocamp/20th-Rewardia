@@ -22,4 +22,7 @@ dependencies = [
     "google-generativeai>=0.8.5",
     "djangorestframework>=3.16.1",
     "django-cors-headers>=4.7.0",
+    "django-storages>=1.14.6",
+    "boto3>=1.40.28",
+    "pillow>=11.3.0",
 ]
