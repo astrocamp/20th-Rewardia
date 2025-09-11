@@ -17,7 +17,7 @@ async function show_rewardia_popup() {
   popup.className = "rewardia_popup";
   popup.innerHTML = `<div class="popup_left">
   <div class="popup_logo"><img src="${chrome.runtime.getURL(
-    "images/logo.png"
+    "images/Rewardia.png"
   )}"></div>
   <div class="popup_text">偵測到信用卡，點此通知查看</div></div>
   <div class="popup_close_btn">X</div>`;
