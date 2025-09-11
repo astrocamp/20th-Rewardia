@@ -270,6 +270,10 @@ REST_FRAMEWORK = {
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# 檔案上傳設定
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
+
 # AWS S3 設定
 USE_S3 = os.getenv('USE_S3', 'False').lower() == 'true'
 
@@ -278,19 +282,18 @@ if USE_S3:
     AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
     AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-    AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'ap-northeast-1')
+    AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'ap-southeast-2')
     AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
     
-    # S3 設定
-    AWS_DEFAULT_ACL = 'public-read'
+    # S3 設定 - 移除 ACL 設定
+    AWS_DEFAULT_ACL = None  # 不使用 ACL
     AWS_S3_OBJECT_PARAMETERS = {
         'CacheControl': 'max-age=86400',
     }
-    
-    # 靜態檔案設定（保持本地儲存，避免破版）
-    # STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    # STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_QUERYSTRING_AUTH = False
+    AWS_S3_VERIFY = True
     
     # 媒體檔案設定（只有圖片上傳到 S3）
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+    DEFAULT_FILE_STORAGE = 'apps.cards.storage.MediaStorage'
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
