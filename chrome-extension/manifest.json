@@ -16,7 +16,7 @@
 
  "content_scripts": [
    {
-     "matches": ["*://24h.pchome.com.tw/*","*://www.momoshop.com.tw/*","http://localhost:8000/*"],
+     "matches": ["*://www.eslite.com/*","*://www.klook.com/*","*://24h.pchome.com.tw/*","*://www.momoshop.com.tw/*","http://localhost:8000/*"],
      "css": ["content_scripts/content_script.css"],
      "js": ["content_scripts/content_script.js"]
    }

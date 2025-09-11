@@ -1,10 +1,23 @@
 const current_host = window.location.hostname;
 const current_url = window.location.href;
 
-if (
-  current_host == "24h.pchome.com.tw" ||
-  current_host == "www.momoshop.com.tw"
-) {
+const merchantMap = {
+  momo: "momo購物",
+  pchome: "pchome",
+  eslite: "誠品",
+  coupang: "Coupang",
+  foodpanda: "foodpanda",
+  kkday: "KKday",
+  klook: "Klook",
+};
+
+let merchant = Object.keys(merchantMap).find((key) => {
+  return current_host.includes(key);
+});
+
+console.log(merchant);
+
+if (merchant) {
   const close_popup = sessionStorage.getItem("close_popup");
 
   if (!close_popup) {
