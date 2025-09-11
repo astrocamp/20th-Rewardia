@@ -2,11 +2,11 @@ const token_url = "http://localhost:8000/users/api/get_token";
 const member_zone = "http://localhost:8000/users/member";
 let loggedin = false;
 
-// async function get_current_url() {
-//   let queryOptions = { active: true, currentWindow: true };
-//   const [tab] = await chrome.tabs.query(queryOptions);
-//   return tab.url;
-// }
+async function get_current_url() {
+  let queryOptions = { active: true, currentWindow: true };
+  const [tab] = await chrome.tabs.query(queryOptions);
+  return tab.url;
+}
 
 async function fetch_token(url) {
   const resp = await fetch(url, {
