@@ -27,6 +27,6 @@ def get_merchant_rewards(request, scope):
     reward_merchant = RewardCategory.objects.filter(
         scope=scope,
         is_active=True,
-    ).order_by(Coalesce("max_rate", "min_rate", 0).desc())
+    ).order_by(Coalesce("max_rate", "min_rate", 0).desc())[:10]
     serializer = RewardSerializer(reward_merchant, many=True)
     return Response(serializer.data)

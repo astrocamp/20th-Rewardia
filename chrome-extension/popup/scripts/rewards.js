@@ -15,51 +15,55 @@ async function get_current_url() {
   return tab.url;
 }
 
-let card_count;
-
 async function return_cards(merchant) {
   const cards = await get_rewards(merchant);
 
-  const title = `<h1>${merchant}信用卡回饋</h1>`;
+  const title = `<h1>${merchant} 信用卡回饋</h1>`;
   rewards_content.insertAdjacentHTML("beforeend", title);
 
   cards.forEach((card) => {
-    let card_reward;
+    let card_rate;
     if (card.min_rate && card.max_rate) {
-      card_reward = `<div class="reward">
-        <div class="reward_text">
-          <h2>${card.card.name}</h2>
-          <span>最高 ${card.max_rate}% 回饋</span>
-          <span>最低 ${card.min_rate}% 回饋</span>
-        </div>
-      </div>`;
+      card_rate = `<span>最高 ${card.max_rate}% 回饋</span>
+          <span>最低 ${card.min_rate}% 回饋</span>`;
     } else if (card.min_rate == null) {
-      card_reward = `<div class="reward">
-        <div class="reward_text">
-          <h2>${card.card.name}</h2>
-          <span>最高 ${card.max_rate}% 回饋</span>
-        </div>
-      </div>`;
+      card_rate = `<span>最高 ${card.max_rate}% 回饋</span>`;
     } else if (card.max_rate == null) {
-      card_reward = `<div class="reward">
+      card_rate = `<span>最低 ${card.min_rate}% 回饋</span>`;
+    }
+
+    const card_reward = `<div class="reward">
         <div class="reward_text">
           <h2>${card.card.name}</h2>
-          <span>最低 ${card.min_rate}% 回饋</span>
+          ${card_rate}
         </div>
       </div>`;
-    }
     rewards_content.insertAdjacentHTML("beforeend", card_reward);
   });
 }
 
-const cur_url = await get_current_url();
+const merchantMap = {
+  momo: "momo購物",
+  pchome: "pchome",
+  eslite: "誠品",
+  coupang: "Coupang",
+  foodpanda: "foodpanda",
+  kkday: "KKday",
+  klook: "Klook",
+  tw: "國內",
+};
 
-if (cur_url.includes("momo")) {
-  await return_cards("momo購物");
-} else if (cur_url.includes("pchome")) {
-  await return_cards("pchome");
-} else if (cur_url.includes("tw")) {
-  await return_cards("國內");
-} else {
-  await return_cards("海外");
+async function get_merchant_cards() {
+  let cur_url = await get_current_url();
+  let merchant = Object.keys(merchantMap).find((key) => {
+    return cur_url.includes(key);
+  });
+
+  if (cur_url.includes(merchant)) {
+    await return_cards(merchantMap[merchant]);
+  } else {
+    await return_cards("海外");
+  }
 }
+
+await get_merchant_cards();
