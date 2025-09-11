@@ -59,11 +59,20 @@ def get_main_data(request):
                 'source': 'confirmed'
             })
 
+        # 處理圖片欄位
+        if card.image:
+            # 如果有上傳的圖片，使用真實的圖片 URL
+            image_url = card.image.url
+        else:
+            # 如果沒有圖片，使用本地 placeholder 或不同的 placeholder 服務
+            # 使用 picsum.photos 作為替代的 placeholder 服務
+            image_url = f'https://picsum.photos/300/180?random={card.id}'
+        
         all_cards_data.append({
             'id': card.id,
             'name': card.name,
             'bank': card.bank,
-            'image': f'https://via.placeholder.com/300x180.png?text={card.name.replace(" ", "+")}',
+            'image': image_url,
             'rewards': rewards_data
         })
 
