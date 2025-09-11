@@ -25,7 +25,6 @@ async function show_rewardia_popup() {
 
   const close_btn = popup.querySelector(".popup_close_btn");
   const rewardia_popup = document.querySelector(".rewardia_popup");
-  console.log(rewardia_popup);
 
   close_btn.addEventListener("click", function () {
     popup.remove();
