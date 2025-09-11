@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "apps.sessions",
     "apps.admins",
     "apps.chatbot",  # Gemini AI robot
+    "apps.ext_api",  # chrome extension api
     # ------------------------------
     "apps.nlp_validation",
     "apps.card_crawler",

@@ -25,7 +25,7 @@ urlpatterns = [
     path("users/", include("apps.users.urls")),
     path("sessions/", include("apps.sessions.urls")),
     path("admins/", include("apps.admins.urls")),
-    path("", include("apps.rewards.urls")),
+    path("api/", include("apps.ext_api.urls")),
     path("api/chatbot/", include("apps.chatbot.urls")),  # Gemini URLs(AI robot)
     path("accounts/", include("allauth.urls")),  # allauth URLs(Google 登入)
 ] + debug_toolbar_urls()
