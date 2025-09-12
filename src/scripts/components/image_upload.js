@@ -252,7 +252,7 @@ export default () => ({
     const card = this.cards.find(c => c.id === cardId);
     if (card) {
       card.image = imageUrl;
-      card.last_modified = lastModified || new Date().toLocaleString();
+      card.last_modified = lastModified || '剛剛';
     }
   },
   

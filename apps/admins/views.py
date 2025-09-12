@@ -8,7 +8,16 @@ from apps.rewards.models import PendingReward, RewardCategory
 from django.db.models import Q, Count
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.base import ContentFile
+from apps.cards.storage import MediaStorage
 import json
+
+
+def _get_last_modified_str(card_instance):
+    """格式化並返回最後異動時間的字串。"""
+    last_modified_time = card_instance.updated_at or card_instance.created_at
+    if last_modified_time:
+        return last_modified_time.strftime('%Y/%m/%d %H:%M:%S')
+    return None
 
 
 # 卡片頁面
@@ -152,7 +161,6 @@ def approve_pending_reward(request, id):
                 messages.error(request, "審核通過失敗")
         except Exception as e:
             messages.error(request, f"審核失敗：{str(e)}")
-            print(f"Approve error: {e}")
     else:
         messages.warning(request, "此項目已經處理過了")
 
@@ -288,8 +296,7 @@ def update_pending_reward(request, id):
 
 
 
-
-# S3圖片上傳頁面
+# 以下是圖片上傳相關
 def image_upload(request):
     """圖片上傳管理頁面"""
     cards = CreditCard.objects.filter(is_active=True).order_by('bank', 'name')
@@ -306,17 +313,12 @@ def api_cards(request):
         # 生成正確的圖片 URL
         image_url = None
         if card.image:
-            from apps.cards.storage import MediaStorage
             storage = MediaStorage()
             # 使用 MediaStorage.url() 來生成正確的 URL，它會自動添加 media/ 前綴
             image_url = storage.url(card.image.name)
         
         # 處理最後異動時間
-        last_modified = None
-        if card.updated_at:
-            last_modified = card.updated_at.strftime('%Y/%m/%d %p%I:%M:%S')
-        elif card.created_at:
-            last_modified = card.created_at.strftime('%Y/%m/%d %p%I:%M:%S')
+        last_modified = _get_last_modified_str(card)
         
         cards_data.append({
             'id': card.id,
@@ -347,7 +349,7 @@ def api_upload_image(request):
         # 獲取卡片物件
         card = get_object_or_404(CreditCard, id=card_id)
         
-        # 驗證檔案類型
+        # 驗證檔案類型, 符合才能上傳
         allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
         if image_file.content_type not in allowed_types:
             return JsonResponse({'success': False, 'error': '不支援的檔案格式'})
@@ -362,7 +364,6 @@ def api_upload_image(request):
         card.save()
         
         # 確保圖片已上傳到 S3
-        from apps.cards.storage import MediaStorage
         storage = MediaStorage()
         
         # 檢查圖片是否在 S3 中存在
@@ -380,20 +381,14 @@ def api_upload_image(request):
                 filename = card.image.name.split('/')[-1]
                 upload_path = f'credit_cards/{filename}'
                 storage.save(upload_path, content)
-                print(f"手動上傳圖片到 S3: {card.image.name}")
             except Exception as e:
-                print(f"手動上傳 S3 失敗: {e}")
                 return JsonResponse({'success': False, 'error': f'S3 上傳失敗: {str(e)}'})
         
         # 重新獲取卡片資料以取得最新的 updated_at 和 image
         card.refresh_from_db()
         
         # 處理最後異動時間
-        last_modified = None
-        if card.updated_at:
-            last_modified = card.updated_at.strftime('%Y/%m/%d %p%I:%M:%S')
-        elif card.created_at:
-            last_modified = card.created_at.strftime('%Y/%m/%d %p%I:%M:%S')
+        last_modified = _get_last_modified_str(card)
         
         # 確保取得最新的圖片 URL
         image_url = None
@@ -409,7 +404,6 @@ def api_upload_image(request):
         
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
-
 
 # API: 刪除圖片
 @require_POST
@@ -429,12 +423,11 @@ def api_delete_image(request):
         
         # 刪除 S3 中的圖片
         try:
-            from apps.cards.storage import MediaStorage
             storage = MediaStorage()
             if storage.exists(card.image.name):
                 storage.delete(card.image.name)
         except Exception as e:
-            print(f"刪除 S3 圖片失敗: {e}")
+            pass  # 靜默處理 S3 刪除錯誤，不影響資料庫清理
         
         # 清空資料庫中的圖片欄位
         card.image = None
@@ -444,11 +437,7 @@ def api_delete_image(request):
         card.refresh_from_db()
         
         # 處理最後異動時間
-        last_modified = None
-        if card.updated_at:
-            last_modified = card.updated_at.strftime('%Y/%m/%d %p%I:%M:%S')
-        elif card.created_at:
-            last_modified = card.created_at.strftime('%Y/%m/%d %p%I:%M:%S')
+        last_modified = _get_last_modified_str(card)
         
         return JsonResponse({
             'success': True, 

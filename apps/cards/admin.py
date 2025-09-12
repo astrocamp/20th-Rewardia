@@ -34,7 +34,3 @@ class CreditCardAdmin(admin.ModelAdmin):
         return "無圖片"
     
     image_preview.short_description = "圖片預覽"
-    
-    def save_model(self, request, obj, form, change):
-        """儲存模型時自動處理圖片"""
-        super().save_model(request, obj, form, change)

@@ -34,7 +34,7 @@
 
   /* ========== Batch Action Buttons ========== */
   .batch-actions-container {
-    @apply fixed flex flex-col gap-3 bottom-64 right-6 z-[9999];
+    @apply fixed flex flex-col gap-6 bottom-64 right-6 z-[9999];
   }
 
   .batch-btn {
@@ -50,7 +50,7 @@
   }
 
   .batch-btn:disabled {
-    @apply bg-gray-400 cursor-not-allowed;
+    @apply bg-gray-400/30 cursor-not-allowed;
   }
   
 }
