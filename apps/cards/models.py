@@ -41,7 +41,7 @@ class CreditCard(models.Model):
     bank = models.CharField("銀行名稱", max_length=15)
     image = models.ImageField(
         "信用卡圖片", 
-        upload_to='credit_cards/',
+        upload_to='',
         blank=True,
         null=True,
         validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])]
@@ -68,13 +68,12 @@ class CreditCard(models.Model):
         # 檢查是否有新圖片上傳
         has_new_image = self.image and hasattr(self.image, 'file')
         
-        # 先執行父類的 save 方法
-        super().save(*args, **kwargs)
-        
-        # 只有在有新圖片時才進行處理
+        # 如果有新圖片，先在記憶體中處理，再一次性儲存
         if has_new_image:
-            # 圖片處理：調整大小、格式轉換、壓縮
-            self.resize_image()
+            self.process_image_before_save()
+        
+        # 執行父類的 save 方法（只儲存一次）
+        super().save(*args, **kwargs)
 
     def format_bank_name(self, bank_name):
         """格式化銀行名稱"""
@@ -90,20 +89,18 @@ class CreditCard(models.Model):
                 
         return bank_name if bank_name in CreditCard.Bank.values else "無"
 
-    def resize_image(self):
-        """圖片處理：調整大小、格式轉換、壓縮"""
+    def process_image_before_save(self):
+        """在儲存前處理圖片（記憶體中處理，避免重複儲存）"""
         if self.image:
             try:
-                from django.conf import settings
-                if getattr(settings, 'USE_S3', False):
-                    # 使用 S3 時，從 BytesIO 讀取
-                    from io import BytesIO
-                    self.image.seek(0)
-                    image_data = self.image.read()
-                    img = Image.open(BytesIO(image_data))
-                else:
-                    # 本地儲存時，使用檔案路徑
-                    img = Image.open(self.image.path)
+                from PIL import Image
+                from io import BytesIO
+                from django.core.files.base import ContentFile
+                
+                # 從上傳的檔案讀取圖片
+                self.image.seek(0)
+                image_data = self.image.read()
+                img = Image.open(BytesIO(image_data))
                 
                 # 設定目標尺寸
                 target_width = 300
@@ -122,32 +119,23 @@ class CreditCard(models.Model):
                 elif img.mode != 'RGB':
                     img = img.convert('RGB')
                 
-                # 儲存處理後的圖片
-                if getattr(settings, 'USE_S3', False):
-                    # S3 儲存
-                    from io import BytesIO
-                    from django.core.files.base import ContentFile
-                    
-                    output = BytesIO()
-                    img.save(output, 'WEBP', quality=85, optimize=True)
-                    output.seek(0)
-                    content = ContentFile(output.getvalue())
-                    
-                    # 保持原檔案名稱，只替換內容
-                    self.image.save(
-                        self.image.name,
-                        content,
-                        save=False
-                    )
-                else:
-                    # 本地儲存
-                    img.save(
-                        self.image.path, 
-                        'WEBP', 
-                        quality=85,
-                        optimize=True
-                    )
+                # 處理後的圖片儲存到記憶體
+                output = BytesIO()
+                img.save(output, 'WEBP', quality=85, optimize=True)
+                output.seek(0)
                 
-                    
+                # 保持原檔案名稱，但更換副檔名為 .webp
+                original_name = self.image.name
+                if '.' in original_name:
+                    name_without_ext = original_name.rsplit('.', 1)[0]
+                    new_name = f"{name_without_ext}.webp"
+                else:
+                    new_name = f"{original_name}.webp"
+                
+                # 用處理後的內容替換原檔案
+                self.image = ContentFile(output.getvalue(), name=new_name)
+                
             except Exception as e:
-                print(f"圖片處理錯誤: {e}")
+                # 如果圖片處理失敗，保持原檔案
+                pass
+

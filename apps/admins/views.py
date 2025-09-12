@@ -375,12 +375,11 @@ def api_upload_image(request):
                 from django.core.files.base import ContentFile
                 content = ContentFile(image_content)
                 
-                # 提取檔案名稱，避免路徑重複
-                # card.image.name 格式: credit_cards/filename.png
-                # 我們只需要 filename.png
+                # 提取檔案名稱，讓 MediaStorage 自動處理路徑
+                # card.image.name 可能是 filename.png 或 path/filename.png
                 filename = card.image.name.split('/')[-1]
-                upload_path = f'credit_cards/{filename}'
-                storage.save(upload_path, content)
+                # MediaStorage location = 'media/credit_cards' 會自動處理完整路徑
+                storage.save(filename, content)
             except Exception as e:
                 return JsonResponse({'success': False, 'error': f'S3 上傳失敗: {str(e)}'})
         
