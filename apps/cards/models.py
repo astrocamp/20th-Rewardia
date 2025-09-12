@@ -62,6 +62,19 @@ class CreditCard(models.Model):
     def __str__(self):
         return f"{self.bank} {self.name}"
 
+
+    def format_bank_name(self, bank_name):
+        if re.search("一銀", bank_name):
+            return "第一"
+        if re.search("美國", bank_name):
+            return "美國運通"
+        if re.search("富邦", bank_name):
+            return "富邦"
+        if bank_name not in CreditCard.Bank.values:
+            return "無"
+        return bank_name
+
+
     def save(self, *args, **kwargs):
         self.bank = self.format_bank_name(self.bank)
         
@@ -80,8 +93,9 @@ class CreditCard(models.Model):
         if re.search("一銀", bank_name):
             return "第一"
         if re.search("美國", bank_name):
-
             return "美國運通"
+        if re.search("富邦", bank_name):
+            return "富邦"
         if bank_name not in CreditCard.Bank.values:
             return "無"
         return bank_name
@@ -123,10 +137,13 @@ class CreditCard(models.Model):
                     # S3 儲存
                     from io import BytesIO
                     from django.core.files.base import ContentFile
+                    
                     output = BytesIO()
                     img.save(output, 'JPEG', quality=85, optimize=True)
                     output.seek(0)
                     content = ContentFile(output.getvalue())
+                    
+                    # 保持原檔案名稱，只替換內容
                     self.image.save(
                         self.image.name,
                         content,

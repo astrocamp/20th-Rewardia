@@ -2,33 +2,14 @@
 
 {% block content %}
 <section
-  class="relative mx-4 sm:mx-6 lg:mx-10 mb-4 sm:mb-6 lg:mb-8 mt-24 overflow-hidden"
+  class="relative mx-4 sm:mx-6 lg:mx-10 mb-4 sm:mb-6 lg:mb-8 mt-24"
   x-bind:class="{ 'banner-hidden': !$store.banner.visible }"
   x-data="imageUpload"
 >
-  <div class="my-4 sm:mb-6 flex flex-row items-center justify-between">
+  <div class="my-4 sm:mb-6">
     <h2 id="image_upload_title" class="text-2xl sm:text-2xl lg:text-2xl font-bold text-black">
       信用卡圖片管理
     </h2>
-
-    <div class="flex gap-4">
-      <button
-        @click="batchUpload()"
-        :disabled="!hasSelectedItems()"
-        class="ui-btn ui-btn-success cursor-pointer"
-        :class="{ 'opacity-50 cursor-not-allowed': !hasSelectedItems() }"
-      >
-        批次新增
-      </button>
-      <button
-        @click="batchDelete()"
-        :disabled="!hasSelectedItems()"
-        class="ui-btn ui-btn-error cursor-pointer"
-        :class="{ 'opacity-50 cursor-not-allowed': !hasSelectedItems() }"
-      >
-        批次刪除
-      </button>
-    </div>
   </div>
 
   <div class="overflow-x-auto">
@@ -77,31 +58,35 @@
             <td>
               <div class="flex flex-col gap-2">
                 <!-- 檔案選擇區域 -->
-                <div class="flex items-center gap-2">
-                  <input 
-                    type="file" 
-                    :id="'file_' + card.id"
-                    accept="image/*"
-                    class="hidden"
-                    @change="handleFileSelect($event, card.id)"
-                  />
-                  <button 
-                    @click="document.getElementById('file_' + card.id).click()"
-                    class="ui-btn ui-btn-info ui-btn-sm"
-                  >
-                    選擇圖片
-                  </button>
-                </div>
-                
-                <!-- 檔案預覽和路徑 -->
-                <div x-show="selectedFiles[card.id]" class="text-xs text-gray-600">
-                  <div class="flex items-center gap-2">
-                    <img 
-                      x-show="selectedFiles[card.id]?.preview"
-                      :src="selectedFiles[card.id]?.preview" 
-                      class="w-8 h-6 object-cover rounded"
+                <!-- 檔案選擇區域 - 水平排列 -->
+                <div class="flex items-center gap-3">
+                  <!-- 選擇圖片按鈕 -->
+                  <div>
+                    <input 
+                      type="file" 
+                      :id="'file_' + card.id"
+                      accept="image/*"
+                      class="hidden"
+                      @change="handleFileSelect($event, card.id)"
                     />
-                    <span x-text="selectedFiles[card.id]?.name" class="truncate"></span>
+                    <button 
+                      @click="document.getElementById('file_' + card.id).click()"
+                      class="ui-btn ui-btn-info ui-btn-sm"
+                    >
+                      選擇圖片
+                    </button>
+                  </div>
+                  
+                  <!-- 檔案預覽和路徑 - 在按鈕右側 -->
+                  <div x-show="selectedFiles[card.id]" class="text-xs text-gray-600 flex-1">
+                    <div class="flex items-center gap-2">
+                      <img 
+                        x-show="selectedFiles[card.id]?.preview"
+                        :src="selectedFiles[card.id]?.preview" 
+                        class="w-8 h-6 object-cover rounded"
+                      />
+                      <span x-text="selectedFiles[card.id]?.name" class="truncate"></span>
+                    </div>
                   </div>
                 </div>
                 
@@ -154,8 +139,36 @@
     </table>
   </div>
 
+  <!-- 固定批次操作按鈕 - 確保在 footer 上方 -->
+  <div style="position: fixed; bottom: 16rem; right: 1.5rem; z-index: 9999;" class="flex flex-col gap-3">
+    <button
+      @click="batchUpload()"
+      :disabled="!hasSelectedItems()"
+      class="px-6 py-3 text-white font-semibold rounded-lg shadow-lg transition-colors cursor-pointer"
+      :class="{ 
+        'bg-green-500 hover:bg-green-600': hasSelectedItems(),
+        'bg-gray-400 cursor-not-allowed': !hasSelectedItems()
+      }"
+      style="display: block !important;"
+    >
+      批次新增
+    </button>
+    <button
+      @click="batchDelete()"
+      :disabled="!hasSelectedItems()"
+      class="px-6 py-3 text-white font-semibold rounded-lg shadow-lg transition-colors cursor-pointer"
+      :class="{ 
+        'bg-red-500 hover:bg-red-600': hasSelectedItems(),
+        'bg-gray-400 cursor-not-allowed': !hasSelectedItems()
+      }"
+      style="display: block !important;"
+    >
+      批次刪除
+    </button>
+  </div>
+
   <!-- 載入指示器 -->
-  <div x-show="isLoading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div x-show="isLoading" class="fixed inset-0 bg-black/50 flex items-center justify-center z-60">
     <div class="bg-white p-6 rounded-lg flex items-center gap-4">
       <span class="loading loading-spinner loading-md"></span>
       <span x-text="loadingMessage"></span>

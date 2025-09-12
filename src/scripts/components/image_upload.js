@@ -22,7 +22,7 @@ export default () => ({
       
       this.cards = data.cards.map(card => ({
         ...card,
-        last_modified: card.updated_at || null
+        // 直接使用後端回傳的 last_modified，不需要重新映射
       }));
     } catch (error) {
       console.error('載入信用卡資料失敗:', error);
@@ -104,7 +104,7 @@ export default () => ({
         const card = this.cards.find(c => c.id === cardId);
         if (card) {
           card.image = result.image_url;
-          card.last_modified = new Date().toLocaleString();
+          card.last_modified = result.last_modified || new Date().toLocaleString();
         }
         
         // 清除選擇的檔案
@@ -152,7 +152,7 @@ export default () => ({
         const card = this.cards.find(c => c.id === cardId);
         if (card) {
           card.image = null;
-          card.last_modified = new Date().toLocaleString();
+          card.last_modified = result.last_modified || new Date().toLocaleString();
         }
         
         this.showSuccess('圖片刪除成功');
@@ -186,8 +186,40 @@ export default () => ({
     
     for (const cardId of selectedCardIds) {
       try {
-        await this.uploadImage(cardId);
-        successCount++;
+        const selectedFile = this.selectedFiles[cardId];
+        const formData = new FormData();
+        formData.append('image', selectedFile.file);
+        formData.append('card_id', cardId);
+        
+        const response = await fetch('/admins/api/upload-image/', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-CSRFToken': this.getCSRFToken()
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`上傳失敗: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          // 更新卡片資料
+          const card = this.cards.find(c => c.id === cardId);
+          if (card) {
+            card.image = result.image_url;
+            card.last_modified = result.last_modified || new Date().toLocaleString();
+          }
+          
+          // 清除選擇的檔案
+          delete this.selectedFiles[cardId];
+          
+          successCount++;
+        } else {
+          throw new Error(result.error || '上傳失敗');
+        }
       } catch (error) {
         errorCount++;
         console.error(`卡片 ${cardId} 上傳失敗:`, error);
@@ -230,8 +262,33 @@ export default () => ({
     
     for (const cardId of selectedCardIds) {
       try {
-        await this.deleteImage(cardId);
-        successCount++;
+        const response = await fetch('/admins/api/delete-image/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': this.getCSRFToken()
+          },
+          body: JSON.stringify({ card_id: cardId })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`刪除失敗: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          // 更新卡片資料
+          const card = this.cards.find(c => c.id === cardId);
+          if (card) {
+            card.image = null;
+            card.last_modified = result.last_modified || new Date().toLocaleString();
+          }
+          
+          successCount++;
+        } else {
+          throw new Error(result.error || '刪除失敗');
+        }
       } catch (error) {
         errorCount++;
         console.error(`卡片 ${cardId} 刪除失敗:`, error);

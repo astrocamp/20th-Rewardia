@@ -4,6 +4,8 @@
 @layer components {
   
   /* ========== Image Upload Components ========== */
+  
+  /* 覆蓋 ui-btn 定義以避免 Tailwind v4 衝突 */
   .ui-btn {
     @apply px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 border border-transparent;
     @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
@@ -81,7 +83,7 @@
   
   /* ========== Loading Overlay ========== */
   .loading-overlay {
-    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+    @apply fixed inset-0 bg-black/50 flex items-center justify-center z-50;
   }
   
   .loading-content {
@@ -129,7 +131,7 @@
   }
   
   .batch-btn:disabled {
-    @apply opacity-50 cursor-not-allowed;
+    @apply opacity-20 cursor-not-allowed;
   }
   
   /* ========== File Input Styling ========== */
@@ -142,7 +144,7 @@
   }
   
   .file-input-label {
-    @apply ui-btn ui-btn-info ui-btn-sm cursor-pointer;
+    @apply px-3 py-1.5 text-xs bg-blue-500 text-white rounded-lg font-medium transition-all duration-200 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer;
   }
   
   /* ========== Progress Indicators ========== */

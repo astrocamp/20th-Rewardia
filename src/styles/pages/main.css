@@ -134,11 +134,11 @@
   }
   
   .list-card-image-container {
-    @apply h-60 rounded-lg overflow-hidden flex items-center justify-center;
+    @apply h-92 rounded-lg overflow-hidden flex items-center justify-center;
   }
   
   .list-card-image {
-    @apply max-w-full max-h-full object-contain rounded-lg;
+    @apply w-full h-full object-contain rounded-lg;
   }
   
   .list-card-right {
@@ -183,11 +183,11 @@
   }
   
   .card-image-container {
-    @apply relative h-48 sm:h-52 lg:h-56 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4;
+    @apply relative h-48 sm:h-52 lg:h-56 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-2;
   }
   
   .card-image {
-    @apply max-w-full max-h-full object-contain rounded-lg;
+    @apply w-full h-full object-contain rounded-lg;
   }
   
   .card-info-container {
