@@ -1,13 +1,11 @@
 {% extends 'layouts/default.html' %} {% block title %} 下載專區 - Rewardia
 {%endblock %} {% block content %}
 <!-- 主要橫幅區域 -->
-<section
-  class="relative mx-4 sm:mx-6 lg:mx-10 mb-4 sm:mb-6 lg:mb-8 banner-spacing overflow-hidden"
-  x-bind:class="{
+<section class="relative mx-4 sm:mx-6 lg:mx-10 mb-4 sm:mb-6 lg:mb-8 banner-spacing overflow-hidden"
+         x-bind:class="{
            'banner-hidden': !$store.banner.visible,
            'banner-transitioning': $store.banner.isTransitioning
-         }"
->
+         }">
   <!-- 頁面標題 - 在 banner 圖上方 -->
   <div class="mb-4 sm:mb-6">
     <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black">
@@ -155,8 +153,7 @@
           <div
             class="w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4"
           >
-            {% include 'components/icon.html' with name="smart-recommend"
-            size="w-6 h-6 sm:w-8 sm:h-8" class="text-blue-600" %}
+            {% include 'components/icon.html' with name="smart-recommend" size="w-6 h-6 sm:w-8 sm:h-8" class="text-blue-600" %}
           </div>
           <h4 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">
             智慧推薦系統
@@ -182,8 +179,7 @@
           <div
             class="w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4"
           >
-            {% include 'components/icon.html' with name="real-time-offer"
-            size="w-6 h-6 sm:w-8 sm:h-8" class="text-green-600" %}
+            {% include 'components/icon.html' with name="real-time-offer" size="w-6 h-6 sm:w-8 sm:h-8" class="text-green-600" %}
           </div>
           <h4 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">
             即時優惠提醒
@@ -209,8 +205,7 @@
           <div
             class="w-12 h-12 sm:w-16 sm:h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4"
           >
-            {% include 'components/icon.html' with name="consumption-analysis"
-            size="w-6 h-6 sm:w-8 sm:h-8" class="text-purple-600" %}
+            {% include 'components/icon.html' with name="consumption-analysis" size="w-6 h-6 sm:w-8 sm:h-8" class="text-purple-600" %}
           </div>
           <h4 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">
             消費分析報告
