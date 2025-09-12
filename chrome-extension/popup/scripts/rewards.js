@@ -49,7 +49,7 @@ const merchantMap = {
   foodpanda: "foodpanda",
   kkday: "KKday",
   klook: "Klook",
-  tw: "國內",
+  ".tw": "國內",
 };
 
 async function get_merchant_cards() {

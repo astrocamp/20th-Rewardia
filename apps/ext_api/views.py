@@ -8,16 +8,22 @@ from django.db.models.functions import Coalesce
 
 @api_view(["GET"])
 def get_rewards(request):
-    all_rewards = RewardCategory.objects.filter(is_active=True).order_by("-max_rate")
+    all_rewards = (
+        RewardCategory.objects.select_related("card")
+        .filter(is_active=True)
+        .order_by("-max_rate")
+    )
     serializer = RewardSerializer(all_rewards, many=True)
     return Response(serializer.data)
 
 
 @api_view(["GET"])
 def get_category_rewards(request, category):
-    reward_category = RewardCategory.objects.filter(
-        category=category, is_active=True
-    ).order_by("-max_rate")
+    reward_category = (
+        RewardCategory.objects.select_related("card")
+        .filter(category=category, is_active=True)
+        .order_by("-max_rate")
+    )
     serializer = RewardSerializer(reward_category, many=True)
     return Response(serializer.data)
 
@@ -25,7 +31,8 @@ def get_category_rewards(request, category):
 @api_view(["GET"])
 def get_merchant_rewards(request, scope):
     reward_merchant = (
-        RewardCategory.objects.filter(scope=scope, is_active=True, card__is_active=True)
+        RewardCategory.objects.select_related("card")
+        .filter(scope=scope, is_active=True, card__is_active=True)
         .annotate(rate=Coalesce("max_rate", "min_rate"))
         .order_by("-rate")[:10]
     )

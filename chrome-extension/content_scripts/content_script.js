@@ -1,6 +1,8 @@
 const current_host = window.location.hostname;
 const current_url = window.location.href;
 
+console.dir(window.location);
+
 const merchantMap = {
   momo: "momo購物",
   pchome: "pchome",
@@ -14,8 +16,6 @@ const merchantMap = {
 let merchant = Object.keys(merchantMap).find((key) => {
   return current_host.includes(key);
 });
-
-console.log(merchant);
 
 if (merchant) {
   const close_popup = sessionStorage.getItem("close_popup");
