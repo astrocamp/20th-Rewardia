@@ -11,6 +11,7 @@ import loginComponent from './components/login.js';
 import messageComponent from './components/message.js';
 import registerComponent from './components/register.js';
 import subscribeComponent from './components/subscribe.js';
+import imageUploadComponent from './components/image_upload.js';
 
 window.Alpine = Alpine;
 
@@ -22,5 +23,6 @@ Alpine.data('register_form', registerComponent);
 Alpine.data('subscribe_form', subscribeComponent);
 Alpine.data("toast_fadeout", messageComponent);
 Alpine.data("chatbot", chatbot);
+Alpine.data("imageUpload", imageUploadComponent);
 
 Alpine.start();

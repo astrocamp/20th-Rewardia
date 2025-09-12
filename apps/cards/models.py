@@ -42,7 +42,7 @@ class CreditCard(models.Model):
     bank = models.CharField("銀行名稱", max_length=15)
     image = models.ImageField(
         "信用卡圖片", 
-        upload_to='brad/credit_cards/',
+        upload_to='credit_cards/',
         blank=True,
         null=True,
         validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])]
@@ -64,36 +64,24 @@ class CreditCard(models.Model):
 
     def save(self, *args, **kwargs):
         self.bank = self.format_bank_name(self.bank)
+        
+        # 檢查是否有新圖片上傳
+        has_new_image = self.image and hasattr(self.image, 'file')
+        
         # 先執行父類的 save 方法
         super().save(*args, **kwargs)
         
-        # 手動上傳圖片到 S3
-        if self.image:
-            try:
-                from apps.cards.storage import MediaStorage
-                storage = MediaStorage()
-                
-                # 讀取圖片內容
-                self.image.seek(0)
-                image_content = self.image.read()
-                
-                # 手動上傳到 S3
-                from django.core.files.base import ContentFile
-                content = ContentFile(image_content)
-                storage.save(self.image.name, content)
-                
-            except Exception as e:
-                print(f"圖片上傳到 S3 失敗: {e}")
-        
-        # 圖片處理：調整大小、格式轉換、壓縮
-        if self.image:
+        # 只有在有新圖片時才進行處理
+        if has_new_image:
+            # 圖片處理：調整大小、格式轉換、壓縮
             self.resize_image()
 
     def format_bank_name(self, bank_name):
         if re.search("一銀", bank_name):
             return "第一"
         if re.search("美國", bank_name):
-            return "美國通運"
+
+            return "美國運通"
         if bank_name not in CreditCard.Bank.values:
             return "無"
         return bank_name
@@ -142,7 +130,7 @@ class CreditCard(models.Model):
                     self.image.save(
                         self.image.name,
                         content,
-                        save=True
+                        save=False
                     )
                 else:
                     # 本地儲存

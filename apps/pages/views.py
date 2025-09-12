@@ -61,8 +61,10 @@ def get_main_data(request):
 
         # 處理圖片欄位
         if card.image:
-            # 如果有上傳的圖片，使用真實的圖片 URL
-            image_url = card.image.url
+            # 如果有上傳的圖片，使用 MediaStorage 生成正確的 URL
+            from apps.cards.storage import MediaStorage
+            storage = MediaStorage()
+            image_url = storage.url(card.image.name)
         else:
             # 如果沒有圖片，使用本地 placeholder 或不同的 placeholder 服務
             # 使用 picsum.photos 作為替代的 placeholder 服務

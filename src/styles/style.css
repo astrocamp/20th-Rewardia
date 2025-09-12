@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+/* Import page-specific styles */
+@import "./pages/main.css";
+@import "./pages/image_upload.css";
+
 @theme {
   --color-primary: #2060b9;
   --color-primary-dark: #193966;

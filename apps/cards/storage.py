@@ -9,7 +9,6 @@ class MediaStorage(S3Storage):
     default_acl = None  # 不使用 ACL
     
     def url(self, name):
-        """確保 URL 包含 media/ 前綴"""
-        if self.location:
-            name = f"{self.location}/{name}"
+        """生成正確的 S3 URL"""
+        # 直接使用父類的 url 方法，讓 storages 自動處理 location
         return super().url(name)

@@ -3,9 +3,12 @@ from django.urls import reverse
 from apps.cards.models import CreditCard
 from django.contrib import messages
 from django.views.decorators.http import require_POST, require_http_methods
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from apps.rewards.models import PendingReward, RewardCategory
 from django.db.models import Q, Count
+from django.views.decorators.csrf import csrf_exempt
+from django.core.files.base import ContentFile
+import json
 
 
 # 卡片頁面
@@ -282,3 +285,138 @@ def update_pending_reward(request, id):
             "current_status": request.GET.get("status", PendingReward.Status.PENDING),
         },
     )
+
+
+# 圖片上傳頁面
+def image_upload(request):
+    """圖片上傳管理頁面"""
+    cards = CreditCard.objects.filter(is_active=True).order_by('bank', 'name')
+    return render(request, 'admins/image_upload.html', {'cards': cards})
+
+
+# API: 獲取信用卡列表
+def api_cards(request):
+    """API: 獲取信用卡列表"""
+    cards = CreditCard.objects.filter(is_active=True).order_by('bank', 'name')
+    cards_data = []
+    
+    for card in cards:
+        # 生成正確的圖片 URL
+        image_url = None
+        if card.image:
+            from apps.cards.storage import MediaStorage
+            storage = MediaStorage()
+            # 使用 MediaStorage.url() 來生成正確的 URL，它會自動添加 media/ 前綴
+            image_url = storage.url(card.image.name)
+        
+        cards_data.append({
+            'id': card.id,
+            'name': card.name,
+            'bank': card.bank,
+            'image': image_url,
+            'last_modified': None  # 初始為空，只有處理圖片後才會更新
+        })
+    
+    return JsonResponse({'cards': cards_data})
+
+
+# API: 上傳圖片
+@require_POST
+def api_upload_image(request):
+    """API: 上傳圖片到 S3"""
+    try:
+        # 獲取上傳的檔案和卡片 ID
+        image_file = request.FILES.get('image')
+        card_id = request.POST.get('card_id')
+        
+        if not image_file:
+            return JsonResponse({'success': False, 'error': '沒有選擇圖片檔案'})
+        
+        if not card_id:
+            return JsonResponse({'success': False, 'error': '沒有指定卡片 ID'})
+        
+        # 獲取卡片物件
+        card = get_object_or_404(CreditCard, id=card_id)
+        
+        # 驗證檔案類型
+        allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+        if image_file.content_type not in allowed_types:
+            return JsonResponse({'success': False, 'error': '不支援的檔案格式'})
+        
+        # 驗證檔案大小 (10MB)
+        max_size = 10 * 1024 * 1024
+        if image_file.size > max_size:
+            return JsonResponse({'success': False, 'error': '檔案大小不能超過 10MB'})
+        
+        # 儲存圖片到模型
+        card.image = image_file
+        card.save()
+        
+        # 確保圖片已上傳到 S3
+        from apps.cards.storage import MediaStorage
+        storage = MediaStorage()
+        
+        # 檢查圖片是否在 S3 中存在
+        if not storage.exists(card.image.name):
+            # 如果不存在，手動上傳
+            try:
+                card.image.seek(0)
+                image_content = card.image.read()
+                from django.core.files.base import ContentFile
+                content = ContentFile(image_content)
+                
+                # 提取檔案名稱，避免路徑重複
+                # card.image.name 格式: credit_cards/filename.png
+                # 我們只需要 filename.png
+                filename = card.image.name.split('/')[-1]
+                upload_path = f'credit_cards/{filename}'
+                storage.save(upload_path, content)
+                print(f"手動上傳圖片到 S3: {card.image.name}")
+            except Exception as e:
+                print(f"手動上傳 S3 失敗: {e}")
+                return JsonResponse({'success': False, 'error': f'S3 上傳失敗: {str(e)}'})
+        
+        return JsonResponse({
+            'success': True, 
+            'image_url': storage.url(card.image.name),
+            'message': '圖片上傳成功'
+        })
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+# API: 刪除圖片
+@require_POST
+def api_delete_image(request):
+    """API: 刪除 S3 圖片"""
+    try:
+        data = json.loads(request.body)
+        card_id = data.get('card_id')
+        
+        if not card_id:
+            return JsonResponse({'success': False, 'error': '沒有指定卡片 ID'})
+        
+        # 獲取卡片物件
+        card = get_object_or_404(CreditCard, id=card_id)
+        
+        if not card.image:
+            return JsonResponse({'success': False, 'error': '該卡片沒有圖片'})
+        
+        # 刪除 S3 中的圖片
+        try:
+            from apps.cards.storage import MediaStorage
+            storage = MediaStorage()
+            if storage.exists(card.image.name):
+                storage.delete(card.image.name)
+        except Exception as e:
+            print(f"刪除 S3 圖片失敗: {e}")
+        
+        # 清空資料庫中的圖片欄位
+        card.image = None
+        card.save()
+        
+        return JsonResponse({'success': True, 'message': '圖片刪除成功'})
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})

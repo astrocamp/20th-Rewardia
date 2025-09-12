@@ -39,4 +39,9 @@ urlpatterns = [
         views.update_pending_reward,
         name="update_pending_reward",
     ),
+    # 圖片上傳相關 URL
+    path("image_upload/", views.image_upload, name="image_upload"),
+    path("api/cards/", views.api_cards, name="api_cards"),
+    path("api/upload-image/", views.api_upload_image, name="api_upload_image"),
+    path("api/delete-image/", views.api_delete_image, name="api_delete_image"),
 ]
