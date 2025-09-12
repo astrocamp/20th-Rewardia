@@ -152,21 +152,56 @@ export default () => ({
         this.selectedMerchant = '';
         
         const keyword = this.searchKeyword.trim().toLowerCase();
-        filteredCards = filteredCards.filter(card => {
-          // 搜尋銀行名稱
-          const bankMatch = card.bank.toLowerCase().includes(keyword);
-          
-          // 搜尋卡片名稱
-          const cardNameMatch = card.name.toLowerCase().includes(keyword);
-          
-          // 搜尋回饋分類的 category、scope、reward_type
-          const rewardMatch = card.rewards.some(reward => 
-            this.isRewardMatchingKeyword(reward, keyword)
+        
+        // 檢查是否為銀行搜尋（包含"銀行"）
+        const isBankSearch = keyword.includes('銀行');
+        // 檢查是否為保險搜尋（包含"人壽"、"保險"）
+        const isInsuranceSearch = keyword.includes('人壽') || keyword.includes('保險');
+        
+        if (keyword === '富邦') {
+          // 富邦搜尋：顯示富邦銀行卡片 + 富邦相關回饋
+          filteredCards = filteredCards.filter(card => {
+            // 包含富邦銀行的卡片
+            const fubonBankMatch = card.bank.toLowerCase().includes('富邦');
+            
+            // 或者有富邦相關回饋的卡片
+            const fubonRewardMatch = card.rewards.some(reward => 
+              reward.scope.toLowerCase().includes('富邦')
+            );
+            
+            return fubonBankMatch || fubonRewardMatch;
+          });
+        } else if (isBankSearch) {
+          // 銀行搜尋：只顯示該銀行的卡片
+          const bankName = keyword.replace('銀行', '').trim();
+          filteredCards = filteredCards.filter(card => 
+            card.bank.toLowerCase().includes(bankName)
           );
-          
-          // 只要任一項目匹配就回傳 true
-          return bankMatch || cardNameMatch || rewardMatch;
-        });
+        } else if (isInsuranceSearch) {
+          // 保險搜尋：顯示有該保險公司回饋的卡片
+          filteredCards = filteredCards.filter(card => 
+            card.rewards.some(reward => 
+              reward.scope.toLowerCase().includes(keyword)
+            )
+          );
+        } else {
+          // 一般搜尋邏輯
+          filteredCards = filteredCards.filter(card => {
+            // 搜尋銀行名稱
+            const bankMatch = card.bank.toLowerCase().includes(keyword);
+            
+            // 搜尋卡片名稱
+            const cardNameMatch = card.name.toLowerCase().includes(keyword);
+            
+            // 搜尋回饋分類的 category、scope、reward_type
+            const rewardMatch = card.rewards.some(reward => 
+              this.isRewardMatchingKeyword(reward, keyword)
+            );
+            
+            // 只要任一項目匹配就回傳 true
+            return bankMatch || cardNameMatch || rewardMatch;
+          });
+        }
       }
 
         // 重新排列優惠順序（符合條件的排前面）
@@ -249,6 +284,8 @@ export default () => ({
       } else if (this.searchKeyword?.trim()) {
         // 關鍵字搜尋時，對每張卡片的回饋進行去重和排序
         const keyword = this.searchKeyword.trim().toLowerCase();
+        
+        // 關鍵字搜尋邏輯
         filteredCards = filteredCards.map(card => {
           const deduplicatedRewards = this.deduplicateRewardsByCategory(card.rewards);
           
@@ -331,6 +368,7 @@ export default () => ({
     );
     return this.getMaxRewardRateFromRewards(matchingRewards);
   },
+
   
   // 根據類別+範圍去重回饋項目，保留數值最高的
   deduplicateRewardsByCategory(rewards) {

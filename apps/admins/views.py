@@ -287,7 +287,9 @@ def update_pending_reward(request, id):
     )
 
 
-# 圖片上傳頁面
+
+
+# S3圖片上傳頁面
 def image_upload(request):
     """圖片上傳管理頁面"""
     cards = CreditCard.objects.filter(is_active=True).order_by('bank', 'name')
@@ -309,12 +311,19 @@ def api_cards(request):
             # 使用 MediaStorage.url() 來生成正確的 URL，它會自動添加 media/ 前綴
             image_url = storage.url(card.image.name)
         
+        # 處理最後異動時間
+        last_modified = None
+        if card.updated_at:
+            last_modified = card.updated_at.strftime('%Y/%m/%d %p%I:%M:%S')
+        elif card.created_at:
+            last_modified = card.created_at.strftime('%Y/%m/%d %p%I:%M:%S')
+        
         cards_data.append({
             'id': card.id,
             'name': card.name,
             'bank': card.bank,
             'image': image_url,
-            'last_modified': None  # 初始為空，只有處理圖片後才會更新
+            'last_modified': last_modified
         })
     
     return JsonResponse({'cards': cards_data})
@@ -376,9 +385,25 @@ def api_upload_image(request):
                 print(f"手動上傳 S3 失敗: {e}")
                 return JsonResponse({'success': False, 'error': f'S3 上傳失敗: {str(e)}'})
         
+        # 重新獲取卡片資料以取得最新的 updated_at 和 image
+        card.refresh_from_db()
+        
+        # 處理最後異動時間
+        last_modified = None
+        if card.updated_at:
+            last_modified = card.updated_at.strftime('%Y/%m/%d %p%I:%M:%S')
+        elif card.created_at:
+            last_modified = card.created_at.strftime('%Y/%m/%d %p%I:%M:%S')
+        
+        # 確保取得最新的圖片 URL
+        image_url = None
+        if card.image:
+            image_url = storage.url(card.image.name)
+        
         return JsonResponse({
             'success': True, 
-            'image_url': storage.url(card.image.name),
+            'image_url': image_url,
+            'last_modified': last_modified,
             'message': '圖片上傳成功'
         })
         
@@ -416,7 +441,21 @@ def api_delete_image(request):
         card.image = None
         card.save()
         
-        return JsonResponse({'success': True, 'message': '圖片刪除成功'})
+        # 重新獲取卡片資料以取得最新的 updated_at
+        card.refresh_from_db()
+        
+        # 處理最後異動時間
+        last_modified = None
+        if card.updated_at:
+            last_modified = card.updated_at.strftime('%Y/%m/%d %p%I:%M:%S')
+        elif card.created_at:
+            last_modified = card.created_at.strftime('%Y/%m/%d %p%I:%M:%S')
+        
+        return JsonResponse({
+            'success': True, 
+            'last_modified': last_modified,
+            'message': '圖片刪除成功'
+        })
         
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
