@@ -14,16 +14,8 @@ export default () => ({
   // 載入信用卡資料
   async loadCards() {
     try {
-      const response = await fetch('/admins/api/cards/');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      
-      this.cards = data.cards.map(card => ({
-        ...card,
-        // 直接使用後端回傳的 last_modified，不需要重新映射
-      }));
+      const data = await this.apiRequest('/admins/api/cards/');
+      this.cards = data.cards;
     } catch (error) {
       console.error('載入信用卡資料失敗:', error);
       this.showError('載入信用卡資料失敗');
@@ -51,13 +43,17 @@ export default () => ({
     // 創建預覽 URL
     const preview = URL.createObjectURL(file);
     
-    // 儲存檔案資訊
-    this.selectedFiles[cardId] = {
-      file: file,
-      preview: preview,
-      name: file.name,
-      size: this.formatFileSize(file.size)
+    // 使用 Alpine.js 響應性更新方式
+    this.selectedFiles = {
+      ...this.selectedFiles,
+      [cardId]: {
+        file: file,
+        preview: preview,
+        name: file.name,
+        size: this.formatFileSize(file.size)
+      }
     };
+    
   },
   
   // 格式化檔案大小
@@ -71,8 +67,7 @@ export default () => ({
   
   // 上傳單張圖片
   async uploadImage(cardId) {
-    const selectedFile = this.selectedFiles[cardId];
-    if (!selectedFile) {
+    if (!this.selectedFiles[cardId]) {
       this.showError('請先選擇圖片');
       return;
     }
@@ -81,39 +76,8 @@ export default () => ({
     this.loadingMessage = '上傳圖片中...';
     
     try {
-      const formData = new FormData();
-      formData.append('image', selectedFile.file);
-      formData.append('card_id', cardId);
-      
-      const response = await fetch('/admins/api/upload-image/', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'X-CSRFToken': this.getCSRFToken()
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`上傳失敗: ${response.status}`);
-      }
-      
-      const result = await response.json();
-      
-      if (result.success) {
-        // 更新卡片資料
-        const card = this.cards.find(c => c.id === cardId);
-        if (card) {
-          card.image = result.image_url;
-          card.last_modified = result.last_modified || new Date().toLocaleString();
-        }
-        
-        // 清除選擇的檔案
-        delete this.selectedFiles[cardId];
-        
-        this.showSuccess('圖片上傳成功');
-      } else {
-        throw new Error(result.error || '上傳失敗');
-      }
+      await this.uploadSingleCard(cardId);
+      this.showSuccess('圖片上傳成功');
     } catch (error) {
       console.error('上傳圖片失敗:', error);
       this.showError('上傳圖片失敗: ' + error.message);
@@ -121,7 +85,7 @@ export default () => ({
       this.isLoading = false;
     }
   },
-  
+
   // 刪除單張圖片
   async deleteImage(cardId) {
     if (!confirm('確定要刪除這張圖片嗎？')) {
@@ -132,33 +96,8 @@ export default () => ({
     this.loadingMessage = '刪除圖片中...';
     
     try {
-      const response = await fetch('/admins/api/delete-image/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': this.getCSRFToken()
-        },
-        body: JSON.stringify({ card_id: cardId })
-      });
-      
-      if (!response.ok) {
-        throw new Error(`刪除失敗: ${response.status}`);
-      }
-      
-      const result = await response.json();
-      
-      if (result.success) {
-        // 更新卡片資料
-        const card = this.cards.find(c => c.id === cardId);
-        if (card) {
-          card.image = null;
-          card.last_modified = result.last_modified || new Date().toLocaleString();
-        }
-        
-        this.showSuccess('圖片刪除成功');
-      } else {
-        throw new Error(result.error || '刪除失敗');
-      }
+      await this.deleteSingleCard(cardId);
+      this.showSuccess('圖片刪除成功');
     } catch (error) {
       console.error('刪除圖片失敗:', error);
       this.showError('刪除圖片失敗: ' + error.message);
@@ -167,144 +106,136 @@ export default () => ({
     }
   },
   
-  // 批次上傳
-  async batchUpload() {
-    const selectedCardIds = this.selectedCards.filter(cardId => 
-      this.selectedFiles[cardId] && this.selectedFiles[cardId].file
-    );
+  // 批次操作通用方法
+  async batchOperation(operation, actionName) {
+    const selectedCardIds = this.getValidSelectedCards(operation);
     
     if (selectedCardIds.length === 0) {
-      this.showError('請選擇要上傳的圖片');
+      this.showError(`請選擇要${actionName}的圖片`);
+      return;
+    }
+    
+    if (operation === 'delete' && !confirm(`確定要刪除 ${selectedCardIds.length} 張圖片嗎？`)) {
       return;
     }
     
     this.isLoading = true;
-    this.loadingMessage = `批次上傳 ${selectedCardIds.length} 張圖片中...`;
+    this.loadingMessage = `批次${actionName} ${selectedCardIds.length} 張圖片中...`;
     
-    let successCount = 0;
-    let errorCount = 0;
+    try {
+      const results = await this.processCardsBatch(selectedCardIds, operation);
+      this.handleBatchResults(results, actionName);
+    } catch (error) {
+      console.error(`批次${actionName}過程中發生錯誤:`, error);
+      this.showError(`批次${actionName}過程中發生錯誤`);
+      this.isLoading = false;
+      this.selectedCards = [];
+    }
+  },
+
+  // 獲取有效的選中卡片
+  getValidSelectedCards(operation) {
+    return this.selectedCards.filter(cardId => {
+      const card = this.cards.find(c => c.id === cardId);
+      if (operation === 'upload') {
+        return card && this.selectedFiles[cardId]?.file;
+      } else if (operation === 'delete') {
+        return card && card.image;
+      }
+      return false;
+    });
+  },
+
+  // 批次處理卡片
+  async processCardsBatch(cardIds, operation) {
+    const results = { success: 0, error: 0 };
     
-    for (const cardId of selectedCardIds) {
+    for (const cardId of cardIds) {
       try {
-        const selectedFile = this.selectedFiles[cardId];
-        const formData = new FormData();
-        formData.append('image', selectedFile.file);
-        formData.append('card_id', cardId);
-        
-        const response = await fetch('/admins/api/upload-image/', {
-          method: 'POST',
-          body: formData,
-          headers: {
-            'X-CSRFToken': this.getCSRFToken()
-          }
-        });
-        
-        if (!response.ok) {
-          throw new Error(`上傳失敗: ${response.status}`);
+        if (operation === 'upload') {
+          await this.uploadSingleCard(cardId);
+        } else if (operation === 'delete') {
+          await this.deleteSingleCard(cardId);
         }
-        
-        const result = await response.json();
-        
-        if (result.success) {
-          // 更新卡片資料
-          const card = this.cards.find(c => c.id === cardId);
-          if (card) {
-            card.image = result.image_url;
-            card.last_modified = result.last_modified || new Date().toLocaleString();
-          }
-          
-          // 清除選擇的檔案
-          delete this.selectedFiles[cardId];
-          
-          successCount++;
-        } else {
-          throw new Error(result.error || '上傳失敗');
-        }
+        results.success++;
       } catch (error) {
-        errorCount++;
-        console.error(`卡片 ${cardId} 上傳失敗:`, error);
+        results.error++;
+        console.error(`卡片 ${cardId} ${operation === 'upload' ? '上傳' : '刪除'}失敗:`, error);
       }
     }
     
+    return results;
+  },
+
+  // 處理批次結果
+  handleBatchResults(results, actionName) {
     this.isLoading = false;
     
-    if (successCount > 0) {
-      this.showSuccess(`批次上傳完成: 成功 ${successCount} 張${errorCount > 0 ? `，失敗 ${errorCount} 張` : ''}`);
+    if (results.success > 0) {
+      const message = `批次${actionName}完成: 成功 ${results.success} 張${results.error > 0 ? `，失敗 ${results.error} 張` : ''}`;
+      this.showSuccess(message);
     } else {
-      this.showError('批次上傳失敗');
+      this.showError(`批次${actionName}失敗`);
     }
     
-    // 清除選擇
     this.selectedCards = [];
   },
-  
+
+  // 批次上傳
+  async batchUpload() {
+    await this.batchOperation('upload', '上傳');
+  },
+
   // 批次刪除
   async batchDelete() {
-    const selectedCardIds = this.selectedCards.filter(cardId => {
-      const card = this.cards.find(c => c.id === cardId);
-      return card && card.image;
+    await this.batchOperation('delete', '刪除');
+  },
+
+  // 單張上傳（內部方法）
+  async uploadSingleCard(cardId) {
+    const selectedFile = this.selectedFiles[cardId];
+    const formData = new FormData();
+    formData.append('image', selectedFile.file);
+    formData.append('card_id', cardId);
+    
+    const result = await this.apiRequest('/admins/api/upload-image/', {
+      method: 'POST',
+      body: formData
     });
     
-    if (selectedCardIds.length === 0) {
-      this.showError('請選擇要刪除的圖片');
-      return;
-    }
-    
-    if (!confirm(`確定要刪除 ${selectedCardIds.length} 張圖片嗎？`)) {
-      return;
-    }
-    
-    this.isLoading = true;
-    this.loadingMessage = `批次刪除 ${selectedCardIds.length} 張圖片中...`;
-    
-    let successCount = 0;
-    let errorCount = 0;
-    
-    for (const cardId of selectedCardIds) {
-      try {
-        const response = await fetch('/admins/api/delete-image/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': this.getCSRFToken()
-          },
-          body: JSON.stringify({ card_id: cardId })
-        });
-        
-        if (!response.ok) {
-          throw new Error(`刪除失敗: ${response.status}`);
-        }
-        
-        const result = await response.json();
-        
-        if (result.success) {
-          // 更新卡片資料
-          const card = this.cards.find(c => c.id === cardId);
-          if (card) {
-            card.image = null;
-            card.last_modified = result.last_modified || new Date().toLocaleString();
-          }
-          
-          successCount++;
-        } else {
-          throw new Error(result.error || '刪除失敗');
-        }
-      } catch (error) {
-        errorCount++;
-        console.error(`卡片 ${cardId} 刪除失敗:`, error);
-      }
-    }
-    
-    this.isLoading = false;
-    
-    if (successCount > 0) {
-      this.showSuccess(`批次刪除完成: 成功 ${successCount} 張${errorCount > 0 ? `，失敗 ${errorCount} 張` : ''}`);
+    if (result.success) {
+      this.updateCardData(cardId, result.image_url, result.last_modified);
+      delete this.selectedFiles[cardId];
     } else {
-      this.showError('批次刪除失敗');
+      throw new Error(result.error || '上傳失敗');
     }
+  },
+
+  // 單張刪除（內部方法）
+  async deleteSingleCard(cardId) {
+    const formData = new FormData();
+    formData.append('card_id', cardId);
+    formData.append('csrfmiddlewaretoken', this.getCSRFToken());
     
-    // 清除選擇
-    this.selectedCards = [];
+    const result = await this.apiRequest('/admins/api/delete-image/', {
+      method: 'POST',
+      body: formData
+    });
+    
+    if (result.success) {
+      this.updateCardData(cardId, null, result.last_modified);
+    } else {
+      throw new Error(result.error || '刪除失敗');
+    }
+  },
+
+  // 更新卡片資料（統一方法）
+  updateCardData(cardId, imageUrl, lastModified) {
+    const card = this.cards.find(c => c.id === cardId);
+    if (card) {
+      card.image = imageUrl;
+      card.last_modified = lastModified || new Date().toLocaleString();
+    }
   },
   
   // 切換單個卡片選擇
@@ -336,6 +267,23 @@ export default () => ({
     return this.selectedCards.length === this.cards.length && this.cards.length > 0;
   },
   
+  // 統一的 API 請求方法
+  async apiRequest(url, options = {}) {
+    const defaultOptions = {
+      headers: {
+        'X-CSRFToken': this.getCSRFToken(),
+        ...options.headers
+      }
+    };
+    
+    const response = await fetch(url, { ...defaultOptions, ...options });
+    if (!response.ok) {
+      throw new Error(`請求失敗: ${response.status}`);
+    }
+    
+    return await response.json();
+  },
+
   // 獲取 CSRF Token
   getCSRFToken() {
     const token = document.querySelector('[name=csrfmiddlewaretoken]');
@@ -344,15 +292,37 @@ export default () => ({
   
   // 顯示成功訊息
   showSuccess(message) {
-    // 可以在這裡添加 toast 通知
     console.log('Success:', message);
-    alert(message); // 臨時使用 alert，可以替換為更好的通知系統
+    this.showToast(message, 'success');
   },
   
   // 顯示錯誤訊息
   showError(message) {
-    // 可以在這裡添加 toast 通知
     console.error('Error:', message);
-    alert(message); // 臨時使用 alert，可以替換為更好的通知系統
+    this.showToast(message, 'error');
+  },
+
+  // 顯示 toast 訊息
+  showToast(message, type = 'info') {
+    // 創建 toast 資料
+    const toastId = 'toast-' + Date.now();
+    const toastData = {
+      id: toastId,
+      message,
+      type,
+      visible: true
+    };
+    
+    // 觸發自定義事件，讓頁面處理 toast 顯示
+    window.dispatchEvent(new CustomEvent('show-toast', { 
+      detail: toastData 
+    }));
+    
+    // 3 秒後自動隱藏
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('hide-toast', { 
+        detail: { id: toastId } 
+      }));
+    }, 3000);
   }
 });

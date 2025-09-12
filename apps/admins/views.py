@@ -416,8 +416,7 @@ def api_upload_image(request):
 def api_delete_image(request):
     """API: 刪除 S3 圖片"""
     try:
-        data = json.loads(request.body)
-        card_id = data.get('card_id')
+        card_id = request.POST.get('card_id')
         
         if not card_id:
             return JsonResponse({'success': False, 'error': '沒有指定卡片 ID'})

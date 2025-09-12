@@ -2,10 +2,6 @@
 /* Corresponds to: templates/admins/image_upload.html */
 
 @layer components {
-  
-  /* ========== Image Upload Components ========== */
-  
-  /* 覆蓋 ui-btn 定義以避免 Tailwind v4 衝突 */
   .ui-btn {
     @apply px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 border border-transparent;
     @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
@@ -35,158 +31,26 @@
     @apply opacity-50 cursor-not-allowed;
   }
   
-  /* ========== File Preview Styles ========== */
-  .file-preview {
-    @apply flex items-center gap-2 p-2 bg-gray-50 rounded-lg border border-gray-200;
-  }
-  
-  .file-preview img {
-    @apply w-8 h-6 object-cover rounded border border-gray-300;
-  }
-  
-  .file-preview .file-info {
-    @apply flex-1 min-w-0;
-  }
-  
-  .file-preview .file-name {
-    @apply text-xs text-gray-700 truncate;
-  }
-  
-  .file-preview .file-size {
-    @apply text-xs text-gray-500;
-  }
-  
-  /* ========== Status Indicators ========== */
-  .status-indicator {
-    @apply inline-flex items-center gap-2;
-  }
-  
-  .status-dot {
-    @apply w-3 h-3 rounded-full;
-  }
-  
-  .status-dot.uploaded {
-    @apply bg-green-500;
-  }
-  
-  .status-dot.not-uploaded {
-    @apply bg-gray-300;
-  }
-  
-  .status-dot.uploading {
-    @apply bg-yellow-500 animate-pulse;
-  }
-  
-  .status-dot.error {
-    @apply bg-red-500;
-  }
-  
-  /* ========== Loading Overlay ========== */
-  .loading-overlay {
-    @apply fixed inset-0 bg-black/50 flex items-center justify-center z-50;
-  }
-  
-  .loading-content {
-    @apply bg-white p-6 rounded-lg flex items-center gap-4 shadow-lg;
-  }
-  
-  /* ========== Table Enhancements ========== */
-  .image-upload-table {
-    @apply w-full border-collapse;
-  }
-  
-  .image-upload-table th {
-    @apply bg-gray-50 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200;
-  }
-  
-  .image-upload-table td {
-    @apply px-4 py-3 border-b border-gray-200;
-  }
-  
-  .image-upload-table tr:hover {
-    @apply bg-gray-50;
-  }
-  
-  /* ========== Action Buttons Container ========== */
-  .action-buttons {
-    @apply flex flex-col gap-2;
-  }
-  
-  .action-row {
-    @apply flex items-center gap-2;
-  }
-  
-  .action-buttons-row {
-    @apply flex gap-2;
-  }
-  
-  /* ========== Batch Operations ========== */
-  .batch-operations {
-    @apply flex gap-4 items-center;
-  }
-  
-  .batch-btn {
-    @apply px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200;
-    @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
-  }
-  
-  .batch-btn:disabled {
-    @apply opacity-20 cursor-not-allowed;
-  }
-  
-  /* ========== File Input Styling ========== */
-  .file-input-wrapper {
-    @apply relative;
-  }
-  
-  .file-input {
-    @apply hidden;
-  }
-  
-  .file-input-label {
-    @apply px-3 py-1.5 text-xs bg-blue-500 text-white rounded-lg font-medium transition-all duration-200 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer;
-  }
-  
-  /* ========== Progress Indicators ========== */
-  .progress-bar {
-    @apply w-full bg-gray-200 rounded-full h-2;
-  }
-  
-  .progress-fill {
-    @apply bg-blue-600 h-2 rounded-full transition-all duration-300;
-  }
-  
-  /* ========== Error Messages ========== */
-  .error-message {
-    @apply text-red-600 text-xs mt-1;
-  }
-  
-  .success-message {
-    @apply text-green-600 text-xs mt-1;
-  }
-  
-  /* ========== Responsive Design ========== */
-  @media (max-width: 768px) {
-    .action-buttons {
-      @apply flex-col;
-    }
-    
-    .action-row {
-      @apply flex-col items-start;
-    }
-    
-    .batch-operations {
-      @apply flex-col items-start gap-2;
-    }
-  }
-}
 
-@layer utilities {
-  .truncate-text {
-    @apply truncate max-w-xs;
+  /* ========== Batch Action Buttons ========== */
+  .batch-actions-container {
+    @apply fixed flex flex-col gap-3 bottom-64 right-6 z-[9999];
+  }
+
+  .batch-btn {
+    @apply px-6 py-3 text-white font-semibold rounded-lg shadow-lg transition-colors cursor-pointer block;
+  }
+
+  .batch-btn-success {
+    @apply bg-green-500 hover:bg-green-600;
+  }
+
+  .batch-btn-error {
+    @apply bg-red-500 hover:bg-red-600;
+  }
+
+  .batch-btn:disabled {
+    @apply bg-gray-400 cursor-not-allowed;
   }
   
-  .image-upload-container {
-    @apply max-w-full overflow-hidden;
-  }
 }

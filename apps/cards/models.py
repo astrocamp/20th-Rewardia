@@ -2,7 +2,6 @@ from django.db import models
 from django.core.validators import FileExtensionValidator
 from PIL import Image
 import re
-import os
 
 
 class CreditCard(models.Model):
@@ -63,18 +62,6 @@ class CreditCard(models.Model):
         return f"{self.bank} {self.name}"
 
 
-    def format_bank_name(self, bank_name):
-        if re.search("一銀", bank_name):
-            return "第一"
-        if re.search("美國", bank_name):
-            return "美國運通"
-        if re.search("富邦", bank_name):
-            return "富邦"
-        if bank_name not in CreditCard.Bank.values:
-            return "無"
-        return bank_name
-
-
     def save(self, *args, **kwargs):
         self.bank = self.format_bank_name(self.bank)
         
@@ -90,15 +77,18 @@ class CreditCard(models.Model):
             self.resize_image()
 
     def format_bank_name(self, bank_name):
-        if re.search("一銀", bank_name):
-            return "第一"
-        if re.search("美國", bank_name):
-            return "美國運通"
-        if re.search("富邦", bank_name):
-            return "富邦"
-        if bank_name not in CreditCard.Bank.values:
-            return "無"
-        return bank_name
+        """格式化銀行名稱"""
+        bank_patterns = {
+            "一銀": "第一",
+            "美國": "美國運通", 
+            "富邦": "富邦"
+        }
+        
+        for pattern, formatted_name in bank_patterns.items():
+            if re.search(pattern, bank_name):
+                return formatted_name
+                
+        return bank_name if bank_name in CreditCard.Bank.values else "無"
 
     def resize_image(self):
         """圖片處理：調整大小、格式轉換、壓縮"""
@@ -139,7 +129,7 @@ class CreditCard(models.Model):
                     from django.core.files.base import ContentFile
                     
                     output = BytesIO()
-                    img.save(output, 'JPEG', quality=85, optimize=True)
+                    img.save(output, 'WEBP', quality=85, optimize=True)
                     output.seek(0)
                     content = ContentFile(output.getvalue())
                     
@@ -153,7 +143,7 @@ class CreditCard(models.Model):
                     # 本地儲存
                     img.save(
                         self.image.path, 
-                        'JPEG', 
+                        'WEBP', 
                         quality=85,
                         optimize=True
                     )
