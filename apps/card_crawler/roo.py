@@ -11,6 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.relative_locator import locate_with
 import time
+import os
 from apps.card_crawler.models import CrawledData, CrawledRecord
 from datetime import timedelta
 from django.utils import timezone
@@ -287,11 +288,9 @@ def main_crawler():
 
     try:
         start_time = time.time()
-        # 使用遠端 Selenium Grid
-        driver = webdriver.Remote(
-            command_executor="http://rewardia-selenium:4444", options=options
-        )
-        # driver = webdriver.Firefox(options=options)
+        # 透過 VPN 連線到本地的 Selenium Grid
+        home_selenium_url = os.environ.get("HOME_SELENIUM_URL")
+        driver = webdriver.Remote(command_executor=home_selenium_url, options=options)
         category_urls = crawl_roo_urls(driver)
         crawl_roo_cards(driver, category_urls)
 

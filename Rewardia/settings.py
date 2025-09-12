@@ -30,7 +30,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["207.148.91.3", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["rewardia.net", "localhost", "127.0.0.1"]
 
 LOGIN_URL = "/sessions/login"
 
@@ -241,11 +241,16 @@ CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "Asia/Taipei"
 
 
+# 從環境變數讀取 Celery 排程時間 (格式: "8:30")
+CRAWLER_SCHEDULE = os.getenv('CRAWLER_SCHEDULE', '8:0').split(':')
+CRAWLER_SCHEDULE_HOUR = int(CRAWLER_SCHEDULE[0])
+CRAWLER_SCHEDULE_MINUTE = int(CRAWLER_SCHEDULE[1])
+
 CELERY_BEAT_SCHEDULE = {
-    # 每天早上 8 點執行爬蟲（完成後自動執行 NLP 分析）
+    # 每天執行爬蟲（完成後自動執行 NLP 分析）
     "daily-crawl-and-nlp": {
         "task": "apps.card_crawler.tasks.crawl_roo_task",
-        "schedule": crontab(hour=8, minute=0),
+        "schedule": crontab(hour=CRAWLER_SCHEDULE_HOUR, minute=CRAWLER_SCHEDULE_MINUTE),
     },
 }
 

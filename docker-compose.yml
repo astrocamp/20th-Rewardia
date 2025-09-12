@@ -25,22 +25,6 @@ services:
     networks:
       - rewardia-network
 
-  selenium-firefox:
-    image: selenium/standalone-firefox:latest
-    container_name: rewardia-selenium
-    ports:
-      - "4444:4444"
-      - "7900:7900" # VNC viewer port
-    environment:
-      - SE_VNC_NO_PASSWORD=1
-      - SE_SCREEN_WIDTH=1920
-      - SE_SCREEN_HEIGHT=1080
-    volumes:
-      - /dev/shm:/dev/shm
-    networks:
-      - rewardia-network
-    restart: unless-stopped
-
   rewardia:
     build:
       context: .
@@ -51,8 +35,11 @@ services:
     depends_on:
       - postgres
       - redis
-      - selenium-firefox
     environment:
+      - AUTOSTART_WEB=true
+      - AUTOSTART_CRAWLER=true
+      - CRAWLER_SCHEDULE=${CRAWLER_SCHEDULE}
+      - HOME_SELENIUM_URL=${HOME_SELENIUM_URL}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
     volumes:
