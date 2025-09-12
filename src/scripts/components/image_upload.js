@@ -40,6 +40,11 @@ export default () => ({
       return;
     }
     
+    // 釋放舊的 blob URL (防止記憶體洩漏)
+    if (this.selectedFiles[cardId]?.preview) {
+      URL.revokeObjectURL(this.selectedFiles[cardId].preview);
+    }
+    
     // 創建預覽 URL
     const preview = URL.createObjectURL(file);
     
@@ -149,8 +154,15 @@ export default () => ({
   // 批次處理卡片
   async processCardsBatch(cardIds, operation) {
     const results = { success: 0, error: 0 };
+    const total = cardIds.length;
     
-    for (const cardId of cardIds) {
+    for (let i = 0; i < cardIds.length; i++) {
+      const cardId = cardIds[i];
+      const current = i + 1;
+      
+      // 更新進度訊息
+      this.loadingMessage = `批次${operation === 'upload' ? '上傳' : '刪除'} ${current}/${total} 張圖片中...`;
+      
       try {
         if (operation === 'upload') {
           await this.uploadSingleCard(cardId);
@@ -197,6 +209,7 @@ export default () => ({
     const formData = new FormData();
     formData.append('image', selectedFile.file);
     formData.append('card_id', cardId);
+    formData.append('csrfmiddlewaretoken', this.getCSRFToken());
     
     const result = await this.apiRequest('/admins/api/upload-image/', {
       method: 'POST',
@@ -205,6 +218,11 @@ export default () => ({
     
     if (result.success) {
       this.updateCardData(cardId, result.image_url, result.last_modified);
+      
+      // 釋放 blob URL 並清除選擇的檔案
+      if (this.selectedFiles[cardId]?.preview) {
+        URL.revokeObjectURL(this.selectedFiles[cardId].preview);
+      }
       delete this.selectedFiles[cardId];
     } else {
       throw new Error(result.error || '上傳失敗');
@@ -278,7 +296,27 @@ export default () => ({
     
     const response = await fetch(url, { ...defaultOptions, ...options });
     if (!response.ok) {
-      throw new Error(`請求失敗: ${response.status}`);
+      let errorMessage = '請求失敗';
+      switch (response.status) {
+        case 400:
+          errorMessage = '請求參數錯誤';
+          break;
+        case 403:
+          errorMessage = '權限不足或 CSRF token 錯誤';
+          break;
+        case 404:
+          errorMessage = '找不到指定的資源';
+          break;
+        case 413:
+          errorMessage = '檔案太大';
+          break;
+        case 500:
+          errorMessage = '伺服器內部錯誤';
+          break;
+        default:
+          errorMessage = `請求失敗 (${response.status})`;
+      }
+      throw new Error(errorMessage);
     }
     
     return await response.json();
@@ -305,7 +343,7 @@ export default () => ({
   // 顯示 toast 訊息
   showToast(message, type = 'info') {
     // 創建 toast 資料
-    const toastId = 'toast-' + Date.now();
+    const toastId = 'toast-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
     const toastData = {
       id: toastId,
       message,
@@ -317,12 +355,5 @@ export default () => ({
     window.dispatchEvent(new CustomEvent('show-toast', { 
       detail: toastData 
     }));
-    
-    // 3 秒後自動隱藏
-    setTimeout(() => {
-      window.dispatchEvent(new CustomEvent('hide-toast', { 
-        detail: { id: toastId } 
-      }));
-    }, 3000);
   }
 });

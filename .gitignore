@@ -24,4 +24,7 @@ uv.lock
 
 .vscode/
 
+# User-uploaded files
+media/
+
 .gitignore

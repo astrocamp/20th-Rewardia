@@ -458,3 +458,4 @@ def api_delete_image(request):
         
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
+
