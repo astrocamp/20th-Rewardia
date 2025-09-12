@@ -49,10 +49,35 @@ services:
       - rewardia-network
     restart: unless-stopped
 
+  nginx-proxy-manager:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx-proxy-manager
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443" 
+      - "81:81"
+    volumes:
+      - nginx-data:/data
+      - nginx-letsencrypt:/etc/letsencrypt
+    environment:
+      DB_ENGINE: postgres
+      DB_HOST: rewardia-postgres
+      DB_PORT: 5432
+      DB_NAME: nginx
+      DB_USER: ${POSTGRES_USER}  
+      DB_PASS: ${POSTGRES_PASSWORD}
+    networks:
+      - rewardia-network
+    depends_on:
+      - postgres
+
 volumes:
   postgres_data:
   redis_data:
   app_logs:
+  nginx-data:
+  nginx-letsencrypt:
 
 networks:
   rewardia-network:

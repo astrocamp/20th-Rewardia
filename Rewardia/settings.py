@@ -30,7 +30,28 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["rewardia.net", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["rewardia.net", "www.rewardia.net", "localhost", "127.0.0.1"]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://rewardia.net", 
+    "https://www.rewardia.net",
+    "http://rewardia.net",
+    "http://www.rewardia.net",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000"
+]
+
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
+
+SESSION_COOKIE_SECURE = True
+
+CSRF_COOKIE_SECURE = True
+
+# 反向代理設定
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
+
 
 LOGIN_URL = "/sessions/login"
 
@@ -242,7 +263,7 @@ CELERY_TIMEZONE = "Asia/Taipei"
 
 
 # 從環境變數讀取 Celery 排程時間 (格式: "8:30")
-CRAWLER_SCHEDULE = os.getenv('CRAWLER_SCHEDULE', '8:0').split(':')
+CRAWLER_SCHEDULE = os.getenv("CRAWLER_SCHEDULE", "8:0").split(":")
 CRAWLER_SCHEDULE_HOUR = int(CRAWLER_SCHEDULE[0])
 CRAWLER_SCHEDULE_MINUTE = int(CRAWLER_SCHEDULE[1])
 
@@ -259,7 +280,10 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 # 給插件使用的
 CORS_ALLOWED_ORIGINS = [
     "chrome-extension://odiagekokpobofjdlbmfobkbohcljnoe",
+    "https://rewardia.net",
+    "https://www.rewardia.net",
 ]
+
 
 CORS_ALLOW_CREDENTIALS = True
 

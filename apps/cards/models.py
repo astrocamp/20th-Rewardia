@@ -76,6 +76,7 @@ class CreditCard(models.Model):
         super().save(*args, **kwargs)
 
     def format_bank_name(self, bank_name):
+<<<<<<< HEAD
         """格式化銀行名稱"""
         bank_patterns = {
             "一銀": "第一",
@@ -139,3 +140,14 @@ class CreditCard(models.Model):
                 # 如果圖片處理失敗，保持原檔案
                 pass
 
+=======
+        # if re.search("Bank", bank_name):
+        #     return "Line Bank"
+        if re.search("一銀", bank_name):
+            return "第一"
+        if re.search("美國", bank_name):
+            return "美國運通"
+        if bank_name not in CreditCard.Bank.values:
+            return "無"
+        return bank_name
+>>>>>>> d001397 (feat:新增反向代理)
