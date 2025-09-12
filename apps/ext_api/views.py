@@ -24,9 +24,11 @@ def get_category_rewards(request, category):
 
 @api_view(["GET"])
 def get_merchant_rewards(request, scope):
-    reward_merchant = RewardCategory.objects.filter(
-        scope=scope,
-        is_active=True,
-    ).order_by(Coalesce("max_rate", "min_rate", 0).desc())[:10]
+    reward_merchant = (
+        RewardCategory.objects.filter(scope=scope, is_active=True, card__is_active=True)
+        .annotate(rate=Coalesce("max_rate", "min_rate"))
+        .order_by("-rate")[:10]
+    )
+
     serializer = RewardSerializer(reward_merchant, many=True)
     return Response(serializer.data)

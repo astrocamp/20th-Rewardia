@@ -24,8 +24,7 @@ async function return_cards(merchant) {
   cards.forEach((card) => {
     let card_rate;
     if (card.min_rate && card.max_rate) {
-      card_rate = `<span>最高 ${card.max_rate}% 回饋</span>
-          <span>最低 ${card.min_rate}% 回饋</span>`;
+      card_rate = `<span>${card.min_rate} - ${card.max_rate}% 回饋</span>`;
     } else if (card.min_rate == null) {
       card_rate = `<span>最高 ${card.max_rate}% 回饋</span>`;
     } else if (card.max_rate == null) {
