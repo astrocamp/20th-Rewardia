@@ -1,0 +1,165 @@
+{% extends 'admins/default.html' %}
+
+{% block content %}
+<section
+  class="relative mx-4 sm:mx-6 lg:mx-10 mb-4 sm:mb-6 lg:mb-8 mt-24 overflow-hidden"
+  x-bind:class="{ 'banner-hidden': !$store.banner.visible }"
+  x-data="imageUpload"
+>
+  <div class="my-4 sm:mb-6 flex flex-row items-center justify-between">
+    <h2 id="image_upload_title" class="text-2xl sm:text-2xl lg:text-2xl font-bold text-black">
+      信用卡圖片管理
+    </h2>
+
+    <div class="flex gap-4">
+      <button
+        @click="batchUpload()"
+        :disabled="!hasSelectedItems()"
+        class="ui-btn ui-btn-success cursor-pointer"
+        :class="{ 'opacity-50 cursor-not-allowed': !hasSelectedItems() }"
+      >
+        批次新增
+      </button>
+      <button
+        @click="batchDelete()"
+        :disabled="!hasSelectedItems()"
+        class="ui-btn ui-btn-error cursor-pointer"
+        :class="{ 'opacity-50 cursor-not-allowed': !hasSelectedItems() }"
+      >
+        批次刪除
+      </button>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="table table-zebra w-full">
+      <thead>
+        <tr>
+          <th class="w-12">
+            <input 
+              type="checkbox" 
+              class="checkbox checkbox-sm" 
+              @change="toggleSelectAll($event)"
+              :checked="isAllSelected()"
+            />
+          </th>
+          <th class="w-32">ID</th>
+          <th class="w-48">信用卡名稱</th>
+          <th class="w-32">銀行</th>
+          <th class="w-64">圖片操作</th>
+          <th class="w-32">狀態</th>
+          <th class="w-48">最後異動時間</th>
+        </tr>
+      </thead>
+      <tbody>
+        <template x-for="card in cards" :key="card.id">
+          <tr class="hover:bg-gray-50">
+            <!-- 勾選框 -->
+            <td>
+              <input 
+                type="checkbox" 
+                class="checkbox checkbox-sm" 
+                :checked="selectedCards.includes(card.id)"
+                @change="toggleSelectCard(card.id)"
+              />
+            </td>
+            
+            <!-- ID -->
+            <td x-text="card.id"></td>
+            
+            <!-- 信用卡名稱 -->
+            <td x-text="card.name"></td>
+            
+            <!-- 銀行 -->
+            <td x-text="card.bank"></td>
+            
+            <!-- 圖片操作區域 -->
+            <td>
+              <div class="flex flex-col gap-2">
+                <!-- 檔案選擇區域 -->
+                <div class="flex items-center gap-2">
+                  <input 
+                    type="file" 
+                    :id="'file_' + card.id"
+                    accept="image/*"
+                    class="hidden"
+                    @change="handleFileSelect($event, card.id)"
+                  />
+                  <button 
+                    @click="document.getElementById('file_' + card.id).click()"
+                    class="ui-btn ui-btn-info ui-btn-sm"
+                  >
+                    選擇圖片
+                  </button>
+                </div>
+                
+                <!-- 檔案預覽和路徑 -->
+                <div x-show="selectedFiles[card.id]" class="text-xs text-gray-600">
+                  <div class="flex items-center gap-2">
+                    <img 
+                      x-show="selectedFiles[card.id]?.preview"
+                      :src="selectedFiles[card.id]?.preview" 
+                      class="w-8 h-6 object-cover rounded"
+                    />
+                    <span x-text="selectedFiles[card.id]?.name" class="truncate"></span>
+                  </div>
+                </div>
+                
+                <!-- 操作按鈕 -->
+                <div class="flex gap-2">
+                  <button 
+                    @click="uploadImage(card.id)"
+                    :disabled="!selectedFiles[card.id]"
+                    class="ui-btn ui-btn-success ui-btn-sm"
+                    :class="{ 'opacity-50 cursor-not-allowed': !selectedFiles[card.id] }"
+                  >
+                    新增
+                  </button>
+                  <button 
+                    @click="deleteImage(card.id)"
+                    :disabled="!card.image"
+                    class="ui-btn ui-btn-error ui-btn-sm"
+                    :class="{ 'opacity-50 cursor-not-allowed': !card.image }"
+                  >
+                    刪除
+                  </button>
+                </div>
+              </div>
+            </td>
+            
+            <!-- 狀態 -->
+            <td>
+              <div class="flex items-center gap-2">
+                <!-- 已上傳圖片預覽 -->
+                <img 
+                  x-show="card.image"
+                  :src="card.image" 
+                  alt="已上傳圖片"
+                  class="w-12 h-8 object-cover rounded border"
+                  @error="card.image = null"
+                />
+                <div 
+                  class="w-3 h-3 rounded-full"
+                  :class="card.image ? 'bg-green-500' : 'bg-gray-300'"
+                ></div>
+                <span x-text="card.image ? '已上傳' : '未上傳'" class="text-sm"></span>
+              </div>
+            </td>
+            
+            <!-- 最後異動時間 -->
+            <td x-text="card.last_modified || '無'"></td>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 載入指示器 -->
+  <div x-show="isLoading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg flex items-center gap-4">
+      <span class="loading loading-spinner loading-md"></span>
+      <span x-text="loadingMessage"></span>
+    </div>
+  </div>
+</section>
+{% endblock %}
