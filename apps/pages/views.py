@@ -5,6 +5,7 @@ from apps.rewards.models import RewardCategory
 from django.http import HttpResponse, JsonResponse # Added JsonResponse
 from django.db.models import Prefetch
 from django.utils.html import escape
+from django.views.decorators.csrf import csrf_exempt
 import json
 
 
@@ -231,6 +232,7 @@ def get_scopes_by_category(request):
 
 
 
+@csrf_exempt
 def calculate_reward(request):
     """計算信用卡回饋 - 使用 Django Form 驗證"""
     if request.method == "POST":
@@ -339,3 +341,4 @@ def get_messages(request):
         """
 
     return HttpResponse(messages_html)
+

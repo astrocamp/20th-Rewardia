@@ -46,10 +46,6 @@
 @import "./utilities/toasts.css";
 @import "./utilities/animations.css";
 
-/* Import utility styles */
-@import "./utilities/toasts.css";
-@import "./utilities/animations.css";
-
 @layer base {
   :root {
     --p: 0 0% 0%;
@@ -73,6 +69,7 @@
   .banner-close-btn {
     @apply hover:bg-gray-700 rounded transition-colors duration-200;
   }
+
 
   .add-card-bg {
     @apply bg-gray-50 rounded-lg;
@@ -127,50 +124,24 @@
 }
 
 @layer utilities {
-  .tw-toast {
-    @apply bg-white text-gray-900 rounded-xl shadow px-4 py-3 text-sm ring-1 ring-black/5;
-  }
-  .tw-toast svg {
-    @apply text-gray-700;
-  }
+.tw-toast { @apply bg-white text-gray-900 rounded-xl shadow px-4 py-3 text-sm ring-1 ring-black/5; }
+.tw-toast svg { @apply text-gray-700; }
 
-  .tw-success {
-    @apply bg-green-50 text-green-800;
-  }
-  .tw-success svg {
-    @apply text-green-600;
-  }
+.tw-success { @apply bg-green-50 text-green-800; }
+.tw-success svg { @apply text-green-600; }
 
-  .tw-error {
-    @apply bg-red-50 text-red-800;
-  }
-  .tw-error svg {
-    @apply text-red-600;
-  }
+.tw-error   { @apply bg-red-50 text-red-800; }
+.tw-error svg { @apply text-red-600; }
 
-  .tw-warn {
-    @apply bg-yellow-50 text-yellow-900;
-  }
-  .tw-warn svg {
-    @apply text-yellow-600;
-  }
+.tw-warn    { @apply bg-yellow-50 text-yellow-900; }
+.tw-warn svg { @apply text-yellow-600; }
 
-  .tw-info {
-    @apply bg-blue-50 text-blue-800;
-  }
-  .tw-info svg {
-    @apply text-blue-600;
-  }
+.tw-info    { @apply bg-blue-50 text-blue-800; }
+.tw-info svg { @apply text-blue-600; }
 }
 
 /* Keyframe animation */
 @keyframes fadein {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+from { opacity:0; transform: translateY(-4px) }
+to   { opacity:1; transform: translateY(0) }
 }

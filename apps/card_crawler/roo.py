@@ -201,7 +201,7 @@ def crawl_roo_urls(driver):
                             href = fresh_categories[i].get_attribute("href")
                             if href:
                                 categories_urls.append(href)
-                    except:
+                    except Exception:
                         continue
 
             return categories_urls

@@ -1,8 +1,8 @@
 <!-- AI 聊天機器人組件 -->
 <div x-data="chatbot()" x-init="username = '{% if user.is_authenticated %}{{ user.first_name|default:user.username }}{% else %}使用者{% endif %}'" x-cloak>
   <!-- 浮動按鈕 -->
-  <button 
-    @click="toggleChat()" 
+  <button
+    @click="toggleChat()"
     class="chatbot-float-btn"
     :class="{ 'opacity-0 pointer-events-none': isOpen }"
     aria-label="開啟 AI 助理"
@@ -15,7 +15,7 @@
   </button>
 
   <!-- 聊天視窗 -->
-  <div 
+  <div
     class="chatbot-window"
     :class="{ 'show': isOpen }"
     x-show="isOpen"
@@ -29,8 +29,8 @@
     <!-- 標題列 -->
     <div class="chatbot-header">
       <h3 class="chatbot-title">Rewardia 助理</h3>
-      <button 
-        @click="closeChat()" 
+      <button
+        @click="closeChat()"
         class="chatbot-close-btn"
         aria-label="關閉聊天視窗"
         type="button"
@@ -58,16 +58,16 @@
       <template x-for="(message, index) in messages" :key="index">
         <div class="w-full mb-4">
           <!-- 發送者標籤 -->
-          <div 
+          <div
             :class="message.type === 'user' ? 'text-right mr-4 mb-1' : 'text-left ml-4 mb-1'"
           >
-            <span 
+            <span
               class="text-xs text-gray-500"
               x-text="message.type === 'user' ? username : 'Rewardia'"
             ></span>
           </div>
           <!-- 訊息氣泡 -->
-          <div 
+          <div
             class="message-bubble whitespace-pre-wrap"
             :class="message.type === 'user' ? 'message-user' : 'message-ai'"
             x-text="message.content"
@@ -104,7 +104,7 @@
         @input="autoResize($event)"
         @keydown="handleKeyDown($event)"
       ></textarea>
-      
+
       <!-- 錯誤訊息 -->
       <div x-show="errorMessage" x-transition class="mt-2">
         <p class="text-red-500 text-xs" x-text="errorMessage"></p>
