@@ -40,15 +40,15 @@ function return_login_view() {
   account_content.innerHTML = login_view;
 }
 
-async function return_loggedin_view(username) {
+async function return_loggedin_view(token, username) {
   loggedin = true;
   const loggedin_view = `<div class="user_cards"><h1>${username} 的卡片</h1></div><div><button class="btn logout_btn">登出</button></div>`;
   account_content.innerHTML = loggedin_view;
 
-  await get_user_cards();
-
   const logout_btn = document.querySelector(".logout_btn");
   logout_btn.addEventListener("click", logout);
+
+  await get_user_cards(token);
 }
 
 function logout() {
@@ -81,15 +81,19 @@ async function check_login_status() {
   }
   if (token && username) {
     loggedin = true;
-    return_loggedin_view(username);
+    return_loggedin_view(token, username);
   }
 }
 
 check_login_status();
 
-async function get_user_cards() {
+async function get_user_cards(token) {
   const user_cards = document.querySelector(".user_cards");
-  const response = await fetch(user_cards_url);
+  const response = await fetch(user_cards_url, {
+    headers: {
+      Authorization: `Token ${token}`,
+    },
+  });
   const cards = await response.json();
 
   cards.forEach((card) => {

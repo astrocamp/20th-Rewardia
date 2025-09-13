@@ -9,7 +9,7 @@ from rest_framework.decorators import (
     permission_classes,
 )
 from django.db.models.functions import Coalesce
-from rest_framework.authentication import SessionAuthentication
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 
@@ -48,8 +48,8 @@ def get_merchant_rewards(request, scope):
 
 
 @api_view(["GET"])
-@authentication_classes([SessionAuthentication])
-@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
+# @permission_classes([IsAuthenticated])
 def get_user_cards(request):
     user_cards = UserCard.objects.filter(user=request.user).order_by("-added_date")
     serializer = UserCardSerializer(user_cards, many=True)
