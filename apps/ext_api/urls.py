@@ -25,4 +25,9 @@ urlpatterns = [
         views.get_user_cards,
         name="get_user_cards",
     ),
+    path(
+        "users/cards/new",
+        views.new_user_card,
+        name="new_user_card",
+    ),
 ]
