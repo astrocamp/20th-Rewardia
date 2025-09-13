@@ -1,5 +1,6 @@
 const token_url = "http://localhost:8000/users/api/get_token";
 const member_zone = "http://localhost:8000/users/member";
+const user_cards_url = "http://localhost:8000/api/users/cards/";
 let loggedin = false;
 
 async function get_current_url() {
@@ -39,10 +40,12 @@ function return_login_view() {
   account_content.innerHTML = login_view;
 }
 
-function return_loggedin_view(username) {
+async function return_loggedin_view(username) {
   loggedin = true;
-  const loggedin_view = `<div id="hidden"></div><div class="login_img"><i class="fa-solid fa-gifts"></i><span class="welcome_msg">嗨 ${username}！恭喜登入成功！</span></div><div><button class="btn logout_btn">登出</button></div>`;
+  const loggedin_view = `<div class="user_cards"><h1>${username} 的卡片</h1></div><div><button class="btn logout_btn">登出</button></div>`;
   account_content.innerHTML = loggedin_view;
+
+  await get_user_cards();
 
   const logout_btn = document.querySelector(".logout_btn");
   logout_btn.addEventListener("click", logout);
@@ -83,3 +86,23 @@ async function check_login_status() {
 }
 
 check_login_status();
+
+async function get_user_cards() {
+  const user_cards = document.querySelector(".user_cards");
+  const response = await fetch(user_cards_url);
+  const cards = await response.json();
+
+  cards.forEach((card) => {
+    const card_view = `<div class="card">
+        <div class="card_text">
+          <h2>${card.card.name}</h2>
+        </div>
+      </div>`;
+    user_cards.insertAdjacentHTML("beforeend", card_view);
+  });
+
+  if (cards.length == 0) {
+    const no_cards = `<div class="no_cards">尚未新增卡片</div>`;
+    user_cards.insertAdjacentHTML("beforeend", no_cards);
+  }
+}

@@ -1,16 +1,17 @@
-.hidden {
-  display: none;
-}
-
 .account_content {
+  width: 100%;
   height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-between;
   box-sizing: border-box;
   padding: 0 15px;
   font-family: "Kulim Park", sans-serif;
+  padding-top: 80px;
+  padding-bottom: 60px;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 .login_img {
@@ -41,13 +42,50 @@
   transition: all 0.3s;
 }
 
-.welcome_msg {
-  margin: 10px;
-  font-weight: bold;
-}
-
 .logout_btn {
   width: 20vw;
   font-size: 12px;
   padding: 8px;
+}
+
+.user_cards {
+  width: 100%;
+}
+
+.card {
+  width: 100%;
+  margin: 20px 0;
+  height: 60px;
+  display: flex;
+  flex-direction: row;
+  background-color: #f3f4f6;
+  border-radius: 20px;
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.card:hover {
+  background-color: #374151;
+  color: white;
+  transition: all 0.2s ease-in-out;
+}
+
+.card_text {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+h1 {
+  font-size: 20px;
+}
+
+h2 {
+  font-size: 16px;
+}
+
+.no_cards {
+  margin: 20px 0;
 }
