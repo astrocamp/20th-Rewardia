@@ -1,5 +1,6 @@
 from apps.rewards.models import RewardCategory
 from apps.cards.models import CreditCard
+from apps.users.models import UserCard
 from rest_framework import serializers
 
 
@@ -15,3 +16,11 @@ class RewardSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = RewardCategory
         fields = ["card", "category", "scope", "min_rate", "max_rate", "reward_type"]
+
+
+class UserCardSerializer(serializers.ModelSerializer):
+    card = CardSerializer(read_only=True)
+
+    class Meta:
+        model = UserCard
+        fields = ["user", "card"]

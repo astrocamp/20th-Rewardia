@@ -42,7 +42,6 @@ function return_login_view() {
 function return_loggedin_view(username) {
   loggedin = true;
   const loggedin_view = `<div id="hidden"></div><div class="login_img"><i class="fa-solid fa-gifts"></i><span class="welcome_msg">嗨 ${username}！恭喜登入成功！</span></div><div><button class="btn logout_btn">登出</button></div>`;
-  // login_view.classList.add("hidden");
   account_content.innerHTML = loggedin_view;
 
   const logout_btn = document.querySelector(".logout_btn");
