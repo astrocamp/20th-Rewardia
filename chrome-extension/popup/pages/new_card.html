@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="../styles/reset.css" />
+    <link rel="stylesheet" href="../styles/default.css" />
+    <link rel="stylesheet" href="../styles/new_card.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+      integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script type="module" src="../scripts/account.js"></script>
+  </head>
+  <body>
+    <header class="header">
+      <div class="logo">REWARDIA</div>
+      <div class="header_options">
+        <div class="settings"><i class="fa-solid fa-gear"></i></div>
+      </div>
+    </header>
+    <div class="new_card_form">
+      <h1>新增卡片</h1>
+      <form action="" method="post">
+        <div class="banks">
+          <label for="bank_select"> * 發卡銀行 </label>
+          <div>
+            <select id="bank_select" name="bank_name" required>
+              <option value="" class="text-[#949AA6]">選擇發卡銀行</option>
+              <option value="">BANKS</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="cards">
+          <label for="card_select"> * 卡片 </label>
+          <div>
+            <select id="card_select" name="card_name" required>
+              <option value="" class="text-[#949AA6]">選擇卡片</option>
+              <option value="">CARDS</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+    <nav class="navbar">
+      <div class="icon">
+        <a href="index.html">
+          <i class="fa-solid fa-house"></i>
+          <span>首頁</span>
+        </a>
+      </div>
+      <div class="icon">
+        <a href="#">
+          <i class="fa-solid fa-credit-card"></i>
+          <span>信用卡</span>
+        </a>
+      </div>
+      <div class="icon">
+        <a href="rewards.html">
+          <i class="fa-solid fa-gift"></i>
+          <span>商家回饋</span>
+        </a>
+      </div>
+      <div class="icon">
+        <a href="login.html">
+          <i class="fa-solid fa-user"></i>
+          <span>帳號</span>
+        </a>
+      </div>
+    </nav>
+  </body>
+</html>

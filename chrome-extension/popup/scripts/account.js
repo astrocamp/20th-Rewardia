@@ -68,25 +68,6 @@ async function get_username() {
   return result.username;
 }
 
-async function check_login_status() {
-  return_login_view();
-  // 一開始叫先確認有沒有token
-  let token = await get_auth_token();
-  let username = await get_username();
-
-  if (!token) {
-    await fetch_token(token_url);
-    token = await get_auth_token();
-    username = await get_username();
-  }
-  if (token && username) {
-    loggedin = true;
-    return_loggedin_view(token, username);
-  }
-}
-
-check_login_status();
-
 async function get_user_cards(token) {
   const user_cards = document.querySelector(".user_cards");
   const response = await fetch(user_cards_url, {
@@ -109,4 +90,32 @@ async function get_user_cards(token) {
     const no_cards = `<div class="no_cards">尚未新增卡片</div>`;
     user_cards.insertAdjacentHTML("beforeend", no_cards);
   }
+
+  const new_card_btn = `<div class="card new_card">
+        <div class="card_text">
+        <a href="new_card.html">
+          <h2>+ 新增卡片</h2>
+        </a>
+        </div>
+      </div>`;
+  user_cards.insertAdjacentHTML("beforeend", new_card_btn);
 }
+
+async function check_login_status() {
+  return_login_view();
+  // 一開始叫先確認有沒有token
+  let token = await get_auth_token();
+  let username = await get_username();
+
+  if (!token) {
+    await fetch_token(token_url);
+    token = await get_auth_token();
+    username = await get_username();
+  }
+  if (token && username) {
+    loggedin = true;
+    return_loggedin_view(token, username);
+  }
+}
+
+check_login_status();

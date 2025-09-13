@@ -1,6 +1,5 @@
 .account_content {
   width: 100%;
-  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -72,6 +71,10 @@
   transition: all 0.2s ease-in-out;
 }
 
+.new_card {
+  cursor: pointer;
+}
+
 .card_text {
   padding: 15px;
   display: flex;
@@ -88,4 +91,9 @@ h2 {
 
 .no_cards {
   margin: 20px 0;
+}
+
+a {
+  text-decoration: none;
+  color: black;
 }

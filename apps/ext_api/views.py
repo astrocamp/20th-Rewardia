@@ -49,8 +49,13 @@ def get_merchant_rewards(request, scope):
 
 @api_view(["GET"])
 @authentication_classes([TokenAuthentication])
-# @permission_classes([IsAuthenticated])
 def get_user_cards(request):
     user_cards = UserCard.objects.filter(user=request.user).order_by("-added_date")
     serializer = UserCardSerializer(user_cards, many=True)
     return Response(serializer.data)
+
+
+@api_view(["POST"])
+@authentication_classes([TokenAuthentication])
+def new_user_card(request):
+    pass
