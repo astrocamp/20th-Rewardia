@@ -106,3 +106,8 @@ a {
   text-decoration: none;
   color: black;
 }
+
+/* confirm_view相關 */
+.buttons {
+  margin: 20px 0;
+}

@@ -40,9 +40,9 @@ urlpatterns = [
         views.new_user_card,
         name="new_user_card",
     ),
-    # path(
-    #     "users/delete_card/<int:id>",
-    #     views.delete_user_card,
-    #     name="delete_user_card",
-    # ),
+    path(
+        "users/delete_card/<int:id>",
+        views.delete_user_card,
+        name="delete_user_card",
+    ),
 ]
