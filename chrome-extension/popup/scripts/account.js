@@ -91,22 +91,52 @@ async function get_user_cards(token, id) {
   const cards = await response.json();
 
   cards.forEach((card) => {
-    const card_view = `<div data-name="${card.card.name}" class="card">
+    const card_view = `<div data-id="${card.card.id}" class="card">
         <div class="card_text">
           <h2>${card.card.name}</h2>
         </div>
         <div class="delete_card">
-          <button class="delete_card_btn">刪除</button>
+          <button data-id="${card.card.id}" class="delete_card_btn">刪除</button>
         </div>
       </div>`;
     user_cards.insertAdjacentHTML("beforeend", card_view);
   });
 
+  //刪除卡片相關
+  const delete_btn = document.querySelector(".delete_card_btn");
+
+  delete_btn.addEventListener("click", async function () {
+    const confirm_view = `<div class="confirm_view">
+    <h1>確定要刪除卡片嗎？</h1>
+    <div class="buttons">
+        <a href="login.html"><button class="cancel">取消</button></a>
+        <a href="login.html"><button class="confirm">確認</button></a>
+      </div></div>`;
+    user_cards.innerHTML = confirm_view;
+    const confirm_btn = document.querySelector(".confirm");
+
+    confirm_btn.addEventListener("click", async function () {
+      const card_id = delete_btn.dataset.id;
+      const delete_card_url = `http://localhost:8000/api/users/delete_card/${card_id}`;
+      const token = await get_auth_token();
+      const response = await fetch(delete_card_url, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      delete_btn.closest(".card").remove();
+    });
+  });
+
+  // 若沒有卡片則顯示
   if (cards.length == 0) {
     const no_cards = `<div class="no_cards">尚未新增卡片</div>`;
     user_cards.insertAdjacentHTML("beforeend", no_cards);
   }
 
+  // 把新增按鈕放在最下面
   const new_card_btn = `<div class="card new_card">
         <div class="card_text">
         <a href="new_card.html">
@@ -138,18 +168,3 @@ async function check_login_status() {
 }
 
 check_login_status();
-
-//刪除卡片相關
-const delete_btn = document.querySelector(".delete_card_btn");
-
-// delete_btn.addEventListener("click", async function () {
-//   const delete_card_url = `http://localhost:8000/api/users/delete_card/${card.name}`;
-//   const token = await get_auth_token();
-//   const response = await fetch(delete_card_url, {
-//     method: "DELETE",
-//     headers: {
-//       Authorization: `Token ${token}`,
-//       "Content-Type": "application/json",
-//     },
-//   });
-// });

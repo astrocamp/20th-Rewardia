@@ -87,10 +87,10 @@ def new_user_card(request):
     return Response(status=201)
 
 
-# @api_view(["DELETE"])
-# @authentication_classes([TokenAuthentication])
-# def delete_user_card(request, id):
-#     user_card = UserCard.objects.get(user=request.user, card=id)
-#     user_card.delete()
+@api_view(["DELETE"])
+@authentication_classes([TokenAuthentication])
+def delete_user_card(request, id):
+    user_card = UserCard.objects.get(user=request.user, card__id=id)
+    user_card.delete()
 
-#     return Response(status=200)
+    return Response(status=200)
