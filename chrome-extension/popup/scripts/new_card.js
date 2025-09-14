@@ -55,4 +55,5 @@ submit.addEventListener("click", async function (e) {
     },
     body: JSON.stringify({ card: card_select.value }),
   });
+  window.location.href = "login.html";
 });
