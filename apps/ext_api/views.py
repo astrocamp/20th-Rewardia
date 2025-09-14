@@ -1,5 +1,6 @@
 # Create your views here.
 from rest_framework.response import Response
+from django.contrib.auth.models import User
 from apps.ext_api.serializers import (
     RewardSerializer,
     UserCardSerializer,
@@ -81,4 +82,8 @@ def get_user_cards(request):
 @api_view(["POST"])
 @authentication_classes([TokenAuthentication])
 def new_user_card(request):
-    pass
+    card_name = request.data.get("card")
+    card = CreditCard.objects.get(name=card_name)
+    user_card = UserCard.objects.create(user=request.user, card=card)
+
+    return

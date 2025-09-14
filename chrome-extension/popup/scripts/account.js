@@ -119,3 +119,5 @@ async function check_login_status() {
 }
 
 check_login_status();
+
+export { get_username };
