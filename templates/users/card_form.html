@@ -14,7 +14,8 @@
 
     <!-- 啟動 Alpine.js 並傳入卡片資料 -->
     <div class="bg-white rounded-lg overflow-hidden"
-         x-data="card_form({
+         x-data="{
+           ...card_form({
            allCards: [
              {% for card in cards %}
              {
@@ -31,7 +32,9 @@
            initialBankName: null,
            initialCardId: null
            {% endif %}
-         })">
+           }),
+           ...card_camera()
+         }">
 
       <div class="bg-[#F9F9F9] rounded-lg min-h-[407px] p-5 md:p-[21px] md:pt-5 md:pb-8">
         <!-- 標題列 -->
@@ -97,6 +100,26 @@
               </div>
             </div>
 
+            <!-- 擷取卡號按鈕 -->
+            <div class="relative mb-5">
+              <label class="block text-lg text-[#111827] mb-2 font-normal">
+                卡號識別
+              </label>
+              <button type="button"
+                      @click="openCamera()"
+                      class="inline-flex items-center px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                擷取卡號
+              </button>
+              <p class="text-sm text-gray-600 mt-1">使用攝影機自動識別信用卡卡號</p>
+            </div>
+
+            <!-- 隱藏的卡號輸入欄位 -->
+            <input type="hidden" id="card-number-input" name="card_number" x-model="recognizedCardNumber">
+
           </div>
 
           <!-- 動作按鈕 -->
@@ -117,8 +140,12 @@
             {% endif %}
           </div>
         </form>
+        
+        <!-- 攝影機模態框 - 移到 x-data 作用域內 -->
+        {% include 'components/card_camera_modal.html' %}
       </div>
     </div>
+    
   </div>
 </section>
 
