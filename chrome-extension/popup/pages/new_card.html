@@ -12,7 +12,7 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-    <script type="module" src="../scripts/account.js"></script>
+    <script type="module" src="../scripts/new_card.js"></script>
   </head>
   <body>
     <header class="header">
@@ -28,8 +28,7 @@
           <label for="bank_select"> * 發卡銀行 </label>
           <div>
             <select id="bank_select" name="bank_name" required>
-              <option value="" class="text-[#949AA6]">選擇發卡銀行</option>
-              <option value="">BANKS</option>
+              <option value="">選擇發卡銀行</option>
             </select>
           </div>
         </div>
@@ -38,11 +37,11 @@
           <label for="card_select"> * 卡片 </label>
           <div>
             <select id="card_select" name="card_name" required>
-              <option value="" class="text-[#949AA6]">選擇卡片</option>
-              <option value="">CARDS</option>
+              <option>選擇卡片</option>
             </select>
           </div>
         </div>
+        <button type="submit">新增</button>
       </form>
     </div>
     <nav class="navbar">
