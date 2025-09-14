@@ -42,6 +42,12 @@ services:
       - HOME_SELENIUM_URL=${HOME_SELENIUM_URL}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - USE_S3=${USE_S3}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_STORAGE_BUCKET_NAME=${AWS_STORAGE_BUCKET_NAME}
+      - AWS_S3_REGION_NAME=${AWS_S3_REGION_NAME}
+
     volumes:
       - ./public:/app/public
       - app_logs:/var/log/supervisor
@@ -55,7 +61,7 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
-      - "443:443" 
+      - "443:443"
       - "81:81"
     volumes:
       - nginx-data:/data
@@ -65,7 +71,7 @@ services:
       DB_HOST: rewardia-postgres
       DB_PORT: 5432
       DB_NAME: nginx
-      DB_USER: ${POSTGRES_USER}  
+      DB_USER: ${POSTGRES_USER}
       DB_PASS: ${POSTGRES_PASSWORD}
     networks:
       - rewardia-network

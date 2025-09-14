@@ -55,4 +55,12 @@ urlpatterns = [
         views.bulk_reject_rewards,
         name="bulk_reject_rewards",
     ),
+    # 排程管理相關 URL
+    path("scheduler/", views.scheduler, name="scheduler"),
+    path("scheduler/api/status/", views.api_scheduler_status, name="api_scheduler_status"),
+    path("scheduler/api/update/", views.api_update_schedule, name="api_update_schedule"),
+    path("scheduler/api/toggle/", views.api_toggle_schedule, name="api_toggle_schedule"),
+    path("scheduler/api/run-now/", views.api_run_now, name="api_run_now"),
+    path("scheduler/api/crawled-records/", views.api_crawled_records, name="api_crawled_records"),
+    path("scheduler/api/analysis-records/", views.api_analysis_records, name="api_analysis_records"),
 ]
