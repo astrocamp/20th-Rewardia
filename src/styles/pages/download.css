@@ -6,59 +6,59 @@
     @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-blue-600 hover:bg-blue-700;
     @apply w-full min-h-12 shadow-sm max-w-64 inline-flex items-center justify-center no-underline;
   }
-  
+
   .download-btn-primary:hover {
     @apply -translate-y-0.5 shadow-lg;
   }
-  
+
   .download-btn-secondary {
     @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-gray-800 hover:bg-gray-700;
-    @apply w-full min-h-12 shadow-sm max-w-64 inline-flex items-center justify-center no-underline;
+    @apply w-auto min-h-12 shadow-sm max-w-64 inline-flex items-center justify-center no-underline;
   }
-  
+
   .download-btn-secondary:hover {
     @apply -translate-y-0.5 shadow-lg;
   }
-  
+
   .download-btn-chrome {
     @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-gray-900 hover:bg-gray-800;
     @apply w-full min-h-12 shadow-sm inline-flex items-center justify-center no-underline max-w-[17.5rem];
   }
-  
+
   .download-btn-chrome:hover {
     @apply -translate-y-0.5 shadow-lg;
   }
-  
+
   .download-btn-app {
     @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-gray-900 hover:bg-gray-800;
     @apply w-full min-h-12 shadow-sm inline-flex items-center justify-center no-underline max-w-[17.5rem];
   }
-  
+
   .download-btn-app:hover {
     @apply -translate-y-0.5 shadow-lg;
   }
 
   .download-btn-banner {
-    @apply max-w-60 min-w-60;
+    @apply max-w-none min-w-0 w-auto;
   }
 
   /* ========== Download Page Layout ========== */
   .download-banner-content {
     @apply relative z-[2] max-w-[50%] pr-8;
   }
-  
+
   .download-section-simple {
     @apply bg-white rounded-2xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 transition-all duration-300 ease-in-out;
   }
-  
+
   .download-image-simple {
     @apply rounded-lg overflow-hidden;
   }
-  
+
   .download-feature-card-simple {
     @apply bg-white rounded-lg overflow-hidden border border-gray-100;
   }
-  
+
   .download-feature-image-simple {
     @apply w-full bg-gradient-to-br from-blue-50 to-indigo-100 h-48 flex items-center justify-center relative overflow-hidden;
   }
@@ -71,32 +71,32 @@
     .download-btn-app {
       @apply max-w-none min-h-11 text-sm p-3;
     }
-    
+
     .download-btn-banner {
       @apply max-w-none min-w-0;
     }
-    
+
     .download-banner-content {
       @apply max-w-full pr-0;
     }
-    
+
     .download-section-simple {
       @apply p-4;
       @apply mb-6;
     }
-    
+
     .download-section-simple .flex {
       @apply flex-col gap-4;
     }
-    
+
     .download-section-simple .flex-shrink-0 {
       @apply w-full;
     }
-    
+
     .download-section-simple .w-\[279px\] {
       @apply w-full;
     }
-    
+
     .download-feature-image-simple {
       @apply h-40;
     }
@@ -106,15 +106,15 @@
     .download-btn-banner {
       @apply max-w-48 min-w-48;
     }
-    
+
     .download-banner-content {
       @apply max-w-[60%] pr-6;
     }
-    
+
     .download-section-simple .flex {
       @apply flex-col gap-6;
     }
-    
+
     .download-feature-image-simple {
       @apply h-44;
     }
@@ -124,11 +124,11 @@
     .download-btn-banner {
       @apply max-w-52 min-w-52;
     }
-    
+
     .download-banner-content {
       @apply max-w-[55%] pr-6;
     }
-    
+
     .download-feature-image-simple {
       @apply h-48;
     }
@@ -138,11 +138,11 @@
     .download-btn-banner {
       @apply max-w-60 min-w-60;
     }
-    
+
     .download-banner-content {
       @apply max-w-[50%] pr-8;
     }
-    
+
     .download-feature-image-simple {
       @apply h-64;
     }

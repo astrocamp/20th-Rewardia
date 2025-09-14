@@ -2,13 +2,15 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from apps.cards.models import CreditCard
 from django.contrib import messages
-from django.views.decorators.http import require_POST, require_http_methods
+from django.views.decorators.http import require_POST, require_GET, require_http_methods
 from django.http import HttpResponse, JsonResponse
 from apps.rewards.models import PendingReward, RewardCategory
 from django.db.models import Q, Count
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.base import ContentFile
 from apps.cards.storage import MediaStorage
+from django.core.paginator import Paginator
+from django.core.cache import cache
 import json
 
 
@@ -16,7 +18,7 @@ def _get_last_modified_str(card_instance):
     """格式化並返回最後異動時間的字串。"""
     last_modified_time = card_instance.updated_at or card_instance.created_at
     if last_modified_time:
-        return last_modified_time.strftime('%Y/%m/%d %H:%M:%S')
+        return last_modified_time.strftime("%Y/%m/%d %H:%M:%S")
     return None
 
 
@@ -58,7 +60,7 @@ def new_card(request):
         return render(request, "admins/new_card.html", card_form_data)
 
 
-@require_http_methods(["GET"])
+@require_GET
 def edit_card(request, id):
     card = get_object_or_404(CreditCard, pk=id)
     banks = CreditCard.Bank
@@ -72,7 +74,7 @@ def edit_card(request, id):
     )
 
 
-@require_http_methods(["POST"])
+@require_POST
 def update_card(request, id):
     card = get_object_or_404(CreditCard, pk=id)
     card.name = request.POST.get("card_edit")
@@ -85,7 +87,7 @@ def update_card(request, id):
     return redirect(url)
 
 
-@require_http_methods(["POST"])
+@require_POST
 def delete_card(request, id):
     card = get_object_or_404(CreditCard, pk=id)
     card.delete()
@@ -95,22 +97,44 @@ def delete_card(request, id):
 
 def rewards(request):
     """主要的rewards管理頁面"""
-    PendingReward.detect_and_soft_delete_duplicates()
+    # 只在第一頁執行重複檢測
+    page_number = request.GET.get("page", 1)
+    if str(page_number) == "1":
+        PendingReward.detect_and_soft_delete_duplicates()
 
     status_filter = request.GET.get("status", PendingReward.Status.PENDING)
 
     if status_filter == "ALL":
-        pending_rewards = PendingReward.objects.all()
+        pending_rewards = PendingReward.objects.select_related("card").all()
     else:
-        pending_rewards = PendingReward.objects.filter(status=status_filter)
+        pending_rewards = PendingReward.objects.select_related("card").filter(
+            status=status_filter
+        )
 
     pending_rewards = pending_rewards.order_by("-created_at")
 
+    # 分頁處理
+    paginator = Paginator(pending_rewards, 50)  # 一頁50筆
+    page_obj = paginator.get_page(page_number)
+
     stats = PendingReward.objects.aggregate(
-        pending_count=Count("id", filter=Q(status=PendingReward.Status.PENDING)),
+        pending_count=Count(
+            "id",
+            filter=Q(status=PendingReward.Status.PENDING, soft_deleted_at__isnull=True),
+        ),
         reviewing_count=Count("id", filter=Q(status=PendingReward.Status.REVIEWING)),
-        approved_count=Count("id", filter=Q(status=PendingReward.Status.APPROVED)),
-        rejected_count=Count("id", filter=Q(status=PendingReward.Status.REJECTED)),
+        approved_count=Count(
+            "id",
+            filter=Q(
+                status=PendingReward.Status.APPROVED, soft_deleted_at__isnull=True
+            ),
+        ),
+        rejected_count=Count(
+            "id",
+            filter=Q(
+                status=PendingReward.Status.REJECTED, soft_deleted_at__isnull=True
+            ),
+        ),
         total_count=Count("id"),
     )
 
@@ -118,22 +142,25 @@ def rewards(request):
         request,
         "admins/rewards.html",
         {
-            "pending_rewards": pending_rewards,
+            "pending_rewards": page_obj,
+            "page_obj": page_obj,
             "current_status": status_filter,
             "stats": stats,
         },
     )
 
 
-@require_http_methods(["GET"])
+@require_GET
 def rewards_table(request):
     """HTMX：返回表格內容"""
     status_filter = request.GET.get("status", PendingReward.Status.PENDING)
 
     if status_filter == "ALL":
-        pending_rewards = PendingReward.objects.all()
+        pending_rewards = PendingReward.objects.select_related("card").all()
     else:
-        pending_rewards = PendingReward.objects.filter(status=status_filter)
+        pending_rewards = PendingReward.objects.select_related("card").filter(
+            status=status_filter
+        )
 
     pending_rewards = pending_rewards.order_by("-created_at")
 
@@ -147,7 +174,7 @@ def rewards_table(request):
     )
 
 
-@require_http_methods(["POST"])
+@require_POST
 def approve_pending_reward(request, id):
     """通過審核"""
     pending_reward = get_object_or_404(PendingReward, pk=id)
@@ -174,7 +201,7 @@ def approve_pending_reward(request, id):
     )
 
 
-@require_http_methods(["POST"])
+@require_POST
 def reject_pending_reward(request, id):
     """駁回審核"""
     pending_reward = get_object_or_404(PendingReward, pk=id)
@@ -240,7 +267,7 @@ def hard_delete_pending_reward(request, id):
         )
 
 
-@require_http_methods(["GET"])
+@require_GET
 def edit_pending_reward(request, id):
     """編輯待審核項目 - 返回編輯表單"""
     pending_reward = get_object_or_404(PendingReward, pk=id)
@@ -254,7 +281,7 @@ def edit_pending_reward(request, id):
     )
 
 
-@require_http_methods(["POST"])
+@require_POST
 def update_pending_reward(request, id):
     """更新待審核項目"""
     pending_reward = get_object_or_404(PendingReward, pk=id)
@@ -295,20 +322,19 @@ def update_pending_reward(request, id):
     )
 
 
-
 # 以下是圖片上傳相關
 def image_upload(request):
     """圖片上傳管理頁面"""
-    cards = CreditCard.objects.filter(is_active=True).order_by('bank', 'name')
-    return render(request, 'admins/image_upload.html', {'cards': cards})
+    cards = CreditCard.objects.filter(is_active=True).order_by("bank", "name")
+    return render(request, "admins/image_upload.html", {"cards": cards})
 
 
 # API: 獲取信用卡列表
 def api_cards(request):
     """API: 獲取信用卡列表"""
-    cards = CreditCard.objects.filter(is_active=True).order_by('bank', 'name')
+    cards = CreditCard.objects.filter(is_active=True).order_by("bank", "name")
     cards_data = []
-    
+
     for card in cards:
         # 生成正確的圖片 URL
         image_url = None
@@ -316,19 +342,21 @@ def api_cards(request):
             storage = MediaStorage()
             # 使用 MediaStorage.url() 來生成正確的 URL，它會自動添加 media/ 前綴
             image_url = storage.url(card.image.name)
-        
+
         # 處理最後異動時間
         last_modified = _get_last_modified_str(card)
-        
-        cards_data.append({
-            'id': card.id,
-            'name': card.name,
-            'bank': card.bank,
-            'image': image_url,
-            'last_modified': last_modified
-        })
-    
-    return JsonResponse({'cards': cards_data})
+
+        cards_data.append(
+            {
+                "id": card.id,
+                "name": card.name,
+                "bank": card.bank,
+                "image": image_url,
+                "last_modified": last_modified,
+            }
+        )
+
+    return JsonResponse({"cards": cards_data})
 
 
 # API: 上傳圖片
@@ -337,35 +365,35 @@ def api_upload_image(request):
     """API: 上傳圖片到 S3"""
     try:
         # 獲取上傳的檔案和卡片 ID
-        image_file = request.FILES.get('image')
-        card_id = request.POST.get('card_id')
-        
+        image_file = request.FILES.get("image")
+        card_id = request.POST.get("card_id")
+
         if not image_file:
-            return JsonResponse({'success': False, 'error': '沒有選擇圖片檔案'})
-        
+            return JsonResponse({"success": False, "error": "沒有選擇圖片檔案"})
+
         if not card_id:
-            return JsonResponse({'success': False, 'error': '沒有指定卡片 ID'})
-        
+            return JsonResponse({"success": False, "error": "沒有指定卡片 ID"})
+
         # 獲取卡片物件
         card = get_object_or_404(CreditCard, id=card_id)
-        
+
         # 驗證檔案類型, 符合才能上傳
-        allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+        allowed_types = ["image/jpeg", "image/jpg", "image/png", "image/webp"]
         if image_file.content_type not in allowed_types:
-            return JsonResponse({'success': False, 'error': '不支援的檔案格式'})
-        
+            return JsonResponse({"success": False, "error": "不支援的檔案格式"})
+
         # 驗證檔案大小 (10MB)
         max_size = 10 * 1024 * 1024
         if image_file.size > max_size:
-            return JsonResponse({'success': False, 'error': '檔案大小不能超過 10MB'})
-        
+            return JsonResponse({"success": False, "error": "檔案大小不能超過 10MB"})
+
         # 儲存圖片到模型
         card.image = image_file
         card.save()
-        
+
         # 確保圖片已上傳到 S3
         storage = MediaStorage()
-        
+
         # 檢查圖片是否在 S3 中存在
         if not storage.exists(card.image.name):
             # 如果不存在，手動上傳
@@ -373,53 +401,59 @@ def api_upload_image(request):
                 card.image.seek(0)
                 image_content = card.image.read()
                 from django.core.files.base import ContentFile
+
                 content = ContentFile(image_content)
-                
+
                 # 提取檔案名稱，讓 MediaStorage 自動處理路徑
                 # card.image.name 可能是 filename.png 或 path/filename.png
-                filename = card.image.name.split('/')[-1]
+                filename = card.image.name.split("/")[-1]
                 # MediaStorage location = 'media/credit_cards' 會自動處理完整路徑
                 storage.save(filename, content)
             except Exception as e:
-                return JsonResponse({'success': False, 'error': f'S3 上傳失敗: {str(e)}'})
-        
+                return JsonResponse(
+                    {"success": False, "error": f"S3 上傳失敗: {str(e)}"}
+                )
+
         # 重新獲取卡片資料以取得最新的 updated_at 和 image
         card.refresh_from_db()
-        
+
         # 處理最後異動時間
         last_modified = _get_last_modified_str(card)
-        
+
         # 確保取得最新的圖片 URL
         image_url = None
         if card.image:
             image_url = storage.url(card.image.name)
-        
-        return JsonResponse({
-            'success': True, 
-            'image_url': image_url,
-            'last_modified': last_modified,
-            'message': '圖片上傳成功'
-        })
-        
+
+        return JsonResponse(
+            {
+                "success": True,
+                "image_url": image_url,
+                "last_modified": last_modified,
+                "message": "圖片上傳成功",
+            }
+        )
+
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
+        return JsonResponse({"success": False, "error": str(e)})
+
 
 # API: 刪除圖片
 @require_POST
 def api_delete_image(request):
     """API: 刪除 S3 圖片"""
     try:
-        card_id = request.POST.get('card_id')
-        
+        card_id = request.POST.get("card_id")
+
         if not card_id:
-            return JsonResponse({'success': False, 'error': '沒有指定卡片 ID'})
-        
+            return JsonResponse({"success": False, "error": "沒有指定卡片 ID"})
+
         # 獲取卡片物件
         card = get_object_or_404(CreditCard, id=card_id)
-        
+
         if not card.image:
-            return JsonResponse({'success': False, 'error': '該卡片沒有圖片'})
-        
+            return JsonResponse({"success": False, "error": "該卡片沒有圖片"})
+
         # 刪除 S3 中的圖片
         try:
             storage = MediaStorage()
@@ -427,23 +461,100 @@ def api_delete_image(request):
                 storage.delete(card.image.name)
         except Exception as e:
             pass  # 靜默處理 S3 刪除錯誤，不影響資料庫清理
-        
+
         # 清空資料庫中的圖片欄位
         card.image = None
         card.save()
-        
+
         # 重新獲取卡片資料以取得最新的 updated_at
         card.refresh_from_db()
-        
+
         # 處理最後異動時間
         last_modified = _get_last_modified_str(card)
-        
-        return JsonResponse({
-            'success': True, 
-            'last_modified': last_modified,
-            'message': '圖片刪除成功'
-        })
-        
-    except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
 
+        return JsonResponse(
+            {"success": True, "last_modified": last_modified, "message": "圖片刪除成功"}
+        )
+
+    except Exception as e:
+        return JsonResponse({"success": False, "error": str(e)})
+
+
+@require_POST
+def bulk_approve_rewards(request):
+    """批量通過審核"""
+    status_filter = request.GET.get("status", PendingReward.Status.PENDING)
+    page_number = request.GET.get("page", 1)
+
+    # 取得當前頁面的項目
+    paginator = Paginator(
+        PendingReward.objects.filter(status=status_filter).order_by("-created_at"), 50
+    )
+    page_obj = paginator.get_page(page_number)
+    current_page_rewards = page_obj.object_list
+
+    success_count = 0
+
+    for reward in current_page_rewards:
+        try:
+            result = reward.approve_and_create_reward_category()
+            if result:
+                success_count += 1
+            else:
+                # 遇到錯誤立即停止並警告
+                messages.error(
+                    request,
+                    f"批量審核失敗！在處理第 {success_count + 1} 個項目「{reward.card.name} - {reward.nlp_category}」時發生錯誤。已成功處理 {success_count} 個項目，剩餘項目未處理。",
+                )
+                break
+        except Exception as e:
+            # 遇到異常立即停止並警告
+            messages.error(
+                request,
+                f"批量審核中斷！在處理「{reward.card.name} - {reward.nlp_category}」時發生錯誤：{str(e)}。已成功處理 {success_count} 個項目，請檢查後重試。",
+            )
+            break
+    else:
+        # 全部成功完成
+        messages.success(request, f"批量審核完成！成功通過 {success_count} 個項目。")
+
+    # 重新導向當前頁面
+    return redirect(
+        f"{reverse('admins:rewards')}?status={status_filter}&page={page_number}"
+    )
+
+
+@require_POST
+def bulk_reject_rewards(request):
+    """批量駁回審核"""
+    status_filter = request.GET.get("status", PendingReward.Status.PENDING)
+    page_number = request.GET.get("page", 1)
+
+    # 取得當前頁面的項目
+    paginator = Paginator(
+        PendingReward.objects.filter(status=status_filter).order_by("-created_at"), 50
+    )
+    page_obj = paginator.get_page(page_number)
+    current_page_rewards = page_obj.object_list
+
+    success_count = 0
+
+    for reward in current_page_rewards:
+        try:
+            reward.reject()
+            success_count += 1
+        except Exception as e:
+            # 遇到異常立即停止並警告
+            messages.error(
+                request,
+                f"批量駁回中斷！在處理「{reward.card.name} - {reward.nlp_category}」時發生錯誤：{str(e)}。已成功處理 {success_count} 個項目，請檢查後重試。",
+            )
+            break
+    else:
+        # 全部成功完成
+        messages.success(request, f"批量駁回完成！成功駁回 {success_count} 個項目。")
+
+    # 重新導向當前頁面
+    return redirect(
+        f"{reverse('admins:rewards')}?status={status_filter}&page={page_number}"
+    )

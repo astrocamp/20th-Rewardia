@@ -67,7 +67,7 @@ class RewardCategory(models.Model):
             if self.min_rate == self.max_rate:
                 rate_display = f"{self.min_rate:.2f}%"
             else:
-                rate_display = f"{self.min_rate:.2f}-{self.max_rate:.2f}%"
+                rate_display = f"{self.min_rate:.2f} ~ {self.max_rate:.2f}%"
         elif self.min_rate is not None:
             rate_display = f"{self.min_rate:.2f}%"
         elif self.max_rate is not None:
@@ -147,21 +147,24 @@ class PendingReward(models.Model):
         )
 
     def approve_and_create_reward_category(self):
-        """通過審核並建立RewardCategory"""
+        """通過審核並建立/更新RewardCategory"""
         if self.status != self.Status.APPROVED:
-            self.status = self.Status.APPROVED
-            self.save()
-
-            # 建立新的RewardCategory
-            reward_category = RewardCategory.objects.create(
+            # 使用 update_or_create 處理重複情況
+            reward_category, created = RewardCategory.objects.update_or_create(
                 card=self.card,
                 category=self.nlp_category,
                 scope=self.nlp_scope,
-                min_rate=self.min_rate,
-                max_rate=self.max_rate,
-                reward_type=self.reward_type,
-                is_active=True,
+                defaults={
+                    'min_rate': self.min_rate,
+                    'max_rate': self.max_rate,
+                    'reward_type': self.reward_type,
+                    'is_active': True,
+                }
             )
+            
+            # 成功處理後才更新狀態
+            self.status = self.Status.APPROVED
+            self.save()
             return reward_category
         return None
 
@@ -176,26 +179,47 @@ class PendingReward(models.Model):
         self.status = self.Status.REVIEWING
         self.save()
 
+    def restore_from_soft_delete(self):
+        """從軟刪除狀態恢復"""
+        self.soft_deleted_at = None
+        self.status = self.Status.PENDING
+        self.save()
+
+    @classmethod
+    def restore_all_soft_deleted(cls):
+        """恢復所有被軟刪除的記錄到 PENDING 狀態"""
+        soft_deleted_records = cls.objects.filter(
+            soft_deleted_at__isnull=False, status=cls.Status.REVIEWING
+        )
+
+        count = 0
+        for record in soft_deleted_records:
+            record.restore_from_soft_delete()
+            count += 1
+
+        return count
+
     @classmethod
     def detect_and_soft_delete_duplicates(cls):
         """檢測並軟刪除重複資料"""
 
-        # 找出有重複的群組
+        # 找出有重複的群組 (只查詢未被軟刪除且狀態為 PENDING 的記錄)
         duplicates = (
-            cls.objects.filter(status=cls.Status.PENDING)
+            cls.objects.filter(status=cls.Status.PENDING, soft_deleted_at__isnull=True)
             .values("card_id", "nlp_category", "nlp_scope", "reward_type")
             .annotate(count=Count("id"))
             .filter(count__gt=1)
         )
 
         for duplicate_group in duplicates:
-            # 找出這群組中的所有記錄
+            # 找出這群組中的所有記錄 (只查詢未被軟刪除且狀態為 PENDING 的記錄)
             records = cls.objects.filter(
                 card_id=duplicate_group["card_id"],
                 nlp_category=duplicate_group["nlp_category"],
                 nlp_scope=duplicate_group["nlp_scope"],
                 reward_type=duplicate_group["reward_type"],
                 status=cls.Status.PENDING,
+                soft_deleted_at__isnull=True,
             ).order_by("-created_at")
 
             # 保留最新的，其他軟刪除

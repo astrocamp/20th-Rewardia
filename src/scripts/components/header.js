@@ -16,7 +16,7 @@ document.addEventListener('alpine:init', () => {
             this.isTransitioning = true;
             this.visible = false;
             localStorage.setItem('bannerClosed', 'true');
-            
+
             // 動畫完成後移除 transitioning 狀態
             setTimeout(() => {
                 this.isTransitioning = false;
@@ -27,7 +27,7 @@ document.addEventListener('alpine:init', () => {
             this.isTransitioning = true;
             this.visible = true;
             localStorage.removeItem('bannerClosed');
-            
+
             // 動畫完成後移除 transitioning 狀態
             setTimeout(() => {
                 this.isTransitioning = false;
@@ -45,7 +45,7 @@ document.addEventListener('alpine:init', () => {
         init() {
             // 初始化全域狀態
             this.banner.init();
-            
+
             this.$nextTick(() => {
                 this.initializeBanner();
             });
@@ -64,12 +64,38 @@ document.addEventListener('alpine:init', () => {
         handleScroll() {
             requestAnimationFrame(() => {
                 if (!this.banner.isInitialized || !this.banner.visible) return;
-                
+
                 if (window.scrollY > this.banner.height) {
                     this.banner.visible = false;
                 }
             });
         },
+
+        // 行動選單狀態
+        mobileMenuOpen: false,
+
+        // 切換行動選單
+        toggleMobileMenu() {
+            this.mobileMenuOpen = !this.mobileMenuOpen;
+            const toggleButton = document.getElementById('menu-toggle');
+
+            // 更新 aria-expanded 屬性以提升無障礙性
+            if (toggleButton) {
+                toggleButton.setAttribute('aria-expanded', this.mobileMenuOpen.toString());
+            }
+        },
+
+        // 關閉行動選單
+        closeMobileMenu() {
+            if (this.mobileMenuOpen) {
+                this.mobileMenuOpen = false;
+                const toggleButton = document.getElementById('menu-toggle');
+
+                if (toggleButton) {
+                    toggleButton.setAttribute('aria-expanded', 'false');
+                }
+            }
+        }
 
     }));
 });
