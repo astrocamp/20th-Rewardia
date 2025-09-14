@@ -1,6 +1,6 @@
 <!-- 單行資料 -->
 <tr id="reward-{{ reward.id }}"
-    class="cursor-pointer transition-all duration-200 {% if reward.soft_deleted_at %}opacity-60{% endif %}"
+    class="cursor-pointer transition-all duration-200"
     data-extracted-sentence="{{ reward.extracted_sentence }}">
 
     <!-- 操作按鈕 -->
@@ -58,11 +58,9 @@
                 </button>
             </div>
         {% elif reward.status == 'REVIEWING' %}
-            <div class="opacity-50 pointer-events-none">
-                <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
-                    審核中
-                </span>
-            </div>
+            <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                審核中
+            </span>
         {% elif reward.status == 'APPROVED' %}
             <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
                 ✓ 已通過
@@ -89,12 +87,12 @@
             {% if reward.min_rate == reward.max_rate %}
                 {{ reward.min_rate }}%
             {% else %}
-                {{ reward.min_rate }}-{{ reward.max_rate }}%
+                {{ reward.min_rate }} ~ {{ reward.max_rate }}%
             {% endif %}
         {% elif reward.min_rate %}
-            {{ reward.min_rate }}%
+            {{ reward.min_rate }}% ~ 無
         {% elif reward.max_rate %}
-            {{ reward.max_rate }}%
+            無 ~ {{ reward.max_rate }}%
         {% else %}
             未知
         {% endif %}
@@ -115,7 +113,7 @@
             </span>
         {% elif reward.status == 'REVIEWING' %}
             <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
-                審核中{% if reward.soft_deleted_at %}{% endif %}
+                {% if reward.soft_deleted_at %}重複項目{% else %}審核中{% endif %}
             </span>
         {% elif reward.status == 'APPROVED' %}
             <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
@@ -128,6 +126,15 @@
         {% endif %}
     </td>
     <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-        {{ reward.created_at|date:"Y/m/d H:i" }}
+        {% if reward.soft_deleted_at %}
+            <div class="text-gray-500">
+                <div class="text-xs">建立:</div>
+                <div>{{ reward.created_at|date:"Y/m/d H:i" }}</div>
+                <div class="text-xs text-red-500 mt-1">重複刪除:</div>
+                <div class="text-red-500">{{ reward.soft_deleted_at|date:"Y/m/d H:i" }}</div>
+            </div>
+        {% else %}
+            {{ reward.created_at|date:"Y/m/d H:i" }}
+        {% endif %}
     </td>
 </tr>

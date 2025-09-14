@@ -44,4 +44,15 @@ urlpatterns = [
     path("api/cards/", views.api_cards, name="api_cards"),
     path("api/upload-image/", views.api_upload_image, name="api_upload_image"),
     path("api/delete-image/", views.api_delete_image, name="api_delete_image"),
+    # 批量操作
+    path(
+        "rewards/bulk-approve/",
+        views.bulk_approve_rewards,
+        name="bulk_approve_rewards",
+    ),
+    path(
+        "rewards/bulk-reject/",
+        views.bulk_reject_rewards,
+        name="bulk_reject_rewards",
+    ),
 ]

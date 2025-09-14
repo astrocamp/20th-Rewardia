@@ -19,37 +19,23 @@
   >
     <!-- 背景圖片 -->
     <div class="absolute inset-0">
-      <img
-        src="https://github.com/astrocamp/20th-Rewardia/blob/pic/img/download-index.png?raw=true"
+      <img src="https://github.com/astrocamp/20th-Rewardia/blob/pic/img/download-index.png?raw=true"
         loading="eager"
         alt="Rewardia Background"
-        class="w-full h-full object-cover object-[75%_9%]"
-      />
+        class="w-full h-full object-cover object-[75%_9%]">
     </div>
 
     <!-- 內容區域 - 限制在左半邊 -->
     <div class="relative z-10 flex items-center h-full download-banner-content">
       <div class="text-white px-4 sm:px-8 lg:px-12">
-        <h1
-          class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 lg:mb-8 leading-tight tracking-wide"
-        >
+        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 lg:mb-8 leading-tight tracking-wide max-w-md sm:max-w-lg lg:max-w-none">
           每次購物都能獲得現金回饋
         </h1>
-        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 lg:gap-6">
-          <a
-            href="#"
-            id="chrome-download"
-            class="download-btn-primary download-btn-banner"
-          >
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 lg:gap-6 items-start">
+          <a href="#" id="chrome-download" class="download-btn-secondary download-btn-banner">
             免費新增至 Chrome
           </a>
-          <a
-            href="#"
-            id="app-download"
-            class="download-btn-secondary download-btn-banner"
-          >
-            新增到桌面應用
-          </a>
+
         </div>
       </div>
     </div>
@@ -58,11 +44,7 @@
 
 <!-- 關於 Rewardia 區塊 -->
 <section class="mx-4 sm:mx-6 lg:mx-10 my-8 sm:my-12 lg:my-16">
-  <h2
-    class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-8 sm:mb-12 lg:mb-16 text-left font-kulim-park leading-tight"
-  >
-    關於 Rewardia
-  </h2>
+  <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-8 sm:mb-12 lg:mb-16 text-left font-kulim-park leading-tight-custom">關於 Rewardia</h2>
 
   <!-- Chrome 擴充插件 -->
   <div class="download-section-simple">
@@ -71,29 +53,17 @@
     >
       <!-- 左側圖片區域 -->
       <div class="flex-shrink-0 w-full lg:w-auto">
-        <div
-          class="w-full sm:w-[279px] h-[253px] bg-gray-200 rounded-lg overflow-hidden download-image-simple"
-        >
-          <img
-            src="https://github.com/astrocamp/20th-Rewardia/blob/pic/img/download-chrome.jpg?raw=true"
+        <div class="w-full sm:w-[279px] h-[253px] bg-gray-200 rounded-lg overflow-hidden download-image-simple">
+          <img src="https://github.com/astrocamp/20th-Rewardia/blob/pic/img/download-chrome.jpg?raw=true"
             alt="Chrome 擴充插件"
-            class="w-full h-full object-cover object-center"
-          />
+            class="w-full h-full object-cover object-center">
         </div>
       </div>
       <!-- 右側文字區域 -->
       <div class="flex-1 space-y-4 sm:space-y-6">
-        <h3
-          class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-3 sm:mb-4 font-kulim-park leading-tight"
-        >
-          Chrome 擴充插件
-        </h3>
-        <p
-          class="text-muted leading-relaxed text-sm sm:text-base font-normal mb-6 sm:mb-8 font-inter leading-[1.5625]"
-        >
-          使用 Rewardia
-          優惠比價小幫手，在您瀏覽網頁時自動偵測購物機會，即時推薦最適合的信用卡，讓您不錯過任何優惠回饋。支援各大電商平台，包括
-          PChome、momo、蝦皮等，讓您的每次網購都能獲得最大回饋。
+        <h3 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-3 sm:mb-4 font-kulim-park leading-tight-custom">Chrome 擴充插件</h3>
+        <p class="text-muted leading-relaxed text-sm sm:text-base font-normal mb-6 sm:mb-8 font-inter leading-[1.5625] line-clamp-2 max-w-md sm:max-w-lg lg:max-w-none">
+          使用 Rewardia 優惠比價小幫手，在您瀏覽網頁時自動偵測購物機會，即時推薦最適合的信用卡，讓您不錯過任何優惠回饋。支援各大電商平台，包括 PChome、momo、蝦皮等，讓您的每次網購都能獲得最大回饋。
         </p>
         <button class="download-btn-chrome">免費新增至 Chrome</button>
       </div>
@@ -119,16 +89,9 @@
       </div>
       <!-- 右側文字區域 -->
       <div class="flex-1 space-y-4 sm:space-y-6">
-        <h3
-          class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-3 sm:mb-4 font-kulim-park leading-tight"
-        >
-          APP 應用
-        </h3>
-        <p
-          class="text-muted leading-relaxed text-sm sm:text-base font-normal mb-6 sm:mb-8 font-inter leading-[1.5625]"
-        >
-          下載 Rewardia
-          手機應用程式，隨時隨地查看信用卡優惠資訊，掃描實體商家條碼即可獲得即時回饋建議。支援離線使用，讓您在沒有網路的情況下也能查詢歷史優惠記錄，是您出門購物的最佳助手。
+        <h3 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-3 sm:mb-4 font-kulim-park leading-tight-custom">APP 應用</h3>
+        <p class="text-muted leading-relaxed text-sm sm:text-base font-normal mb-6 sm:mb-8 font-inter leading-[1.5625] line-clamp-2 max-w-md sm:max-w-lg lg:max-w-none">
+          下載 Rewardia 手機應用程式，隨時隨地查看信用卡優惠資訊，掃描實體商家條碼即可獲得即時回饋建議。支援離線使用，讓您在沒有網路的情況下也能查詢歷史優惠記錄，是您出門購物的最佳助手。
         </p>
         <button class="download-btn-app">免費新增至 APP 應用</button>
       </div>

@@ -19,8 +19,9 @@
         <!-- 漢堡按鈕：僅手機顯示 -->
         <button id="menu-toggle"
                 class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100"
-                aria-controls="mobile-menu" aria-expanded="false" aria-label="打開主選單">
-          <!-- 三條線 icon -->
+                aria-controls="mobile-menu" aria-expanded="false" aria-label="打開主選單"
+                @click="toggleMobileMenu()">
+
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path d="M4 6h16M4 12h16M4 18h16" stroke-width="2" stroke-linecap="round"/>
           </svg>
@@ -29,7 +30,16 @@
     </div>
 
     <!-- 行動選單（預設隱藏） -->
-    <div id="mobile-menu" class="md:hidden hidden border-t border-gray-200 pt-3 pb-4">
+    <div id="mobile-menu"
+         x-show="mobileMenuOpen"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-1"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 -translate-y-1"
+         @click.outside="closeMobileMenu()"
+         class="md:hidden border-t border-gray-200 pt-3 pb-4 relative z-50">
       <nav class="flex flex-col space-y-2">
         <a href="{% url 'admins:cards' %}" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">卡片</a>
         <a href="{% url 'admins:rewards' %}" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">獎勵回饋</a>

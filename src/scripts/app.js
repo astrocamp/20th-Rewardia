@@ -3,7 +3,9 @@ import "htmx.org";
 
 // Import all components
 import './components/header.js';
-import chatbot from './components/chatbot.js';
+import './components/calculator.js';
+import './components/rewards.js';
+import chatbot from "./components/chatbot.js";
 import mainSearchComponent from './components/main.js';
 import cardFormComponent from './components/card_form.js';
 import faqComponent from './components/faq.js';
