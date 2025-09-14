@@ -21,6 +21,11 @@ urlpatterns = [
         name="get_merchant_rewards",
     ),
     path(
+        "users/<int:id>/cards/",
+        views.get_user_cards,
+        name="get_user_cards",
+    ),
+    path(
         "banks/",
         views.get_banks,
         name="get_banks",
@@ -31,13 +36,13 @@ urlpatterns = [
         name="get_cards",
     ),
     path(
-        "users/cards/",
-        views.get_user_cards,
-        name="get_user_cards",
-    ),
-    path(
-        "users/cards/new",
+        "users/new_card/",
         views.new_user_card,
         name="new_user_card",
     ),
+    # path(
+    #     "users/delete_card/<int:id>",
+    #     views.delete_user_card,
+    #     name="delete_user_card",
+    # ),
 ]
