@@ -7,7 +7,7 @@ from rest_framework import serializers
 class CardSerializer(serializers.ModelSerializer):
     class Meta:
         model = CreditCard
-        fields = ["name", "bank"]
+        fields = ["id", "name", "bank"]
 
 
 class RewardSerializer(serializers.HyperlinkedModelSerializer):

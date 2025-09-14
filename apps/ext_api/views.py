@@ -69,11 +69,9 @@ def get_cards(request, bank):
 
 @api_view(["GET"])
 @authentication_classes([TokenAuthentication])
-def get_user_cards(request):
+def get_user_cards(request, id):
     user_cards = (
-        UserCard.objects.select_related("card")
-        .filter(user=request.user)
-        .order_by("-added_date")
+        UserCard.objects.select_related("card").filter(user=id).order_by("-added_date")
     )
     serializer = UserCardSerializer(user_cards, many=True)
     return Response(serializer.data)
@@ -86,4 +84,13 @@ def new_user_card(request):
     card = CreditCard.objects.get(name=card_name)
     user_card = UserCard.objects.create(user=request.user, card=card)
 
-    return
+    return Response(status=201)
+
+
+# @api_view(["DELETE"])
+# @authentication_classes([TokenAuthentication])
+# def delete_user_card(request, id):
+#     user_card = UserCard.objects.get(user=request.user, card=id)
+#     user_card.delete()
+
+#     return Response(status=200)

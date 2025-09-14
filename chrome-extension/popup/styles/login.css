@@ -61,14 +61,23 @@
   border-radius: 20px;
   transition: all 0.3s ease-in-out;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .card:hover {
   background-color: #374151;
   color: white;
   transition: all 0.2s ease-in-out;
+}
+
+.delete_card {
+  padding: 15px;
+}
+
+.delete_card button {
+  font-size: 10px;
 }
 
 .new_card {

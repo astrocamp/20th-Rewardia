@@ -2,12 +2,7 @@ const bank_select = document.querySelector("#bank_select");
 const card_select = document.querySelector("#card_select");
 const submit = document.querySelector("#new_card_submit");
 const banks_url = "http://localhost:8000/api/banks/";
-const new_card_url = "http://localhost:8000/api/users/cards/new";
-
-async function get_username() {
-  const result = await chrome.storage.local.get(["username"]);
-  return result.username;
-}
+const new_card_url = "http://localhost:8000/api/users/new_card/";
 
 async function get_auth_token() {
   const result = await chrome.storage.local.get(["authToken"]);
@@ -52,7 +47,7 @@ bank_select.addEventListener("change", async function () {
 submit.addEventListener("click", async function (e) {
   e.preventDefault();
   const token = await get_auth_token();
-  await fetch(new_card_url, {
+  const response = await fetch(new_card_url, {
     method: "POST",
     headers: {
       Authorization: `Token ${token}`,
