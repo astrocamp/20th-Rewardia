@@ -12,6 +12,13 @@ from apps.cards.storage import MediaStorage
 from django.core.paginator import Paginator
 from django.core.cache import cache
 import json
+from django_celery_beat.models import PeriodicTask, CrontabSchedule
+from apps.card_crawler.models import CrawledRecord
+from apps.nlp_validation.models import AnalysisStatistics
+from celery import current_app
+from django_celery_results.models import TaskResult
+from datetime import datetime, timedelta
+from django.utils import timezone
 
 
 def _get_last_modified_str(card_instance):
@@ -549,3 +556,263 @@ def bulk_reject_rewards(request):
     return redirect(
         f"{reverse('admins:rewards')}?status={status_filter}&page={page_number}"
     )
+
+# 排程管理相關 Views
+def scheduler(request):
+    """排程管理主頁面"""
+    return render(request, "admins/scheduler.html")
+
+
+def api_scheduler_status(request):
+    """獲取當前排程狀態"""
+    try:
+        task = PeriodicTask.objects.filter(
+            task="apps.card_crawler.tasks.crawl_roo_task"
+        ).first()
+
+        # 檢查 Celery 服務狀態
+        celery_worker_active = False
+        celery_beat_active = False
+
+        try:
+            # 檢查 Celery Worker 是否活躍
+            inspect = current_app.control.inspect()
+            stats = inspect.stats()
+            if stats:
+                celery_worker_active = True
+
+            # 檢查最近1分鐘內是否有 beat 心跳
+            recent_beat_time = timezone.now() - timedelta(minutes=1)
+            recent_heartbeat = TaskResult.objects.filter(
+                date_created__gte=recent_beat_time
+            ).exists()
+            if recent_heartbeat or stats:
+                celery_beat_active = True
+
+        except Exception as celery_error:
+            print(f"Celery 檢查錯誤: {celery_error}")
+
+        # 檢查是否有正在執行的任務
+        is_running = False
+        current_task_info = None
+
+        # 檢查最近5分鐘內的任務狀態
+        recent_time = timezone.now() - timedelta(minutes=5)
+        running_tasks = TaskResult.objects.filter(
+            task_name="apps.card_crawler.tasks.crawl_roo_task",
+            status="STARTED",
+            date_created__gte=recent_time
+        ).first()
+
+        if running_tasks:
+            is_running = True
+            current_task_info = {
+                'task_id': running_tasks.task_id,
+                'started_at': running_tasks.date_created.strftime('%H:%M:%S')
+            }
+
+        if task and task.crontab:
+            return JsonResponse({
+                'success': True,
+                'schedule': {
+                    'hour': task.crontab.hour,
+                    'minute': task.crontab.minute,
+                    'enabled': task.enabled,
+                    'last_run_at': task.last_run_at.strftime('%Y-%m-%d %H:%M:%S') if task.last_run_at else None,
+                    'is_running': is_running,
+                    'current_task': current_task_info,
+                    'celery_worker_active': celery_worker_active,
+                    'celery_beat_active': celery_beat_active
+                }
+            })
+        else:
+            return JsonResponse({
+                'success': True,
+                'schedule': {
+                    'hour': 8,
+                    'minute': 0,
+                    'enabled': False,
+                    'last_run_at': None,
+                    'is_running': is_running,
+                    'current_task': current_task_info,
+                    'celery_worker_active': celery_worker_active,
+                    'celery_beat_active': celery_beat_active
+                }
+            })
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+@require_POST
+def api_update_schedule(request):
+    """更新排程時間"""
+    try:
+        data = json.loads(request.body)
+        hour = int(data.get('hour', 8))
+        minute = int(data.get('minute', 0))
+
+        # 獲取或創建 CrontabSchedule
+        crontab, created = CrontabSchedule.objects.get_or_create(
+            minute=minute,
+            hour=hour,
+            day_of_week='*',
+            day_of_month='*',
+            month_of_year='*',
+        )
+
+        # 獲取或創建 PeriodicTask
+        task, created = PeriodicTask.objects.get_or_create(
+            name='daily-crawl-and-nlp',
+            defaults={
+                'task': 'apps.card_crawler.tasks.crawl_roo_task',
+                'crontab': crontab,
+                'enabled': True,
+            }
+        )
+
+        if not created:
+            task.crontab = crontab
+            task.save()
+
+        return JsonResponse({
+            'success': True,
+            'message': f'排程時間已更新為 {hour:02d}:{minute:02d}'
+        })
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+@require_POST
+def api_toggle_schedule(request):
+    """啟用/停用排程"""
+    try:
+        task = PeriodicTask.objects.filter(
+            task="apps.card_crawler.tasks.crawl_roo_task"
+        ).first()
+
+        if task:
+            task.enabled = not task.enabled
+            task.save()
+
+            status = "啟用" if task.enabled else "停用"
+            return JsonResponse({
+                'success': True,
+                'enabled': task.enabled,
+                'message': f'排程已{status}'
+            })
+        else:
+            return JsonResponse({'success': False, 'error': '找不到排程任務'})
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+@require_POST
+def api_run_now(request):
+    """立即執行爬蟲任務"""
+    try:
+        # 使用 Celery 立即執行任務
+        from apps.card_crawler.tasks import crawl_roo_task
+        result = crawl_roo_task.delay()
+
+        return JsonResponse({
+            'success': True,
+            'task_id': result.id,
+            'message': '爬蟲任務已開始執行'
+        })
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+def api_crawled_records(request):
+    """獲取爬蟲執行記錄"""
+    try:
+        records = CrawledRecord.objects.order_by('-created_at')[:20]
+
+        data = []
+        for record in records:
+            # 判斷是否有錯誤
+            has_errors = bool(record.errors)
+            error_message = None
+
+            if has_errors:
+                # 爬蟲記錄：使用字典裡面的實際內容數量
+                error_count = 0
+                if isinstance(record.errors, dict):
+                    # 計算字典中實際的錯誤項目數量
+                    error_count = len([v for v in record.errors.values() if v])
+                elif isinstance(record.errors, list):
+                    error_count = len(record.errors)
+
+                if error_count > 0:
+                    error_message = f"{error_count} 個錯誤"
+                else:
+                    # 如果計算出來是 0，表示沒有實際錯誤
+                    has_errors = False
+
+            data.append({
+                'id': record.id,
+                'created_at': record.created_at.strftime('%m/%d %H:%M'),
+                'total_cards': record.total_cards,
+                'total_time': f"{record.total_time:.1f}",
+                'average_time': f"{record.average_time:.3f}",
+                'errors': error_message,
+                'has_errors': has_errors
+            })
+
+        return JsonResponse({
+            'success': True,
+            'records': data
+        })
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+def api_analysis_records(request):
+    """獲取 NLP 分析記錄"""
+    try:
+        records = AnalysisStatistics.objects.order_by('-created_at')[:20]
+
+        data = []
+        for record in records:
+            # 判斷是否有錯誤
+            has_errors = bool(record.errors)
+            error_message = None
+
+            if has_errors:
+                # NLP分析記錄：使用 error_count 欄位判斷
+                error_count = 0
+                if isinstance(record.errors, dict) and 'error_count' in record.errors:
+                    error_count = record.errors['error_count']
+                elif isinstance(record.errors, list):
+                    error_count = len(record.errors)
+                elif isinstance(record.errors, dict):
+                    error_count = len(record.errors)
+
+                if error_count > 0:
+                    error_message = f"{error_count} 個錯誤"
+                else:
+                    # 如果計算出來是 0，表示沒有實際錯誤
+                    has_errors = False
+
+            data.append({
+                'id': record.id,
+                'created_at': record.created_at.strftime('%m/%d %H:%M'),
+                'analyzed_count': record.analyzed_count,
+                'total_time': f"{record.total_time:.1f}",
+                'average_time': f"{record.average_time:.3f}",
+                'errors': error_message,
+                'has_errors': has_errors
+            })
+
+        return JsonResponse({
+            'success': True,
+            'records': data
+        })
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+

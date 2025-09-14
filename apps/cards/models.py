@@ -40,7 +40,7 @@ class CreditCard(models.Model):
     name = models.CharField("信用卡名稱", max_length=50)
     bank = models.CharField("銀行名稱", max_length=15)
     image = models.ImageField(
-        "信用卡圖片", 
+        "信用卡圖片",
         upload_to='',
         blank=True,
         null=True,
@@ -61,33 +61,31 @@ class CreditCard(models.Model):
     def __str__(self):
         return f"{self.bank} {self.name}"
 
-
     def save(self, *args, **kwargs):
         self.bank = self.format_bank_name(self.bank)
-        
+
         # 檢查是否有新圖片上傳
         has_new_image = self.image and hasattr(self.image, 'file')
-        
+
         # 如果有新圖片，先在記憶體中處理，再一次性儲存
         if has_new_image:
             self.process_image_before_save()
-        
+
         # 執行父類的 save 方法（只儲存一次）
         super().save(*args, **kwargs)
 
     def format_bank_name(self, bank_name):
-<<<<<<< HEAD
         """格式化銀行名稱"""
         bank_patterns = {
             "一銀": "第一",
-            "美國": "美國運通", 
+            "美國": "美國運通",
             "富邦": "富邦"
         }
-        
+
         for pattern, formatted_name in bank_patterns.items():
             if re.search(pattern, bank_name):
                 return formatted_name
-                
+
         return bank_name if bank_name in CreditCard.Bank.values else "無"
 
     def process_image_before_save(self):
@@ -97,19 +95,19 @@ class CreditCard(models.Model):
                 from PIL import Image
                 from io import BytesIO
                 from django.core.files.base import ContentFile
-                
+
                 # 從上傳的檔案讀取圖片
                 self.image.seek(0)
                 image_data = self.image.read()
                 img = Image.open(BytesIO(image_data))
-                
+
                 # 設定目標尺寸
                 target_width = 300
                 target_height = 180
-                
+
                 # 保持比例調整大小
                 img.thumbnail((target_width, target_height), Image.Resampling.LANCZOS)
-                
+
                 # 轉換為 RGB 模式
                 if img.mode in ('RGBA', 'LA', 'P'):
                     background = Image.new('RGB', img.size, (255, 255, 255))
@@ -119,12 +117,12 @@ class CreditCard(models.Model):
                     img = background
                 elif img.mode != 'RGB':
                     img = img.convert('RGB')
-                
+
                 # 處理後的圖片儲存到記憶體
                 output = BytesIO()
                 img.save(output, 'WEBP', quality=85, optimize=True)
                 output.seek(0)
-                
+
                 # 保持原檔案名稱，但更換副檔名為 .webp
                 original_name = self.image.name
                 if '.' in original_name:
@@ -132,22 +130,11 @@ class CreditCard(models.Model):
                     new_name = f"{name_without_ext}.webp"
                 else:
                     new_name = f"{original_name}.webp"
-                
+
                 # 用處理後的內容替換原檔案
                 self.image = ContentFile(output.getvalue(), name=new_name)
-                
+
             except Exception as e:
                 # 如果圖片處理失敗，保持原檔案
                 pass
 
-=======
-        # if re.search("Bank", bank_name):
-        #     return "Line Bank"
-        if re.search("一銀", bank_name):
-            return "第一"
-        if re.search("美國", bank_name):
-            return "美國運通"
-        if bank_name not in CreditCard.Bank.values:
-            return "無"
-        return bank_name
->>>>>>> d001397 (feat:新增反向代理)

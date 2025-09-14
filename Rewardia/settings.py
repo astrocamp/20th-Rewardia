@@ -33,12 +33,12 @@ DEBUG = True
 ALLOWED_HOSTS = ["rewardia.net", "www.rewardia.net", "localhost", "127.0.0.1"]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://rewardia.net", 
+    "https://rewardia.net",
     "https://www.rewardia.net",
     "http://rewardia.net",
     "http://www.rewardia.net",
     "http://localhost:8000",
-    "http://127.0.0.1:8000"
+    "http://127.0.0.1:8000",
 ]
 
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
@@ -98,6 +98,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -170,7 +171,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "zh-hant"
 
 TIME_ZONE = "Asia/Taipei"
 
@@ -262,19 +263,6 @@ CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "Asia/Taipei"
 
 
-# 從環境變數讀取 Celery 排程時間 (格式: "8:30")
-CRAWLER_SCHEDULE = os.getenv("CRAWLER_SCHEDULE", "8:0").split(":")
-CRAWLER_SCHEDULE_HOUR = int(CRAWLER_SCHEDULE[0])
-CRAWLER_SCHEDULE_MINUTE = int(CRAWLER_SCHEDULE[1])
-
-CELERY_BEAT_SCHEDULE = {
-    # 每天執行爬蟲（完成後自動執行 NLP 分析）
-    "daily-crawl-and-nlp": {
-        "task": "apps.card_crawler.tasks.crawl_roo_task",
-        "schedule": crontab(hour=CRAWLER_SCHEDULE_HOUR, minute=CRAWLER_SCHEDULE_MINUTE),
-    },
-}
-
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 # 給插件使用的
@@ -296,33 +284,35 @@ REST_FRAMEWORK = {
 
 # -----------AWS相關------------
 # Media files (User uploaded files)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # 檔案上傳設定
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
 
 # AWS S3 設定
-USE_S3 = os.getenv('USE_S3', 'False').lower() == 'true'
+USE_S3 = os.getenv("USE_S3", "False").lower() == "true"
 
 if USE_S3:
     # AWS 設定
-    AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
-    AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
-    AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-    AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'ap-southeast-2')
-    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com'
-    
+    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+    AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
+    AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", "ap-southeast-2")
+    AWS_S3_CUSTOM_DOMAIN = (
+        f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
+    )
+
     # S3 設定 - 移除 ACL 設定
     AWS_DEFAULT_ACL = None  # 不使用 ACL
     AWS_S3_OBJECT_PARAMETERS = {
-        'CacheControl': 'max-age=86400',
+        "CacheControl": "max-age=86400",
     }
     AWS_S3_FILE_OVERWRITE = False
     AWS_QUERYSTRING_AUTH = False
     AWS_S3_VERIFY = True
-    
+
     # 媒體檔案設定（只有圖片上傳到 S3）
-    DEFAULT_FILE_STORAGE = 'apps.cards.storage.MediaStorage'
-    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
+    DEFAULT_FILE_STORAGE = "apps.cards.storage.MediaStorage"
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
