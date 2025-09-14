@@ -15,6 +15,7 @@ import registerComponent from './components/register.js';
 import subscribeComponent from './components/subscribe.js';
 import imageUploadComponent from './components/image_upload.js';
 import schedulerComponent from './components/scheduler.js';
+import cardCameraComponent from './components/card_camera.js';
 
 window.Alpine = Alpine;
 
@@ -28,5 +29,7 @@ Alpine.data("toast_fadeout", messageComponent);
 Alpine.data("chatbot", chatbot);
 Alpine.data("imageUpload", imageUploadComponent);
 Alpine.data("schedulerControl", schedulerComponent);
+Alpine.data("card_camera", cardCameraComponent);
+
 
 Alpine.start();

@@ -20,8 +20,9 @@
   },
   "dependencies": {
     "@tailwindcss/cli": "^4.1.12",
-    "tailwindcss": "^4.1.13",
     "alpinejs": "^3.14.9",
-    "htmx.org": "^2.0.6"
+    "htmx.org": "^2.0.6",
+    "tailwindcss": "^4.1.13",
+    "tesseract.js": "^6.0.1"
   }
 }
