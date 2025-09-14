@@ -22,6 +22,18 @@ def _get_last_modified_str(card_instance):
     return None
 
 
+def _get_paginated_rewards_for_bulk_action(request):
+    """獲取當前頁面待處理項目的輔助函數"""
+    status_filter = request.GET.get("status", PendingReward.Status.PENDING)
+    page_number = request.GET.get("page", 1)
+    queryset = PendingReward.objects.filter(status=status_filter).order_by(
+        "-created_at"
+    )
+    paginator = Paginator(queryset, 50)
+    page_obj = paginator.get_page(page_number)
+    return page_obj.object_list, status_filter, page_number
+
+
 # 卡片頁面
 def cards(request):
     cards = CreditCard.objects.order_by("-updated_at")
@@ -53,7 +65,7 @@ def new_card(request):
             )
             messages.success(request, "新增卡片成功")
             return redirect("admins:cards")
-        except:
+        except Exception:
             messages.error(request, "新增失敗")
             return redirect("admins:cards")
     else:
@@ -142,7 +154,6 @@ def rewards(request):
         request,
         "admins/rewards.html",
         {
-            "pending_rewards": page_obj,
             "page_obj": page_obj,
             "current_status": status_filter,
             "stats": stats,
@@ -263,7 +274,7 @@ def hard_delete_pending_reward(request, id):
     else:
         messages.error(request, "無法刪除此項目，只能刪除重複的項目")
         return HttpResponse(
-            f'<tr><td colspan="9" class="text-red-500">無法刪除此項目，只能刪除重複的項目</td></tr>'
+            '<tr><td colspan="9" class="text-red-500">無法刪除此項目，只能刪除重複的項目</td></tr>'
         )
 
 
@@ -483,16 +494,9 @@ def api_delete_image(request):
 @require_POST
 def bulk_approve_rewards(request):
     """批量通過審核"""
-    status_filter = request.GET.get("status", PendingReward.Status.PENDING)
-    page_number = request.GET.get("page", 1)
-
-    # 取得當前頁面的項目
-    paginator = Paginator(
-        PendingReward.objects.filter(status=status_filter).order_by("-created_at"), 50
+    current_page_rewards, status_filter, page_number = (
+        _get_paginated_rewards_for_bulk_action(request)
     )
-    page_obj = paginator.get_page(page_number)
-    current_page_rewards = page_obj.object_list
-
     success_count = 0
 
     for reward in current_page_rewards:
@@ -508,17 +512,14 @@ def bulk_approve_rewards(request):
                 )
                 break
         except Exception as e:
-            # 遇到異常立即停止並警告
             messages.error(
                 request,
                 f"批量審核中斷！在處理「{reward.card.name} - {reward.nlp_category}」時發生錯誤：{str(e)}。已成功處理 {success_count} 個項目，請檢查後重試。",
             )
             break
     else:
-        # 全部成功完成
         messages.success(request, f"批量審核完成！成功通過 {success_count} 個項目。")
 
-    # 重新導向當前頁面
     return redirect(
         f"{reverse('admins:rewards')}?status={status_filter}&page={page_number}"
     )
@@ -527,16 +528,9 @@ def bulk_approve_rewards(request):
 @require_POST
 def bulk_reject_rewards(request):
     """批量駁回審核"""
-    status_filter = request.GET.get("status", PendingReward.Status.PENDING)
-    page_number = request.GET.get("page", 1)
-
-    # 取得當前頁面的項目
-    paginator = Paginator(
-        PendingReward.objects.filter(status=status_filter).order_by("-created_at"), 50
+    current_page_rewards, status_filter, page_number = (
+        _get_paginated_rewards_for_bulk_action(request)
     )
-    page_obj = paginator.get_page(page_number)
-    current_page_rewards = page_obj.object_list
-
     success_count = 0
 
     for reward in current_page_rewards:
@@ -544,17 +538,14 @@ def bulk_reject_rewards(request):
             reward.reject()
             success_count += 1
         except Exception as e:
-            # 遇到異常立即停止並警告
             messages.error(
                 request,
                 f"批量駁回中斷！在處理「{reward.card.name} - {reward.nlp_category}」時發生錯誤：{str(e)}。已成功處理 {success_count} 個項目，請檢查後重試。",
             )
             break
     else:
-        # 全部成功完成
         messages.success(request, f"批量駁回完成！成功駁回 {success_count} 個項目。")
 
-    # 重新導向當前頁面
     return redirect(
         f"{reverse('admins:rewards')}?status={status_filter}&page={page_number}"
     )

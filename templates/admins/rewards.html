@@ -52,7 +52,7 @@
 
     <!-- 資料表格 -->
     <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-        {% if pending_rewards %}
+        {% if page_obj %}
         <!-- 通知訊息區域 -->
         <div id="messages-container">
             {% include 'layouts/messages.html' %}
@@ -63,14 +63,14 @@
             <button
                 class="inline-block bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-bold border-0"
                 style="background-color: #059669 !important; color: white !important;"
-                onclick="showLoadingAndSubmit(this, '{% url 'admins:bulk_approve_rewards' %}?status={{ current_status }}&page={{ page_obj.number }}', '確定要通過本頁 {{ pending_rewards|length }} 個待審核項目嗎？')">
-                全部通過 ({{ pending_rewards|length }})
+                onclick="showLoadingAndSubmit(this, '{% url 'admins:bulk_approve_rewards' %}?status={{ current_status }}&page={{ page_obj.number }}', '確定要通過本頁 {{ page_obj|length }} 個待審核項目嗎？')">
+                全部通過 ({{ page_obj|length }})
             </button>
             <button
                 class="inline-block bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-bold border-0"
                 style="background-color: #dc2626 !important; color: white !important;"
-                onclick="showLoadingAndSubmit(this, '{% url 'admins:bulk_reject_rewards' %}?status={{ current_status }}&page={{ page_obj.number }}', '確定要駁回本頁 {{ pending_rewards|length }} 個待審核項目嗎？')">
-                全部駁回 ({{ pending_rewards|length }})
+                onclick="showLoadingAndSubmit(this, '{% url 'admins:bulk_reject_rewards' %}?status={{ current_status }}&page={{ page_obj.number }}', '確定要駁回本頁 {{ page_obj|length }} 個待審核項目嗎？')">
+                全部駁回 ({{ page_obj|length }})
             </button>
         </div>
         {% endif %}
@@ -92,7 +92,7 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    {% for reward in pending_rewards %}
+                    {% for reward in page_obj %}
                         {% include "admins/reward_row.html" %}
                     {% endfor %}
                 </tbody>
