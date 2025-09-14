@@ -21,6 +21,16 @@ urlpatterns = [
         name="get_merchant_rewards",
     ),
     path(
+        "banks/",
+        views.get_banks,
+        name="get_banks",
+    ),
+    path(
+        "<bank>/cards/",
+        views.get_cards,
+        name="get_cards",
+    ),
+    path(
         "users/cards/",
         views.get_user_cards,
         name="get_user_cards",
