@@ -76,6 +76,10 @@
   padding: 0 5px;
 }
 
+.display_rewards span {
+  color: #13b8ff;
+}
+
 /* Keyframe animation */
 @keyframes slideInFromRight {
   from {
