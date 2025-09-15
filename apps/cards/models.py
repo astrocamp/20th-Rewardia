@@ -65,7 +65,11 @@ class CreditCard(models.Model):
         self.bank = self.format_bank_name(self.bank)
 
         # 檢查是否有新圖片上傳
-        has_new_image = self.image and hasattr(self.image, 'file')
+        try:
+            has_new_image = self.image and hasattr(self.image, 'file') and self.image.file
+        except (FileNotFoundError, OSError):
+            # 如果檔案不存在（如 S3 檔案），則不處理圖片
+            has_new_image = False
 
         # 如果有新圖片，先在記憶體中處理，再一次性儲存
         if has_new_image:
@@ -92,6 +96,9 @@ class CreditCard(models.Model):
         """在儲存前處理圖片（記憶體中處理，避免重複儲存）"""
         if self.image:
             try:
+                # 檢查是否為 S3 檔案或已存在的檔案
+                if not hasattr(self.image, 'file'):
+                    return
                 from PIL import Image
                 from io import BytesIO
                 from django.core.files.base import ContentFile
@@ -134,7 +141,8 @@ class CreditCard(models.Model):
                 # 用處理後的內容替換原檔案
                 self.image = ContentFile(output.getvalue(), name=new_name)
 
-            except Exception as e:
-                # 如果圖片處理失敗，保持原檔案
+            except (FileNotFoundError, OSError, Exception) as e:
+                # 如果圖片處理失敗（包括 S3 檔案存取錯誤），保持原檔案
+                print(f"圖片處理失敗: {e}")
                 pass
 

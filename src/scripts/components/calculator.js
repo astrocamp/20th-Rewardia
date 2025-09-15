@@ -36,23 +36,23 @@ function autoCalculate() {
     const categorySelect = document.getElementById('category_select');
     const scopeSelect = document.getElementById('scope_select');
     const amountInput = document.getElementById('amount_input');
-    
+
     // 檢查所有必填欄位是否都已填寫
-    if (bankSelect && bankSelect.value && 
-        cardSelect && cardSelect.value && 
-        categorySelect && categorySelect.value && 
-        scopeSelect && scopeSelect.value && 
-        amountInput && amountInput.value && 
+    if (bankSelect && bankSelect.value &&
+        cardSelect && cardSelect.value &&
+        categorySelect && categorySelect.value &&
+        scopeSelect && scopeSelect.value &&
+        amountInput && amountInput.value &&
         form && form.checkValidity()) {
-        
+
         console.log('Auto calculate triggered');
-        
+
         // 獲取 CSRF token
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        
+
         // 收集表單資料
         const formData = new FormData(form);
-        
+
         // 使用 fetch API 發送請求
         fetch('/calculate-reward/', {
             method: 'POST',
@@ -75,7 +75,19 @@ function autoCalculate() {
     }
 }
 
-// 確保函數可以被全域調用（給 HTML 中的 onclick 和 HTMX 使用）
-window.clearForm = clearForm;
-window.scrollToResult = scrollToResult;
-window.autoCalculate = autoCalculate;
+// HTMX 支援函數
+function triggerCalculation() {
+    // 檢查所有必填欄位是否都有值
+    const form = document.getElementById('calc_form');
+    const amountInput = document.getElementById('amount_input');
+
+    if (form && form.checkValidity() && amountInput && amountInput.value) {
+        // 手動觸發 amount_input 的 HTMX 請求
+        if (typeof htmx !== 'undefined') {
+            htmx.trigger(amountInput, 'input');
+        }
+    }
+}
+
+// 將函數綁定到全域供 HTMX 使用
+window.triggerCalculation = triggerCalculation;

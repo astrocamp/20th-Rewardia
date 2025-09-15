@@ -1,4 +1,9 @@
-<header class="fixed-header bg-white border-b border-gray-200 shadow-sm">
+<header class="fixed-header bg-white border-b border-gray-200 shadow-sm"
+        x-data="{ 
+          mobileMenuOpen: false,
+          toggleMobileMenu() { this.mobileMenuOpen = !this.mobileMenuOpen },
+          closeMobileMenu() { this.mobileMenuOpen = false }
+        }">
   <!-- Top Banner -->
   <div class="top-banner-container" x-ref="topBanner" x-show="$store.banner.visible" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
     <div id="top-banner" class="bg-gray-900 text-white py-3 sm:py-4">
