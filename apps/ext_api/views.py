@@ -18,6 +18,18 @@ from django.db.models.functions import Coalesce
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
+from rest_framework import status
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+import json
+import cv2
+import numpy as np
+from PIL import Image
+import io
+import base64
+from google.cloud import vision
+import os
+import re
 
 
 @api_view(["GET"])
@@ -104,3 +116,327 @@ def delete_user_card(request, id):
         return Response(status=204)
     except UserCard.DoesNotExist:
         return Response(status=404)
+
+
+@api_view(["POST"])
+def ocr_with_vision(request):
+    """
+    信用卡卡號 OCR 識別 API
+    接收：影像文件 + ROI 百分比座標
+    回傳：{success, masked, card_number, luhn_valid}
+    """
+    try:
+        # 檢查是否有影像文件
+        if 'image' not in request.FILES:
+            return Response({
+                'success': False,
+                'error': '缺少影像文件'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # 檢查是否有 ROI 座標
+        if 'roi' not in request.POST:
+            return Response({
+                'success': False,
+                'error': '缺少 ROI 座標'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # 獲取影像和 ROI
+        image_file = request.FILES['image']
+        roi_data = json.loads(request.POST['roi'])
+        
+        # 驗證 ROI 格式
+        required_keys = ['left', 'top', 'width', 'height']
+        if not all(key in roi_data for key in required_keys):
+            return Response({
+                'success': False,
+                'error': 'ROI 座標格式錯誤'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # 處理影像
+        result = process_card_image(image_file, roi_data)
+        
+        return Response(result)
+        
+    except Exception as e:
+        print(f"OCR API 錯誤: {str(e)}")
+        return Response({
+            'success': False,
+            'error': f'處理失敗: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+def process_card_image(image_file, roi_data):
+    """
+    處理信用卡影像：ROI 裁切 + 影像前處理 + OCR
+    """
+    try:
+        # 1. 讀取影像
+        image_bytes = image_file.read()
+        nparr = np.frombuffer(image_bytes, np.uint8)
+        image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        
+        if image is None:
+            raise ValueError("無法讀取影像")
+        
+        # 2. 根據 ROI 百分比裁切影像
+        roi_image = crop_roi(image, roi_data)
+        
+        # 3. 影像前處理
+        processed_image = preprocess_image(roi_image)
+        
+        # 4. OCR 識別
+        card_number = perform_ocr(processed_image)
+        
+        return {
+            'success': True,
+            'masked': '',  # 暫時返回空字串
+            'card_number': card_number,
+            'luhn_valid': None  # 暫時返回 None
+        }
+        
+    except Exception as e:
+        print(f"影像處理錯誤: {str(e)}")
+        raise
+
+
+def crop_roi(image, roi_data):
+    """
+    根據 ROI 百分比座標裁切影像
+    """
+    height, width = image.shape[:2]
+    
+    # 計算實際像素座標
+    left = int((roi_data['left'] / 100) * width)
+    top = int((roi_data['top'] / 100) * height)
+    right = left + int((roi_data['width'] / 100) * width)
+    bottom = top + int((roi_data['height'] / 100) * height)
+    
+    # 確保座標在影像範圍內
+    left = max(0, left)
+    top = max(0, top)
+    right = min(width, right)
+    bottom = min(height, bottom)
+    
+    # 裁切影像
+    cropped = image[top:bottom, left:right]
+    
+    print(f"原始影像: {width}x{height}")
+    print(f"ROI 座標: ({left}, {top}, {right}, {bottom})")
+    print(f"裁切後影像: {cropped.shape}")
+    
+    return cropped
+
+
+def preprocess_image(image):
+    """
+    影像前處理：CLAHE、去噪、銳化、傾斜校正、二值化
+    """
+    try:
+        # 轉換為灰階
+        if len(image.shape) == 3:
+            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        else:
+            gray = image.copy()
+        
+        # 1. CLAHE 對比度限制自適應直方圖均衡化
+        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+        enhanced = clahe.apply(gray)
+        
+        # 2. 去噪
+        denoised = cv2.fastNlMeansDenoising(enhanced, None, 10, 7, 21)
+        
+        # 3. 銳化
+        kernel = np.array([[-1,-1,-1], [-1,9,-1], [-1,-1,-1]])
+        sharpened = cv2.filter2D(denoised, -1, kernel)
+        
+        # 4. 傾斜校正（簡單版本）
+        corrected = correct_skew(sharpened)
+        
+        # 5. 二值化
+        _, binary = cv2.threshold(corrected, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        
+        print("影像前處理完成")
+        return binary
+        
+    except Exception as e:
+        print(f"影像前處理錯誤: {str(e)}")
+        # 如果前處理失敗，返回原始灰階影像
+        if len(image.shape) == 3:
+            return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        return image
+
+
+def correct_skew(image):
+    """
+    簡單的傾斜校正
+    """
+    try:
+        # 使用霍夫變換檢測直線
+        edges = cv2.Canny(image, 50, 150, apertureSize=3)
+        lines = cv2.HoughLines(edges, 1, np.pi/180, threshold=100)
+        
+        if lines is not None:
+            angles = []
+            for line in lines:
+                rho, theta = line[0]
+                angle = theta * 180 / np.pi
+                if 45 < angle < 135:  # 接近水平的線
+                    angles.append(angle - 90)
+            
+            if angles:
+                # 計算平均角度
+                avg_angle = np.mean(angles)
+                if abs(avg_angle) > 0.5:  # 只校正角度大於 0.5 度的
+                    # 旋轉影像
+                    center = (image.shape[1] // 2, image.shape[0] // 2)
+                    rotation_matrix = cv2.getRotationMatrix2D(center, avg_angle, 1.0)
+                    corrected = cv2.warpAffine(image, rotation_matrix, (image.shape[1], image.shape[0]))
+                    return corrected
+        
+        return image
+        
+    except Exception as e:
+        print(f"傾斜校正錯誤: {str(e)}")
+        return image
+
+
+def perform_ocr(image):
+    """
+    使用 Google Cloud Vision API 進行 OCR
+    """
+    try:
+        from django.conf import settings
+        
+        # 檢查是否有 API Key
+        if not hasattr(settings, 'GOOGLE_CLOUD_VISION_API_KEY') or not settings.GOOGLE_CLOUD_VISION_API_KEY:
+            print("Google Cloud Vision API Key 未設定")
+            return None
+        
+        # 將 OpenCV 影像轉換為 base64
+        _, buffer = cv2.imencode('.jpg', image)
+        image_bytes = buffer.tobytes()
+        image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+        
+        # 使用 REST API 呼叫 Google Cloud Vision
+        import requests
+        
+        url = f"https://vision.googleapis.com/v1/images:annotate?key={settings.GOOGLE_CLOUD_VISION_API_KEY}"
+        
+        payload = {
+            "requests": [
+                {
+                    "image": {
+                        "content": image_base64
+                    },
+                    "features": [
+                        {
+                            "type": "TEXT_DETECTION",
+                            "maxResults": 1
+                        }
+                    ]
+                }
+            ]
+        }
+        
+        headers = {
+            "Content-Type": "application/json"
+        }
+        
+        response = requests.post(url, json=payload, headers=headers)
+        
+        if response.status_code != 200:
+            print(f"Vision API 請求失敗: {response.status_code}")
+            return None
+        
+        result = response.json()
+        
+        if 'responses' not in result or not result['responses']:
+            print("Vision API 回應格式錯誤")
+            return None
+        
+        text_annotations = result['responses'][0].get('textAnnotations', [])
+        
+        if not text_annotations:
+            print("未檢測到任何文字")
+            return None
+        
+        # 提取所有檢測到的文字
+        full_text = text_annotations[0].get('description', '')
+        print(f"OCR 檢測到的文字: {full_text}")
+        
+        # 提取卡號
+        card_number = extract_card_number(full_text)
+        
+        return card_number
+        
+    except Exception as e:
+        print(f"OCR 處理錯誤: {str(e)}")
+        return None
+
+
+def extract_card_number(text):
+    """
+    從 OCR 文字中提取信用卡卡號
+    """
+    if not text:
+        return None
+    
+    # 移除所有非數字字符
+    numbers_only = re.sub(r'\D', '', text)
+    
+    # 尋找可能的卡號（13-19位數字）
+    card_patterns = [
+        r'\b\d{16}\b',  # 16位數字
+        r'\b\d{15}\b',  # 15位數字
+        r'\b\d{17}\b',  # 17位數字
+        r'\b\d{18}\b',  # 18位數字
+        r'\b\d{19}\b',  # 19位數字
+    ]
+    
+    for pattern in card_patterns:
+        matches = re.findall(pattern, numbers_only)
+        if matches:
+            # 返回最長的一個
+            return max(matches, key=len)
+    
+    # 如果沒有找到標準格式，嘗試從長數字序列中提取
+    long_numbers = re.findall(r'\d{12,}', numbers_only)
+    if long_numbers:
+        return long_numbers[0]
+    
+    return None
+
+
+# 暫時註解掉 Luhn 驗證和卡號遮蔽功能
+# def luhn_check(card_number):
+#     """
+#     Luhn 算法驗證信用卡號
+#     """
+#     if not card_number or len(card_number) < 13:
+#         return False
+#     
+#     def digits_of(n):
+#         return [int(d) for d in str(n)]
+#     
+#     digits = digits_of(card_number)
+#     odd_digits = digits[-1::-2]
+#     even_digits = digits[-2::-2]
+#     
+#     checksum = sum(odd_digits)
+#     for d in even_digits:
+#         checksum += sum(digits_of(d * 2))
+#     
+#     return checksum % 10 == 0
+
+
+# def mask_card_number(card_number):
+#     """
+#     遮蔽信用卡號（顯示前4位和後4位）
+#     """
+#     if not card_number or len(card_number) < 8:
+#         return card_number
+#     
+#     if len(card_number) <= 8:
+#         return '*' * (len(card_number) - 4) + card_number[-4:]
+#     
+#     return card_number[:4] + '*' * (len(card_number) - 8) + card_number[-4:]
