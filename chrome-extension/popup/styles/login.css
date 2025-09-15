@@ -55,7 +55,6 @@
   width: 100%;
   margin: 20px 0;
   height: 60px;
-  display: flex;
   flex-direction: row;
   background-color: #f3f4f6;
   border-radius: 20px;
