@@ -1,5 +1,14 @@
 /* 信用卡攝影機識別樣式 */
 
+/* 統一的過渡動畫樣式 */
+.transition-fade-in {
+  @apply transition ease-out duration-300;
+}
+
+.transition-fade-out {
+  @apply transition ease-in duration-200;
+}
+
 /* 保留實際使用的樣式 */
 .card-camera-modal-backdrop {
   @apply fixed inset-0 bg-black/75 transition-opacity;
