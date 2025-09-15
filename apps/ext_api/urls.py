@@ -45,4 +45,9 @@ urlpatterns = [
         views.delete_user_card,
         name="delete_user_card",
     ),
+    path(  
+        "ocr/vision/",
+        views.ocr_with_vision,
+        name="ocr_with_vision",
+    ),
 ]

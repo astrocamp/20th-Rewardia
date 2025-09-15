@@ -27,6 +27,9 @@ SECRET_KEY = "django-insecure-rjptsy-s2@ssc(j4jj0=8+tykyt^^r&dfxx^z#%%1t_psw++=!
 # Gemini API Key
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
+# Google Cloud Vision API Key
+GOOGLE_CLOUD_VISION_API_KEY = os.getenv("GOOGLE_CLOUD_VISION_API_KEY")
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
