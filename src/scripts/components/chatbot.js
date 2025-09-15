@@ -1,23 +1,3 @@
-
-// 文字清理函數 - 移除 HTML 標籤但保留換行
-function sanitizeText(text) {
-  if (!text || typeof text !== 'string') {
-    return '';
-  }
-  
-  try {
-    return text
-      .replace(/<br\s*\/?>/gi, '\n') // 將 <br> 轉換為換行
-      .replace(/<\/p>/gi, '\n\n') // 將 </p> 轉換為雙換行
-      .replace(/<[^>]*>/g, '') // 移除所有其他 HTML 標籤
-      .replace(/\n\s*\n\s*\n/g, '\n\n') // 清理多餘的換行
-      .trim(); // 移除首尾空白
-  } catch (error) {
-    console.warn('文字清理失敗:', error);
-    return text || '';
-  }
-}
-
 // 常數定義
 const CONSTANTS = {
   STORAGE_KEY: 'chatbot_memory',
@@ -39,6 +19,27 @@ const CONSTANTS = {
     bottom: 40 
   }
 };
+
+
+// 文字清理函數 - 移除 HTML 標籤但保留換行
+function sanitizeText(text) {
+  if (!text || typeof text !== 'string') {
+    return '';
+  }
+  
+  try {
+    return text
+      .replace(/<br\s*\/?>/gi, '\n') // 將 <br> 轉換為換行
+      .replace(/<\/p>/gi, '\n\n') // 將 </p> 轉換為雙換行
+      .replace(/<[^>]*>/g, '') // 移除所有其他 HTML 標籤
+      .replace(/\n\s*\n\s*\n/g, '\n\n') // 清理多餘的換行
+      .trim(); // 移除首尾空白
+  } catch (error) {
+    console.warn('文字清理失敗:', error);
+    return text || '';
+  }
+}
+
 
 // 輔助函數：創建預設視窗狀態
 function createDefaultWindowState() {
@@ -248,6 +249,12 @@ export default function chatbot() {
         // 移除所有 HTML 標籤，只保留純文字
         const safeTextContent = sanitizeText(data.response);
 
+        // 檢查是否為導航指令
+        if (safeTextContent.startsWith('NAVIGATE:')) {
+          this.handleNavigationCommand(safeTextContent);
+          return; // 不添加到聊天記錄，直接執行導航
+        }
+
         // 添加 AI 回應到聊天記錄
         this.messages.push({
           type: 'ai',
@@ -329,6 +336,174 @@ export default function chatbot() {
           this.$refs.messageInput.focus();
         }
       });
+    },
+
+    // 處理導航指令
+    handleNavigationCommand(command) {
+      // 解析導航指令格式：NAVIGATE:target:message
+      const parts = command.split(':');
+      if (parts.length < 3) return;
+      
+      const target = parts[1];
+      const message = parts.slice(2).join(':'); // 處理訊息中可能包含冒號的情況
+      
+      // 先顯示回應訊息
+      this.messages.push({
+        type: 'ai',
+        content: message,
+        timestamp: new Date()
+      });
+      
+      // 執行導航
+      this.$nextTick(() => {
+        this.executeNavigation(target);
+      });
+    },
+
+    // 執行具體的導航動作
+    executeNavigation(target) {
+      const currentPath = window.location.pathname;
+      
+      switch (target) {
+        case 'member_area':
+          if (currentPath === '/users/member/') {
+            // 已在會員專區
+            this.messages.push({
+              type: 'ai',
+              content: '這裡就是了喔',
+              timestamp: new Date()
+            });
+            this.focusInput();
+          } else {
+            // 導航到會員專區
+            window.location.href = '/users/member/';
+          }
+          break;
+          
+        case 'home':
+          if (currentPath === '/') {
+            // 已在首頁
+            this.messages.push({
+              type: 'ai',
+              content: '這裡就是了喔',
+              timestamp: new Date()
+            });
+            this.focusInput();
+          } else {
+            // 導航到首頁
+            window.location.href = '/';
+          }
+          break;
+          
+        case 'download':
+          if (currentPath === '/download/') {
+            // 已在下載專區
+            this.messages.push({
+              type: 'ai',
+              content: '這裡就是了喔',
+              timestamp: new Date()
+            });
+            this.focusInput();
+          } else {
+            // 導航到下載專區
+            window.location.href = '/download/';
+          }
+          break;
+          
+        case 'calculator':
+          if (currentPath === '/calculator/') {
+            // 已在優惠試算
+            this.messages.push({
+              type: 'ai',
+              content: '這裡就是了喔',
+              timestamp: new Date()
+            });
+            this.focusInput();
+          } else {
+            // 導航到優惠試算
+            window.location.href = '/calculator/';
+          }
+          break;
+          
+        case 'about':
+          if (currentPath === '/faq/') {
+            // 已在關於功能
+            this.messages.push({
+              type: 'ai',
+              content: '這裡就是了喔',
+              timestamp: new Date()
+            });
+            this.focusInput();
+          } else {
+            // 導航到關於功能
+            window.location.href = '/faq/';
+          }
+          break;
+          
+        case 'add_card':
+          if (currentPath === '/users/cards/new/') {
+            // 已在新增卡片頁面，開啟相機
+            this.messages.push({
+              type: 'ai',
+              content: '好的，幫你打開相機',
+              timestamp: new Date()
+            });
+            // 觸發相機開啟事件
+            window.dispatchEvent(new CustomEvent('open-camera'));
+            this.focusInput();
+          } else {
+            // 導航到新增卡片頁面
+            window.location.href = '/users/cards/new/';
+          }
+          break;
+          
+        case 'login':
+          // 導航到登入頁面
+          window.location.href = '/sessions/login/';
+          break;
+          
+        case 'register':
+          // 導航到註冊頁面
+          window.location.href = '/users/register/';
+          break;
+          
+        case 'logout':
+          // 執行登出並導回首頁
+          this.performLogout();
+          break;
+          
+        default:
+          console.warn('未知的導航目標:', target);
+      }
+    },
+
+    // 執行登出
+    performLogout() {
+      // 創建一個隱藏的 form 來提交登出請求
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/accounts/logout/';
+      
+      // 添加 CSRF token
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+      if (csrfToken) {
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrfmiddlewaretoken';
+        csrfInput.value = csrfToken.value;
+        form.appendChild(csrfInput);
+      }
+      
+      // 添加 next 參數
+      const nextInput = document.createElement('input');
+      nextInput.type = 'hidden';
+      nextInput.name = 'next';
+      nextInput.value = '/';
+      form.appendChild(nextInput);
+      
+      // 提交表單
+      document.body.appendChild(form);
+      form.submit();
     },
 
     // 計算視窗位置（共用函式）
