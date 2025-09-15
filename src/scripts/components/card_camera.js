@@ -20,13 +20,26 @@ export default (config = {}) => ({
   showEdit: false,
   editNumber: '',
   
+  // Toast 訊息狀態
+  toast: {
+    show: false,
+    message: '',
+    type: 'info'
+  },
+  
   // 初始化
   init() {
     console.log('card_camera init() 被調用');
     this.video = this.$refs.video;
     this.canvas = this.$refs.canvas;
+    
+    // 預先獲取 CSRF Token
+    this.csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+    
     console.log('video 初始化:', this.video);
     console.log('canvas 初始化:', this.canvas);
+    console.log('CSRF Token 初始化:', this.csrfToken ? '已獲取' : '未找到');
+    
     if (this.canvas) {
       this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
     }
@@ -41,13 +54,6 @@ export default (config = {}) => ({
       
       // 等待 DOM 更新
       await this.$nextTick();
-      
-      // 強制顯示模態框（臨時修復 x-show 問題）
-      const modalElement = document.querySelector('[x-show="showModal"]');
-      if (modalElement) {
-        modalElement.style.display = 'block';
-        modalElement.style.visibility = 'visible';
-      }
       
       const constraints = {
         video: {
@@ -83,12 +89,6 @@ export default (config = {}) => ({
     this.maskedNumber = '';
     this.retries = 0;
     
-    // 隱藏模態框
-    const modalElement = document.querySelector('[x-show="showCameraModal"]');
-    if (modalElement) {
-      modalElement.style.display = 'none';
-      modalElement.style.visibility = 'hidden';
-    }
   },
   
   // 計算 ROI 百分比座標
@@ -275,7 +275,16 @@ export default (config = {}) => ({
     } else {
       this.error = '';
     }
-    this.showToast(message, type);
+    
+    // 使用 Alpine.js 狀態管理 Toast
+    this.toast.show = true;
+    this.toast.message = message;
+    this.toast.type = type;
+    
+    // 自動隱藏 Toast
+    setTimeout(() => {
+      this.toast.show = false;
+    }, 3000);
   },
   
   // 確認編輯的卡號
@@ -289,13 +298,21 @@ export default (config = {}) => ({
     }
   },
   
-  // 重置編輯狀態
+  // 重置編輯狀態（保留已識別的卡號）
   resetEditState() {
+    this.showEdit = false;
+    this.editNumber = '';
+    this.error = '';
+  },
+  
+  // 完全重置狀態（清空所有識別結果）
+  resetAllState() {
     this.showEdit = false;
     this.editNumber = '';
     this.cardNumber = '';
     this.maskedNumber = '';
     this.error = '';
+    this.retries = 0;
   },
   
   // 取消編輯
@@ -305,37 +322,11 @@ export default (config = {}) => ({
   
   // 重新辨識
   retryRecognition() {
-    this.resetEditState();
-    this.retries = 0;
+    this.resetAllState();
     // 重新開啟攝影機
     this.openCamera();
   },
   
-  // 顯示 toast 訊息
-  showToast(message, type = 'info') {
-    // 創建 toast 元素
-    const toast = document.createElement('div');
-    toast.className = `fixed top-4 right-4 z-[9999] px-4 py-3 rounded-lg shadow-lg text-white max-w-sm ${
-      type === 'success' ? 'bg-green-500' : 
-      type === 'error' ? 'bg-red-500' : 
-      'bg-blue-500'
-    }`;
-    toast.textContent = message;
-    
-    // 添加到頁面
-    document.body.appendChild(toast);
-    
-    // 自動移除
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      toast.style.transform = 'translateY(-10px)';
-      setTimeout(() => {
-        if (toast.parentNode) {
-          toast.parentNode.removeChild(toast);
-        }
-      }, 300);
-    }, 3000);
-  },
   
   // 格式化卡號顯示（每4位加空格）
   formatCardNumber(cardNumber) {
@@ -347,9 +338,49 @@ export default (config = {}) => ({
     return cleaned.replace(/(.{4})/g, '$1 ').trim();
   },
   
+  // 智能格式化卡號輸入（保持游標位置）
+  formatCardInput(event) {
+    const input = event.target;
+    const cursorPosition = input.selectionStart;
+    const oldValue = input.value;
+    
+    // 移除非數字字符
+    const cleaned = oldValue.replace(/\D/g, '');
+    
+    // 限制最多16位數字
+    const limited = cleaned.substring(0, 16);
+    
+    // 每4位加空格
+    const formatted = limited.replace(/(.{4})/g, '$1 ').trim();
+    
+    // 設置新值
+    input.value = formatted;
+    
+    // 計算新的游標位置
+    let newCursorPosition = cursorPosition;
+    
+    // 如果刪除了字符，游標位置需要調整
+    if (formatted.length < oldValue.length) {
+      // 計算刪除的字符數
+      const deletedChars = oldValue.length - formatted.length;
+      newCursorPosition = Math.max(0, cursorPosition - deletedChars);
+    } else if (formatted.length > oldValue.length) {
+      // 如果添加了空格，游標位置需要前移
+      const addedChars = formatted.length - oldValue.length;
+      newCursorPosition = cursorPosition + addedChars;
+    }
+    
+    // 設置游標位置
+    this.$nextTick(() => {
+      input.setSelectionRange(newCursorPosition, newCursorPosition);
+    });
+    
+    // 更新 editNumber
+    this.editNumber = formatted;
+  },
+  
   // 獲取 CSRF Token
   getCSRFToken() {
-    const token = document.querySelector('[name=csrfmiddlewaretoken]');
-    return token ? token.value : '';
+    return this.csrfToken || '';
   }
 });
