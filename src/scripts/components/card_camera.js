@@ -1,39 +1,31 @@
 export default (config = {}) => ({
   // 攝影機相關狀態
-  isCameraOpen: false,
+  cameraOpen: false,
   stream: null,
-  videoElement: null,
+  video: null,
   canvas: null,
   ctx: null,
   
   // API 呼叫狀態
-  isProcessing: false,
-  recognizedCardNumber: '',
-  maskedCardNumber: '',
+  processing: false,
+  cardNumber: '',
+  maskedNumber: '',
   luhnValid: false,
-  retryCount: 0,
+  retries: 0,
   maxRetries: 3,
   
   // UI 狀態
-  showCameraModal: false,
-  showResult: false,
-  errorMessage: '',
-  successMessage: '',
-  showEditModal: false,
-  editableCardNumber: '',
-  
-  // 取景框尺寸（百分比）
-  cardFrameWidth: 90,
-  cardFrameHeight: 30,
-  cardFrameTop: 65,
-  cardFrameLeft: 50,
+  showModal: false,
+  error: '',
+  showEdit: false,
+  editNumber: '',
   
   // 初始化
   init() {
     console.log('card_camera init() 被調用');
-    this.videoElement = this.$refs.video;
+    this.video = this.$refs.video;
     this.canvas = this.$refs.canvas;
-    console.log('videoElement 初始化:', this.videoElement);
+    console.log('video 初始化:', this.video);
     console.log('canvas 初始化:', this.canvas);
     if (this.canvas) {
       this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
@@ -44,14 +36,14 @@ export default (config = {}) => ({
   async openCamera() {
     console.log('openCamera 被調用');
     try {
-      this.errorMessage = '';
-      this.showCameraModal = true;
+      this.error = '';
+      this.showModal = true;
       
       // 等待 DOM 更新
       await this.$nextTick();
       
       // 強制顯示模態框（臨時修復 x-show 問題）
-      const modalElement = document.querySelector('[x-show="showCameraModal"]');
+      const modalElement = document.querySelector('[x-show="showModal"]');
       if (modalElement) {
         modalElement.style.display = 'block';
         modalElement.style.visibility = 'visible';
@@ -66,14 +58,14 @@ export default (config = {}) => ({
       };
       
       this.stream = await navigator.mediaDevices.getUserMedia(constraints);
-      this.videoElement.srcObject = this.stream;
-      this.isCameraOpen = true;
+      this.video.srcObject = this.stream;
+      this.cameraOpen = true;
       
       console.log('攝影機開啟成功');
     } catch (error) {
       console.error('開啟攝影機失敗:', error);
-      this.errorMessage = '無法開啟攝影機，請檢查權限設定';
-      this.isCameraOpen = false;
+      this.error = '無法開啟攝影機，請檢查權限設定';
+      this.cameraOpen = false;
     }
   },
   
@@ -84,13 +76,12 @@ export default (config = {}) => ({
       this.stream.getTracks().forEach(track => track.stop());
       this.stream = null;
     }
-    this.isCameraOpen = false;
-    this.showCameraModal = false;
-    this.showResult = false;
-    this.errorMessage = '';
-    this.recognizedCardNumber = '';
-    this.maskedCardNumber = '';
-    this.retryCount = 0;
+    this.cameraOpen = false;
+    this.showModal = false;
+    this.error = '';
+    this.cardNumber = '';
+    this.maskedNumber = '';
+    this.retries = 0;
     
     // 隱藏模態框
     const modalElement = document.querySelector('[x-show="showCameraModal"]');
@@ -138,13 +129,13 @@ export default (config = {}) => ({
   // 拍照並呼叫後端 OCR API
   async captureAndRecognize() {
     console.log('captureAndRecognize 被調用');
-    if (!this.isCameraOpen || this.isProcessing) {
+    if (!this.cameraOpen || this.processing) {
       console.log('攝影機未開啟或正在處理中');
       return;
     }
     
-    this.isProcessing = true;
-    this.errorMessage = '';
+    this.processing = true;
+    this.error = '';
     
     try {
       // 計算 ROI 座標
@@ -164,20 +155,20 @@ export default (config = {}) => ({
       
     } catch (error) {
       console.error('拍照識別失敗:', error);
-      this.errorMessage = error.message || '拍照識別失敗，請重試';
-      this.retryCount++;
+      this.error = error.message || '拍照識別失敗，請重試';
+      this.retries++;
     } finally {
-      this.isProcessing = false;
+      this.processing = false;
     }
   },
   
   // 拍攝完整影像
   async captureFullImage() {
-    if (!this.videoElement || !this.canvas || !this.ctx) {
+    if (!this.video || !this.canvas || !this.ctx) {
       throw new Error('攝影機或畫布未初始化');
     }
     
-    const video = this.videoElement;
+    const video = this.video;
     const canvas = this.canvas;
     const ctx = this.ctx;
     
@@ -228,23 +219,23 @@ export default (config = {}) => ({
       console.log('OCR API 回應:', result);
       
       if (result.success) {
-        this.maskedCardNumber = result.masked || '';
-        this.recognizedCardNumber = result.card_number || '';
+        this.maskedNumber = result.masked || '';
+        this.cardNumber = result.card_number || '';
         this.luhnValid = result.luhn_valid || false;
         
         // 檢查是否成功識別到16位卡號
-        const cardNumberDigits = this.recognizedCardNumber ? this.recognizedCardNumber.replace(/\D/g, '') : '';
+        const cardNumberDigits = this.cardNumber ? this.cardNumber.replace(/\D/g, '') : '';
         
         if (cardNumberDigits.length === 16) {
           // 識別成功：顯示成功訊息並開啟編輯模式
-          this.showSuccessMessage('卡號辨識成功，請確認掃描結果');
-          this.showEditModal = true;
-          this.editableCardNumber = this.recognizedCardNumber;
+          this.showMessage('卡號辨識成功，請確認掃描結果', 'success');
+          this.showEdit = true;
+          this.editNumber = this.cardNumber;
           this.closeCamera();
         } else {
           // 識別失敗：顯示失敗訊息並重新拍照
-          this.showErrorMessage('卡號辨識失敗，請重新拍照');
-          this.retryCount++;
+          this.showMessage('卡號辨識失敗，請重新拍照', 'error');
+          this.retries++;
           // 延遲1秒後重新開啟攝影機
           setTimeout(() => {
             this.openCamera();
@@ -262,8 +253,8 @@ export default (config = {}) => ({
   
   // 重新拍照
   retryCapture() {
-    if (this.retryCount < this.maxRetries) {
-      this.errorMessage = '';
+    if (this.retries < this.maxRetries) {
+      this.error = '';
       this.captureAndRecognize();
     } else {
       this.openManualInput();
@@ -272,57 +263,52 @@ export default (config = {}) => ({
   
   // 開啟手動輸入
   openManualInput() {
-    this.showEditModal = true;
-    this.editableCardNumber = '';
+    this.showEdit = true;
+    this.editNumber = '';
     this.closeCamera();
   },
   
-  // 顯示錯誤訊息
-  showErrorMessage(message) {
-    this.errorMessage = message;
-    this.successMessage = '';
-    // 顯示錯誤 toast
-    this.showToast(message, 'error');
+  // 顯示訊息（統一處理成功/錯誤）
+  showMessage(message, type = 'info') {
+    if (type === 'error') {
+      this.error = message;
+    } else {
+      this.error = '';
+    }
+    this.showToast(message, type);
   },
   
   // 確認編輯的卡號
   confirmCardNumber() {
-    if (this.editableCardNumber.length >= 12) {
-      this.recognizedCardNumber = this.editableCardNumber;
-      this.showEditModal = false;
-      this.showResult = true;
-      console.log('確認的卡號:', this.recognizedCardNumber);
+    if (this.editNumber.length >= 12) {
+      this.cardNumber = this.editNumber;
+      this.showEdit = false;
+      console.log('確認的卡號:', this.cardNumber);
     } else {
       alert('請輸入完整的卡號（至少12位數字）');
     }
   },
   
+  // 重置編輯狀態
+  resetEditState() {
+    this.showEdit = false;
+    this.editNumber = '';
+    this.cardNumber = '';
+    this.maskedNumber = '';
+    this.error = '';
+  },
+  
   // 取消編輯
   cancelEdit() {
-    this.showEditModal = false;
-    this.editableCardNumber = '';
-    this.recognizedCardNumber = '';
-    this.maskedCardNumber = '';
+    this.resetEditState();
   },
   
   // 重新辨識
   retryRecognition() {
-    this.showEditModal = false;
-    this.editableCardNumber = '';
-    this.recognizedCardNumber = '';
-    this.maskedCardNumber = '';
-    this.errorMessage = '';
-    this.retryCount = 0;
+    this.resetEditState();
+    this.retries = 0;
     // 重新開啟攝影機
     this.openCamera();
-  },
-  
-  // 顯示成功訊息
-  showSuccessMessage(message) {
-    this.errorMessage = '';
-    this.successMessage = message;
-    // 顯示成功 toast
-    this.showToast(message, 'success');
   },
   
   // 顯示 toast 訊息
