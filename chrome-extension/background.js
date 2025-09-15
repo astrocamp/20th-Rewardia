@@ -1,4 +1,7 @@
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "calculate") {
+  }
+
   if (message.action === "open_loggedin") {
     chrome.action.openPopup();
     chrome.action.setIcon({
