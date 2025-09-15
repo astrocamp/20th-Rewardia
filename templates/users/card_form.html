@@ -34,7 +34,9 @@
            {% endif %}
            }),
            ...card_camera()
-         }">
+         }"
+         @open-camera="openCamera()"
+         @open-camera.window="openCamera()">
 
       <div class="bg-[#F9F9F9] rounded-lg min-h-[407px] p-5 md:p-[21px] md:pt-5 md:pb-8">
         <!-- 標題列 -->
@@ -115,6 +117,15 @@
                 擷取卡號
               </button>
               <p class="text-sm text-gray-600 mt-1">使用攝影機自動識別信用卡卡號</p>
+              
+              <button type="button"
+                      class="inline-flex items-center px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors mt-3">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                輸入卡號
+              </button>
+              <p class="text-sm text-gray-500 mt-1">手動輸入信用卡卡號</p>
             </div>
 
             <!-- 隱藏的卡號輸入欄位 -->

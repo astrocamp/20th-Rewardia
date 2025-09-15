@@ -141,3 +141,79 @@ PERSONAL_QUERY_KEYWORDS = [
 REWARD_TYPE_KEYWORDS = [
     "回饋類型", "回饋種類", "有哪些類型", "有哪些種類", "什麼類型", "什麼種類"
 ]
+
+# 導航相關關鍵字
+NAVIGATION_KEYWORDS = {
+    # 會員專區相關
+    'member_area': [
+        "會員專區", "我的資料", "我的個人資料", "個人資料", "我的卡片"
+    ],
+    # 一般頁面導航
+    'general_pages': {
+        'home': ["去首頁", "首頁"],
+        'download': ["去下載專區", "下載專區"],
+        'calculator': ["去優惠試算", "優惠試算"],
+        'about': ["去關於功能", "關於功能"]
+    },
+    # 新增卡片相關
+    'add_card': ["擷取卡號", "擷取卡片", "新增卡片", "加卡片", "加入卡片"],
+    # 登出相關
+    'logout': ["登出", "退出", "登出會員"],
+    # 登入註冊相關
+    'auth_pages': {
+        'login': ["登入", "去登入", "登入頁面"],
+        'register': ["註冊", "去註冊", "註冊頁面"]
+    }
+}
+
+# 比較相關關鍵字
+COMPARISON_KEYWORDS = {
+    # 比較指示詞
+    'comparison_indicators': [
+        "比較", "比", "對比", "對照", "哪一個", "哪個", "哪張", "哪一張"
+    ],
+    # 最高級指示詞
+    'highest_indicators': [
+        "最高", "最好", "最佳", "最優", "最大", "最棒", "最強"
+    ],
+    # 銀行限定指示詞
+    'bank_limited_indicators': [
+        "銀行", "哪一家", "哪個銀行", "在.*銀行"
+    ]
+}
+
+# 個人化推薦關鍵字
+PERSONAL_RECOMMENDATION_KEYWORDS = {
+    # 個人化指示詞
+    'personal_indicators': [
+        "我喜歡", "我常", "我愛", "我習慣", "我經常", "我偏好", "我最常"
+    ],
+    # 推薦指示詞
+    'recommendation_indicators': [
+        "最適合我", "適合我", "推薦給我", "推薦我", "建議我", "給我建議"
+    ],
+    # 特定商家/類別
+    'specific_merchants': [
+        "壽司郎", "爭鮮", "藏壽司", "海壽司", "點爭鮮"
+    ]
+}
+
+# 卡片比較推薦關鍵字
+CARD_COMPARISON_RECOMMENDATION_KEYWORDS = {
+    # 比較指示詞
+    'comparison_indicators': [
+        "有比", "比我的", "比這張", "比這張卡", "比我的卡", "比我的卡片"
+    ],
+    # 優惠/回饋指示詞
+    'reward_indicators': [
+        "更多", "更高", "更好", "更優", "更棒", "更強", "更划算"
+    ],
+    # 其他卡片指示詞
+    'other_card_indicators': [
+        "其它卡片", "其他卡片", "別的卡片", "其他卡", "別的卡", "其它卡"
+    ],
+    # 銀行限定指示詞
+    'bank_limited_indicators': [
+        "銀行", "哪一家", "哪個銀行", "在.*銀行"
+    ]
+}
