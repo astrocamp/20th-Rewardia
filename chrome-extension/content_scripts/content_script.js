@@ -63,19 +63,44 @@ if (current_url == "http://localhost:8000/users/member/") {
   });
 }
 
-async function display_rewards() {
+// 顯示回饋金額在momo網站相關
+async function display_momo_rewards(rate, card) {
   const checkout_price = document.querySelector(".checkout-content-price");
-  const price = document.querySelector(".checkout-content-price").textContent;
+  let price = Number(
+    document
+      .querySelector(".checkout-content-price.final-price")
+      .textContent.trim()
+      .replace(",", "")
+      .slice(1)
+  );
+
+  let reward = (price * (rate / 100)).toFixed(2);
+  console.log(price);
+
   if (checkout_price) {
     const display = document.createElement("span");
     display.className = "display_rewards";
     display.innerHTML = `<img src="${chrome.runtime.getURL(
       "images/Rewardia.png"
-    )}"><p>刷滙豐滙鑽卡，最高回饋15元</p>`;
+    )}"><p>刷 <span>${card}</span>，最高回饋${reward}元</p>`;
     checkout_price.appendChild(display);
   }
 }
 
 if (current_url.includes("cart")) {
-  display_rewards();
+  const checkout_price = document.querySelector(".checkout-content-price");
+  if (checkout_price) {
+    chrome.runtime.sendMessage(
+      {
+        action: "calculate",
+      },
+      async (response) => {
+        const card = response.data;
+        const max_rate = Number(card.max_rate);
+        const card_name = card.card.name;
+
+        await display_momo_rewards(max_rate, card_name);
+      }
+    );
+  }
 }
