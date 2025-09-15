@@ -190,15 +190,11 @@ def process_card_image(image_file, roi_data):
         # 5. 格式化卡號
         formatted_card_number = format_card_number(card_number) if card_number else None
         
-        # 6. 暫時跳過驗證和遮蔽（專注於 OCR 識別）
-        # luhn_valid = luhn_check(card_number) if card_number else False
-        # masked_number = mask_card_number(card_number) if card_number else ''
-        
         return {
             'success': True,
-            'masked': '',  # 暫時返回空字串
-            'card_number': formatted_card_number,  # 返回格式化後的卡號
-            'luhn_valid': None  # 暫時返回 None
+            'masked': '',
+            'card_number': formatted_card_number,
+            'luhn_valid': None
         }
         
     except Exception as e:
@@ -447,36 +443,3 @@ def format_card_number(card_number):
     return formatted_with_spaces
 
 
-# 暫時註解掉 Luhn 驗證和卡號遮蔽功能
-# def luhn_check(card_number):
-#     """
-#     Luhn 算法驗證信用卡號
-#     """
-#     if not card_number or len(card_number) < 13:
-#         return False
-#     
-#     def digits_of(n):
-#         return [int(d) for d in str(n)]
-#     
-#     digits = digits_of(card_number)
-#     odd_digits = digits[-1::-2]
-#     even_digits = digits[-2::-2]
-#     
-#     checksum = sum(odd_digits)
-#     for d in even_digits:
-#         checksum += sum(digits_of(d * 2))
-#     
-#     return checksum % 10 == 0
-
-
-# def mask_card_number(card_number):
-#     """
-#     遮蔽信用卡號（顯示前4位和後4位）
-#     """
-#     if not card_number or len(card_number) < 8:
-#         return card_number
-#     
-#     if len(card_number) <= 8:
-#         return '*' * (len(card_number) - 4) + card_number[-4:]
-#     
-#     return card_number[:4] + '*' * (len(card_number) - 8) + card_number[-4:]
