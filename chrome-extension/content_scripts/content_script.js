@@ -70,12 +70,11 @@ async function display_momo_rewards(rate, card) {
     document
       .querySelector(".checkout-content-price.final-price")
       .textContent.trim()
-      .replace(",", "")
+      .replace(/,/g, "")
       .slice(1)
   );
 
   let reward = (price * (rate / 100)).toFixed(2);
-  console.log(price);
 
   if (checkout_price) {
     const display = document.createElement("span");
@@ -95,6 +94,7 @@ if (current_url.includes("cart")) {
         action: "calculate",
       },
       async (response) => {
+        if (!response?.data) return;
         const card = response.data;
         const max_rate = Number(card.max_rate);
         const card_name = card.card.name;

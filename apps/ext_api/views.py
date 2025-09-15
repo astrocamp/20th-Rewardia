@@ -102,6 +102,6 @@ def delete_user_card(request, id):
         user_card = UserCard.objects.get(user=request.user, card__id=id)
         user_card.delete()
 
-        return Response(status=200)
+        return Response(status=204)
     except UserCard.DoesNotExist:
         return Response(status=404)
