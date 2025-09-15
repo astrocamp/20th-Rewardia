@@ -211,7 +211,7 @@ export default (config = {}) => ({
     console.log('影像大小:', imageBlob.size, 'bytes');
     
     try {
-      const response = await fetch('/api/ocr/vision', {
+      const response = await fetch('/api/ocr/vision/', {
         method: 'POST',
         body: formData,
         headers: {

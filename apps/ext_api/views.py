@@ -346,6 +346,7 @@ def perform_ocr(image):
         
         if response.status_code != 200:
             print(f"Vision API 請求失敗: {response.status_code}")
+            print(f"錯誤回應: {response.text}")
             return None
         
         result = response.json()
