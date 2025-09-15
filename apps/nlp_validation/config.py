@@ -238,6 +238,7 @@ class NLPConfig:
             "%",
             "最高",
             "無上限",
+            "享",
         ]
 
     @staticmethod
@@ -274,6 +275,8 @@ class NLPConfig:
             "加碼利率",
             "~",
             "～",
+            "預借",
+            "活儲",
         ]
 
     @staticmethod

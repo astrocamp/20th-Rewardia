@@ -33,8 +33,7 @@
                         hx-get="/get-cards-by-bank/"
                         hx-target="#card_select"
                         hx-trigger="change"
-                        hx-include="this"
-                        onchange="autoCalculate()">
+                        hx-include="this">
                   <option value="" selected disabled>請選擇銀行</option>
                   {% for bank_name in banks %}
                   <option value="{{ bank_name }}">{{ bank_name }}</option>
@@ -57,7 +56,7 @@
                         hx-target="#category_select"
                         hx-trigger="change"
                         hx-include="this"
-                        onchange="autoCalculate()">
+                        hx-on:htmx:after-request="triggerCalculation()">
                   <option value="" selected disabled>請先選擇銀行，再選擇卡片</option>
                 </select>
                 <div class="select-arrow" aria-hidden="true">
@@ -74,7 +73,7 @@
                         hx-target="#scope_select"
                         hx-trigger="change"
                         hx-include="#card_select,this"
-                        onchange="autoCalculate()">
+                        hx-on:htmx:after-request="triggerCalculation()">
                   <option value="" selected disabled>請先選擇卡片</option>
                 </select>
                 <div class="select-arrow" aria-hidden="true">
@@ -86,7 +85,11 @@
             <div class="field-group">
               <label for="scope_select" class="field-label required">消費種類</label>
               <div class="select-wrapper">
-                <select id="scope_select" name="scope_select" class="ui-select" aria-label="選擇消費種類" required onchange="autoCalculate()">
+                <select id="scope_select" name="scope_select" class="ui-select" aria-label="選擇消費種類" required 
+                        hx-trigger="change" 
+                        hx-post="/calculate-reward/" 
+                        hx-target="#result_value"
+                        hx-include="#calc_form">
                   <option value="" selected disabled>請先選擇消費類別</option>
                 </select>
                 <div class="select-arrow" aria-hidden="true">
@@ -97,7 +100,11 @@
             <!-- 消費金額 -->
             <div class="field-group field-full">
               <label for="amount_input" class="field-label required">消費金額</label>
-              <input id="amount_input" type="number" name="amount_input" inputmode="decimal" placeholder="請輸入消費金額" class="ui-input" aria-label="消費金額" required min="0.01" step="0.01" oninput="autoCalculate()" />
+              <input id="amount_input" type="number" name="amount_input" inputmode="decimal" placeholder="請輸入消費金額" class="ui-input" aria-label="消費金額" required min="0.01" step="0.01" 
+                     hx-trigger="input changed delay:500ms" 
+                     hx-post="/calculate-reward/" 
+                     hx-target="#result_value"
+                     hx-include="#calc_form" />
             </div>
           </div>
 
@@ -114,7 +121,10 @@
 
           <!-- 動作按鈕 -->
           <div class="action-buttons">
-          <button type="button" class="ui-btn ui-btn-secondary" onclick="clearForm()">清空填寫</button>
+          <button type="button" class="ui-btn ui-btn-secondary" 
+                  hx-get="/calculator/"
+                  hx-target="section.calculator-page"
+                  hx-select="section.calculator-page">清空填寫</button>
           </div>
 
 

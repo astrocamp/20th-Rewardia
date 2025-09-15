@@ -1,4 +1,9 @@
-<header class="fixed-header bg-white border-b border-gray-200 shadow-sm">
+<header class="fixed-header bg-white border-b border-gray-200 shadow-sm" 
+        x-data="{ 
+          mobileMenuOpen: false,
+          toggleMobileMenu() { this.mobileMenuOpen = !this.mobileMenuOpen },
+          closeMobileMenu() { this.mobileMenuOpen = false }
+        }">
   <!-- Main Header -->
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-20">

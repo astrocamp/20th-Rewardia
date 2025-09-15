@@ -4,8 +4,8 @@
 
 {% block content %}
 <!-- 主要橫幅區域 (Banner) -->
-<section class="relative mx-4 sm:mx-6 lg:mx-10 mb-4 sm:mb-6 lg:mb-8 banner-spacing overflow-hidden" 
-         x-bind:class="{ 
+<section class="relative mx-4 sm:mx-6 lg:mx-10 mb-4 sm:mb-6 lg:mb-8 banner-spacing overflow-hidden"
+         x-bind:class="{
            'banner-hidden': !$store.banner.visible,
            'banner-transitioning': $store.banner.isTransitioning
          }">
@@ -13,17 +13,17 @@
   <div class="mb-4 sm:mb-6">
     <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black">首頁</h2>
   </div>
-  
+
   <!-- Banner 圖區域 -->
   <div class="relative h-[300px] sm:h-[350px] lg:h-[400px] overflow-hidden rounded-lg">
     <!-- 背景圖片 -->
     <div class="absolute inset-0">
-      <img src="https://github.com/astrocamp/20th-Rewardia/blob/pic/img/ChatGPT%20Image%202025%E5%B9%B48%E6%9C%8821%E6%97%A5%20%E4%B8%8A%E5%8D%8806_10_26.png?raw=true" 
-        alt="Rewardia Banner Background" 
+      <img src="https://rewardia-web-pic.s3.ap-southeast-2.amazonaws.com/web-pic/download-index.webp"
+        alt="Rewardia Banner Background"
         loading="eager"
         class="w-full h-full object-cover object-[75%_9%]">
     </div>
-    
+
     <!-- 內容區域 - 限制在左半邊 -->
     <div class="relative z-10 flex items-center h-full">
       <div class="text-white px-4 sm:px-8 lg:px-12 w-full lg:w-1/2">
@@ -49,7 +49,7 @@
   <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-8 sm:mb-12 text-left font-sans leading-tight">
     卡片總覽
   </h2>
-  
+
   <!-- 搜尋區域 -->
   <div class="mb-8">
     <div class="bg-white rounded-lg shadow-sm border border-gray-300 overflow-hidden">
@@ -63,7 +63,7 @@
             </template>
           </select>
         </div>
-        
+
         <!-- 選擇優惠類別 -->
         <div class="flex-1 border-b sm:border-b-0 sm:border-r border-gray-200">
           <select x-model="selectedReward" @change="onRewardChange" class="horizontal-search-select search-select-height search-select-padding">
@@ -73,7 +73,7 @@
             </template>
           </select>
         </div>
-        
+
         <!-- 選擇店家 -->
         <div class="flex-1 border-b sm:border-b-0 sm:border-r border-gray-200">
           <select x-model="selectedMerchant" @change="onMerchantChange" class="horizontal-search-select search-select-height search-select-padding">
@@ -83,14 +83,14 @@
             </template>
           </select>
         </div>
-        
+
         <!-- 搜尋輸入 -->
         <div class="flex-1">
           <input type="text" x-model="searchKeyword" @input="performSearch" placeholder="請輸入關鍵字" class="horizontal-search-input search-input-height search-input-padding">
         </div>
       </div>
     </div>
-  
+
   <!-- 卡牌式展示區域（畫面b）- 初始狀態 -->
           <div x-show="viewMode === 'grid'" class="grid-view-container mt-6 max-h-[80vh] overflow-y-auto" @scroll="handleScroll">
     <div class="credit-card-grid">
@@ -116,14 +116,14 @@
         </div>
       </template>
     </div>
-    
+
     <!-- 網格視圖載入更多指示器 -->
     <div x-show="hasMoreCards()" class="text-center py-6">
       <div class="text-gray-500">
         向下滾動載入更多卡片...
       </div>
     </div>
-    
+
     <!-- 網格視圖沒有更多卡片時的提示 -->
     <div x-show="!hasMoreCards() && allCards.length > 0" class="text-center py-6 text-gray-500">
       已顯示所有卡片
@@ -146,7 +146,7 @@
             <img :src="card.image" :alt="card.name" class="list-card-image">
           </div>
         </div>
-        
+
         <!-- 右側：優惠條件列表 -->
         <div class="list-card-right">
           <template x-for="(reward, index) in card.rewards.slice(0, 4)" :key="index">
@@ -165,7 +165,7 @@
         </div>
       </div>
     </template>
-    
+
     <!-- 載入更多指示器 -->
     <div x-show="hasMoreCards()" class="text-center py-6">
       <div x-show="!isLoadingMore" class="text-gray-500">
@@ -176,7 +176,7 @@
         <span class="text-gray-500">載入中...</span>
       </div>
     </div>
-    
+
     <!-- 沒有更多卡片時的提示 -->
     <div x-show="!hasMoreCards() && allCards.length > 0" class="text-center py-6 text-gray-500">
       已顯示所有相關卡片
