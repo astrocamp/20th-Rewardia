@@ -18,6 +18,7 @@ export default (config = {}) => ({
   showCameraModal: false,
   showResult: false,
   errorMessage: '',
+  successMessage: '',
   showEditModal: false,
   editableCardNumber: '',
   
@@ -231,10 +232,24 @@ export default (config = {}) => ({
         this.recognizedCardNumber = result.card_number || '';
         this.luhnValid = result.luhn_valid || false;
         
-        // 顯示結果並開啟編輯模式
-        this.showEditModal = true;
-        this.editableCardNumber = this.recognizedCardNumber;
-        this.closeCamera();
+        // 檢查是否成功識別到16位卡號
+        const cardNumberDigits = this.recognizedCardNumber ? this.recognizedCardNumber.replace(/\D/g, '') : '';
+        
+        if (cardNumberDigits.length === 16) {
+          // 識別成功：顯示成功訊息並開啟編輯模式
+          this.showSuccessMessage('卡號辨識成功，請確認掃描結果');
+          this.showEditModal = true;
+          this.editableCardNumber = this.recognizedCardNumber;
+          this.closeCamera();
+        } else {
+          // 識別失敗：顯示失敗訊息並重新拍照
+          this.showErrorMessage('卡號辨識失敗，請重新拍照');
+          this.retryCount++;
+          // 延遲1秒後重新開啟攝影機
+          setTimeout(() => {
+            this.openCamera();
+          }, 1000);
+        }
       } else {
         throw new Error(result.error || 'OCR 識別失敗');
       }
@@ -262,6 +277,14 @@ export default (config = {}) => ({
     this.closeCamera();
   },
   
+  // 顯示錯誤訊息
+  showErrorMessage(message) {
+    this.errorMessage = message;
+    this.successMessage = '';
+    // 顯示錯誤 toast
+    this.showToast(message, 'error');
+  },
+  
   // 確認編輯的卡號
   confirmCardNumber() {
     if (this.editableCardNumber.length >= 12) {
@@ -282,9 +305,58 @@ export default (config = {}) => ({
     this.maskedCardNumber = '';
   },
   
+  // 重新辨識
+  retryRecognition() {
+    this.showEditModal = false;
+    this.editableCardNumber = '';
+    this.recognizedCardNumber = '';
+    this.maskedCardNumber = '';
+    this.errorMessage = '';
+    this.retryCount = 0;
+    // 重新開啟攝影機
+    this.openCamera();
+  },
+  
+  // 顯示成功訊息
+  showSuccessMessage(message) {
+    this.errorMessage = '';
+    this.successMessage = message;
+    // 顯示成功 toast
+    this.showToast(message, 'success');
+  },
+  
+  // 顯示 toast 訊息
+  showToast(message, type = 'info') {
+    // 創建 toast 元素
+    const toast = document.createElement('div');
+    toast.className = `fixed top-4 right-4 z-[9999] px-4 py-3 rounded-lg shadow-lg text-white max-w-sm ${
+      type === 'success' ? 'bg-green-500' : 
+      type === 'error' ? 'bg-red-500' : 
+      'bg-blue-500'
+    }`;
+    toast.textContent = message;
+    
+    // 添加到頁面
+    document.body.appendChild(toast);
+    
+    // 自動移除
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(-10px)';
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.parentNode.removeChild(toast);
+        }
+      }, 300);
+    }, 3000);
+  },
+  
   // 格式化卡號顯示（每4位加空格）
   formatCardNumber(cardNumber) {
     if (!cardNumber) return '';
+    // 如果已經有空格，直接返回
+    if (cardNumber.includes(' ')) return cardNumber;
+    // 否則移除非數字字符並每4位加空格
     const cleaned = cardNumber.replace(/\D/g, '');
     return cleaned.replace(/(.{4})/g, '$1 ').trim();
   },
