@@ -31,17 +31,17 @@ urlpatterns = [
         name="get_banks",
     ),
     path(
-        "<bank>/cards/",
+        "banks/<bank>/cards/",
         views.get_cards,
         name="get_cards",
     ),
     path(
-        "users/new_card/",
+        "users/new_card/<int:id>",
         views.new_user_card,
         name="new_user_card",
     ),
     path(
-        "users/delete_card/<int:id>",
+        "users/delete_card/<int:id>/",
         views.delete_user_card,
         name="delete_user_card",
     ),

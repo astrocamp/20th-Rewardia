@@ -17,6 +17,7 @@ from rest_framework.decorators import (
 from django.db.models.functions import Coalesce
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from django.utils import timezone
 
 
 @api_view(["GET"])
@@ -70,6 +71,8 @@ def get_cards(request, bank):
 @api_view(["GET"])
 @authentication_classes([TokenAuthentication])
 def get_user_cards(request, id):
+    if request.user.id != id:
+        return Response(status=403)
     user_cards = (
         UserCard.objects.select_related("card").filter(user=id).order_by("-added_date")
     )
@@ -79,18 +82,26 @@ def get_user_cards(request, id):
 
 @api_view(["POST"])
 @authentication_classes([TokenAuthentication])
-def new_user_card(request):
-    card_name = request.data.get("card")
-    card = CreditCard.objects.get(name=card_name)
-    user_card = UserCard.objects.create(user=request.user, card=card)
+def new_user_card(request, id):
+    try:
+        card_id = request.data.get("card")
+        card = CreditCard.objects.get(id=card_id)
+        user_card = UserCard.objects.update_or_create(
+            user=request.user, card=card, defaults={"added_date": timezone.now()}
+        )
 
-    return Response(status=201)
+        return Response(status=201)
+    except CreditCard.DoesNotExist:
+        return Response(status=404)
 
 
 @api_view(["DELETE"])
 @authentication_classes([TokenAuthentication])
 def delete_user_card(request, id):
-    user_card = UserCard.objects.get(user=request.user, card__id=id)
-    user_card.delete()
+    try:
+        user_card = UserCard.objects.get(user=request.user, card__id=id)
+        user_card.delete()
 
-    return Response(status=200)
+        return Response(status=200)
+    except UserCard.DoesNotExist:
+        return Response(status=404)

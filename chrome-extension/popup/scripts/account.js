@@ -1,6 +1,5 @@
-const token_url = "http://localhost:8000/users/api/get_token";
-const member_zone = "http://localhost:8000/users/member";
-const user_cards_url = "http://localhost:8000/api/users/cards/";
+const token_url = "https://rewardia.net/users/api/get_token";
+const member_zone = "https://rewardia.net/users/member";
 
 let loggedin = false;
 
@@ -103,30 +102,37 @@ async function get_user_cards(token, id) {
   });
 
   //刪除卡片相關
-  const delete_btn = document.querySelector(".delete_card_btn");
+  const delete_btns = document.querySelectorAll(".delete_card_btn");
 
-  delete_btn.addEventListener("click", async function () {
-    const confirm_view = `<div class="confirm_view">
+  delete_btns.forEach((btn) => {
+    btn.addEventListener("click", async function () {
+      const confirm_view = `<div class="confirm_view">
     <h1>確定要刪除卡片嗎？</h1>
     <div class="buttons">
         <a href="login.html"><button class="cancel">取消</button></a>
-        <a href="login.html"><button class="confirm">確認</button></a>
+        <button data-id="${btn.dataset.id}" class="confirm">確認</button>
       </div></div>`;
-    user_cards.innerHTML = confirm_view;
-    const confirm_btn = document.querySelector(".confirm");
+      user_cards.innerHTML = confirm_view;
+      const confirm_btn = document.querySelector(
+        `.confirm[data-id='${btn.dataset.id}']`
+      );
 
-    confirm_btn.addEventListener("click", async function () {
-      const card_id = delete_btn.dataset.id;
-      const delete_card_url = `http://localhost:8000/api/users/delete_card/${card_id}`;
-      const token = await get_auth_token();
-      const response = await fetch(delete_card_url, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
+      confirm_btn.addEventListener("click", async function () {
+        const card_id = btn.dataset.id;
+
+        const delete_card_url = `http://localhost:8000/api/users/delete_card/${card_id}/`;
+
+        const token = await get_auth_token();
+        const response = await fetch(delete_card_url, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        window.location.href = "login.html";
       });
-      delete_btn.closest(".card").remove();
     });
   });
 
