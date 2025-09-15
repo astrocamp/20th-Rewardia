@@ -12,10 +12,6 @@
 </head>
 <body x-data="header()" @scroll.window="handleScroll()">
 
-    <main class="calculator-page">
-      {% include 'layouts/messages.html' %} {% block content %} {% endblock %}
-    </main>
-
   {% include 'layouts/header.html' %}
 
   <!-- AI 聊天機器人組件 - 不在登入和註冊頁面顯示 -->
