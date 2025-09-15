@@ -1,8 +1,6 @@
 const current_host = window.location.hostname;
 const current_url = window.location.href;
 
-console.dir(window.location);
-
 const merchantMap = {
   momo: "momo購物",
   pchome: "pchome",
@@ -55,6 +53,7 @@ async function show_rewardia_popup() {
 
   setTimeout(() => {
     popup.remove();
+    sessionStorage.setItem("close_popup", "true");
   }, 3000);
 }
 
@@ -62,4 +61,18 @@ if (current_url == "http://localhost:8000/users/member/") {
   chrome.runtime.sendMessage({
     action: "open_loggedin",
   });
+}
+
+async function display_rewards() {
+  const checkout_price = document.querySelector(".checkout-content-price");
+  if (checkout_price) {
+    const display = document.createElement("span");
+    display.className = "display_rewards";
+    display.innerText = `最高回饋30%`;
+    checkout_price.appendChild(display);
+  }
+}
+
+if (current_url.includes("cart")) {
+  display_rewards();
 }
