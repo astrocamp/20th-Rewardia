@@ -57,6 +57,25 @@
   font-size: 12px;
 }
 
+/* 購物車顯示回饋相關 */
+
+.display_rewards {
+  font-size: 16px;
+  color: #24458d;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.display_rewards img {
+  width: 18px;
+  height: 18px;
+}
+
+.display_rewards p {
+  padding: 0 5px;
+}
+
 /* Keyframe animation */
 @keyframes slideInFromRight {
   from {

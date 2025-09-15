@@ -65,10 +65,13 @@ if (current_url == "http://localhost:8000/users/member/") {
 
 async function display_rewards() {
   const checkout_price = document.querySelector(".checkout-content-price");
+  const price = document.querySelector(".checkout-content-price").textContent;
   if (checkout_price) {
     const display = document.createElement("span");
     display.className = "display_rewards";
-    display.innerText = `最高回饋30%`;
+    display.innerHTML = `<img src="${chrome.runtime.getURL(
+      "images/Rewardia.png"
+    )}"><p>刷滙豐滙鑽卡，最高回饋15元</p>`;
     checkout_price.appendChild(display);
   }
 }
