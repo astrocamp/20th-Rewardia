@@ -29,16 +29,11 @@ export default (config = {}) => ({
   
   // 初始化
   init() {
-    console.log('card_camera init() 被調用');
     this.video = this.$refs.video;
     this.canvas = this.$refs.canvas;
     
     // 預先獲取 CSRF Token
     this.csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
-    
-    console.log('video 初始化:', this.video);
-    console.log('canvas 初始化:', this.canvas);
-    console.log('CSRF Token 初始化:', this.csrfToken ? '已獲取' : '未找到');
     
     if (this.canvas) {
       this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
@@ -47,7 +42,6 @@ export default (config = {}) => ({
   
   // 開啟攝影機
   async openCamera() {
-    console.log('openCamera 被調用');
     try {
       this.error = '';
       this.showModal = true;
@@ -66,18 +60,14 @@ export default (config = {}) => ({
       this.stream = await navigator.mediaDevices.getUserMedia(constraints);
       this.video.srcObject = this.stream;
       this.cameraOpen = true;
-      
-      console.log('攝影機開啟成功');
     } catch (error) {
-      console.error('開啟攝影機失敗:', error);
-      this.error = '無法開啟攝影機，請檢查權限設定';
       this.cameraOpen = false;
+      this.handleError(error, '無法開啟攝影機，請檢查權限設定');
     }
   },
   
   // 關閉攝影機
   closeCamera() {
-    console.log('closeCamera 被調用');
     if (this.stream) {
       this.stream.getTracks().forEach(track => track.stop());
       this.stream = null;
@@ -91,20 +81,30 @@ export default (config = {}) => ({
     
   },
   
-  // 計算 ROI 百分比座標
-  calculateROI() {
-    if (!this.$refs.frame) {
-      console.error('找不到取景框元素');
-      return null;
-    }
-    
+  // 驗證必要元素
+  validateElements() {
     const frame = this.$refs.frame;
     const video = this.$refs.video;
     
-    if (!video || !frame) {
-      console.error('找不到 video 或 frame 元素');
-      return null;
+    if (!frame) {
+      console.error('找不到取景框元素');
+      return false;
     }
+    
+    if (!video) {
+      console.error('找不到 video 元素');
+      return false;
+    }
+    
+    return { frame, video };
+  },
+  
+  // 計算 ROI 百分比座標
+  calculateROI() {
+    const elements = this.validateElements();
+    if (!elements) return null;
+    
+    const { frame, video } = elements;
     
     const frameRect = frame.getBoundingClientRect();
     const videoRect = video.getBoundingClientRect();
@@ -122,15 +122,12 @@ export default (config = {}) => ({
       height: Math.round(height * 100) / 100
     };
     
-    console.log('計算的 ROI 百分比:', roi);
     return roi;
   },
   
   // 拍照並呼叫後端 OCR API
   async captureAndRecognize() {
-    console.log('captureAndRecognize 被調用');
     if (!this.cameraOpen || this.processing) {
-      console.log('攝影機未開啟或正在處理中');
       return;
     }
     
@@ -154,8 +151,7 @@ export default (config = {}) => ({
       await this.callOCRAPI(imageBlob, roi);
       
     } catch (error) {
-      console.error('拍照識別失敗:', error);
-      this.error = error.message || '拍照識別失敗，請重試';
+      this.handleError(error, '拍照識別失敗，請重試');
       this.retries++;
     } finally {
       this.processing = false;
@@ -168,9 +164,7 @@ export default (config = {}) => ({
       throw new Error('攝影機或畫布未初始化');
     }
     
-    const video = this.video;
-    const canvas = this.canvas;
-    const ctx = this.ctx;
+    const { video, canvas, ctx } = this;
     
     // 設定畫布尺寸為影片實際尺寸
     canvas.width = video.videoWidth;
@@ -183,7 +177,6 @@ export default (config = {}) => ({
     return new Promise((resolve, reject) => {
       canvas.toBlob((blob) => {
         if (blob) {
-          console.log('完整影像拍攝成功，大小:', blob.size, 'bytes');
           resolve(blob);
         } else {
           reject(new Error('影像轉換失敗'));
@@ -198,9 +191,6 @@ export default (config = {}) => ({
     formData.append('image', imageBlob, 'card_image.jpg');
     formData.append('roi', JSON.stringify(roi));
     
-    console.log('發送 OCR API 請求...');
-    console.log('ROI:', roi);
-    console.log('影像大小:', imageBlob.size, 'bytes');
     
     try {
       const response = await fetch('/api/ocr/vision/', {
@@ -216,7 +206,6 @@ export default (config = {}) => ({
       }
       
       const result = await response.json();
-      console.log('OCR API 回應:', result);
       
       if (result.success) {
         this.maskedNumber = result.masked || '';
@@ -246,7 +235,7 @@ export default (config = {}) => ({
       }
       
     } catch (error) {
-      console.error('OCR API 呼叫失敗:', error);
+      this.handleError(error, 'OCR API 呼叫失敗');
       throw error;
     }
   },
@@ -266,6 +255,14 @@ export default (config = {}) => ({
     this.showEdit = true;
     this.editNumber = '';
     this.closeCamera();
+  },
+  
+  // 統一錯誤處理
+  handleError(error, defaultMessage = '操作失敗，請重試') {
+    const message = error?.message || defaultMessage;
+    this.error = message;
+    this.showMessage(message, 'error');
+    console.error('操作失敗:', error);
   },
   
   // 顯示訊息（統一處理成功/錯誤）
@@ -292,7 +289,6 @@ export default (config = {}) => ({
     if (this.editNumber.length >= 12) {
       this.cardNumber = this.editNumber;
       this.showEdit = false;
-      console.log('確認的卡號:', this.cardNumber);
     } else {
       alert('請輸入完整的卡號（至少12位數字）');
     }
