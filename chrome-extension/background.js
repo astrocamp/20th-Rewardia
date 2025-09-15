@@ -22,7 +22,7 @@ async function get_merchant_data() {
     return cur_url.includes(key);
   });
 
-  if (cur_url.includes(merchant)) {
+  if (merchant) {
     const data = await get_rewards(merchantMap[merchant]);
     return data;
   }
@@ -33,7 +33,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     (async () => {
       const merchant_data = await get_merchant_data();
       // 取第一個，因為第一個是最大值
-      sendResponse({ data: merchant_data[0] });
+      sendResponse({ data: merchant_data?.[0] });
     })();
 
     return true;
