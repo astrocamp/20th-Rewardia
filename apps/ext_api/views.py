@@ -187,10 +187,17 @@ def process_card_image(image_file, roi_data):
         # 4. OCR 識別
         card_number = perform_ocr(processed_image)
         
+        # 5. 格式化卡號
+        formatted_card_number = format_card_number(card_number) if card_number else None
+        
+        # 6. 暫時跳過驗證和遮蔽（專注於 OCR 識別）
+        # luhn_valid = luhn_check(card_number) if card_number else False
+        # masked_number = mask_card_number(card_number) if card_number else ''
+        
         return {
             'success': True,
             'masked': '',  # 暫時返回空字串
-            'card_number': card_number,
+            'card_number': formatted_card_number,  # 返回格式化後的卡號
             'luhn_valid': None  # 暫時返回 None
         }
         
@@ -406,6 +413,38 @@ def extract_card_number(text):
         return long_numbers[0]
     
     return None
+
+
+def format_card_number(card_number):
+    """
+    格式化信用卡號碼：
+    1. 不足16碼：補足到16碼（後面補0）
+    2. 超過16碼：保留前16碼
+    3. 每4個數字之間加空格
+    """
+    if not card_number:
+        return None
+    
+    # 移除所有非數字字符
+    numbers_only = re.sub(r'\D', '', card_number)
+    
+    if len(numbers_only) < 16:
+        # 不足16碼：後面補0
+        formatted = numbers_only.ljust(16, '0')
+        print(f"卡號不足16碼，補足後: {formatted}")
+    elif len(numbers_only) > 16:
+        # 超過16碼：保留前16碼
+        formatted = numbers_only[:16]
+        print(f"卡號超過16碼，截取前16碼: {formatted}")
+    else:
+        # 正好16碼
+        formatted = numbers_only
+    
+    # 每4個數字之間加空格
+    formatted_with_spaces = ' '.join([formatted[i:i+4] for i in range(0, len(formatted), 4)])
+    
+    print(f"格式化後的卡號: {formatted_with_spaces}")
+    return formatted_with_spaces
 
 
 # 暫時註解掉 Luhn 驗證和卡號遮蔽功能
