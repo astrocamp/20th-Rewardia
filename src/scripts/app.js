@@ -16,6 +16,7 @@ import subscribeComponent from './components/subscribe.js';
 import imageUploadComponent from './components/image_upload.js';
 import schedulerComponent from './components/scheduler.js';
 import cardCameraComponent from './components/card_camera.js';
+import passwordChangeComponent from './components/password_change.js';
 
 window.Alpine = Alpine;
 
@@ -30,6 +31,6 @@ Alpine.data("chatbot", chatbot);
 Alpine.data("imageUpload", imageUploadComponent);
 Alpine.data("schedulerControl", schedulerComponent);
 Alpine.data("card_camera", cardCameraComponent);
-
+Alpine.data("password_change", passwordChangeComponent);
 
 Alpine.start();

@@ -2,10 +2,17 @@ from django.shortcuts import render
 from .data.faq_content import FAQ_DATA
 from apps.cards.models import CreditCard
 from apps.rewards.models import RewardCategory
+<<<<<<< HEAD
 from django.http import HttpResponse, JsonResponse  # Added JsonResponse
+=======
+from django.http import HttpResponse, JsonResponse
+>>>>>>> 0f8bb46 (feat: 會員專區新增會員能夠進行修改密碼的功能)
 from django.db.models import Prefetch
 from django.utils.html import escape
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.messages import get_messages
+from apps.cards.storage import MediaStorage
+from .forms import RewardCalculatorForm
 import json
 
 
@@ -79,8 +86,11 @@ def get_main_data(request):
         # 處理圖片欄位
         if card.image:
             # 如果有上傳的圖片，使用 MediaStorage 生成正確的 URL
+<<<<<<< HEAD
             from apps.cards.storage import MediaStorage
 
+=======
+>>>>>>> 0f8bb46 (feat: 會員專區新增會員能夠進行修改密碼的功能)
             storage = MediaStorage()
             image_url = storage.url(card.image.name)
         else:
@@ -259,8 +269,6 @@ def get_scopes_by_category(request):
 def calculate_reward(request):
     """計算信用卡回饋 - 使用 Django Form 驗證"""
     if request.method == "POST":
-        from .forms import RewardCalculatorForm
-
         form = RewardCalculatorForm(request.POST)
 
         if form.is_valid():
@@ -342,8 +350,6 @@ def calculate_reward(request):
 # HTMX 用的 Messages API
 def get_messages(request):
     """取得 Django Messages 並轉成 HTML"""
-    from django.contrib.messages import get_messages
-
     messages_html = ""
     messages_list = get_messages(request)
 

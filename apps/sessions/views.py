@@ -30,9 +30,13 @@ def login_view(request):
 @require_POST
 def logout_view(request):
     """用戶登出視圖"""
+    # 檢查使用者是否已登入
+    if not request.user.is_authenticated:
+        return redirect("pages:main")
+    
     username = UserAuthenticationService.logout_user(request)
 
     if username:
         UserAuthenticationService.handle_logout_success(request, username)
 
-        return redirect("pages:main")
+    return redirect("pages:main")
