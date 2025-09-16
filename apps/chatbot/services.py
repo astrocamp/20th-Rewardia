@@ -1,6 +1,7 @@
 # Chatbot 資料庫查詢服務
 import logging
 import functools
+import re
 from django.db.models import Q, Value, DecimalField
 from django.db.models.functions import Coalesce
 from apps.cards.models import CreditCard
@@ -11,7 +12,8 @@ from apps.chatbot.config import (
     BANK_MAPPING, COMMON_KEYWORDS, PERSONAL_QUERY_KEYWORDS, REWARD_TYPE_KEYWORDS, 
     NAVIGATION_KEYWORDS, COMPARISON_KEYWORDS, PERSONAL_RECOMMENDATION_KEYWORDS, 
     CARD_COMPARISON_RECOMMENDATION_KEYWORDS, RESPONSE_MESSAGES, PAGE_MAPPING,
-    INTENT_KEYWORDS, FORMAT_CONFIG, DATABASE_CONFIG
+    INTENT_KEYWORDS, FORMAT_CONFIG, DATABASE_CONFIG, ERROR_DETECTION_CONFIG, 
+    DYNAMIC_RESPONSE_TEMPLATES
 )
 
 # 設定日誌記錄器
@@ -487,7 +489,6 @@ class ChatbotResponseBuilder:
                 # 特定卡片比較：A卡與B卡
                 intent["comparison_type"] = "specific_cards"
                 # 提取卡片名稱
-                import re
                 
                 # 簡化版本：直接分割並清理
                 # 先移除比較前綴
@@ -1401,8 +1402,8 @@ class ChatbotResponseBuilder:
                     else:
                         return RESPONSE_MESSAGES['no_user_category_rewards'].format(category=intent['categories'][0])
             
-            # 3. 查詢使用者個人卡片（僅當沒有類別查詢時）
-            if any(keyword in user_message for keyword in PERSONAL_QUERY_KEYWORDS) and not intent["categories"]:
+            # 3. 查詢使用者個人卡片（優先處理個人查詢關鍵字）
+            if any(keyword in user_message for keyword in PERSONAL_QUERY_KEYWORDS):
                 user_cards = ChatbotDataService.get_user_cards(user_id)
                 if user_cards:
                     response = RESPONSE_MESSAGES['user_cards']['header']
@@ -1439,7 +1440,7 @@ class ChatbotResponseBuilder:
         # 如果意圖是查詢特定類別的回饋，但沒有指定銀行，則補充或修正回應
         if intent["categories"] and not intent["banks"]:
             # 檢查是否有錯誤的「沒有資料」回答
-            error_indicators = ["沒有", "找不到", "無相關", "無資料", "資料庫中沒有"]
+            error_indicators = ERROR_DETECTION_CONFIG['error_indicators']
             has_error_response = any(indicator in response for indicator in error_indicators)
             
             # 計算回應中的卡片數量
@@ -1451,11 +1452,11 @@ class ChatbotResponseBuilder:
             
             # 如果沒有條列式內容、有錯誤回答、或卡片數量不足，則補充正確資料
             # 對於「所有銀行」問題，期望更多卡片；對於一般問題，至少3張
-            expected_min_cards = 8 if any(keyword in user_message for keyword in ["所有", "全部", "全部銀行", "所有銀行"]) else 3
+            expected_min_cards = DATABASE_CONFIG['expected_min_cards_all_banks'] if any(keyword in user_message for keyword in ERROR_DETECTION_CONFIG['all_banks_keywords']) else DATABASE_CONFIG['expected_min_cards_general']
             if not any(line.strip().startswith('-') for line in response.split('\n')) or has_error_response or card_count < expected_min_cards:
                 for category in intent["categories"]:
                     # 檢查是否詢問「最高」或「最好」的回饋
-                    is_highest_only = any(keyword in user_message for keyword in ["最高", "最好", "最佳", "最優", "最大", "最棒"])
+                    is_highest_only = any(keyword in user_message for keyword in ERROR_DETECTION_CONFIG['highest_keywords'])
                     
                     # 根據問題類型決定返回的卡片數量
                     limit = 1 if is_highest_only else 5
@@ -1467,13 +1468,13 @@ class ChatbotResponseBuilder:
                             response = ""
                         
                         if is_highest_only:
-                            response += f"\n\n{category} 回饋最高的信用卡：\n"  # 保持原樣，因為是動態類別名稱
+                            response += f"\n\n{DYNAMIC_RESPONSE_TEMPLATES['highest_reward'].format(category=category)}\n"
                         else:
                             # 根據問題類型選擇更合適的標題
-                            if any(keyword in user_message for keyword in ["有哪些", "哪些", "什麼", "什麼卡", "所有", "全部", "有", "的卡", "卡片", "信用卡"]):
-                                response += f"\n\n{category}的信用卡：\n"  # 保持原樣，因為是動態類別名稱
+                            if any(keyword in user_message for keyword in ERROR_DETECTION_CONFIG['list_query_keywords']):
+                                response += f"\n\n{DYNAMIC_RESPONSE_TEMPLATES['category_cards'].format(category=category)}\n"
                             else:
-                                response += f"\n\n{category} 消費的最佳回饋卡片：\n"  # 保持原樣，因為是動態類別名稱
+                                response += f"\n\n{DYNAMIC_RESPONSE_TEMPLATES['best_reward_cards'].format(category=category)}\n"
                         
                         for reward in rewards:
                             rate_display = ChatbotDataService._format_reward_rate_from_dict(reward)

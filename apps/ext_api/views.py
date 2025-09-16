@@ -27,9 +27,13 @@ import numpy as np
 from PIL import Image
 import io
 import base64
+import logging
 from google.cloud import vision
 import os
 import re
+
+# 設定日誌記錄器
+logger = logging.getLogger(__name__)
 
 
 @api_view(["GET"])
@@ -142,7 +146,7 @@ def ocr_with_vision(request):
         return Response(result)
         
     except Exception as e:
-        print(f"OCR API 錯誤: {str(e)}")
+        logger.error(f"OCR API 錯誤: {str(e)}", exc_info=True)
         return Response({
             'success': False,
             'error': f'處理失敗: {str(e)}'
@@ -168,11 +172,24 @@ def process_card_image(image_file):
         
         # 3. OCR 識別
         ocr_result = perform_ocr(processed_image)
+        if ocr_result is None:
+            return {
+                'success': False,
+                'error': 'OCR 處理失敗'
+            }
+        
         card_number = ocr_result.get('card_number')
         full_text = ocr_result.get('full_text', '')
         
         # 4. 格式化卡號
         formatted_card_number = format_card_number(card_number) if card_number else None
+        
+        # 檢查卡號格式化是否成功
+        if formatted_card_number is None and card_number:
+            return {
+                'success': False,
+                'error': '卡號長度不足，請重新拍照'
+            }
         
         return {
             'success': True,
@@ -183,7 +200,7 @@ def process_card_image(image_file):
         }
         
     except Exception as e:
-        print(f"影像處理錯誤: {str(e)}")
+        logger.error(f"影像處理錯誤: {str(e)}", exc_info=True)
         raise
 
 
@@ -217,11 +234,11 @@ def preprocess_image(image):
         # 5. 二值化
         _, binary = cv2.threshold(corrected, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         
-        print("影像前處理完成")
+        logger.info("影像前處理完成")
         return binary
         
     except Exception as e:
-        print(f"影像前處理錯誤: {str(e)}")
+        logger.error(f"影像前處理錯誤: {str(e)}", exc_info=True)
         # 如果前處理失敗，返回原始灰階影像
         if len(image.shape) == 3:
             return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -258,7 +275,7 @@ def correct_skew(image):
         return image
         
     except Exception as e:
-        print(f"傾斜校正錯誤: {str(e)}")
+        logger.error(f"傾斜校正錯誤: {str(e)}", exc_info=True)
         return image
 
 
@@ -271,7 +288,7 @@ def perform_ocr(image):
         
         # 檢查是否有 API Key
         if not hasattr(settings, 'GOOGLE_CLOUD_VISION_API_KEY') or not settings.GOOGLE_CLOUD_VISION_API_KEY:
-            print("Google Cloud Vision API Key 未設定")
+            logger.error("Google Cloud Vision API Key 未設定")
             return None
         
         # 將 OpenCV 影像轉換為 base64
@@ -310,25 +327,25 @@ def perform_ocr(image):
         response = requests.post(url, json=payload, headers=headers)
         
         if response.status_code != 200:
-            print(f"Vision API 請求失敗: {response.status_code}")
-            print(f"錯誤回應: {response.text}")
+            logger.error(f"Vision API 請求失敗: {response.status_code}")
+            logger.error(f"錯誤回應: {response.text}")
             return None
         
         result = response.json()
         
         if 'responses' not in result or not result['responses']:
-            print("Vision API 回應格式錯誤")
+            logger.error("Vision API 回應格式錯誤")
             return None
         
         text_annotations = result['responses'][0].get('textAnnotations', [])
         
         if not text_annotations:
-            print("未檢測到任何文字")
+            logger.warning("未檢測到任何文字")
             return None
         
         # 提取所有檢測到的文字（使用第一個 text_annotation 的 description）
         full_text = text_annotations[0].get('description', '')
-        print(f"OCR 檢測到的文字: {full_text}")
+        logger.info(f"OCR 檢測到的文字: {full_text}")
         
         # 提取卡號（使用建議 B 的簡化邏輯）
         card_number = extract_card_number_simplified(full_text)
@@ -339,7 +356,7 @@ def perform_ocr(image):
         }
         
     except Exception as e:
-        print(f"OCR 處理錯誤: {str(e)}")
+        logger.error(f"OCR 處理錯誤: {str(e)}", exc_info=True)
         return None
 
 
@@ -382,9 +399,10 @@ def extract_card_number_simplified(text):
 def format_card_number(card_number):
     """
     格式化信用卡號碼：
-    1. 不足16碼：補足到16碼（後面補0）
-    2. 超過16碼：保留前16碼
-    3. 每4個數字之間加空格
+    1. 12位以上：顯示實際辨識數字
+    2. 11位以下：返回 None（表示失敗）
+    3. 超過16碼：保留前16碼
+    4. 每4個數字之間加空格
     """
     if not card_number:
         return None
@@ -392,22 +410,23 @@ def format_card_number(card_number):
     # 移除所有非數字字符
     numbers_only = re.sub(r'\D', '', card_number)
     
-    if len(numbers_only) < 16:
-        # 不足16碼：後面補0
-        formatted = numbers_only.ljust(16, '0')
-        print(f"卡號不足16碼，補足後: {formatted}")
+    if len(numbers_only) < 12:
+        # 11位以下：返回 None 表示失敗
+        logger.warning(f"卡號長度不足（{len(numbers_only)}位），辨識失敗")
+        return None
     elif len(numbers_only) > 16:
         # 超過16碼：保留前16碼
         formatted = numbers_only[:16]
-        print(f"卡號超過16碼，截取前16碼: {formatted}")
+        logger.info(f"卡號超過16碼，截取前16碼: {formatted}")
     else:
-        # 正好16碼
+        # 12-16碼：顯示實際辨識數字
         formatted = numbers_only
+        logger.info(f"卡號長度{len(numbers_only)}位，使用實際辨識數字: {formatted}")
     
     # 每4個數字之間加空格
     formatted_with_spaces = ' '.join([formatted[i:i+4] for i in range(0, len(formatted), 4)])
     
-    print(f"格式化後的卡號: {formatted_with_spaces}")
+    logger.info(f"格式化後的卡號: {formatted_with_spaces}")
     return formatted_with_spaces
 
 
