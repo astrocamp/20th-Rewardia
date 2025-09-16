@@ -134,7 +134,8 @@ COMMON_KEYWORDS = [
 # 個人查詢關鍵字
 PERSONAL_QUERY_KEYWORDS = [
     "我有哪些卡", "我的卡", "我持有", "我的信用卡", "我有的卡",
-    "我設定的", "我加入的", "我設的", "我加的", "哪些有", "哪些是"
+    "我設定的", "我加入的", "我設的", "我加的", "哪些有", "哪些是",
+    "我有哪些信用卡", "我的卡片", "我的卡片有哪些"
 ]
 
 # 回饋類型查詢關鍵字
@@ -146,7 +147,7 @@ REWARD_TYPE_KEYWORDS = [
 NAVIGATION_KEYWORDS = {
     # 會員專區相關
     'member_area': [
-        "會員專區", "我的資料", "我的個人資料", "個人資料", "我的卡片"
+        "會員專區", "我的資料", "我的個人資料", "個人資料"
     ],
     # 一般頁面導航
     'general_pages': {
@@ -393,4 +394,19 @@ DATABASE_CONFIG = {
     'max_cards_display': 5,
     'expected_min_cards_all_banks': 8,
     'expected_min_cards_general': 3
+}
+
+# 錯誤檢測和回應補充配置
+ERROR_DETECTION_CONFIG = {
+    'error_indicators': ["沒有", "找不到", "無相關", "無資料", "資料庫中沒有"],
+    'all_banks_keywords': ["所有", "全部", "全部銀行", "所有銀行"],
+    'highest_keywords': ["最高", "最好", "最佳", "最優", "最大", "最棒"],
+    'list_query_keywords': ["有哪些", "哪些", "什麼", "什麼卡", "所有", "全部", "有", "的卡", "卡片", "信用卡"]
+}
+
+# 動態回應模板
+DYNAMIC_RESPONSE_TEMPLATES = {
+    'highest_reward': "{category} 回饋最高的信用卡：",
+    'category_cards': "{category}的信用卡：",
+    'best_reward_cards': "{category} 消費的最佳回饋卡片："
 }
