@@ -84,19 +84,16 @@ def get_main_data(request):
             storage = MediaStorage()
             image_url = storage.url(card.image.name)
         else:
-            # 如果沒有圖片，使用本地 placeholder 或不同的 placeholder 服務
-            # 使用 picsum.photos 作為替代的 placeholder 服務
-            image_url = f"https://picsum.photos/300/180?random={card.id}"
-
-        all_cards_data.append(
-            {
-                "id": card.id,
-                "name": card.name,
-                "bank": card.bank,
-                "image": image_url,
-                "rewards": rewards_data,
-            }
-        )
+            # 如果沒有圖片，不顯示圖片
+            image_url = None
+        
+        all_cards_data.append({
+            'id': card.id,
+            'name': card.name,
+            'bank': card.bank,
+            'image': image_url,  
+            'rewards': rewards_data
+        })
 
     # 處理銀行資料
     banks = [

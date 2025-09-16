@@ -6,8 +6,8 @@ export default () => ({
   searchKeyword: '',
   allCards: [], // 主要卡片資料陣列
   originalCards: [], // 原始資料備份
-  loadedCount: 9, // 載入的卡片數量（網格9張）
-  gridLoadIncrement: 6, // 網格視圖每次載入6張
+  loadedCount: 12, // 載入的卡片數量（網格12張）
+  gridLoadIncrement: 8, // 網格視圖每次載入8張
   listLoadIncrement: 1, // 列表視圖每次載入1張
   isLoadingMore: false,
   rewardCategoryMap: {},
@@ -46,7 +46,7 @@ export default () => ({
   resetToGridView() {
     const shuffled = [...this.originalCards].sort(() => 0.5 - Math.random());
     this.allCards = shuffled;
-    this.loadedCount = Math.min(9, this.allCards.length);
+    this.loadedCount = Math.min(12, this.allCards.length);
     this.viewMode = 'grid';
   },
   
@@ -318,7 +318,7 @@ export default () => ({
       }
       
       this.allCards = filteredCards;
-      this.loadedCount = Math.min(3, filteredCards.length);
+      this.loadedCount = Math.min(12, filteredCards.length);
     }, 500);
   },
   
