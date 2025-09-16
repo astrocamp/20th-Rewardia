@@ -65,7 +65,7 @@ if (current_url == "http://localhost:8000/users/member/") {
 
 // 顯示回饋金額在momo網站相關
 async function display_momo_rewards(rate, card) {
-  const checkout_price = document.querySelector(".checkout-content-price");
+  const checkout_price = document.querySelector(".checkout-item");
   let price = Number(
     document
       .querySelector(".checkout-content-price.final-price")
@@ -82,25 +82,45 @@ async function display_momo_rewards(rate, card) {
     display.innerHTML = `<img src="${chrome.runtime.getURL(
       "images/Rewardia.png"
     )}"><p>刷 <span>${card}</span>，最高回饋${reward}元</p>`;
-    checkout_price.appendChild(display);
+    checkout_price.insertAdjacentElement("afterend", display);
   }
 }
 
 if (current_url.includes("cart")) {
-  const checkout_price = document.querySelector(".checkout-content-price");
+  const checkout_price = document.querySelector(
+    ".checkout-content-price.final-price"
+  );
   if (checkout_price) {
-    chrome.runtime.sendMessage(
-      {
-        action: "calculate",
-      },
-      async (response) => {
-        if (!response?.data) return;
-        const card = response.data;
-        const max_rate = Number(card.max_rate);
-        const card_name = card.card.name;
+    let last_price = 0;
 
-        await display_momo_rewards(max_rate, card_name);
+    function check_price() {
+      const price = Number(
+        document
+          .querySelector(".checkout-content-price.final-price")
+          .textContent.trim()
+          .replace(/,/g, "")
+          .slice(1)
+      );
+
+      if (price !== last_price) {
+        console.log(last_price, price);
+        last_price = price;
+        chrome.runtime.sendMessage(
+          {
+            action: "calculate",
+          },
+          async (response) => {
+            if (!response?.data) return;
+            const card = response.data;
+            const max_rate = Number(card.max_rate);
+            const card_name = card.card.name;
+
+            await display_momo_rewards(max_rate, card_name);
+          }
+        );
       }
-    );
+    }
+
+    setInterval(check_price, 2000);
   }
 }
