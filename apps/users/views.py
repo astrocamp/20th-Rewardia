@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .forms import UserRegistrationForm
 from .services import UserRegistrationService
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from rest_framework.authtoken.models import Token
@@ -15,6 +14,9 @@ from rest_framework.decorators import (
     authentication_classes,
     permission_classes,
 )
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.backends import ModelBackend
+import json
 
 # from apps.banks.models import Bank
 from apps.cards.models import CreditCard
@@ -253,3 +255,68 @@ def get_token(request):
             {"error": "Failed to retrieve token"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+
+
+# 修改密碼 API 端點
+@login_required
+def change_password(request):
+    """修改密碼 API 端點"""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': '只允許 POST 請求'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        old_password = data.get('old_password', '').strip()
+        new_password = data.get('new_password', '').strip()
+        confirm_password = data.get('confirm_password', '').strip()
+        
+        errors = {}
+        
+        # 驗證舊密碼
+        if not old_password:
+            errors['old_password'] = '舊密碼為必填項目'
+        elif not authenticate(username=request.user.username, password=old_password):
+            errors['old_password'] = '舊密碼不正確'
+        
+        # 驗證新密碼
+        if not new_password:
+            errors['new_password'] = '新密碼為必填項目'
+        elif len(new_password) < 8 or len(new_password) > 20:
+            errors['new_password'] = '密碼長度必須在 8-20 個字元之間'
+        elif not new_password.isalnum():
+            errors['new_password'] = '密碼只能包含英文字母和數字，不能有空格或特殊字元'
+        elif not any(c.isupper() for c in new_password):
+            errors['new_password'] = '密碼必須包含至少一個英文大寫字母'
+        elif not any(c.islower() for c in new_password):
+            errors['new_password'] = '密碼必須包含至少一個英文小寫字母'
+        elif not any(c.isdigit() for c in new_password):
+            errors['new_password'] = '密碼必須包含至少一個數字'
+        elif new_password == old_password:
+            errors['new_password'] = '新密碼不能與舊密碼相同'
+        
+        # 驗證確認密碼
+        if not confirm_password:
+            errors['confirm_password'] = '確認密碼為必填項目'
+        elif confirm_password != new_password:
+            errors['confirm_password'] = '兩次輸入的密碼不一致，請重新確認'
+        
+        # 如果有錯誤，返回錯誤訊息
+        if errors:
+            return JsonResponse({'success': False, 'errors': errors}, status=400)
+        
+        # 更新密碼
+        request.user.set_password(new_password)
+        request.user.save()
+        
+        # 重新登入使用者（因為 set_password 會讓會話失效）
+        login(request, request.user, backend='django.contrib.auth.backends.ModelBackend')
+        
+        # 使用 Django Messages 框架
+        messages.success(request, '密碼修改成功！')
+        
+        return JsonResponse({'success': True, 'redirect': True})
+        
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'message': '無效的 JSON 資料'}, status=400)
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': f'修改密碼失敗：{str(e)}'}, status=500)

@@ -1,11 +1,157 @@
 {% extends 'layouts/default.html' %}
 {% block title %}會員專區 - Rewardia{%endblock %}
 {% block content %}
-<section class="calculator-page calculator-spacing"
-         x-bind:class="{
+<section class="calculator-page calculator-spacing" 
+         x-data="password_change"
+         x-bind:class="{ 
            'banner-hidden': !$store.banner.visible,
            'banner-transitioning': $store.banner.isTransitioning
          }">
+  <!-- 修改密碼彈窗 -->
+  <div x-show="showPasswordModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+    <!-- 背景遮罩 -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="closePasswordModal()"></div>
+    
+    <!-- 彈窗內容 -->
+    <div class="flex min-h-full items-center justify-center p-4">
+      <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-auto" @click.stop>
+        <!-- 彈窗標題 -->
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-900">修改密碼</h3>
+        </div>
+        
+        <!-- 彈窗表單 -->
+        <form @submit.prevent="submitPasswordChange()" class="px-6 py-4">
+          {% csrf_token %}
+          <!-- 隱藏的使用者名稱欄位（用於可訪問性和密碼管理器） -->
+          <input type="text" name="username" autocomplete="username" value="{{ user.username }}" style="display: none;">
+          <!-- 舊密碼欄位 -->
+          <div class="mb-4">
+            <label for="old_password" class="block text-sm font-medium text-gray-700 mb-2">舊密碼</label>
+            <div class="relative">
+              <input 
+                :type="showOldPassword ? 'text' : 'password'"
+                id="old_password"
+                name="old_password"
+                placeholder="請輸入舊密碼"
+                autocomplete="current-password"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                :class="{'border-red-500': passwordChangeErrors.old_password}"
+                x-model="passwordChangeData.old_password"
+                @input="clearPasswordFieldError('old_password')"
+                @blur="validatePasswordField('old_password')"
+                required>
+              <button 
+                type="button" 
+                class="absolute inset-y-0 right-0 pr-3 flex items-center"
+                @click="showOldPassword = !showOldPassword"
+                :aria-label="showOldPassword ? '隱藏密碼' : '顯示密碼'"
+              >
+                <svg x-show="!showOldPassword" class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+                <svg x-show="showOldPassword" class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+                </svg>
+              </button>
+            </div>
+            <div x-show="passwordChangeErrors.old_password" class="text-red-500 text-sm mt-1" x-text="passwordChangeErrors.old_password"></div>
+          </div>
+
+          <!-- 新密碼欄位 -->
+          <div class="mb-4">
+            <label for="new_password" class="block text-sm font-medium text-gray-700 mb-2">新密碼</label>
+            <div class="relative">
+              <input 
+                :type="showNewPassword ? 'text' : 'password'"
+                id="new_password"
+                name="new_password"
+                placeholder="輸入密碼(至少8碼，含英文大/小寫與數字)"
+                autocomplete="new-password"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                :class="{'border-red-500': passwordChangeErrors.new_password}"
+                x-model="passwordChangeData.new_password"
+                @input="clearPasswordFieldError('new_password')"
+                @blur="validatePasswordField('new_password')"
+                required>
+              <button 
+                type="button" 
+                class="absolute inset-y-0 right-0 pr-3 flex items-center"
+                @click="showNewPassword = !showNewPassword"
+                :aria-label="showNewPassword ? '隱藏密碼' : '顯示密碼'"
+              >
+                <svg x-show="!showNewPassword" class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+                <svg x-show="showNewPassword" class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+                </svg>
+              </button>
+            </div>
+            <div x-show="passwordChangeErrors.new_password" class="text-red-500 text-sm mt-1" x-text="passwordChangeErrors.new_password"></div>
+          </div>
+
+          <!-- 確認新密碼欄位 -->
+          <div class="mb-6">
+            <label for="confirm_new_password" class="block text-sm font-medium text-gray-700 mb-2">確認新密碼</label>
+            <div class="relative">
+              <input 
+                :type="showConfirmNewPassword ? 'text' : 'password'"
+                id="confirm_new_password"
+                name="confirm_new_password"
+                placeholder="請再次輸入您的密碼"
+                autocomplete="new-password"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                :class="{'border-red-500': passwordChangeErrors.confirm_new_password}"
+                x-model="passwordChangeData.confirm_new_password"
+                @input="clearPasswordFieldError('confirm_new_password')"
+                @blur="validatePasswordField('confirm_new_password')"
+                required>
+              <button 
+                type="button" 
+                class="absolute inset-y-0 right-0 pr-3 flex items-center"
+                @click="showConfirmNewPassword = !showConfirmNewPassword"
+                :aria-label="showConfirmNewPassword ? '隱藏密碼' : '顯示密碼'"
+              >
+                <svg x-show="!showConfirmNewPassword" class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+                <svg x-show="showConfirmNewPassword" class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+                </svg>
+              </button>
+            </div>
+            <div x-show="passwordChangeErrors.confirm_new_password" class="text-red-500 text-sm mt-1" x-text="passwordChangeErrors.confirm_new_password"></div>
+          </div>
+
+          <!-- 一般錯誤訊息 -->
+          <div x-show="passwordChangeErrors.general" class="text-red-500 text-sm mb-4" x-text="passwordChangeErrors.general"></div>
+
+          <!-- 按鈕區域 -->
+          <div class="flex justify-end space-x-3">
+            <button 
+              type="button" 
+              @click="closePasswordModal()"
+              class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 border border-gray-300 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+            >
+              取消
+            </button>
+            <button 
+              type="submit" 
+              :disabled="!isPasswordFormValid() || isSubmittingPassword"
+              class="px-4 py-2 text-sm font-medium text-white bg-black border border-transparent rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span x-show="!isSubmittingPassword">確認</span>
+              <span x-show="isSubmittingPassword">處理中...</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
   <div class="calculator-container">
     <!-- 區塊標題：會員專區 -->
     <h2 class="calculator-title">會員專區</h2>
@@ -45,7 +191,7 @@
               </svg>
               <h3 class="member-section-title">會員資料</h3>
             </div>
-            <button class="ui-btn ui-btn-primary">修改密碼</button>
+            <button class="ui-btn ui-btn-primary" @click="openPasswordModal()">修改密碼</button>
           </div>
 
           <div class="member-info-grid">

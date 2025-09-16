@@ -44,6 +44,7 @@ export default () => ({
     if (!/^[a-zA-Z0-9]+$/.test(password)) { this.errors.password = '密碼只能包含英文字母和數字，不能有空格或特殊字元'; return false; }
     if (!/[A-Z]/.test(password)) { this.errors.password = '密碼必須包含至少一個英文大寫字母'; return false; }
     if (!/[a-z]/.test(password)) { this.errors.password = '密碼必須包含至少一個英文小寫字母'; return false; }
+    if (!/[0-9]/.test(password)) { this.errors.password = '密碼必須包含至少一個數字'; return false; }
     return true;
   },
 

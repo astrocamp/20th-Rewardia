@@ -15,4 +15,5 @@ urlpatterns = [
         name="api_cards_by_bank",
     ),
     path("api/get_token", views.get_token, name="get_token"),
+    path("change-password/", views.change_password, name="change_password"),
 ]
