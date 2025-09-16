@@ -122,8 +122,8 @@ def delete_user_card(request, id):
 def ocr_with_vision(request):
     """
     信用卡卡號 OCR 識別 API
-    接收：影像文件 + ROI 百分比座標
-    回傳：{success, masked, card_number, luhn_valid}
+    接收：已裁切的影像文件（前端已處理 ROI）
+    回傳：{success, masked, card_number, luhn_valid, full_text}
     """
     try:
         # 檢查是否有影像文件
@@ -133,27 +133,11 @@ def ocr_with_vision(request):
                 'error': '缺少影像文件'
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        # 檢查是否有 ROI 座標
-        if 'roi' not in request.POST:
-            return Response({
-                'success': False,
-                'error': '缺少 ROI 座標'
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        # 獲取影像和 ROI
+        # 獲取影像文件
         image_file = request.FILES['image']
-        roi_data = json.loads(request.POST['roi'])
-        
-        # 驗證 ROI 格式
-        required_keys = ['left', 'top', 'width', 'height']
-        if not all(key in roi_data for key in required_keys):
-            return Response({
-                'success': False,
-                'error': 'ROI 座標格式錯誤'
-            }, status=status.HTTP_400_BAD_REQUEST)
         
         # 處理影像
-        result = process_card_image(image_file, roi_data)
+        result = process_card_image(image_file)
         
         return Response(result)
         
@@ -165,9 +149,10 @@ def ocr_with_vision(request):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-def process_card_image(image_file, roi_data):
+def process_card_image(image_file):
     """
-    處理信用卡影像：ROI 裁切 + 影像前處理 + OCR
+    處理信用卡影像：影像前處理 + OCR
+    前端已裁切 ROI，後端直接處理
     """
     try:
         # 1. 讀取影像
@@ -178,23 +163,23 @@ def process_card_image(image_file, roi_data):
         if image is None:
             raise ValueError("無法讀取影像")
         
-        # 2. 根據 ROI 百分比裁切影像
-        roi_image = crop_roi(image, roi_data)
+        # 2. 影像前處理
+        processed_image = preprocess_image(image)
         
-        # 3. 影像前處理
-        processed_image = preprocess_image(roi_image)
+        # 3. OCR 識別
+        ocr_result = perform_ocr(processed_image)
+        card_number = ocr_result.get('card_number')
+        full_text = ocr_result.get('full_text', '')
         
-        # 4. OCR 識別
-        card_number = perform_ocr(processed_image)
-        
-        # 5. 格式化卡號
+        # 4. 格式化卡號
         formatted_card_number = format_card_number(card_number) if card_number else None
         
         return {
             'success': True,
             'masked': '',
             'card_number': formatted_card_number,
-            'luhn_valid': None
+            'luhn_valid': None,
+            'full_text': full_text  # 新增：用於錯誤回補
         }
         
     except Exception as e:
@@ -202,32 +187,6 @@ def process_card_image(image_file, roi_data):
         raise
 
 
-def crop_roi(image, roi_data):
-    """
-    根據 ROI 百分比座標裁切影像
-    """
-    height, width = image.shape[:2]
-    
-    # 計算實際像素座標
-    left = int((roi_data['left'] / 100) * width)
-    top = int((roi_data['top'] / 100) * height)
-    right = left + int((roi_data['width'] / 100) * width)
-    bottom = top + int((roi_data['height'] / 100) * height)
-    
-    # 確保座標在影像範圍內
-    left = max(0, left)
-    top = max(0, top)
-    right = min(width, right)
-    bottom = min(height, bottom)
-    
-    # 裁切影像
-    cropped = image[top:bottom, left:right]
-    
-    print(f"原始影像: {width}x{height}")
-    print(f"ROI 座標: ({left}, {top}, {right}, {bottom})")
-    print(f"裁切後影像: {cropped.shape}")
-    
-    return cropped
 
 
 def preprocess_image(image):
@@ -336,7 +295,10 @@ def perform_ocr(image):
                             "type": "TEXT_DETECTION",
                             "maxResults": 1
                         }
-                    ]
+                    ],
+                    "imageContext": {
+                        "languageHints": ["en"]  # 建議 A：有助數字/英文字分割
+                    }
                 }
             ]
         }
@@ -364,23 +326,27 @@ def perform_ocr(image):
             print("未檢測到任何文字")
             return None
         
-        # 提取所有檢測到的文字
+        # 提取所有檢測到的文字（使用第一個 text_annotation 的 description）
         full_text = text_annotations[0].get('description', '')
         print(f"OCR 檢測到的文字: {full_text}")
         
-        # 提取卡號
-        card_number = extract_card_number(full_text)
+        # 提取卡號（使用建議 B 的簡化邏輯）
+        card_number = extract_card_number_simplified(full_text)
         
-        return card_number
+        return {
+            'card_number': card_number,
+            'full_text': full_text
+        }
         
     except Exception as e:
         print(f"OCR 處理錯誤: {str(e)}")
         return None
 
 
-def extract_card_number(text):
+def extract_card_number_simplified(text):
     """
-    從 OCR 文字中提取信用卡卡號
+    簡化的卡號提取邏輯（建議 B）：
+    用正規式抓出 14-19 位的數字片段，優先 16 位
     """
     if not text:
         return None
@@ -388,23 +354,25 @@ def extract_card_number(text):
     # 移除所有非數字字符
     numbers_only = re.sub(r'\D', '', text)
     
-    # 尋找可能的卡號（13-19位數字）
+    # 按照建議 B：尋找 14-19 位數字片段，優先 16 位
     card_patterns = [
-        r'\b\d{16}\b',  # 16位數字
+        r'\b\d{16}\b',  # 優先：16位數字
         r'\b\d{15}\b',  # 15位數字
+        r'\b\d{14}\b',  # 14位數字
         r'\b\d{17}\b',  # 17位數字
         r'\b\d{18}\b',  # 18位數字
         r'\b\d{19}\b',  # 19位數字
     ]
     
+    # 按優先順序尋找
     for pattern in card_patterns:
         matches = re.findall(pattern, numbers_only)
         if matches:
-            # 返回最長的一個
-            return max(matches, key=len)
+            # 返回第一個匹配的（通常是最準確的）
+            return matches[0]
     
     # 如果沒有找到標準格式，嘗試從長數字序列中提取
-    long_numbers = re.findall(r'\d{12,}', numbers_only)
+    long_numbers = re.findall(r'\d{13,}', numbers_only)
     if long_numbers:
         return long_numbers[0]
     

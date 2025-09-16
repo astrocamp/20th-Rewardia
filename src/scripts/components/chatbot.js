@@ -236,7 +236,8 @@ export default function chatbot() {
           },
           body: JSON.stringify({
             message: message,
-            conversation_history: this.messages.slice(-CONSTANTS.CONVERSATION_HISTORY_LENGTH) // 傳遞最近對話
+            conversation_history: this.messages.slice(-6), // 傳遞最近6條對話
+            current_page: window.location.pathname // 傳遞當前頁面路徑
           })
         });
 

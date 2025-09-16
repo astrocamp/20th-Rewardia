@@ -14,21 +14,3 @@
   @apply fixed inset-0 bg-black/75 transition-opacity;
 }
 
-/* 自訂拍照按鈕樣式 */
-.custom-capture-btn {
-  display: inline-flex !important;
-  align-items: center !important;
-  padding: 0.5rem 1rem !important;
-  color: white !important;
-  border: none !important;
-  border-radius: 0.5rem !important;
-  cursor: pointer !important;
-  font-weight: 500 !important;
-  font-size: 1rem !important;
-  background: #2563eb !important;
-}
-
-.custom-capture-btn:disabled {
-  background: #9ca3af !important;
-  cursor: not-allowed !important;
-}
