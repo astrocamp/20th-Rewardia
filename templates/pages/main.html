@@ -98,7 +98,7 @@
         <div class="credit-card-item">
           <!-- 卡片圖片 -->
           <div class="card-image-container">
-            <img :src="card.image" :alt="card.name" class="card-image">
+            <img :src="card.image" :alt="card.name" class="card-image" x-show="card.image">
           </div>
           <!-- 卡片資訊 -->
           <div class="card-info-container">
@@ -145,7 +145,7 @@
           </div>
           <!-- 下方：信用卡圖片 -->
           <div class="list-card-image-container">
-            <img :src="card.image" :alt="card.name" class="list-card-image">
+            <img :src="card.image" :alt="card.name" class="list-card-image" x-show="card.image">
           </div>
         </div>
 

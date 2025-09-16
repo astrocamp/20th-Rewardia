@@ -97,7 +97,7 @@
   
   /* ========== Search Form Components ========== */
   .search-select-height {
-    @apply h-20;
+    @apply h-16;
   }
   
   .search-select-padding {
@@ -105,7 +105,7 @@
   }
   
   .search-input-height {
-    @apply h-20;
+    @apply h-16;
   }
   
   .search-input-padding {
@@ -175,7 +175,7 @@
   }
   
   .credit-card-grid {
-    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8;
+    @apply grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8;
   }
   
   .credit-card-item {
@@ -183,7 +183,7 @@
   }
   
   .card-image-container {
-    @apply relative h-48 sm:h-52 lg:h-56 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-2;
+    @apply relative h-48 sm:h-52 lg:h-56 flex items-center justify-center p-2;
   }
   
   .card-image {
