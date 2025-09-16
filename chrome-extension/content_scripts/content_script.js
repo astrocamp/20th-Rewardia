@@ -57,7 +57,7 @@ async function show_rewardia_popup() {
   }, 3000);
 }
 
-if (current_url == "http://localhost:8000/users/member/") {
+if (current_url == "https://rewardia.net/users/member/") {
   chrome.runtime.sendMessage({
     action: "open_loggedin",
   });
