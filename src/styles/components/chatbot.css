@@ -140,7 +140,7 @@
 }
 
 .chatbot-input {
-  @apply w-full min-h-10 max-h-30 p-3 border-none rounded-lg bg-white text-gray-700 resize-none outline-none text-sm leading-5 transition-all duration-200 shadow-sm;
+  @apply w-full min-h-10 max-h-30 p-3 border-none rounded-lg bg-white text-gray-700 resize-none outline-none text-lg leading-5 transition-all duration-200 shadow-sm;
 }
 
 .chatbot-input:focus {

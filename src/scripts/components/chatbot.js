@@ -1,12 +1,21 @@
 
 // 文字清理函數 - 移除 HTML 標籤但保留換行
 function sanitizeText(text) {
-  return text
-    .replace(/<br\s*\/?>/gi, '\n') // 將 <br> 轉換為換行
-    .replace(/<\/p>/gi, '\n\n') // 將 </p> 轉換為雙換行
-    .replace(/<[^>]*>/g, '') // 移除所有其他 HTML 標籤
-    .replace(/\n\s*\n\s*\n/g, '\n\n') // 清理多餘的換行
-    .trim(); // 移除首尾空白
+  if (!text || typeof text !== 'string') {
+    return '';
+  }
+  
+  try {
+    return text
+      .replace(/<br\s*\/?>/gi, '\n') // 將 <br> 轉換為換行
+      .replace(/<\/p>/gi, '\n\n') // 將 </p> 轉換為雙換行
+      .replace(/<[^>]*>/g, '') // 移除所有其他 HTML 標籤
+      .replace(/\n\s*\n\s*\n/g, '\n\n') // 清理多餘的換行
+      .trim(); // 移除首尾空白
+  } catch (error) {
+    console.warn('文字清理失敗:', error);
+    return text || '';
+  }
 }
 
 // 常數定義
@@ -17,12 +26,17 @@ const CONSTANTS = {
   SAVE_THROTTLE_DELAY: 300,
   DUPLICATE_MESSAGE_THRESHOLD: 3000, // 3秒防重複
   TEXTAREA_MAX_HEIGHT: 120,
+  CONVERSATION_HISTORY_LENGTH: 6, // 傳遞最近對話數量
+  // 視窗尺寸限制
+  MIN_WINDOW_WIDTH: 250,
+  MIN_WINDOW_HEIGHT: 300,
+  MAX_WINDOW_SCALE: 2, // 最大縮放倍數
   // 視窗預設設定
   DEFAULT_WINDOW: {
     width: 280, // w-70 = 280px
     height: 350,
-    right: 8, // right-2 = 8px
-    bottom: 32 // bottom-8 = 32px
+    right: 48, 
+    bottom: 40 
   }
 };
 
@@ -123,10 +137,6 @@ export default function chatbot() {
     // IME 輸入法狀態
     isComposing: false,
 
-    // 初始化
-    init() {
-    },
-
     // 儲存到記憶體和 sessionStorage
     saveToMemory() {
       // 限制歷史長度，避免記憶體膨脹
@@ -209,7 +219,11 @@ export default function chatbot() {
 
       try {
         // 讀取 CSRF token
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        const csrfTokenElement = document.querySelector('meta[name="csrf-token"]');
+        if (!csrfTokenElement) {
+          throw new Error('CSRF token 未找到');
+        }
+        const csrfToken = csrfTokenElement.getAttribute('content');
 
         // 調用 Django API
         const response = await fetch('/api/chatbot/', {
@@ -221,7 +235,7 @@ export default function chatbot() {
           },
           body: JSON.stringify({
             message: message,
-            conversation_history: this.messages.slice(-6) // 傳遞最近6條對話
+            conversation_history: this.messages.slice(-CONSTANTS.CONVERSATION_HISTORY_LENGTH) // 傳遞最近對話
           })
         });
 
@@ -278,7 +292,6 @@ export default function chatbot() {
       });
     },
 
-
     // 自動調整 textarea 高度
     autoResize(event) {
       const textarea = event.target;
@@ -302,7 +315,6 @@ export default function chatbot() {
     },
 
     handleCompositionEnd(event) {
-      this.isComposing = false;
       // 在某些瀏覽器中，compositionend 事件可能在 keydown 之後觸發
       // 使用 setTimeout 確保狀態正確更新
       setTimeout(() => {
@@ -319,12 +331,21 @@ export default function chatbot() {
       });
     },
 
-    // === 拖拽功能（Alpine.js 方式）===
+    // 計算視窗位置（共用函式）
+    getWindowPosition() {
+      return {
+        left: window.innerWidth - this.windowState.right - this.windowState.width,
+        top: window.innerHeight - this.windowState.bottom - this.windowState.height
+      };
+    },
+
+    // === 拖拽功能 ===
     startDrag(event) {
       this.isDragging = true;
       // 記錄起始位置偏移
-      this.dragOffset.x = event.clientX - (window.innerWidth - this.windowState.right - this.windowState.width);
-      this.dragOffset.y = event.clientY - (window.innerHeight - this.windowState.bottom - this.windowState.height);
+      const windowPos = this.getWindowPosition();
+      this.dragOffset.x = event.clientX - windowPos.left;
+      this.dragOffset.y = event.clientY - windowPos.top;
       event.preventDefault();
     },
 
@@ -340,17 +361,22 @@ export default function chatbot() {
       // 限制在視窗範圍內
       this.windowState.right = Math.max(0, Math.min(window.innerWidth - this.windowState.width, newRight));
       this.windowState.bottom = Math.max(0, Math.min(window.innerHeight - this.windowState.height, newBottom));
-      
-      this.saveToMemory();
     },
 
     stopDrag() {
-      this.isDragging = false;
+      if (this.isDragging) {
+        this.isDragging = false;
+        this.saveToMemory();
+      }
     },
 
-    // === 調整大小功能（Alpine.js 方式）===
+    // === 調整大小功能 ===
     startResize(event) {
       this.isResizing = true;
+      // 記錄初始尺寸和位置
+      this.initialWidth = this.windowState.width;
+      this.initialHeight = this.windowState.height;
+      this.initialDiagonal = Math.sqrt(this.initialWidth ** 2 + this.initialHeight ** 2);
       event.preventDefault();
       event.stopPropagation(); // 防止觸發拖拽
     },
@@ -359,30 +385,44 @@ export default function chatbot() {
       if (!this.isResizing) return;
       
       // 計算視窗左上角位置（基於當前的 right/bottom 值）
-      const windowLeft = window.innerWidth - this.windowState.right - this.windowState.width;
-      const windowTop = window.innerHeight - this.windowState.bottom - this.windowState.height;
+      const windowPos = this.getWindowPosition();
       
-      // 計算新大小（從左上角到滑鼠位置）
-      const newWidth = Math.max(250, event.clientX - windowLeft);
-      const newHeight = Math.max(300, event.clientY - windowTop);
+      // 計算滑鼠相對於視窗左上角的距離
+      const mouseX = event.clientX - windowPos.left;
+      const mouseY = event.clientY - windowPos.top;
+      
+      // 計算滑鼠距離（相對於視窗左上角）
+      const mouseDistance = Math.sqrt(mouseX ** 2 + mouseY ** 2);
+      
+      // 計算縮放比例：相對於初始對角線距離
+      const scaleFactor = mouseDistance / this.initialDiagonal;
+      
+      // 計算新的等比例大小（基於初始尺寸）
+      const newWidth = this.initialWidth * scaleFactor;
+      const newHeight = this.initialHeight * scaleFactor;
       
       // 設定最大尺寸限制（預設大小的兩倍）
-      const maxAllowedWidth = CONSTANTS.DEFAULT_WINDOW.width * 2;  // 280 * 2 = 560px
-      const maxAllowedHeight = CONSTANTS.DEFAULT_WINDOW.height * 2; // 350 * 2 = 700px
+      const maxAllowedWidth = CONSTANTS.DEFAULT_WINDOW.width * CONSTANTS.MAX_WINDOW_SCALE;
+      const maxAllowedHeight = CONSTANTS.DEFAULT_WINDOW.height * CONSTANTS.MAX_WINDOW_SCALE;
       
       // 計算可用空間（考慮螢幕邊界和尺寸限制）
       const maxWidth = Math.min(
-        window.innerWidth - windowLeft,  // 螢幕右邊界限制
-        maxAllowedWidth                  // 尺寸限制
+        window.innerWidth - windowPos.left,  // 螢幕右邊界限制
+        maxAllowedWidth                      // 尺寸限制
       );
       const maxHeight = Math.min(
-        window.innerHeight - windowTop,  // 螢幕下邊界限制
-        maxAllowedHeight                 // 尺寸限制
+        window.innerHeight - windowPos.top,  // 螢幕下邊界限制
+        maxAllowedHeight                     // 尺寸限制
       );
       
-      // 即時更新視窗大小（確保不超出限制）
-      this.windowState.width = Math.min(maxWidth, newWidth);
-      this.windowState.height = Math.min(maxHeight, newHeight);
+      // 等比例縮放：確保寬度和高度都符合限制，且不超過 1 倍
+      const scaleX = maxWidth / newWidth;
+      const scaleY = maxHeight / newHeight;
+      const finalScale = Math.min(1, scaleX, scaleY); // 限制不超過 1 倍，允許縮小
+      
+      // 即時更新視窗大小（等比例縮放）
+      this.windowState.width = Math.max(CONSTANTS.MIN_WINDOW_WIDTH, newWidth * finalScale);
+      this.windowState.height = Math.max(CONSTANTS.MIN_WINDOW_HEIGHT, newHeight * finalScale);
     },
 
     stopResize() {
@@ -391,18 +431,17 @@ export default function chatbot() {
       this.saveToMemory();
     },
 
-      // 取得視窗樣式（計算屬性方式）
-      get windowStyle() {
-        // 將 right/bottom 轉換為 left/top 以便直觀調整大小
-        const left = window.innerWidth - this.windowState.right - this.windowState.width;
-        const top = window.innerHeight - this.windowState.bottom - this.windowState.height;
-        
-        return {
-          width: `${this.windowState.width}px`,
-          height: `${this.windowState.height}px`,
-          left: `${Math.max(0, left)}px`,
-          top: `${Math.max(0, top)}px`
-        };
-      }
+    // 取得視窗樣式
+    get windowStyle() {
+      // 將 right/bottom 轉換為 left/top 以便直觀調整大小
+      const windowPos = this.getWindowPosition();
+      
+      return {
+        width: `${this.windowState.width}px`,
+        height: `${this.windowState.height}px`,
+        left: `${Math.max(0, windowPos.left)}px`,
+        top: `${Math.max(0, windowPos.top)}px`
+      };
+    }
   }
 }
