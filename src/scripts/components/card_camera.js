@@ -135,20 +135,14 @@ export default (config = {}) => ({
     this.error = '';
     
     try {
-      // 計算 ROI 座標
-      const roi = this.calculateROI();
-      if (!roi) {
-        throw new Error('無法計算取景框座標');
-      }
-      
-      // 拍攝完整影像（不裁切）
-      const imageBlob = await this.captureFullImage();
+      // 拍攝 ROI 區域影像（只送 ROI 區域給後端）
+      const imageBlob = await this.captureROIImage();
       if (!imageBlob) {
         throw new Error('拍照失敗');
       }
       
-      // 呼叫後端 API
-      await this.callOCRAPI(imageBlob, roi);
+      // 呼叫後端 API（不需要 ROI 座標，因為已經裁切了）
+      await this.callOCRAPI(imageBlob);
       
     } catch (error) {
       this.handleError(error, '拍照識別失敗，請重試');
@@ -158,22 +152,40 @@ export default (config = {}) => ({
     }
   },
   
-  // 拍攝完整影像
-  async captureFullImage() {
+  // 拍攝 ROI 區域影像
+  async captureROIImage() {
     if (!this.video || !this.canvas || !this.ctx) {
       throw new Error('攝影機或畫布未初始化');
     }
     
     const { video, canvas, ctx } = this;
+    const roi = this.calculateROI();
     
-    // 設定畫布尺寸為影片實際尺寸
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    if (!roi) {
+      throw new Error('無法計算 ROI 座標');
+    }
     
-    // 繪製完整影片畫面
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    // 計算實際像素座標
+    const videoWidth = video.videoWidth;
+    const videoHeight = video.videoHeight;
     
-    // 轉換為 Blob
+    const left = Math.round((roi.left / 100) * videoWidth);
+    const top = Math.round((roi.top / 100) * videoHeight);
+    const width = Math.round((roi.width / 100) * videoWidth);
+    const height = Math.round((roi.height / 100) * videoHeight);
+    
+    // 設定畫布尺寸為 ROI 區域尺寸
+    canvas.width = width;
+    canvas.height = height;
+    
+    // 繪製 ROI 區域
+    ctx.drawImage(
+      video, 
+      left, top, width, height,  // 來源區域 (ROI)
+      0, 0, width, height        // 目標區域 (整個畫布)
+    );
+    
+    // 轉換為 Blob，降低品質以減少檔案大小
     return new Promise((resolve, reject) => {
       canvas.toBlob((blob) => {
         if (blob) {
@@ -181,15 +193,14 @@ export default (config = {}) => ({
         } else {
           reject(new Error('影像轉換失敗'));
         }
-      }, 'image/jpeg', 0.9);
+      }, 'image/jpeg', 0.8); // 降低品質到 0.8
     });
   },
   
   // 呼叫後端 OCR API
-  async callOCRAPI(imageBlob, roi) {
+  async callOCRAPI(imageBlob) {
     const formData = new FormData();
     formData.append('image', imageBlob, 'card_image.jpg');
-    formData.append('roi', JSON.stringify(roi));
     
     
     try {
@@ -222,13 +233,24 @@ export default (config = {}) => ({
           this.editNumber = this.cardNumber;
           this.closeCamera();
         } else {
-          // 識別失敗：顯示失敗訊息並重新拍照
-          this.showMessage('卡號辨識失敗，請重新拍照', 'error');
-          this.retries++;
-          // 延遲1秒後重新開啟攝影機
-          setTimeout(() => {
-            this.openCamera();
-          }, 1000);
+          // 識別失敗：嘗試錯誤回補
+          const fallbackNumber = this.extractLongestNumber(result.full_text || '');
+          
+          if (fallbackNumber && fallbackNumber.length >= 10) {
+            // 有可用的回補數字：顯示編輯模式讓用戶修正
+            this.showMessage('卡號辨識不完整，已自動填入部分數字，請手動修正', 'info');
+            this.showEdit = true;
+            this.editNumber = this.formatCardNumber(fallbackNumber);
+            this.closeCamera();
+          } else {
+            // 沒有可用的回補數字：顯示失敗訊息並重新拍照
+            this.showMessage('卡號辨識失敗，請重新拍照', 'error');
+            this.retries++;
+            // 延遲1秒後重新開啟攝影機
+            setTimeout(() => {
+              this.openCamera();
+            }, 1000);
+          }
         }
       } else {
         throw new Error(result.error || 'OCR 識別失敗');
@@ -332,6 +354,25 @@ export default (config = {}) => ({
     // 否則移除非數字字符並每4位加空格
     const cleaned = cardNumber.replace(/\D/g, '');
     return cleaned.replace(/(.{4})/g, '$1 ').trim();
+  },
+
+  // 從 OCR 文字中提取最長的數字序列（錯誤回補用）
+  extractLongestNumber(text) {
+    if (!text) return '';
+    
+    // 移除所有非數字字符
+    const numbersOnly = text.replace(/\D/g, '');
+    
+    // 尋找所有數字序列（至少8位）
+    const numberSequences = numbersOnly.match(/\d{8,}/g);
+    
+    if (!numberSequences || numberSequences.length === 0) {
+      return '';
+    }
+    
+    // 返回最長的數字序列
+    return numberSequences.reduce((longest, current) => 
+      current.length > longest.length ? current : longest, '');
   },
   
   // 智能格式化卡號輸入（保持游標位置）

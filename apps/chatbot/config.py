@@ -156,7 +156,7 @@ NAVIGATION_KEYWORDS = {
         'about': ["去關於功能", "關於功能"]
     },
     # 新增卡片相關
-    'add_card': ["擷取卡號", "擷取卡片"],
+    'add_card': ["擷取卡號", "擷取卡片", "去新增卡片", "新增卡片", "加卡片", "去加卡片"],
     # 登出相關
     'logout': ["登出", "退出", "登出會員"],
     # 登入註冊相關
@@ -216,4 +216,181 @@ CARD_COMPARISON_RECOMMENDATION_KEYWORDS = {
     'bank_limited_indicators': [
         "銀行", "哪一家", "哪個銀行", "在.*銀行"
     ]
+}
+
+# 回應訊息配置
+RESPONSE_MESSAGES = {
+    'navigation': {
+        'member_area': "好的，我帶你去",
+        'already_here': "這裡就是了喔", 
+        'login_required': "請先登入會員",
+        'logout': "好的，記得常回來喔",
+        'not_logged_in': "您尚未登入",
+        'default': "好的，我帶你去",
+        'add_card': "好的，我帶你去",
+        'general_pages': {
+            'home': "好的，我帶你去首頁",
+            'download': "好的，我帶你去下載專區",
+            'calculator': "好的，我帶你去優惠試算", 
+            'about': "好的，我帶你去關於功能"
+        },
+        'auth_pages': {
+            'login': "好的，我帶你去登入頁面",
+            'register': "好的，我帶你去註冊頁面"
+        }
+    },
+    'comparison': {
+        'no_cards_found': "無法找到指定的卡片進行比較",
+        'no_category_specified': "請指定要比較的回饋類別",
+        'no_cards_specified': "請指定要比較的兩張卡片",
+        'no_data_found': "目前沒有 {category} 相關的回饋資料",
+        'bank_no_data': "{bank} 目前沒有 {category} 相關的回饋資料",
+        'comparison_title': "{category} 回饋比較：\n\n",
+        'no_reward': "- {bank} {name}: 無 {category} 回饋\n",
+        'highest_in_bank': "{bank} 在 {category} 回饋最高的信用卡：\n- {name}: {rate} {type}",
+        'highest_unlimited': "{category} 回饋最高的信用卡：\n- {bank} {name}: {rate} {type}",
+        'highest_tied': "{bank} 在 {category} 回饋最高的信用卡（並列）：\n",
+        'highest_tied_unlimited': "{category} 回饋最高的信用卡（並列）：\n",
+        'cards_in_bank': "{bank} 在 {category} 回饋的信用卡：\n",
+        'cards_unlimited': "{category} 回饋的信用卡：\n"
+    },
+    'personal': {
+        'no_cards_set': "您目前沒有設定任何信用卡",
+        'no_rewards': "您持有的卡片目前沒有回饋資訊",
+        'no_category_specified': "請告訴我您喜歡的消費類別，例如：出國、購物、看電影、現金回饋等",
+        'no_card_specified': "請告訴我您要比較的卡片名稱，例如：我的富邦卡、我的中信卡等"
+    },
+    'recommendation': {
+        'no_better_cards': "很抱歉，目前沒有比您的 {card_name} 在 {category} 回饋更高的其他卡片。您的卡片已經是 {category} 方面回饋最高的選擇了！",
+        'found_better_cards': "是的！有比您的 {card_name} 在 {category} 回饋更高的卡片：\n\n- {bank} {better_card_name}: {rate} {reward_type}\n\n這張卡片的回饋率比您目前的卡片更高！",
+        'personal_recommendation_bank': "根據您喜歡 {category} 的消費習慣，{bank} 最適合您的信用卡是：\n\n- {name}: {rate} {type}\n\n這張卡片在 {category} 消費時能給您最高的回饋！",
+        'personal_recommendation_unlimited': "根據您喜歡 {category} 的消費習慣，最適合您的信用卡是：\n\n- {bank} {name}: {rate} {type}\n\n這張卡片在 {category} 消費時能給您最高的回饋！",
+        'bank_no_recommendation': "很抱歉，{bank} 目前沒有 {category} 相關的回饋信用卡。建議您可以考慮其他銀行，或選擇該銀行的其他回饋類別。",
+        'no_recommendation': "很抱歉，目前沒有 {category} 相關的回饋信用卡。建議您可以選擇其他消費類別，或聯繫我們了解更多信用卡資訊。",
+        'no_comparison_data': "您的 {card_name} 在 {category} 方面沒有回饋資料，無法進行比較。",
+        'better_card_in_bank': "是的！{bank} 有比您的 {card_name} 在 {category} 回饋更高的卡片：\n\n- {name}: {rate} {type}\n\n這張卡片的回饋率比您目前的卡片更高！",
+        'no_better_card_in_bank': "很抱歉，{bank} 目前沒有比您的 {card_name} 在 {category} 回饋更高的其他卡片。您的卡片已經是該銀行在 {category} 方面回饋最高的選擇了！"
+    },
+    'context': {
+        'conversation_history': "\n\n## 對話歷史\n",
+        'history_description': "以下是最近的對話記錄，請根據上下文理解用戶的問題：\n\n",
+        'user_prefix': "用戶：",
+        'ai_prefix': "AI：",
+        'context_analysis': "\n## 上下文分析\n",
+        'analysis_points': "請特別注意以下幾點：\n",
+        'analysis_1': "1. 如果用戶問「哪一張有XXX」，請根據前面提到的銀行或卡片範圍來回答\n",
+        'analysis_2': "2. 如果前面提到了特定銀行的卡片，後續問題應該限定在該銀行的範圍內\n",
+        'analysis_3': "3. 如果用戶問「哪一張有加油站」，請查詢資料庫中該銀行卡片的加油站回饋資料\n",
+        'analysis_4': "4. 優先使用提供的資料庫查詢結果，不要基於關鍵字推測\n",
+        'analysis_5': "5. 不要重複前面已經列出的卡片清單，而是要根據問題提供具體的回饋資訊\n\n",
+        'analysis_conclusion': "請根據以上對話歷史和上下文分析，理解用戶當前問題的具體含義，並提供準確的回應。\n"
+    },
+    'user_info': {
+        'header': "\n\n## 用戶資訊\n用戶已登入，目前持有的信用卡：\n",
+        'nickname_prefix': " (暱稱: ",
+        'nickname_suffix': ")",
+        'primary_marker': " [主要卡片]"
+    },
+    'database_info': {
+        'header': "\n\n## 可查詢的資料庫資訊\n",
+        'description': "注意：以下資料庫資訊是實際可查詢的資料，請優先使用這些資料回答用戶問題。\n\n",
+        'supported_banks': "支援的銀行:\n",
+        'more_banks': "- 等共 {count} 家銀行\n",
+        'categories': "消費類別:\n",
+        'more_categories': "- 等共 {count} 個類別\n",
+        'total_cards': "可用信用卡: 共 {count} 張\n"
+    },
+    'card_benefit': {
+        'header': "\n\n## 特定卡片優惠問題處理\n",
+        'description': "用戶詢問特定卡片的優惠資訊。請查詢資料庫中該卡片的回饋資料。\n",
+        'query_prefix': "\n### 查詢 ",
+        'query_suffix': " 的優惠：\n",
+        'no_data': "- 資料庫中沒有 {name} 的回饋資料\n",
+        'unrecognized': "- 無法識別具體的卡片名稱，請提供更詳細的資訊\n"
+    },
+    'context_question': {
+        'header': "\n\n## 上下文問題處理\n",
+        'description': "用戶問的是關於 {banks} 的上下文問題。\n",
+        'bank_category_prefix': "\n### ",
+        'bank_category_suffix': " 的回饋：\n",
+        'no_bank_data': "- 資料庫中沒有 {bank} 在 {category} 的回饋資料\n"
+    },
+    'bank_cards': {
+        'header': "\n\n## {bank} 的信用卡：\n",
+        'category_rewards': "\n### {category} 回饋：\n",
+        'no_category_rewards': "- 暫無 {category} 回饋的卡片\n"
+    },
+    'bank_rewards': {
+        'header': "\n\n## {bank} 的消費回饋：\n"
+    },
+    'platform_info': {
+        'header': "\n\n## Rewardia 平台資訊\n",
+        'main_features': "主要功能: {features}\n"
+    },
+    'supported_banks': {
+        'header': "Rewardia 支援以下銀行：\n"
+    },
+    'reward_types': {
+        'header': "您持有的卡片有以下回饋類型：\n",
+        'type_prefix': "\n{type}：\n",
+        'more_rewards': "- 等共 {count} 個{type}回饋\n"
+    },
+    'user_cards': {
+        'header': "您目前持有的信用卡有：\n"
+    },
+    'user_category_rewards': {
+        'header': "您持有的卡片中，{category}相關的回饋："
+    },
+    'no_user_category_rewards': "您持有的卡片中沒有{category}相關的回饋。",
+    'card_rewards': {
+        'header': "{name}的回饋：\n",
+        'no_rewards': "{name}目前沒有回饋資料。",
+        'unrecognized_card': "無法識別您詢問的卡片名稱，請提供更詳細的資訊。"
+    }
+}
+
+# 頁面映射配置
+PAGE_MAPPING = {
+    'general_pages': {
+        'home': '首頁',
+        'download': '下載專區', 
+        'calculator': '優惠試算',
+        'about': '關於功能'
+    },
+    'auth_pages': {
+        'login': '登入頁面',
+        'register': '註冊頁面'
+    }
+}
+
+# 意圖分析關鍵字
+INTENT_KEYWORDS = {
+    'context_indicators': ["哪一張", "哪張", "哪個", "哪個有", "哪張有", "哪一張有"],
+    'card_benefit_indicators': ["有什麼優惠", "有什麼回饋", "優惠", "回饋", "有什麼好處"],
+    'comparison_separators': ["與", "及", "和", "vs"],
+    'comparison_prefixes': ["請比較", "比較", "比比看", "比看看", "比一下", "請比一下"],
+    'card_suffixes': ["卡", "信用卡"],
+    'priority_categories': ['保險', '電影', '購物', '出國', '現金回饋', '紅利回饋'],
+    'highest_indicators': ["最高", "最好", "最佳", "最優", "最大", "最棒", "所有", "全部", "全部銀行", "所有銀行"],
+    'bank_limited_keywords': ["銀行", "哪一家", "哪個銀行"]
+}
+
+# 格式化相關配置
+FORMAT_CONFIG = {
+    'unknown_rate': "未知",
+    'rate_suffix': "%",
+    'filter_exclude': ["無"],
+    'min_word_length': 1,
+    'min_partial_word_length': 2
+}
+
+# 資料庫查詢配置
+DATABASE_CONFIG = {
+    'conversation_history_limit': 3,
+    'max_categories_display': 10,
+    'max_banks_display': 10,
+    'max_rewards_per_type': 3,
+    'max_cards_display': 5,
+    'expected_min_cards_all_banks': 8,
+    'expected_min_cards_general': 3
 }

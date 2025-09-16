@@ -52,6 +52,7 @@ async def chat_api(request):
             body = request.body
             data = json.loads(body)
             message = data.get('message')
+            current_page = data.get('current_page', '')  # 獲取當前頁面信息
 
             if not message:
                 return JsonResponse({'error': '訊息內容為必填'}, status=400)
@@ -84,7 +85,7 @@ async def chat_api(request):
             
             # 6. Enhance response
             enhanced_response = await sync_to_async(ChatbotResponseBuilder.enhance_response_with_data, thread_sensitive=True)(
-                validated_response, intent, user_id
+                validated_response, intent, user_id, current_page
             )
 
             return JsonResponse({'response': enhanced_response})
