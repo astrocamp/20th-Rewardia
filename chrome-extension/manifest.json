@@ -7,17 +7,14 @@
     "default_popup": "popup/pages/rewards.html",
     "default_icon": "images/Rewardia.png"
   },
-  "permissions":["storage","activeTab","tabs"],
+  "permissions":["storage","tabs"],
   "host_permissions": [
-    "https://rewardia.net/*",
-    "http://localhost:8000/*",
-    "http://*/*",
-    "https://*/*"
+    "https://rewardia.net/*"
   ],
 
  "content_scripts": [
    {
-     "matches": ["*://www.eslite.com/*","*://www.klook.com/*","*://24h.pchome.com.tw/*","*://www.momoshop.com.tw/*","*://cart.momoshop.com.tw/*","http://localhost:8000/*"],
+     "matches": ["*://www.eslite.com/*","*://www.klook.com/*","*://24h.pchome.com.tw/*","*://www.momoshop.com.tw/*","*://cart.momoshop.com.tw/*"],
      "css": ["content_scripts/content_script.css"],
      "js": ["content_scripts/content_script.js"]
    }
