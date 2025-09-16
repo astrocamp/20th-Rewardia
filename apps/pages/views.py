@@ -17,6 +17,10 @@ def privacy(request):
     return render(request, "pages/privacy.html")
 
 
+def tos(request):
+    return render(request, "pages/tos.html")
+
+
 def main(request):
     return render(request, "pages/main.html")
 
