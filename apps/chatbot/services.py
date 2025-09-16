@@ -442,11 +442,8 @@ class ChatbotResponseBuilder:
         # 新增卡片導航
         elif nav_type == "add_card":
             if user_id:
-                # 已登入：檢查是否在新增卡片頁面
-                if current_page and ('cards/new' in current_page or 'add_card' in current_page):
-                    return RESPONSE_MESSAGES['navigation']['already_here']
-                else:
-                    return f"NAVIGATE:add_card:{RESPONSE_MESSAGES['navigation']['add_card']}"
+                # 已登入：無論在哪個頁面都回傳導航指令，讓前端處理具體邏輯
+                return f"NAVIGATE:add_card:{RESPONSE_MESSAGES['navigation']['add_card']}"
             else:
                 # 未登入
                 return RESPONSE_MESSAGES['navigation']['login_required']
