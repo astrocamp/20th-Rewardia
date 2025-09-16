@@ -103,7 +103,6 @@ if (current_url.includes("cart")) {
       );
 
       if (price !== last_price) {
-        console.log(last_price, price);
         last_price = price;
         chrome.runtime.sendMessage(
           {

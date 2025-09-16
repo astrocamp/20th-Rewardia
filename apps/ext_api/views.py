@@ -84,8 +84,7 @@ def get_user_cards(request, id):
 @authentication_classes([TokenAuthentication])
 def new_user_card(request, id):
     try:
-        card_id = request.data.get("card")
-        card = CreditCard.objects.get(id=card_id)
+        card = CreditCard.objects.get(id=id)
         user_card = UserCard.objects.update_or_create(
             user=request.user, card=card, defaults={"added_date": timezone.now()}
         )
