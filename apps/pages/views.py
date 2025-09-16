@@ -75,7 +75,7 @@ def get_main_data(request):
             'id': card.id,
             'name': card.name,
             'bank': card.bank,
-            'image': image_url,
+            'image': '',  
             'rewards': rewards_data
         })
 

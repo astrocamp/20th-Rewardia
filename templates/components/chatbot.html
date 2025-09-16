@@ -26,7 +26,6 @@
     :class="{ 'show': isOpen, 'dragging': isDragging, 'resizing': isResizing }"
     :style="windowStyle"
     x-show="isOpen"
-    x-ref="chatWindow"
     x-transition:enter="transition ease-out duration-300"
     x-transition:enter-start="opacity-0 transform translate-y-full scale-75"
     x-transition:enter-end="opacity-100 transform translate-y-0 scale-100"
@@ -104,7 +103,7 @@
       <textarea
         x-model="currentMessage"
         :disabled="isLoading"
-        placeholder="輸入您的問題... (按 Enter 發送)"
+        placeholder="輸入問題並按 Enter 發送"
         class="chatbot-input"
         maxlength="500"
         autocomplete="off"
