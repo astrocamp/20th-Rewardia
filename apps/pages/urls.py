@@ -6,6 +6,7 @@ app_name = "pages"
 urlpatterns = [
     path("download/", views.download, name="download"),
     path("privacy/", views.privacy, name="privacy"),
+    path("tos/", views.tos, name="tos"),
     path("", views.main, name="main"),
     path("faq/", views.faq, name="faq"),
     path("calculator/", views.calculator, name="calculator"),
