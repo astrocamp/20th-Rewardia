@@ -2,7 +2,7 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- 桌機：左一 320px / 左二 220px / 左三 吃滿剩餘 -->
     <div class="grid grid-cols-1 lg:grid-cols-[320px_220px_minmax(0,1fr)] gap-12 items-start">
-      
+
       <!-- 左一：品牌（約 320px） -->
       <div class="space-y-6">
         <h3 class="text-4xl font-bold uppercase tracking-wider">Rewardia</h3>
@@ -28,7 +28,7 @@
       <div>
         <h4 class="text-lg font-semibold mb-4">聯絡我們</h4>
         <ul class="space-y-2 text-gray-300">
-          <li><a href="#" class="hover:text-white transition-colors">隱私權政策</a></li>
+          <li><a href="{%url 'pages:privacy'%}" class="hover:text-white transition-colors">隱私權政策</a></li>
           <li><a href="#" class="hover:text-white transition-colors">服務條款</a></li>
           <li><a href="#" class="hover:text-white transition-colors">客服與回饋</a></li>
         </ul>
@@ -60,10 +60,10 @@
               <span x-show="isSubmitting">訂閱中...</span>
             </button>
           </div>
-          
+
           <!-- 訊息顯示區域 -->
           <div x-show="message" x-transition class="mt-2">
-            <p 
+            <p
               class="text-sm px-2"
               :class="{
                 'text-green-400': messageType === 'success',

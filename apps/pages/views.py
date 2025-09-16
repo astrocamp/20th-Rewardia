@@ -2,7 +2,7 @@ from django.shortcuts import render
 from .data.faq_content import FAQ_DATA
 from apps.cards.models import CreditCard
 from apps.rewards.models import RewardCategory
-from django.http import HttpResponse, JsonResponse # Added JsonResponse
+from django.http import HttpResponse, JsonResponse  # Added JsonResponse
 from django.db.models import Prefetch
 from django.utils.html import escape
 from django.views.decorators.csrf import csrf_exempt
@@ -12,8 +12,14 @@ import json
 def download(request):
     return render(request, "pages/download.html")
 
+
+def privacy(request):
+    return render(request, "pages/privacy.html")
+
+
 def main(request):
     return render(request, "pages/main.html")
+
 
 def faq(request):
     context = {"faq_categories": FAQ_DATA["categories"]}
@@ -21,25 +27,29 @@ def faq(request):
 
 
 def get_main_data(request):
-    cards = CreditCard.objects.filter(is_active=True).prefetch_related(
-        'reward_categories'  # 預取回饋分類
-    ).order_by('bank', 'name')
+    cards = (
+        CreditCard.objects.filter(is_active=True)
+        .prefetch_related(
+            "reward_categories"  # 預取回饋分類
+        )
+        .order_by("bank", "name")
+    )
 
     # 一次性獲取所有需要的資料
     banks_set = set()
     reward_categories_set = set()
     merchants_set = set()
     all_cards_data = []
-    
+
     for card in cards:
         banks_set.add(card.bank)
         rewards_data = []
-        
+
         # 處理回饋分類
         for reward in card.reward_categories.filter(is_active=True):
             reward_categories_set.add(reward.category)
             merchants_set.add(reward.scope)
-            
+
             # 處理回饋率顯示
             min_rate, max_rate = reward.min_rate, reward.max_rate
             if min_rate is None and max_rate is None:
@@ -50,94 +60,113 @@ def get_main_data(request):
                 rate_display = f"{max_rate}%"
             else:
                 rate_display = f"{min_rate}%-{max_rate}%"
-                
-            rewards_data.append({
-                'category': reward.category,
-                'scope': reward.scope,
-                'rate': rate_display,
-                'reward_type': reward.reward_type,
-                'category_code': reward.category,
-                'source': 'confirmed'
-            })
+
+            rewards_data.append(
+                {
+                    "category": reward.category,
+                    "scope": reward.scope,
+                    "rate": rate_display,
+                    "reward_type": reward.reward_type,
+                    "category_code": reward.category,
+                    "source": "confirmed",
+                }
+            )
 
         # 處理圖片欄位
         if card.image:
             # 如果有上傳的圖片，使用 MediaStorage 生成正確的 URL
             from apps.cards.storage import MediaStorage
+
             storage = MediaStorage()
             image_url = storage.url(card.image.name)
         else:
             # 如果沒有圖片，使用本地 placeholder 或不同的 placeholder 服務
             # 使用 picsum.photos 作為替代的 placeholder 服務
-            image_url = f'https://picsum.photos/300/180?random={card.id}'
-        
-        all_cards_data.append({
-            'id': card.id,
-            'name': card.name,
-            'bank': card.bank,
-            'image': '',  
-            'rewards': rewards_data
-        })
+            image_url = f"https://picsum.photos/300/180?random={card.id}"
+
+        all_cards_data.append(
+            {
+                "id": card.id,
+                "name": card.name,
+                "bank": card.bank,
+                "image": image_url,
+                "rewards": rewards_data,
+            }
+        )
 
     # 處理銀行資料
-    banks = [{
-        'code': bank.lower().replace(' ', '_'), 
-        'name': bank
-    } for bank in sorted(banks_set)]
+    banks = [
+        {"code": bank.lower().replace(" ", "_"), "name": bank}
+        for bank in sorted(banks_set)
+    ]
 
     # 處理回饋類別選項
     reward_category_map = {}
     reward_categories_choices = []
-    
+
     for category in sorted(reward_categories_set):
-        category_code = category.upper().replace(' ', '_').replace('/', '_')
+        category_code = category.upper().replace(" ", "_").replace("/", "_")
         reward_categories_choices.append((category_code, category))
         reward_category_map[category_code] = category
 
     # 處理店家選項
-    merchants = [{'code': merchant.lower().replace(' ', '_'), 'name': merchant} for merchant in sorted(merchants_set)]
+    merchants = [
+        {"code": merchant.lower().replace(" ", "_"), "name": merchant}
+        for merchant in sorted(merchants_set)
+    ]
 
-    return JsonResponse({
-        'all_cards_data': all_cards_data,
-        'banks': banks,
-        'merchants': merchants,
-        'reward_categories_choices': reward_categories_choices,
-        'reward_category_map': reward_category_map,
-    }, safe=False)
+    return JsonResponse(
+        {
+            "all_cards_data": all_cards_data,
+            "banks": banks,
+            "merchants": merchants,
+            "reward_categories_choices": reward_categories_choices,
+            "reward_category_map": reward_category_map,
+        },
+        safe=False,
+    )
 
 
 # API - 根據優惠類別獲取對應的店家列表
 def get_merchants_by_category(request):
     """根據優惠類別獲取對應的店家列表"""
     category_code = request.GET.get("category_code")
-    
+
     if category_code:
         # 直接查詢所有回饋類別來建立映射
-        reward_categories = RewardCategory.objects.filter(is_active=True).values_list('category', flat=True).distinct()
-        
+        reward_categories = (
+            RewardCategory.objects.filter(is_active=True)
+            .values_list("category", flat=True)
+            .distinct()
+        )
+
         # 建立類別代碼到類別名稱的映射
         reward_category_map = {}
         for category in reward_categories:
-            category_code_mapped = category.upper().replace(' ', '_').replace('/', '_')
+            category_code_mapped = category.upper().replace(" ", "_").replace("/", "_")
             reward_category_map[category_code_mapped] = category
-        
+
         # 獲取實際的類別名稱
         category_name = reward_category_map.get(category_code)
-        
+
         if category_name:
             # 查詢該類別下的所有店家
-            merchants = RewardCategory.objects.filter(
-                category=category_name,
-                is_active=True
-            ).values_list('scope', flat=True).distinct().order_by('scope')
-            
-            merchants_list = [{'code': merchant.lower().replace(' ', '_'), 'name': merchant} for merchant in merchants]
-            
-            return JsonResponse({
-                'merchants': merchants_list
-            })
-    
-    return JsonResponse({'merchants': []})
+            merchants = (
+                RewardCategory.objects.filter(category=category_name, is_active=True)
+                .values_list("scope", flat=True)
+                .distinct()
+                .order_by("scope")
+            )
+
+            merchants_list = [
+                {"code": merchant.lower().replace(" ", "_"), "name": merchant}
+                for merchant in merchants
+            ]
+
+            return JsonResponse({"merchants": merchants_list})
+
+    return JsonResponse({"merchants": []})
+
 
 # 共用的選項生成函數
 def _generate_options_html(default_text, items, value_field, text_field):
@@ -154,7 +183,6 @@ def _generate_options_html(default_text, items, value_field, text_field):
     return options_html
 
 
-
 def calculator(request):
     banks = (
         CreditCard.objects.filter(is_active=True)
@@ -167,20 +195,22 @@ def calculator(request):
     }
     return render(request, "pages/calculator.html", context)
 
+
 # HTMX 用的 API - 根據銀行取得卡片
 def get_cards_by_bank(request):
     bank_name = request.GET.get("bank_select")
 
     if bank_name:
-        cards = CreditCard.objects.filter(bank=bank_name, is_active=True).order_by("name")
-        return HttpResponse(_generate_options_html(
-            "請先選擇銀行，再選擇卡片", 
-            cards, 
-            "id", 
+        cards = CreditCard.objects.filter(bank=bank_name, is_active=True).order_by(
             "name"
-        ))
+        )
+        return HttpResponse(
+            _generate_options_html("請先選擇銀行，再選擇卡片", cards, "id", "name")
+        )
 
-    return HttpResponse('<option value="" selected disabled>請先選擇銀行，再選擇卡片</option>')
+    return HttpResponse(
+        '<option value="" selected disabled>請先選擇銀行，再選擇卡片</option>'
+    )
 
 
 # HTMX 用的 API - 根據卡片取得消費類別
@@ -196,12 +226,9 @@ def get_categories_by_card(request):
             .order_by("category")
         )
 
-        return HttpResponse(_generate_options_html(
-            "請先選擇卡片", 
-            categories, 
-            "category", 
-            "category"
-        ))
+        return HttpResponse(
+            _generate_options_html("請先選擇卡片", categories, "category", "category")
+        )
 
     return HttpResponse('<option value="" selected disabled>請先選擇卡片</option>')
 
@@ -220,16 +247,11 @@ def get_scopes_by_category(request):
             .order_by("scope")
         )
 
-        return HttpResponse(_generate_options_html(
-            "請先選擇消費類別", 
-            scopes, 
-            "scope", 
-            "scope"
-        ))
+        return HttpResponse(
+            _generate_options_html("請先選擇消費類別", scopes, "scope", "scope")
+        )
 
     return HttpResponse('<option value="" selected disabled>請先選擇消費類別</option>')
-
-
 
 
 @csrf_exempt
@@ -341,4 +363,3 @@ def get_messages(request):
         """
 
     return HttpResponse(messages_html)
-
