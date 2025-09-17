@@ -28,12 +28,37 @@ async function get_merchant_data() {
   }
 }
 
+async function get_user_cards(token, id) {
+  const user_cards_url = `https://rewardia.net/api/users/${id}/cards/`;
+  const response = await fetch(user_cards_url, {
+    headers: {
+      Authorization: `Token ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  const cards = await response.json();
+  return cards;
+}
+
+async function get_auth_token() {
+  const result = await chrome.storage.local.get(["authToken"]);
+  return result.authToken;
+}
+
+async function get_userID() {
+  const result = await chrome.storage.local.get(["userID"]);
+  return result.userID;
+}
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "calculate") {
     (async () => {
+      const token = await get_auth_token();
+      const userID = await get_userID();
+      const user_cards = await get_user_cards(token, userID);
       const merchant_data = await get_merchant_data();
       // 取第一個，因為第一個是最大值
-      sendResponse({ data: merchant_data?.[0] });
+      sendResponse({ data: merchant_data?.[0], cards: user_cards });
     })();
 
     return true;
