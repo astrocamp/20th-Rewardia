@@ -5,7 +5,7 @@
   "manifest_version": 3,
   "action": {
     "default_popup": "popup/pages/rewards.html",
-    "default_icon": "images/Rewardia.png"
+    "default_icon": "images/Rewardia_128.png"
   },
   "permissions":["storage","tabs"],
   "host_permissions": [
