@@ -1,7 +1,7 @@
 <!-- AI 聊天機器人組件 -->
-<div 
-  x-data="chatbot()" 
-  x-init="username = '{% if user.is_authenticated %}{{ user.first_name|default:user.username }}{% else %}使用者{% endif %}'" 
+<div
+  x-data="chatbot()"
+  x-init="username = '{% if user.is_authenticated %}{{ user.first_name|default:user.username }}{% else %}使用者{% endif %}'"
   @mousemove.window="handleDrag($event); handleResize($event)"
   @mouseup.window="stopDrag(); stopResize()"
   x-cloak
@@ -34,8 +34,8 @@
     <!-- 標題列（可拖拽） -->
     <div class="chatbot-header" @mousedown="startDrag($event)">
       <h3 class="chatbot-title">Rewardia 助理</h3>
-      <button 
-        @click="closeChat()" 
+      <button
+        @click="closeChat()"
         @mousedown.stop
         class="chatbot-close-btn"
         aria-label="關閉聊天視窗"
@@ -120,7 +120,7 @@
     </div>
 
     <!-- 調整大小控制 -->
-    <div 
+    <div
       class="chatbot-resize-handle"
       @mousedown="startResize($event)"
       aria-label="調整視窗大小"

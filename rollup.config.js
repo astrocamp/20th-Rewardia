@@ -4,12 +4,12 @@ import terser from '@rollup/plugin-terser';
 
 export default (commandLineArgs) => {
   const isProduction = commandLineArgs.environment === 'production';
-  
+
   return {
     input: 'src/scripts/app.js',
     output: {
       file: 'public/scripts/app.js',
-      format: 'iife',
+      format: 'esm',
       sourcemap: !isProduction
     },
     plugins: [
