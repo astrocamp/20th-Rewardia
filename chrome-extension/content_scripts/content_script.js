@@ -114,7 +114,7 @@ if (current_url.includes("cart")) {
             action: "calculate",
           },
           async (response) => {
-            if (!response?.data) return;
+            if (!response?.data || !response?.cards) return;
             const card = response.data;
             const max_rate = Number(card.max_rate);
             const card_name = card.card.name;
