@@ -73,9 +73,60 @@ def member_zone(request):
     context = {}
 
     if request.user.is_authenticated:
-        # 獲取用戶的卡片資料
-        user_cards = request.user.user_cards.select_related("card").all()
-        context["user_cards"] = user_cards
+        # 獲取用戶的卡片資料，只顯示 is_active=True 的卡片
+        user_cards = request.user.user_cards.select_related("card").filter(card__is_active=True)
+        
+        # 處理每張卡片的詳細資訊
+        processed_cards = []
+        for user_card in user_cards:
+            # 處理圖片 URL
+            image_url = None
+            if user_card.card.image:
+                from apps.cards.storage import MediaStorage
+                storage = MediaStorage()
+                image_url = storage.url(user_card.card.image.name)
+            
+            # 處理卡號
+            masked_card_number = user_card.get_masked_card_number() if user_card.card_number_encrypted else "尚未登記卡號"
+            
+            # 處理最高回饋率
+            from apps.rewards.models import RewardCategory
+            from django.db.models import Max, Case, When, Value, DecimalField
+            
+            # 查詢該卡片的最高回饋率
+            highest_reward = RewardCategory.objects.filter(
+                card=user_card.card,
+                is_active=True
+            ).annotate(
+                max_effective_rate=Case(
+                    When(max_rate__isnull=False, then='max_rate'),
+                    When(min_rate__isnull=False, then='min_rate'),
+                    default=Value(0),
+                    output_field=DecimalField()
+                )
+            ).order_by('-max_effective_rate').first()
+            
+            # 格式化回饋率顯示
+            reward_display = None
+            if highest_reward:
+                if highest_reward.min_rate is not None and highest_reward.max_rate is not None:
+                    if highest_reward.min_rate == highest_reward.max_rate:
+                        reward_display = f"{highest_reward.category} {highest_reward.min_rate:.2f}%"
+                    else:
+                        reward_display = f"{highest_reward.category} {highest_reward.min_rate:.2f}%~{highest_reward.max_rate:.2f}%"
+                elif highest_reward.min_rate is not None:
+                    reward_display = f"{highest_reward.category} {highest_reward.min_rate:.2f}%"
+                elif highest_reward.max_rate is not None:
+                    reward_display = f"{highest_reward.category} {highest_reward.max_rate:.2f}%"
+            
+            processed_cards.append({
+                'user_card': user_card,
+                'image_url': image_url,
+                'masked_card_number': masked_card_number,
+                'reward_display': reward_display
+            })
+        
+        context["processed_cards"] = processed_cards
 
     return render(request, "users/member_zone.html", context)
 
@@ -225,14 +276,16 @@ def card_delete(request, card_id):
         # 處理刪除請求
         card_name = f"{user_card.card.bank} {user_card.card.name}"
         user_card.delete()
-        messages.success(request, f"成功刪除 {card_name}！")
-        return redirect("users:member_zone")
+        return JsonResponse({
+            'success': True,
+            'message': f"成功刪除 {card_name}！"
+        })
 
-    # GET 請求：顯示確認刪除頁面
-    context = {
-        "user_card": user_card,
-    }
-    return render(request, "users/card_delete_confirm.html", context)
+    # GET 請求：返回錯誤
+    return JsonResponse({
+        'success': False,
+        'message': '只允許 POST 請求'
+    }, status=405)
 
 
 # 允許插件獲得token的函數
