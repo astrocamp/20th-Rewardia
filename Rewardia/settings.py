@@ -30,6 +30,9 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 # Google Cloud Vision API Key
 GOOGLE_CLOUD_VISION_API_KEY = os.getenv("GOOGLE_CLOUD_VISION_API_KEY")
 
+# 信用卡號碼加密金鑰
+FERNET_KEY = os.getenv("FERNET_KEY")
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 

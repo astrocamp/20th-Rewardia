@@ -42,8 +42,8 @@
     @apply flex flex-row gap-4 w-1/2 min-w-80;
   }
   
-  .card-image {
-    @apply w-32 h-20 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden;
+  .list-card-image {
+    @apply w-full h-full object-contain rounded-lg;
   }
   
   .card-details {
@@ -248,7 +248,7 @@
       @apply flex-col gap-3;
     }
     
-    .card-image {
+    .list-card-image {
       @apply w-full h-32 max-w-52 self-center;
     }
     
