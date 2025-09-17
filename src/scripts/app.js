@@ -17,6 +17,7 @@ import imageUploadComponent from './components/image_upload.js';
 import schedulerComponent from './components/scheduler.js';
 import cardCameraComponent from './components/card_camera.js';
 import passwordChangeComponent from './components/password_change.js';
+import memberZoneComponent from './components/member_zone.js';
 
 window.Alpine = Alpine;
 
@@ -32,5 +33,6 @@ Alpine.data("imageUpload", imageUploadComponent);
 Alpine.data("schedulerControl", schedulerComponent);
 Alpine.data("card_camera", cardCameraComponent);
 Alpine.data("password_change", passwordChangeComponent);
+Alpine.data("member_zone", memberZoneComponent);
 
 Alpine.start();

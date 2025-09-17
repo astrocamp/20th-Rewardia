@@ -2,11 +2,11 @@
 {% block title %}會員專區 - Rewardia{%endblock %}
 {% block content %}
 <section class="calculator-page calculator-spacing" 
-         x-data="password_change"
-         x-bind:class="{ 
-           'banner-hidden': !$store.banner.visible,
-           'banner-transitioning': $store.banner.isTransitioning
-         }">
+        x-data="password_change"
+        x-bind:class="{ 
+          'banner-hidden': !$store.banner.visible,
+          'banner-transitioning': $store.banner.isTransitioning
+        }">
   <!-- 修改密碼彈窗 -->
   <div x-show="showPasswordModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
     <!-- 背景遮罩 -->
@@ -225,18 +225,72 @@
             <a href="{% url 'users:card_new' %}" class="ui-btn ui-btn-primary">+ 新增卡片</a>
           </div>
 
-          {% if user_cards %}
-            <!-- 有卡片資料 -->
-            <div class="member-cards-list">
-              {% for user_card in user_cards %}
-              <div class="member-card-item">
-                <div class="member-card-info">
-                  <h4 class="member-card-name">{{ user_card.card.bank.name }} {{ user_card.card.name }}</h4>
-                  <p class="member-card-bank">{{ user_card.card.bank.name }}</p>
+          {% if processed_cards %}
+            <!-- 有卡片資料 - 卡牌式佈局 -->
+            <div class="member-cards-grid">
+              {% for card_data in processed_cards %}
+              <div class="member-card-item" x-data="member_zone()">
+                <!-- 卡片圖片 -->
+                <div class="member-card-image-container">
+                  {% if card_data.image_url %}
+                    <img src="{{ card_data.image_url }}" alt="{{ card_data.user_card.card.name }}" class="member-card-image">
+                  {% else %}
+                    <div class="member-card-placeholder">
+                      <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                      </svg>
+                    </div>
+                  {% endif %}
                 </div>
+                
+                <!-- 卡片資訊 -->
+                <div class="member-card-info">
+                  <h4 class="member-card-name">{{ card_data.user_card.card.name }}</h4>
+                  <p class="member-card-bank">{{ card_data.user_card.card.bank }}</p>
+                  <p class="member-card-number">{{ card_data.masked_card_number }}</p>
+                  {% if card_data.reward_display %}
+                    <p class="member-card-reward">{{ card_data.reward_display }}</p>
+                  {% else %}
+                    <p class="member-card-reward text-gray-400">無回饋資訊</p>
+                  {% endif %}
+                </div>
+                
+                <!-- 操作按鈕 -->
                 <div class="member-card-actions">
-                  <a href="{% url 'users:card_edit' user_card.id %}" class="ui-btn-small ui-btn-small-dark">編輯</a>
-                  <a href="{% url 'users:card_delete' user_card.id %}" class="ui-btn-small ui-btn-small-gray">刪除</a>
+                  <button class="member-card-btn member-card-btn-edit" disabled>
+                    編輯
+                  </button>
+                  <button @click="showDeleteDialog()" class="member-card-btn member-card-btn-delete">
+                    刪除
+                  </button>
+                </div>
+                
+                <!-- 刪除確認對話框 -->
+                <div x-show="showDeleteConfirm" 
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0"
+                     x-transition:enter-end="opacity-100"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0"
+                     class="member-delete-confirm"
+                     @click.away="hideDeleteDialog()">
+                  <div class="member-delete-dialog">
+                    <h4 class="member-delete-title">確認刪除</h4>
+                    <p class="member-delete-message">確定要刪除這張卡片嗎？此操作無法復原。</p>
+                    <div class="member-delete-actions">
+                      <button @click="hideDeleteDialog()" 
+                              class="member-delete-btn member-delete-btn-cancel"
+                              :disabled="isDeleting">
+                        取消
+                      </button>
+                      <button @click="deleteCard({{ card_data.user_card.id }})" 
+                              class="member-delete-btn member-delete-btn-confirm"
+                              :disabled="isDeleting"
+                              x-text="isDeleting ? '刪除中...' : '確認刪除'">
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
               {% endfor %}
