@@ -110,6 +110,7 @@ if (current_url.includes("cart")) {
           },
           async (response) => {
             if (!response?.data) return;
+            console.log(response.data, response.cards);
             const card = response.data;
             const max_rate = Number(card.max_rate);
             const card_name = card.card.name;
