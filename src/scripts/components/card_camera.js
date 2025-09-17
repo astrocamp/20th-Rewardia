@@ -9,6 +9,7 @@ export default (config = {}) => ({
   // API 呼叫狀態
   processing: false,
   cardNumber: '',
+  recognizedCardNumber: '', // 為模板中的變數提供定義
   maskedNumber: '',
   luhnValid: false,
   retries: 0,
@@ -221,6 +222,7 @@ export default (config = {}) => ({
       if (result.success) {
         this.maskedNumber = result.masked || '';
         this.cardNumber = result.card_number || '';
+        this.recognizedCardNumber = result.card_number || ''; // 同步更新 recognizedCardNumber
         this.luhnValid = result.luhn_valid || false;
         
         // 檢查是否成功識別到16位卡號
@@ -310,6 +312,7 @@ export default (config = {}) => ({
   confirmCardNumber() {
     if (this.editNumber.length >= 12) {
       this.cardNumber = this.editNumber;
+      this.recognizedCardNumber = this.editNumber; // 同步更新 recognizedCardNumber
       this.showEdit = false;
     } else {
       alert('請輸入完整的卡號（至少12位數字）');
