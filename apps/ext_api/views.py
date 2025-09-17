@@ -22,6 +22,10 @@ from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
+import os
+os.environ['OPENCV_IO_ENABLE_OPENEXR'] = '1'
+# 設定無頭模式
+os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 import cv2
 import numpy as np
 from PIL import Image

@@ -2,11 +2,11 @@
 
 @theme {
   @keyframes typing {
-    0%, 80%, 100% { 
+    0%, 80%, 100% {
       transform: scale(0);
       opacity: 0.5;
     }
-    40% { 
+    40% {
       transform: scale(1);
       opacity: 1;
     }
@@ -17,9 +17,9 @@
 /* 浮動按鈕 - 右邊，footer 上方 */
 .chatbot-float-btn {
   @apply fixed bottom-6 right-6 w-14 h-14 text-gray-700 rounded-full z-60 flex items-center justify-center cursor-pointer transition-all duration-200;
-  @apply bg-[linear-gradient(180deg,#B8F5E6_0%,#34D399_100%)];
-  @apply shadow-[0_4px_12px_rgba(52,211,153,0.4)];
-  @apply border-2 border-[#34D399];
+  @apply bg-[linear-gradient(180deg,#0c3c9a_0%,#000000_100%)];
+  @apply shadow-[0_4px_12px_rgba(118,202,230,.75)];
+  @apply border-2 border-[#3392df];
 }
 
 .chatbot-float-btn:hover {
@@ -126,12 +126,12 @@
 }
 
 /* 保留原生 CSS：動畫延遲，Tailwind 沒有對應的 nth-child 選擇器 */
-.chatbot-typing-dot:nth-child(1) { 
-  animation-delay: -0.32s; 
+.chatbot-typing-dot:nth-child(1) {
+  animation-delay: -0.32s;
 }
 
-.chatbot-typing-dot:nth-child(2) { 
-  animation-delay: -0.16s; 
+.chatbot-typing-dot:nth-child(2) {
+  animation-delay: -0.16s;
 }
 
 /* 輸入區域 */

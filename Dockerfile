@@ -24,6 +24,17 @@ RUN apt-get update && apt-get install -y \
     postgresql-client \
     redis-tools \
     supervisor \
+    libglib2.0-0 \
+    libgl1-mesa-dev \
+    libgles2-mesa-dev \
+    libegl1-mesa-dev \
+    libsm6 \
+    libxext6 \
+    libxrender1 \
+    libgomp1 \
+    libgtk-3-0 \
+    libgstreamer1.0-0 \
+    libgstreamer-plugins-base1.0-0 \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 

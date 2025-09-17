@@ -105,13 +105,15 @@
             <h3 x-text="card.name" class="card-title"></h3>
             <p x-text="card.bank" class="card-bank"></p>
             <!-- 主要優惠 -->
-            <div class="card-main-reward" x-show="card.rewards && card.rewards.length > 0">
-              <div class="reward-highlight-item">
-                <span x-text="card.rewards[0].category" class="reward-category-text"></span>
-                <span x-text="card.rewards[0].rate" class="reward-rate-text"></span>
-                <span x-text="card.rewards[0].reward_type" class="reward-type-text"></span>
+            <template x-if="card.rewards && card.rewards.length > 0">
+              <div class="card-main-reward">
+                <div class="reward-highlight-item">
+                  <span x-text="card.rewards[0].category" class="reward-category-text"></span>
+                  <span x-text="card.rewards[0].rate" class="reward-rate-text"></span>
+                  <span x-text="card.rewards[0].reward_type" class="reward-type-text"></span>
+                </div>
               </div>
-            </div>
+            </template>
           </div>
         </div>
       </template>
