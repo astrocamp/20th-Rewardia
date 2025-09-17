@@ -14,7 +14,7 @@
 
  "content_scripts": [
    {
-     "matches": ["*://www.eslite.com/*","*://www.klook.com/*","*://24h.pchome.com.tw/*","*://www.momoshop.com.tw/*","*://cart.momoshop.com.tw/*"],
+     "matches": ["*://www.eslite.com/*","*://www.klook.com/*","*://24h.pchome.com.tw/*","*://www.momoshop.com.tw/*","*://cart.momoshop.com.tw/*", "https://rewardia.net/*"],
      "css": ["content_scripts/content_script.css"],
      "js": ["content_scripts/content_script.js"]
    }
