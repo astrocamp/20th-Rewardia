@@ -3,6 +3,9 @@ from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from cryptography.fernet import Fernet
+from django.conf import settings
+import base64
 
 
 class UserCard(models.Model):
@@ -35,6 +38,13 @@ class UserCard(models.Model):
     )
 
     is_active = models.BooleanField("Is Active", default=True)
+    
+    card_number_encrypted = models.TextField(
+        "Encrypted Card Number",
+        blank=True,
+        null=True,
+        help_text="加密後的信用卡卡號"
+    )
 
     class Meta:
         db_table = "user_cards"
@@ -52,6 +62,50 @@ class UserCard(models.Model):
                 pk=self.pk
             ).update(is_primary=False)
         super().save(*args, **kwargs)
+
+    def set_card_number(self, card_number):
+        """加密並存儲卡號"""
+        if card_number:
+            try:
+                # 從 settings 取得加密金鑰
+                key = getattr(settings, 'FERNET_KEY', Fernet.generate_key()).encode()
+                fernet = Fernet(key)
+                encrypted_data = fernet.encrypt(card_number.encode())
+                self.card_number_encrypted = base64.b64encode(encrypted_data).decode()
+            except Exception:
+                self.card_number_encrypted = None
+        else:
+            self.card_number_encrypted = None
+    
+    def get_card_number(self):
+        """解密並返回卡號"""
+        if self.card_number_encrypted:
+            try:
+                key = getattr(settings, 'FERNET_KEY', Fernet.generate_key()).encode()
+                fernet = Fernet(key)
+                encrypted_data = base64.b64decode(self.card_number_encrypted.encode())
+                decrypted_data = fernet.decrypt(encrypted_data)
+                return decrypted_data.decode()
+            except Exception:
+                return None
+        return None
+
+    def get_masked_card_number(self):
+        """取得遮罩後的卡號顯示（前6後4，中間6碼用*）"""
+        card_number = self.get_card_number()
+        if card_number:
+            # 移除所有非數字字元
+            clean_number = ''.join(filter(str.isdigit, card_number))
+            if len(clean_number) >= 16:  # 至少 16 位數（標準信用卡）
+                # 前6碼 + 中間6個* + 後4碼
+                return f"{clean_number[:6]}-******-{clean_number[-4:]}"
+            elif len(clean_number) >= 10:  # 至少 10 位數
+                # 前6碼 + 中間用* + 後4碼
+                middle_stars = '*' * (len(clean_number) - 10)
+                return f"{clean_number[:6]}-{middle_stars}-{clean_number[-4:]}"
+            else:
+                return "****-****-****-****"
+        return "未設定"
 
     def __str__(self):
         display_name = self.nickname or self.card.name
