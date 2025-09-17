@@ -101,6 +101,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       path: "images/Rewardia-loggedin.png",
     });
   }
+
+  if (message.action === "log_out") {
+    chrome.action.setIcon({
+      path: "images/Rewardia_128.png",
+    });
+  }
+
   if (message.action === "open_extension") {
     chrome.action.openPopup();
   }
