@@ -25,7 +25,7 @@ dependencies = [
     "django-storages>=1.14.6",
     "boto3>=1.40.28",
     "pillow>=11.3.0",
-    "opencv-python>=4.12.0.88",
     "google-cloud-vision>=3.10.2",
     "requests>=2.32.5",
+    "opencv-python-headless>=4.12.0.88",
 ]
