@@ -64,7 +64,7 @@ if (current_url == "https://rewardia.net/users/member/") {
 }
 
 // 顯示回饋金額在momo網站相關
-async function display_momo_rewards(rate, card) {
+async function display_momo_rewards(rate, card, is_user_card) {
   const checkout_price = document.querySelector(".checkout-item");
   let price = Number(
     document
@@ -83,6 +83,11 @@ async function display_momo_rewards(rate, card) {
       "images/Rewardia.png"
     )}"><p>刷 <span>${card}</span>，最高回饋${reward}元</p>`;
     checkout_price.insertAdjacentElement("afterend", display);
+    if (is_user_card) {
+      const user_card_notice = document.createElement("p");
+      user_card_notice.innerText = "你有這張卡！";
+      display.insertAdjacentElement("beforeend", user_card_notice);
+    }
   }
 }
 
@@ -110,12 +115,14 @@ if (current_url.includes("cart")) {
           },
           async (response) => {
             if (!response?.data) return;
-            console.log(response.data, response.cards);
             const card = response.data;
             const max_rate = Number(card.max_rate);
             const card_name = card.card.name;
-
-            await display_momo_rewards(max_rate, card_name);
+            const user_cards = response.cards.map((card) => {
+              return card.card.name;
+            });
+            const is_user_card = user_cards.includes(card_name);
+            await display_momo_rewards(max_rate, card_name, is_user_card);
           }
         );
       }
