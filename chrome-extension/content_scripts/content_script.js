@@ -28,7 +28,7 @@ async function show_rewardia_popup() {
   popup.className = "rewardia_popup";
   popup.innerHTML = `<div class="popup_left">
   <div class="popup_logo"><img src="${chrome.runtime.getURL(
-    "images/Rewardia.png"
+    "images/Rewardia_128.png"
   )}"></div>
   <div class="popup_text">偵測到信用卡，點此通知查看</div></div>
   <div class="popup_close_btn">X</div>`;
@@ -141,4 +141,29 @@ if (current_url.includes("cart")) {
 
     setInterval(check_price, 2000);
   }
+}
+
+if (current_url.includes("cart.momoshop.com.tw")) {
+  const observer = new MutationObserver((mutations) => {
+    const cardNo_1 = document.querySelector("#cardNo_1");
+    const cardNo_2 = document.querySelector("#cardNo_2");
+    const cardNo_3_hidden = document.querySelector("#cardNo_3");
+    const cardNo_3 = document.querySelector("#cardNo_3_temp");
+    const cardNo_4 = document.querySelector("#cardNo_4");
+    if (cardNo_1) {
+      cardNo_1.addEventListener("focus", function () {
+        cardNo_1.value = 4111;
+        cardNo_2.value = 1111;
+        cardNo_3_hidden.value = 1111;
+        cardNo_3.value = "****";
+        cardNo_4.value = 1111;
+      });
+      observer.disconnect();
+    }
+  });
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+  });
 }
