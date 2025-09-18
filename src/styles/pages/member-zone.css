@@ -28,7 +28,7 @@
   }
 
   .member-section-bg {
-    @apply bg-white rounded-lg p-6;
+    @apply bg-white rounded-lg p-3 lg:p-4;
   }
 
   .member-section-header {
@@ -62,12 +62,32 @@
 
   /* ========== Member Cards Grid Layout (使用 main.css 的樣式) ========== */
   .member-cards-grid {
-    @apply grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8 mt-10;
+    @apply flex flex-wrap gap-2 lg:gap-3 mt-10;
+    /* 預設左對齊，只有在小螢幕時才置中 */
   }
 
   .member-card-item {
     @apply bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100;
     @apply hover:shadow-xl transition-shadow duration-200;
+    @apply w-72 flex-shrink-0; /* 固定寬度 288px */
+    @apply transition-all duration-300; /* 平滑過渡效果 */
+  }
+
+  /* 當螢幕寬度不足以容納兩張卡片時，單張卡片放大並置中 */
+  @media (max-width: 640px) {
+    .member-cards-grid {
+      @apply justify-center; /* 小螢幕時置中對齊 */
+    }
+    
+    .member-card-item {
+      @apply w-80; /* 放大到 320px */
+    }
+  }
+
+  @media (min-width: 641px) and (max-width: 768px) {
+    .member-card-item {
+      @apply w-72; /* 平板模式維持 288px */
+    }
   }
 
   .member-card-image-container {
@@ -126,14 +146,21 @@
   }
 
   .member-card-actions {
-    @apply flex justify-end p-3 lg:p-4 gap-3; /* 改為 justify-end，按鈕靠右對齊 */
+    @apply flex justify-between p-3 lg:p-4 gap-3; /* 改為 justify-between，左右對齊 */
+  }
+
+  /* 當只有刪除按鈕時，靠右對齊 */
+  .member-card-actions:has(.member-card-btn-add.hidden) {
+    @apply justify-end;
   }
 
   .member-card-btn {
     @apply px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200;
-    /* 移除 flex-1，改用固定寬度 */
-    min-width: 120px; /* 設定最小寬度 */
-    flex: 0 0 auto; /* 不自動伸縮 */
+    @apply w-32 flex-shrink-0; /* 使用 Tailwind 的 w-32 (128px) 和 flex-shrink-0 */
+  }
+
+  .member-card-btn.hidden {
+    @apply hidden; /* 確保 hidden 的按鈕完全不佔用空間 */
   }
 
   .member-card-btn-add {
@@ -294,9 +321,7 @@
       @apply flex-col gap-4 items-start;
     }
     
-    .member-cards-grid {
-      @apply gap-4;
-    }
+    /* 移除響應式卡片網格設定，使用固定寬度 */
     
     .member-card-image-container {
       @apply h-36;
@@ -324,9 +349,7 @@
   }
 
   @media (min-width: 641px) and (max-width: 1024px) {
-    .member-cards-grid {
-      @apply gap-6;
-    }
+    /* 移除響應式卡片網格設定，使用固定寬度 */
     
     .member-card-image-container {
       @apply h-44;

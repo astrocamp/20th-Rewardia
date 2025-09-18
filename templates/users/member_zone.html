@@ -343,8 +343,8 @@
                      x-transition:leave-start="opacity-100"
                      x-transition:leave-end="opacity-0"
                      class="member-add-card-confirm"
-                     @click.away="hideAddCardNumberDialog()">
-                  <div class="member-add-card-dialog">
+                     @click="hideAddCardNumberDialog()">
+                  <div class="member-add-card-dialog" @click.stop="">
                     <h4 class="member-add-card-title">新增卡號</h4>
                     <p class="member-add-card-message">請選擇新增卡號的方式：</p>
                     <div class="member-add-card-actions">
@@ -369,8 +369,8 @@
                      x-transition:leave-start="opacity-100"
                      x-transition:leave-end="opacity-0"
                      class="member-manual-input-confirm"
-                     @click.away="hideManualInputDialog()">
-                  <div class="member-manual-input-dialog">
+                     @click="hideManualInputDialog()">
+                  <div class="member-manual-input-dialog" @click.stop="">
                     <div class="member-manual-input-header">
                       <h4 class="member-manual-input-title">請手動輸入信用卡卡號</h4>
                       <button @click="hideManualInputDialog()" 
@@ -419,8 +419,8 @@
                      x-transition:leave-start="opacity-100"
                      x-transition:leave-end="opacity-0"
                      class="member-delete-confirm"
-                     @click.away="hideDeleteDialog()">
-                  <div class="member-delete-dialog">
+                     @click="hideDeleteDialog()">
+                  <div class="member-delete-dialog" @click.stop="">
                     <h4 class="member-delete-title">確認刪除</h4>
                     <p class="member-delete-message">確定要刪除這張卡片嗎？此操作無法復原。</p>
                     <div class="member-delete-actions">
