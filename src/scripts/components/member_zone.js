@@ -15,6 +15,7 @@ export default function memberZoneComponent() {
     manualCardNumber: '',
     
     
+    
     // 初始化
     init() {
       // 可以在此處加入初始化邏輯

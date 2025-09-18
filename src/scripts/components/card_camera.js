@@ -24,7 +24,6 @@ export default (config = {}) => ({
   showEdit: false,
   editNumber: '',
   
-  
   // 初始化
   init() {
     this.video = this.$refs.video;
@@ -44,6 +43,9 @@ export default (config = {}) => ({
     console.log('openCamera called with eventData:', eventData);
     this.currentCardId = eventData?.cardId || null;
     console.log('currentCardId set to:', this.currentCardId);
+    
+    // 判斷是否為 card_form 模式
+    this.isCardFormMode = eventData?.isCardForm || false;
     
     try {
       this.error = '';
@@ -231,29 +233,52 @@ export default (config = {}) => ({
         const cardNumberDigits = this.cardNumber ? this.cardNumber.replace(/\D/g, '') : '';
         
         if (cardNumberDigits.length === 16) {
-          // 識別成功：顯示成功訊息並開啟編輯模式
-          this.showMessage('卡號辨識成功，請確認掃描結果', 'success');
-          this.showEdit = true;
-          this.editNumber = this.cardNumber;
-          this.closeCamera();
+          // 識別成功：根據模式決定處理方式
+          if (this.isCardFormMode) {
+            // card_form 模式：直接填入表單欄位
+            this.fillFormField(this.cardNumber);
+            this.showMessage('卡號辨識成功，已填入表單', 'success');
+            this.closeCamera();
+          } else {
+            // member_zone 模式：顯示確認介面
+            this.showMessage('卡號辨識成功，請確認掃描結果', 'success');
+            this.showEdit = true;
+            this.editNumber = this.cardNumber;
+            this.closeCamera();
+          }
         } else {
           // 識別失敗：嘗試錯誤回補
           const fallbackNumber = this.extractLongestNumber(result.full_text || '');
           
-          if (fallbackNumber && fallbackNumber.length >= 10) {
-            // 有可用的回補數字：顯示編輯模式讓用戶修正
-            this.showMessage('卡號辨識不完整，已自動填入部分數字，請手動修正', 'info');
-            this.showEdit = true;
-            this.editNumber = this.formatCardNumber(fallbackNumber);
-            this.closeCamera();
+          if (this.isCardFormMode) {
+            // card_form 模式：直接填入部分卡號
+            if (fallbackNumber && fallbackNumber.length >= 10) {
+              this.fillFormField(fallbackNumber);
+              this.showMessage('卡號辨識不完整，已自動填入部分數字，請手動修正', 'info');
+              this.closeCamera();
+            } else {
+              this.showMessage('卡號辨識失敗，請重新拍照', 'error');
+              this.retries++;
+              // 延遲1秒後重新開啟攝影機
+              setTimeout(() => {
+                this.openCamera({ isCardForm: true });
+              }, 1000);
+            }
           } else {
-            // 沒有可用的回補數字：顯示失敗訊息並重新拍照
-            this.showMessage('卡號辨識失敗，請重新拍照', 'error');
-            this.retries++;
-            // 延遲1秒後重新開啟攝影機
-            setTimeout(() => {
-              this.openCamera();
-            }, 1000);
+            // member_zone 模式：顯示編輯模式
+            if (fallbackNumber && fallbackNumber.length >= 10) {
+              this.showMessage('卡號辨識不完整，已自動填入部分數字，請手動修正', 'info');
+              this.showEdit = true;
+              this.editNumber = this.formatCardNumber(fallbackNumber);
+              this.closeCamera();
+            } else {
+              this.showMessage('卡號辨識失敗，請重新拍照', 'error');
+              this.retries++;
+              // 延遲1秒後重新開啟攝影機
+              setTimeout(() => {
+                this.openCamera();
+              }, 1000);
+            }
           }
         }
       } else {
@@ -391,8 +416,40 @@ export default (config = {}) => ({
   // 重新辨識
   retryRecognition() {
     this.resetAllState();
-    // 重新開啟攝影機
-    this.openCamera();
+    // 重新開啟攝影機，保持當前模式
+    if (this.isCardFormMode) {
+      this.openCamera({ isCardForm: true });
+    } else {
+      this.openCamera();
+    }
+  },
+  
+  // 填入表單欄位（card_form 模式專用）
+  fillFormField(cardNumber) {
+    // 格式化卡號（每4位加空格）
+    const formattedNumber = this.formatCardNumber(cardNumber);
+    
+    // 查找可見的卡號輸入欄位
+    const visibleInput = document.querySelector('input[id="cardNumberInput"]');
+    if (visibleInput) {
+      visibleInput.value = formattedNumber;
+      // 觸發 input 事件以更新 Alpine.js 的數據綁定
+      visibleInput.dispatchEvent(new Event('input', { bubbles: true }));
+      console.log('Card number filled to visible input field:', formattedNumber);
+    }
+    
+    // 查找隱藏的卡號輸入欄位
+    const hiddenInput = document.querySelector('input[id="card-number-input"]');
+    if (hiddenInput) {
+      hiddenInput.value = cardNumber.replace(/\s/g, ''); // 隱藏欄位使用無空格的格式
+      // 觸發 input 事件以更新 Alpine.js 的數據綁定
+      hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
+      console.log('Card number filled to hidden input field:', cardNumber.replace(/\s/g, ''));
+    }
+    
+    if (!visibleInput && !hiddenInput) {
+      console.warn('No card number input fields found');
+    }
   },
   
   

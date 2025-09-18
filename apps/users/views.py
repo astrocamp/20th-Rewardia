@@ -216,8 +216,8 @@ def card_form(request, card_id=None):
         card_id_from_form = request.POST.get("card_id")
         card_number = request.POST.get("card_number", "").strip()
         
-        # 調試信息（已移除）
-        # print(f"DEBUG: bank_name={bank_name}, card_id={card_id_from_form}, card_number='{card_number}'")
+        # 調試信息
+        print(f"DEBUG: bank_name={bank_name}, card_id={card_id_from_form}, card_number='{card_number}'")
 
         # 檢查資料完整性
         if not bank_name or not card_id_from_form:
@@ -334,11 +334,8 @@ def card_form(request, card_id=None):
                     f"成功新增 {selected_card.bank} {selected_card.name}！",
                 )
 
-            # 保持在新增頁面，不跳轉
-            context = prepare_card_form_context(
-                user_card=None, is_edit_mode=False, include_selected_bank=False
-            )
-            return render(request, "users/card_form.html", context)
+                # 新增卡片成功後轉址到會員專區
+                return redirect('users:member_zone')
 
         except CreditCard.DoesNotExist:
             messages.error(request, "選擇的卡片不存在")

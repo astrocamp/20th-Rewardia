@@ -8,7 +8,8 @@
           class="fixed top-4 right-4 z-[9999] space-y-2"
   x-data="member_zone_toast()"
   @show-toast.window="addToast($event.detail)"
-  @hide-toast.window="removeToast($event.detail.id)"
+  x-init="console.log('member_zone_toast initialized')"
+  x-show="toasts.length > 0"
 >
   <template x-for="toast in toasts" :key="toast.id">
     <div 
