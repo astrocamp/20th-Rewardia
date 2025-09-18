@@ -27,7 +27,7 @@
             </div>
 
             <!-- 白色按鈕：手機/桌機都顯示 -->
-            <a href="#"
+            <a href="https://chromewebstore.google.com/detail/rewardia/ahmfkgkefmandfahccfbbpfffnphkakl?authuser=0&hl=en"
               class="ml-2 sm:ml-6 bg-white text-gray-900 px-4 sm:px-6 py-2 rounded-full font-bold text-sm hover:bg-gray-100 whitespace-nowrap shrink-0">
               免費新增至 Chrome
             </a>
@@ -74,6 +74,14 @@
               <span class="max-w-20 truncate">{{ user.username }}</span>
             </div>
           </div>
+
+          <!-- 管理後台連結：僅 superuser 可見 -->
+          {% if user.is_superuser %}
+          <a href="{% url 'admins:cards' %}" class="btn-secondary rounded-lg py-2 px-4 md:px-6">
+            管理後台
+          </a>
+          {% endif %}
+
           <!-- 登出按鈕 -->
           <form method="post" action="{% url 'sessions:logout' %}">
             {% csrf_token %}

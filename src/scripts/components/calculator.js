@@ -91,3 +91,5 @@ function triggerCalculation() {
 
 // 將函數綁定到全域供 HTMX 使用
 window.triggerCalculation = triggerCalculation;
+window.clearForm = clearForm;
+window.scrollToResult = scrollToResult;
