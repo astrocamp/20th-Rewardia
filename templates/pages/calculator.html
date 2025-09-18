@@ -85,11 +85,12 @@
             <div class="field-group">
               <label for="scope_select" class="field-label required">消費種類</label>
               <div class="select-wrapper">
-                <select id="scope_select" name="scope_select" class="ui-select" aria-label="選擇消費種類" required 
-                        hx-trigger="change" 
-                        hx-post="/calculate-reward/" 
+                <select id="scope_select" name="scope_select" class="ui-select" aria-label="選擇消費種類" required
+                        hx-trigger="change"
+                        hx-post="/calculate-reward/"
                         hx-target="#result_value"
-                        hx-include="#calc_form">
+                        hx-include="#calc_form"
+                        hx-on:htmx:after-request="document.getElementById('amount_input').focus()">
                   <option value="" selected disabled>請先選擇消費類別</option>
                 </select>
                 <div class="select-arrow" aria-hidden="true">
@@ -100,11 +101,13 @@
             <!-- 消費金額 -->
             <div class="field-group field-full">
               <label for="amount_input" class="field-label required">消費金額</label>
-              <input id="amount_input" type="number" name="amount_input" inputmode="decimal" placeholder="請輸入消費金額" class="ui-input" aria-label="消費金額" required min="0.01" step="0.01" 
-                     hx-trigger="input changed delay:500ms" 
-                     hx-post="/calculate-reward/" 
+              <input id="amount_input" type="number" name="amount_input" inputmode="decimal" placeholder="請輸入消費金額" class="ui-input" aria-label="消費金額" required min="0.01" step="0.01"
+                     hx-trigger="input changed delay:500ms"
+                     hx-post="/calculate-reward/"
                      hx-target="#result_value"
-                     hx-include="#calc_form" />
+                     hx-include="#calc_form"
+                     onkeydown="if(event.key === 'Enter') event.preventDefault();" />
+
             </div>
           </div>
 
@@ -112,7 +115,8 @@
             <div class="result-card-bg">
               <div class="result-content">
                 <p class="result-label">計算結果</p>
-                <p class="result-value" id="result_value">請選擇欄位進行計算</p>
+                <p class="result-value" id="result_value"
+                   hx-on:htmx:after-swap="scrollToResult()">請選擇欄位進行計算</p>
 
               </div>
             </div>
@@ -121,10 +125,8 @@
 
           <!-- 動作按鈕 -->
           <div class="action-buttons">
-          <button type="button" class="ui-btn ui-btn-secondary" 
-                  hx-get="/calculator/"
-                  hx-target="section.calculator-page"
-                  hx-select="section.calculator-page">清空填寫</button>
+          <button type="button" class="ui-btn ui-btn-secondary"
+                  onclick="clearForm()">清空填寫</button>
           </div>
 
 
