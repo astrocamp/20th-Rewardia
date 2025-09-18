@@ -93,8 +93,12 @@ def member_zone(request):
             from apps.rewards.models import RewardCategory
             from django.db.models import Max, Case, When, Value, DecimalField
             
-            # 查詢該卡片的最高回饋率
-            highest_reward = RewardCategory.objects.filter(
+            # 查詢該卡片的所有回饋率，按 category 分組並取最高費率
+            from django.db.models import Max
+            from collections import defaultdict
+            
+            # 獲取所有回饋項目
+            all_rewards = RewardCategory.objects.filter(
                 card=user_card.card,
                 is_active=True
             ).annotate(
@@ -104,26 +108,39 @@ def member_zone(request):
                     default=Value(0),
                     output_field=DecimalField()
                 )
-            ).order_by('-max_effective_rate').first()
+            )
             
-            # 格式化回饋率顯示
-            reward_display = None
-            if highest_reward:
-                if highest_reward.min_rate is not None and highest_reward.max_rate is not None:
-                    if highest_reward.min_rate == highest_reward.max_rate:
-                        reward_display = f"{highest_reward.category} {highest_reward.min_rate:.2f}%"
+            # 按 category 分組，保留每個 category 的最高費率項目
+            category_highest = {}
+            for reward in all_rewards:
+                category = reward.category
+                if category not in category_highest or reward.max_effective_rate > category_highest[category].max_effective_rate:
+                    category_highest[category] = reward
+            
+            # 按費率排序，取前三高
+            top_rewards = sorted(category_highest.values(), key=lambda x: x.max_effective_rate, reverse=True)[:3]
+            
+            # 格式化前三高回饋率顯示
+            top_rewards_display = []
+            for reward in top_rewards:
+                if reward.min_rate is not None and reward.max_rate is not None:
+                    if reward.min_rate == reward.max_rate:
+                        reward_text = f"{reward.category} {reward.min_rate:.2f}%"
                     else:
-                        reward_display = f"{highest_reward.category} {highest_reward.min_rate:.2f}%~{highest_reward.max_rate:.2f}%"
-                elif highest_reward.min_rate is not None:
-                    reward_display = f"{highest_reward.category} {highest_reward.min_rate:.2f}%"
-                elif highest_reward.max_rate is not None:
-                    reward_display = f"{highest_reward.category} {highest_reward.max_rate:.2f}%"
+                        reward_text = f"{reward.category} {reward.min_rate:.2f}%~{reward.max_rate:.2f}%"
+                elif reward.min_rate is not None:
+                    reward_text = f"{reward.category} {reward.min_rate:.2f}%"
+                elif reward.max_rate is not None:
+                    reward_text = f"{reward.category} {reward.max_rate:.2f}%"
+                else:
+                    continue
+                top_rewards_display.append(reward_text)
             
             processed_cards.append({
                 'user_card': user_card,
                 'image_url': image_url,
                 'masked_card_number': masked_card_number,
-                'reward_display': reward_display
+                'top_rewards_display': top_rewards_display
             })
         
         context["processed_cards"] = processed_cards
@@ -264,6 +281,76 @@ def card_form(request, card_id=None):
                 include_selected_bank=False,
             )
             return render(request, "users/card_form.html", context)
+
+
+# 新增卡號功能
+@login_required
+def card_add_number(request, card_id):
+    """為用戶卡片新增卡號（從無到有）"""
+    user_card = get_object_or_404(UserCard, id=card_id, user=request.user)
+    
+    if request.method == "POST":
+        try:
+            import json
+            data = json.loads(request.body)
+            card_number = data.get('card_number', '').strip()
+            
+            if not card_number:
+                return JsonResponse({
+                    'success': False,
+                    'message': '卡號不能為空'
+                })
+            
+            # 檢查是否已經有卡號
+            # 嘗試解密驗證是否為有效的加密卡號
+            try:
+                decrypted = user_card.get_card_number()
+                print(f"DEBUG: card_id={card_id}, card_number_encrypted={user_card.card_number_encrypted}, decrypted={decrypted}")
+                if decrypted and decrypted.strip():
+                    return JsonResponse({
+                        'success': False,
+                        'message': '此卡片已有卡號，無法重複新增'
+                    })
+            except Exception as e:
+                # 解密失敗或沒有卡號，允許新增
+                print(f"DEBUG: Exception in get_card_number: {e}")
+                pass
+            
+            # 移除所有非數字字符
+            import re
+            clean_number = re.sub(r'\D', '', card_number)
+            
+            if len(clean_number) < 12 or len(clean_number) > 19:
+                return JsonResponse({
+                    'success': False,
+                    'message': '卡號長度必須在12-19位之間'
+                })
+            
+            # 新增卡號
+            user_card.set_card_number(clean_number)
+            user_card.save()
+            
+            card_name = f"{user_card.card.bank} {user_card.card.name}"
+            return JsonResponse({
+                'success': True,
+                'message': f"成功為 {card_name} 新增卡號！"
+            })
+            
+        except json.JSONDecodeError:
+            return JsonResponse({
+                'success': False,
+                'message': '請求格式錯誤'
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'新增失敗: {str(e)}'
+            })
+    
+    return JsonResponse({
+        'success': False,
+        'message': '只允許 POST 請求'
+    }, status=405)
 
 
 # 刪除功能
