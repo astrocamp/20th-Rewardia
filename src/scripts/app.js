@@ -32,6 +32,9 @@ window.showToast = function(message, type = 'info') {
     visible: true
   };
   
+  // 調試信息
+  console.log('showToast called:', toastData);
+  
   // 觸發自定義事件，讓頁面處理 toast 顯示
   window.dispatchEvent(new CustomEvent('show-toast', { 
     detail: toastData 
@@ -56,12 +59,15 @@ Alpine.data("member_zone", memberZoneComponent);
 Alpine.data("member_zone_toast", () => ({
   toasts: [],
   addToast(detail) {
+    console.log('member_zone_toast addToast called:', detail);
     this.toasts.push(detail);
+    console.log('Current toasts:', this.toasts);
     // 3 秒後自動移除
     setTimeout(() => this.removeToast(detail.id), 3000);
   },
   removeToast(id) {
     this.toasts = this.toasts.filter(t => t.id !== id);
+    console.log('Toast removed, remaining:', this.toasts);
   }
 }));
 

@@ -95,7 +95,7 @@ export default (config = {}) => ({
     // 檢查是否選擇了銀行和卡片
     if (!this.selectedBank || !this.selectedCard) {
       if (window.showToast) {
-        window.showToast('請選擇銀行和卡片', 'error');
+        window.showToast('請選擇銀行與卡片', 'error');
       }
       return false;
     }
@@ -131,42 +131,34 @@ export default (config = {}) => ({
     }
 
     // 將手動輸入的卡號同步到隱藏欄位（移除空格）
-    if (this.manualCardNumber) {
+    if (this.manualCardNumber && this.manualCardNumber.trim()) {
       this.recognizedCardNumber = this.manualCardNumber.replace(/\s/g, '');
+    } else {
+      this.recognizedCardNumber = '';
     }
     
-    // 使用 AJAX 提交表單，避免頁面重新載入
+    // 使用傳統表單提交，確保轉址和訊息都能正常工作
     const form = document.getElementById('card-form');
     if (form) {
-      // 準備表單數據
-      const formData = new FormData(form);
-      formData.set('bank_name', this.selectedBank);
-      formData.set('card_id', this.selectedCard);
-      formData.set('card_number', this.recognizedCardNumber || '');
+      // 設置表單數據
+      const bankNameInput = form.querySelector('[name="bank_name"]');
+      const cardIdInput = form.querySelector('[name="card_id"]');
+      const cardNumberInput = form.querySelector('[name="card_number"]');
       
-      // 發送 AJAX 請求
-      fetch(form.action, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
-        }
-      })
-      .then(response => response.text())
-      .then(html => {
-        // 更新頁面內容
-        document.body.innerHTML = html;
-        // 重新初始化 Alpine.js（避免重複初始化）
-        if (window.Alpine && !window.Alpine._initialized) {
-          window.Alpine.start();
-        }
-      })
-      .catch(error => {
-        console.error('Form submission error:', error);
-        if (window.showToast) {
-          window.showToast('提交失敗，請稍後再試', 'error');
-        }
+      if (bankNameInput) bankNameInput.value = this.selectedBank;
+      if (cardIdInput) cardIdInput.value = this.selectedCard;
+      if (cardNumberInput) cardNumberInput.value = this.recognizedCardNumber || '';
+      
+      // 調試信息
+      console.log('Form submission debug:', {
+        bank_name: this.selectedBank,
+        card_id: this.selectedCard,
+        card_number: this.recognizedCardNumber,
+        manualCardNumber: this.manualCardNumber
       });
+      
+      // 提交表單
+      form.submit();
     }
   }
 });

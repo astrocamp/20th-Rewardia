@@ -114,7 +114,6 @@
                 </label>
                 <input type="text"
                        id="cardNumberInput"
-                       name="card_number"
                        class="w-full h-12 rounded-lg bg-white border border-[#D1D5DB] px-4 text-gray-900 transition-colors duration-200 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                        placeholder="可手動輸入信用卡卡號或按下擷取卡號按鈕開啟相機功能"
                        maxlength="19"
@@ -133,7 +132,7 @@
               <!-- 左側：擷取卡號按鈕和說明文字 -->
               <div class="flex flex-col">
                 <button type="button"
-                        @click="openCamera()"
+                        @click="openCamera({ isCardForm: true })"
                         class="inline-flex items-center px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors w-fit">
                   <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
@@ -160,7 +159,9 @@
                 {% else %}
                   <button type="button"
                           @click="submitForm($event)"
-                          class="inline-flex items-center justify-center rounded-lg w-[132px] h-[52px] px-6 font-medium transition-colors duration-200 select-none bg-[#2060B9] text-white hover:bg-[#1c55a4] active:bg-[#184a90] disabled:bg-[#9BB6DD] disabled:cursor-not-allowed disabled:opacity-70">
+                          :disabled="!selectedBank || !selectedCard"
+                          class="inline-flex items-center justify-center rounded-lg w-[132px] h-[52px] px-6 font-medium transition-colors duration-200 select-none bg-[#2060B9] text-white hover:bg-[#1c55a4] active:bg-[#184a90] disabled:bg-[#9BB6DD] disabled:cursor-not-allowed disabled:opacity-70"
+                          :class="(!selectedBank || !selectedCard) ? 'bg-[#9BB6DD] cursor-not-allowed opacity-70' : 'bg-[#2060B9] hover:bg-[#1c55a4] active:bg-[#184a90]'">
                     新增卡片
                   </button>
                 {% endif %}
