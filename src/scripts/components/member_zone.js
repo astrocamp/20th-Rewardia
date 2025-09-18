@@ -69,9 +69,9 @@ export default function memberZoneComponent() {
     // 確認手動輸入
     async confirmManualInput(cardId) {
       const cleanNumber = this.manualCardNumber.replace(/\s/g, '');
-      if (!this.manualCardNumber || cleanNumber.length < 12 || cleanNumber.length > 19) {
+      if (!this.manualCardNumber || cleanNumber.length !== 16) {
         if (window.showToast) {
-          window.showToast('請輸入12-19位卡號', 'error');
+          window.showToast('請輸入16位卡號', 'error');
         }
         return;
       }
@@ -99,7 +99,7 @@ export default function memberZoneComponent() {
           this.hideManualInputDialog();
           setTimeout(() => {
             window.location.reload();
-          }, 1000);
+          }, 3000);
         } else {
           if (window.showToast) {
             window.showToast(data.message || '新增失敗', 'error');
@@ -157,7 +157,7 @@ export default function memberZoneComponent() {
           // 重新載入頁面
           setTimeout(() => {
             window.location.reload();
-          }, 1000);
+          }, 3000);
         } else {
           // 顯示錯誤訊息
           if (window.showToast) {

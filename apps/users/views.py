@@ -16,10 +16,14 @@ from rest_framework.decorators import (
 )
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.backends import ModelBackend
+from django.db.models import Max, Case, When, Value, DecimalField
+from collections import defaultdict
 import json
-
-# from apps.banks.models import Bank
+import logging
+import re
 from apps.cards.models import CreditCard
+from apps.cards.storage import MediaStorage
+from apps.rewards.models import RewardCategory
 from .models import UserCard
 
 
@@ -54,7 +58,6 @@ def prepare_card_form_context(
         # 處理圖片 URL
         image_url = None
         if card.image:
-            from apps.cards.storage import MediaStorage
             storage = MediaStorage()
             image_url = storage.url(card.image.name)
         
@@ -93,43 +96,43 @@ def member_zone(request):
         # 獲取用戶的卡片資料，只顯示 is_active=True 的卡片
         user_cards = request.user.user_cards.select_related("card").filter(card__is_active=True)
         
+        # 一次性獲取所有相關的回饋資料，避免 N+1 查詢問題
+        card_ids = [user_card.card.id for user_card in user_cards]
+        all_rewards = RewardCategory.objects.filter(
+            card_id__in=card_ids,
+            is_active=True
+        ).annotate(
+            max_effective_rate=Case(
+                When(max_rate__isnull=False, then='max_rate'),
+                When(min_rate__isnull=False, then='min_rate'),
+                default=Value(0),
+                output_field=DecimalField()
+            )
+        ).select_related('card')
+        
+        # 按卡片 ID 分組回饋資料
+        rewards_by_card = defaultdict(list)
+        for reward in all_rewards:
+            rewards_by_card[reward.card.id].append(reward)
+        
         # 處理每張卡片的詳細資訊
         processed_cards = []
         for user_card in user_cards:
             # 處理圖片 URL
             image_url = None
             if user_card.card.image:
-                from apps.cards.storage import MediaStorage
                 storage = MediaStorage()
                 image_url = storage.url(user_card.card.image.name)
             
             # 處理卡號
             masked_card_number = user_card.get_masked_card_number() if user_card.card_number_encrypted else "尚未登記卡號"
             
-            # 處理最高回饋率
-            from apps.rewards.models import RewardCategory
-            from django.db.models import Max, Case, When, Value, DecimalField
-            
-            # 查詢該卡片的所有回饋率，按 category 分組並取最高費率
-            from django.db.models import Max
-            from collections import defaultdict
-            
-            # 獲取所有回饋項目
-            all_rewards = RewardCategory.objects.filter(
-                card=user_card.card,
-                is_active=True
-            ).annotate(
-                max_effective_rate=Case(
-                    When(max_rate__isnull=False, then='max_rate'),
-                    When(min_rate__isnull=False, then='min_rate'),
-                    default=Value(0),
-                    output_field=DecimalField()
-                )
-            )
+            # 處理最高回饋率 - 從預先查詢的資料中獲取
+            card_rewards = rewards_by_card.get(user_card.card.id, [])
             
             # 按 category 分組，保留每個 category 的最高費率項目
             category_highest = {}
-            for reward in all_rewards:
+            for reward in card_rewards:
                 category = reward.category
                 if category not in category_highest or reward.max_effective_rate > category_highest[category].max_effective_rate:
                     category_highest[category] = reward
@@ -165,7 +168,7 @@ def member_zone(request):
     return render(request, "users/member_zone.html", context)
 
 
-# API 端點：根據銀行名稱返回該銀行的所有信用卡（JSON 格式，給 Alpine.js 用）
+# API 端點：根據銀行名稱返回該銀行的所有信用卡（JSON 格式）
 def get_cards_by_bank(request, bank_name):
     try:
         # 取得該銀行的所有啟用信用卡
@@ -216,8 +219,6 @@ def card_form(request, card_id=None):
         card_id_from_form = request.POST.get("card_id")
         card_number = request.POST.get("card_number", "").strip()
         
-        # 調試信息
-        print(f"DEBUG: bank_name={bank_name}, card_id={card_id_from_form}, card_number='{card_number}'")
 
         # 檢查資料完整性
         if not bank_name or not card_id_from_form:
@@ -233,7 +234,6 @@ def card_form(request, card_id=None):
         # 驗證卡號（如果提供了）- 卡號不是必填
         clean_number = ""
         if card_number and card_number.strip():
-            import re
             # 先移除空格，再檢查是否包含非數字字符
             card_number_no_spaces = card_number.replace(' ', '')
             if re.search(r'[^\d]', card_number_no_spaces):
@@ -356,7 +356,6 @@ def card_add_number(request, card_id):
     
     if request.method == "POST":
         try:
-            import json
             data = json.loads(request.body)
             card_number = data.get('card_number', '').strip()
             
@@ -370,19 +369,23 @@ def card_add_number(request, card_id):
             # 嘗試解密驗證是否為有效的加密卡號
             try:
                 decrypted = user_card.get_card_number()
-                print(f"DEBUG: card_id={card_id}, card_number_encrypted={user_card.card_number_encrypted}, decrypted={decrypted}")
                 if decrypted and decrypted.strip():
                     return JsonResponse({
                         'success': False,
                         'message': '此卡片已有卡號，無法重複新增'
                     })
+            except (ValueError, TypeError, UnicodeDecodeError, AttributeError) as e:
+                # 預期的解密失敗（資料格式問題），允許新增
+                logger = logging.getLogger(__name__)
+                logger.debug(f"Card number decryption failed (expected): {e}")
+                pass
             except Exception as e:
-                # 解密失敗或沒有卡號，允許新增
-                print(f"DEBUG: Exception in get_card_number: {e}")
+                # 未預期的錯誤，記錄並允許新增（避免阻塞用戶操作）
+                logger = logging.getLogger(__name__)
+                logger.warning(f"Unexpected error in card number decryption: {e}")
                 pass
             
             # 移除所有非數字字符
-            import re
             clean_number = re.sub(r'\D', '', card_number)
             
             if len(clean_number) < 12 or len(clean_number) > 19:
@@ -406,10 +409,21 @@ def card_add_number(request, card_id):
                 'success': False,
                 'message': '請求格式錯誤'
             })
-        except Exception as e:
+        except (ValueError, TypeError, UnicodeDecodeError, AttributeError) as e:
+            # 資料處理相關的預期錯誤
+            logger = logging.getLogger(__name__)
+            logger.error(f"Data processing error in card_add_number: {e}")
             return JsonResponse({
                 'success': False,
-                'message': f'新增失敗: {str(e)}'
+                'message': '資料處理失敗，請檢查輸入格式'
+            })
+        except Exception as e:
+            # 未預期的系統錯誤
+            logger = logging.getLogger(__name__)
+            logger.error(f"Unexpected error in card_add_number: {e}")
+            return JsonResponse({
+                'success': False,
+                'message': '系統錯誤，請稍後再試'
             })
     
     return JsonResponse({

@@ -3,9 +3,10 @@ from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 from django.conf import settings
 import base64
+import logging
 
 
 class UserCard(models.Model):
@@ -72,7 +73,10 @@ class UserCard(models.Model):
                 fernet = Fernet(key)
                 encrypted_data = fernet.encrypt(card_number.encode())
                 self.card_number_encrypted = base64.b64encode(encrypted_data).decode()
-            except Exception:
+            except (ValueError, TypeError, UnicodeDecodeError, AttributeError) as e:
+                # 記錄具體錯誤並設定為 None
+                logger = logging.getLogger(__name__)
+                logger.error(f"Card number encryption failed: {e}")
                 self.card_number_encrypted = None
         else:
             self.card_number_encrypted = None
@@ -86,7 +90,15 @@ class UserCard(models.Model):
                 encrypted_data = base64.b64decode(self.card_number_encrypted.encode())
                 decrypted_data = fernet.decrypt(encrypted_data)
                 return decrypted_data.decode()
-            except Exception:
+            except InvalidToken as e:
+                # 處理 Fernet 解密錯誤（金鑰不匹配、資料損毀等）
+                logger = logging.getLogger(__name__)
+                logger.error(f"Card number decryption failed - Invalid token: {e}")
+                return None
+            except (ValueError, TypeError, UnicodeDecodeError, AttributeError) as e:
+                # 記錄具體錯誤並返回 None
+                logger = logging.getLogger(__name__)
+                logger.error(f"Card number decryption failed: {e}")
                 return None
         return None
 
