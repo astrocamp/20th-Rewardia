@@ -112,9 +112,9 @@ export default (config = {}) => ({
       }
       
       // 檢查長度
-      if (cleanNumber.length < 12 || cleanNumber.length > 19) {
+      if (cleanNumber.length !== 16) {
         if (window.showToast) {
-          window.showToast('卡號長度必須在12-19位之間', 'error');
+          window.showToast('請輸入16位卡號', 'error');
         }
         return false;
       }

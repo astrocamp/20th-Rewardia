@@ -36,7 +36,7 @@ FERNET_KEY = os.getenv("FERNET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["rewardia.net", "www.rewardia.net", "localhost", "127.0.0.1","10.8.8.65"]
+ALLOWED_HOSTS = ["rewardia.net", "www.rewardia.net", "localhost", "127.0.0.1",]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://rewardia.net",
@@ -45,14 +45,13 @@ CSRF_TRUSTED_ORIGINS = [
     "http://www.rewardia.net",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
-    "http://10.8.8.65:8000",
 ]
 
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 
-SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = True
 
-CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = True
 
 # 反向代理設定
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
@@ -71,7 +70,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django.contrib.sites",  # OAuth 必要：allauth 需要 sites framework 來管理多站點
+    "django.contrib.sites",  # OAuth 必要
     "storages",  # AWS S3 支援
     # ------------------------------
     "django_celery_results",
@@ -91,7 +90,7 @@ INSTALLED_APPS = [
     "apps.nlp_validation",
     "apps.card_crawler",
     # ------------------------------
-    # OAuth 相關套件 - django-allauth
+    # OAuth 相關套件
     "allauth",  # OAuth 核心套件
     "allauth.account",  # OAuth 必要：Email 管理和帳號功能
     "allauth.socialaccount",  # OAuth 必要：社交帳號登入核心
