@@ -39,13 +39,14 @@ logger = logging.getLogger(__name__)
 
 
 @api_view(["GET"])
-def get_rewards(request):
-    all_rewards = (
+def get_card_rewards(request, id):
+    card_rewards = (
         RewardCategory.objects.select_related("card")
-        .filter(is_active=True)
+        .filter(card__id=id)
         .order_by("-max_rate")
     )
-    serializer = RewardSerializer(all_rewards, many=True)
+
+    serializer = RewardSerializer(card_rewards, many=True)
     return Response(serializer.data)
 
 

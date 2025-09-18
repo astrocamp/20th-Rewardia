@@ -6,9 +6,9 @@ app_name = "ext_api"
 
 urlpatterns = [
     path(
-        "rewards/",
-        views.get_rewards,
-        name="get_rewards",
+        "rewards/cards/<int:id>",
+        views.get_card_rewards,
+        name="get_card_rewards",
     ),
     path(
         "rewards/scope/<scope>/",
@@ -50,7 +50,7 @@ urlpatterns = [
         views.delete_user_card,
         name="delete_user_card",
     ),
-    path(  
+    path(
         "ocr/vision/",
         views.ocr_with_vision,
         name="ocr_with_vision",
