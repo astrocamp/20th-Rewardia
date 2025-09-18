@@ -4,8 +4,13 @@
   "version": "1.0",
   "manifest_version": 3,
   "action": {
-    "default_popup": "popup/pages/rewards.html",
-    "default_icon": "images/Rewardia_128.png"
+    "default_popup": "popup/pages/rewards.html"
+  },
+  "icons": {
+    "16": "images/Rewardia_16.png",
+    "32": "images/Rewardia_32.png",
+    "48": "images/Rewardia_48.png",
+    "128": "images/Rewardia_128.png"
   },
   "permissions":["storage","tabs"],
   "host_permissions": [
