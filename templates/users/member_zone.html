@@ -52,7 +52,8 @@
            'banner-hidden': !$store.banner.visible,
            'banner-transitioning': $store.banner.isTransitioning
          }">
-  <!-- 修改密碼彈窗 -->
+  <!-- 修改密碼彈窗 - 只對傳統註冊用戶顯示 -->
+  {% if not has_google_oauth %}
   <div x-show="showPasswordModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
     <!-- 背景遮罩 -->
     <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="closePasswordModal()"></div>
@@ -197,6 +198,7 @@
       </div>
     </div>
   </div>
+  {% endif %}
   <div class="calculator-container">
     <!-- 區塊標題：會員專區 -->
     <h2 class="calculator-title">會員專區</h2>
@@ -236,12 +238,20 @@
               </svg>
               <h3 class="member-section-title">會員資料</h3>
             </div>
+            {% if not has_google_oauth %}
             <button class="ui-btn ui-btn-primary" @click="openPasswordModal()">修改密碼</button>
+            {% endif %}
           </div>
 
           <div class="member-info-grid">
             <div class="member-info-item">
-              <span class="member-info-label">帳號</span>
+              <span class="member-info-label">
+                {% if has_google_oauth %}
+                  Google帳號登入用戶
+                {% else %}
+                  帳號
+                {% endif %}
+              </span>
               <span class="member-info-value">{{ user.username }}</span>
             </div>
             <div class="member-info-item">

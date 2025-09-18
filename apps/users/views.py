@@ -93,6 +93,19 @@ def member_zone(request):
     context = {}
 
     if request.user.is_authenticated:
+        # 檢查用戶是否有 Google OAuth 關聯
+        has_google_oauth = False
+        try:
+            from allauth.socialaccount.models import SocialAccount
+            has_google_oauth = SocialAccount.objects.filter(
+                user=request.user, 
+                provider='google'
+            ).exists()
+        except ImportError:
+            # 如果 allauth 沒有安裝或導入失敗，預設為 False
+            pass
+        
+        context['has_google_oauth'] = has_google_oauth
         # 獲取用戶的卡片資料，只顯示 is_active=True 的卡片
         user_cards = request.user.user_cards.select_related("card").filter(card__is_active=True)
         
