@@ -91,7 +91,7 @@ async function display_momo_rewards(rate, card, is_user_card) {
     const display = document.createElement("span");
     display.className = "display_rewards";
     display.innerHTML = `<img src="${chrome.runtime.getURL(
-      "images/Rewardia.png"
+      "images/Rewardia_128.png"
     )}"><p>刷 <span>${card}</span>，最高回饋${reward}元</p>`;
     checkout_price.insertAdjacentElement("afterend", display);
     if (is_user_card) {
@@ -143,25 +143,57 @@ if (current_url.includes("cart")) {
   }
 }
 
+// 填寫信用卡資訊相關
+function get_user_cards() {
+  chrome.runtime.sendMessage(
+    {
+      action: "get_user_cards",
+    },
+    async (response) => {
+      console.log(await response.data);
+    }
+  );
+  return;
+}
+
+function display_cards(cards) {
+  const card_selector = document.createElement("div");
+  card_selector.className = "card_selector";
+  card_selector.innerHTML = `<select id="card_select" name="card" required>
+              <option>選擇卡片</option>
+            </select>`;
+  card_select = document.querySelector("#card_select");
+  cards.forEach((card) => {
+    const card_selection = `<option value="${card.id}">${card.name}</option>`;
+
+    card_select.insertAdjacentHTML("beforeend", card_selection);
+  });
+}
+
+function fill_card_num(card_num) {
+  const card_num_1 = document.querySelector("#cardNo_1");
+  const card_num_2 = document.querySelector("#cardNo_2");
+  const card_num_3_hidden = document.querySelector("#cardNo_3");
+  const card_num_3 = document.querySelector("#cardNo_3_temp");
+  const card_num_4 = document.querySelector("#cardNo_4");
+
+  if (card_num_1) {
+    card_num_1.addEventListener("focus", function () {});
+
+    card_num_1.value = 4111;
+    card_num_2.value = 1111;
+    card_num_3_hidden.value = 1111;
+    card_num_3.value = "****";
+    card_num_4.value = 1111;
+  }
+}
+
 if (current_url.includes("cart.momoshop.com.tw")) {
   const observer = new MutationObserver((mutations) => {
-    const cardNo_1 = document.querySelector("#cardNo_1");
-    const cardNo_2 = document.querySelector("#cardNo_2");
-    const cardNo_3_hidden = document.querySelector("#cardNo_3");
-    const cardNo_3 = document.querySelector("#cardNo_3_temp");
-    const cardNo_4 = document.querySelector("#cardNo_4");
-    if (cardNo_1) {
-      cardNo_1.addEventListener("focus", function () {
-        cardNo_1.value = 4111;
-        cardNo_2.value = 1111;
-        cardNo_3_hidden.value = 1111;
-        cardNo_3.value = "****";
-        cardNo_4.value = 1111;
-      });
-      observer.disconnect();
-    }
+    get_user_cards();
+    fill_card_num();
+    observer.disconnect();
   });
-
   observer.observe(document.body, {
     childList: true,
     subtree: true,

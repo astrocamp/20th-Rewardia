@@ -18,6 +18,16 @@ async function get_rewards(merchant) {
   return data;
 }
 
+async function get_auth_token() {
+  const result = await chrome.storage.local.get(["authToken"]);
+  return result.authToken;
+}
+
+async function get_userID() {
+  const result = await chrome.storage.local.get(["userID"]);
+  return result.userID;
+}
+
 async function get_merchant_data() {
   let cur_url = await get_current_url();
   let merchant = Object.keys(merchantMap).find((key) => {
@@ -110,6 +120,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (message.action === "open_extension") {
     chrome.action.openPopup();
+  }
+
+  if (message.action === "get_user_cards") {
+    (async () => {
+      const token = await get_auth_token();
+      const userID = await get_userID();
+      const cards = await get_user_cards(token, userID);
+      sendResponse({ data: cards });
+    })();
+
+    return true;
   }
 });
 
