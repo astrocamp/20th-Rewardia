@@ -91,18 +91,18 @@ class UserCard(models.Model):
         return None
 
     def get_masked_card_number(self):
-        """取得遮罩後的卡號顯示（前6後4，中間6碼用*）"""
+        """取得遮罩後的卡號顯示（前8後4，中間用*）"""
         card_number = self.get_card_number()
         if card_number:
             # 移除所有非數字字元
             clean_number = ''.join(filter(str.isdigit, card_number))
             if len(clean_number) >= 16:  # 至少 16 位數（標準信用卡）
-                # 前6碼 + 中間6個* + 後4碼
-                return f"{clean_number[:6]}-******-{clean_number[-4:]}"
-            elif len(clean_number) >= 10:  # 至少 10 位數
-                # 前6碼 + 中間用* + 後4碼
-                middle_stars = '*' * (len(clean_number) - 10)
-                return f"{clean_number[:6]}-{middle_stars}-{clean_number[-4:]}"
+                # 前8碼 + 中間4個* + 後4碼
+                return f"{clean_number[:8]}-****-{clean_number[-4:]}"
+            elif len(clean_number) >= 12:  # 至少 12 位數
+                # 前8碼 + 中間用* + 後4碼
+                middle_stars = '*' * (len(clean_number) - 12)
+                return f"{clean_number[:8]}-{middle_stars}-{clean_number[-4:]}"
             else:
                 return "****-****-****-****"
         return "未設定"

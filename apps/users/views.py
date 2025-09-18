@@ -46,7 +46,24 @@ def prepare_card_form_context(
     user_card=None, is_edit_mode=False, include_selected_bank=False
 ):
     # 取得所有活躍的卡片
-    cards = CreditCard.objects.filter(is_active=True).only("id", "name", "bank")
+    cards = CreditCard.objects.filter(is_active=True).only("id", "name", "bank", "image")
+
+    # 處理卡片資料，包含圖片 URL
+    processed_cards = []
+    for card in cards:
+        # 處理圖片 URL
+        image_url = None
+        if card.image:
+            from apps.cards.storage import MediaStorage
+            storage = MediaStorage()
+            image_url = storage.url(card.image.name)
+        
+        processed_cards.append({
+            'id': card.id,
+            'name': card.name,
+            'bank': card.bank,
+            'image_url': image_url
+        })
 
     # 取得所有有卡片的銀行名稱 (去重複)
     bank_names = cards.values_list("bank", flat=True).distinct().order_by("bank")
@@ -55,7 +72,7 @@ def prepare_card_form_context(
 
     context = {
         "banks": banks,
-        "cards": cards,
+        "cards": processed_cards,  # 使用處理後的卡片資料
         "user_card": user_card,
         "is_edit_mode": is_edit_mode,
     }
