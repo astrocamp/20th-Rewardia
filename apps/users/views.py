@@ -214,6 +214,10 @@ def card_form(request, card_id=None):
         # 取得表單資料
         bank_name = request.POST.get("bank_name")
         card_id_from_form = request.POST.get("card_id")
+        card_number = request.POST.get("card_number", "").strip()
+        
+        # 調試信息（已移除）
+        # print(f"DEBUG: bank_name={bank_name}, card_id={card_id_from_form}, card_number='{card_number}'")
 
         # 檢查資料完整性
         if not bank_name or not card_id_from_form:
@@ -225,6 +229,31 @@ def card_form(request, card_id=None):
                 include_selected_bank=False,
             )
             return render(request, "users/card_form.html", context)
+
+        # 驗證卡號（如果提供了）- 卡號不是必填
+        clean_number = ""
+        if card_number and card_number.strip():
+            import re
+            # 先移除空格，再檢查是否包含非數字字符
+            card_number_no_spaces = card_number.replace(' ', '')
+            if re.search(r'[^\d]', card_number_no_spaces):
+                messages.error(request, "卡號格式異常：只能包含數字，不允許字母或特殊符號")
+                context = prepare_card_form_context(
+                    user_card=user_card,
+                    is_edit_mode=is_edit_mode,
+                    include_selected_bank=False,
+                )
+                return render(request, "users/card_form.html", context)
+            
+            clean_number = re.sub(r'\D', '', card_number)
+            if len(clean_number) < 12 or len(clean_number) > 19:
+                messages.error(request, "卡號長度必須在12-19位之間")
+                context = prepare_card_form_context(
+                    user_card=user_card,
+                    is_edit_mode=is_edit_mode,
+                    include_selected_bank=False,
+                )
+                return render(request, "users/card_form.html", context)
 
         try:
             selected_card = CreditCard.objects.get(id=card_id_from_form)
@@ -260,11 +289,22 @@ def card_form(request, card_id=None):
 
                 # 更新現有卡片
                 user_card.card = selected_card
+                
+                # 如果有提供卡號，則加密並儲存
+                if clean_number:
+                    user_card.set_card_number(clean_number)
+                
                 user_card.save()
                 messages.success(
                     request,
                     f"成功更新為 {selected_card.bank} {selected_card.name}！",
                 )
+                
+                # 保持在編輯頁面，不跳轉
+                context = prepare_card_form_context(
+                    user_card=user_card, is_edit_mode=True, include_selected_bank=True
+                )
+                return render(request, "users/card_form.html", context)
             else:
                 # 新增模式：檢查重複 + 創建新卡片
                 if UserCard.objects.filter(
@@ -279,15 +319,26 @@ def card_form(request, card_id=None):
                     )
                     return render(request, "users/card_form.html", context)
 
-                UserCard.objects.create(
+                # 創建新卡片
+                new_user_card = UserCard.objects.create(
                     user=request.user, card=selected_card, nickname="", is_primary=False
                 )
+                
+                # 如果有提供卡號，則加密並儲存
+                if clean_number:
+                    new_user_card.set_card_number(clean_number)
+                    new_user_card.save()
+                
                 messages.success(
                     request,
                     f"成功新增 {selected_card.bank} {selected_card.name}！",
                 )
 
-            return redirect("users:member_zone")
+            # 保持在新增頁面，不跳轉
+            context = prepare_card_form_context(
+                user_card=None, is_edit_mode=False, include_selected_bank=False
+            )
+            return render(request, "users/card_form.html", context)
 
         except CreditCard.DoesNotExist:
             messages.error(request, "選擇的卡片不存在")

@@ -271,7 +271,8 @@
 
           {% if processed_cards %}
             <!-- 有卡片資料 - 卡牌式佈局 -->
-            <div class="member-cards-grid">
+            <div class="member-cards-container">
+              <div class="member-cards-grid">
               {% for card_data in processed_cards %}
               <div class="member-card-item" x-data="member_zone()">
                 <!-- 卡片圖片 -->
@@ -439,6 +440,7 @@
                 </div>
               </div>
               {% endfor %}
+              </div>
             </div>
           {% else %}
             <!-- 沒有卡片資料 -->

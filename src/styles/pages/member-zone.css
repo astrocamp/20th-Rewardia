@@ -60,33 +60,54 @@
     @apply text-gray-700 opacity-70;
   }
 
-  /* ========== Member Cards Grid Layout (使用 main.css 的樣式) ========== */
+  /* ========== Member Cards Container (外層容器 - 整體置中) ========== */
+  .member-cards-container {
+    @apply max-w-[1200px] mx-auto mt-10;
+  }
+
+  /* ========== Member Cards Grid (內層容器 - 每行第一張對齊) ========== */
   .member-cards-grid {
-    @apply flex flex-wrap gap-2 lg:gap-3 mt-10;
-    /* 預設左對齊，只有在小螢幕時才置中 */
+    @apply flex flex-wrap gap-2 lg:gap-3;
+    /* 整體置中，但每行內容左對齊 */
+    @apply justify-center;
+  }
+
+  /* 使用 CSS Grid 實現每行第一張卡片的對齊 */
+  .member-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(288px, 288px));
+    justify-content: center;
+    gap: 8px 12px;
+  }
+
+  @media (min-width: 641px) {
+    .member-cards-grid {
+      gap: 8px 16px;
+    }
   }
 
   .member-card-item {
     @apply bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100;
     @apply hover:shadow-xl transition-shadow duration-200;
-    @apply w-72 flex-shrink-0; /* 固定寬度 288px */
     @apply transition-all duration-300; /* 平滑過渡效果 */
+    
+    /* 固定寬高 */
+    @apply h-[450px] w-72 flex-shrink-0; /* 固定高度 450px，固定寬度 288px */
   }
 
-  /* 當螢幕寬度不足以容納兩張卡片時，單張卡片放大並置中 */
-  @media (max-width: 640px) {
+  /* 當螢幕寬度小於650px時，卡牌不換行，水平滾動 */
+  @media (max-width: 650px) {
     .member-cards-grid {
-      @apply justify-center; /* 小螢幕時置中對齊 */
+      /* 切換回 flex 佈局以支援水平滾動 */
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: 8px;
+      justify-content: flex-start;
     }
     
     .member-card-item {
-      @apply w-80; /* 放大到 320px */
-    }
-  }
-
-  @media (min-width: 641px) and (max-width: 768px) {
-    .member-card-item {
-      @apply w-72; /* 平板模式維持 288px */
+      @apply flex-none; /* 不縮放 */
     }
   }
 
