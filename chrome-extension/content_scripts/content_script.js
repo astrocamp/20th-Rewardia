@@ -145,29 +145,35 @@ if (current_url.includes("cart")) {
 
 // 填寫信用卡資訊相關
 function get_user_cards() {
-  chrome.runtime.sendMessage(
-    {
-      action: "get_user_cards",
-    },
-    async (response) => {
-      console.log(await response.data);
-    }
-  );
-  return;
+  return new Promise((resolve) => {
+    chrome.runtime.sendMessage(
+      {
+        action: "get_user_cards",
+      },
+      (response) => {
+        resolve(response.data);
+      }
+    );
+  });
 }
 
 function display_cards(cards) {
-  const card_selector = document.createElement("div");
+  const credit_card_area = document.querySelector("#cardTbody");
+  const price = document.querySelector("#paySumB").textContent;
+  const card_selector = document.createElement("tr");
   card_selector.className = "card_selector";
-  card_selector.innerHTML = `<select id="card_select" name="card" required>
+  card_selector.innerHTML = `<th class="selector_head"><img src="${chrome.runtime.getURL(
+    "images/Rewardia_16.png"
+  )}">使用者</br>信用卡：</th><td><select id="card_select" name="card" required>
               <option>選擇卡片</option>
-            </select>`;
-  card_select = document.querySelector("#card_select");
-  cards.forEach((card) => {
-    const card_selection = `<option value="${card.id}">${card.name}</option>`;
+            </select><p class="reward_price">回饋金額：${price}</p></td>`;
+  const card_select = card_selector.querySelector("#card_select");
 
+  cards.forEach((card) => {
+    const card_selection = `<option value="${card.card.id}">${card.card.name}</option>`;
     card_select.insertAdjacentHTML("beforeend", card_selection);
   });
+  credit_card_area.insertAdjacentElement("beforeend", card_selector);
 }
 
 function fill_card_num(card_num) {
@@ -180,19 +186,25 @@ function fill_card_num(card_num) {
   if (card_num_1) {
     card_num_1.addEventListener("focus", function () {});
 
-    card_num_1.value = 4111;
-    card_num_2.value = 1111;
-    card_num_3_hidden.value = 1111;
-    card_num_3.value = "****";
-    card_num_4.value = 1111;
+    // card_num_1.value = 4111;
+    // card_num_2.value = 1111;
+    // card_num_3_hidden.value = 1111;
+    // card_num_3.value = "****";
+    // card_num_4.value = 1111;
   }
 }
 
 if (current_url.includes("cart.momoshop.com.tw")) {
-  const observer = new MutationObserver((mutations) => {
-    get_user_cards();
-    fill_card_num();
-    observer.disconnect();
+  const observer = new MutationObserver(async (mutations) => {
+    const card_num_1 = document.querySelector("#cardNo_1");
+    const cards = await get_user_cards();
+    if (card_num_1) {
+      card_num_1.addEventListener("focus", function () {
+        card_num_1.value = 4111;
+        display_cards(cards);
+      });
+    }
+    // fill_card_num();
   });
   observer.observe(document.body, {
     childList: true,

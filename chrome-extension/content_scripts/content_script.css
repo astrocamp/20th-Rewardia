@@ -120,4 +120,26 @@
   50% {
     transform: scale(1.1);
   }
+/* 自動填入信用卡號相關 */
+.card_selector td {
+  vertical-align: middle;
+  padding-left: 5px;
+}
+
+.card_selector th.selector_head {
+  vertical-align: middle;
+}
+
+.reward_price {
+  padding-top: 5px;
+  font-size: 12px;
+  height: 20px;
+}
+
+#card_select {
+  width: auto;
+  background-color: white;
+  height: 30px;
+  border: solid 2px #13b8ff;
+  vertical-align: middle;
 }

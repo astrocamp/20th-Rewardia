@@ -20,7 +20,11 @@ class RewardSerializer(serializers.HyperlinkedModelSerializer):
 
 class UserCardSerializer(serializers.ModelSerializer):
     card = CardSerializer(read_only=True)
+    partial_card_num = serializers.SerializerMethodField()
 
     class Meta:
         model = UserCard
         fields = ["user", "card"]
+
+    def get_partial_card_num():
+        pass
