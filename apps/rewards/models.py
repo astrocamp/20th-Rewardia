@@ -155,13 +155,13 @@ class PendingReward(models.Model):
                 category=self.nlp_category,
                 scope=self.nlp_scope,
                 defaults={
-                    'min_rate': self.min_rate,
-                    'max_rate': self.max_rate,
-                    'reward_type': self.reward_type,
-                    'is_active': True,
-                }
+                    "min_rate": self.min_rate,
+                    "max_rate": self.max_rate,
+                    "reward_type": self.reward_type,
+                    "is_active": True,
+                },
             )
-            
+
             # 成功處理後才更新狀態
             self.status = self.Status.APPROVED
             self.save()
