@@ -1,12 +1,56 @@
 {% extends 'layouts/default.html' %}
 {% block title %}會員專區 - Rewardia{%endblock %}
 {% block content %}
+
+<!-- Toast 容器 -->
+        <div 
+          id="member-zone-toasts" 
+          class="fixed top-4 right-4 z-[9999] space-y-2"
+  x-data="member_zone_toast()"
+  @show-toast.window="addToast($event.detail)"
+  @hide-toast.window="removeToast($event.detail.id)"
+>
+  <template x-for="toast in toasts" :key="toast.id">
+    <div 
+      :class="[
+        'tw-toast min-w-80 max-w-96',
+        toast.type === 'success' ? 'tw-success' : 
+        toast.type === 'error' ? 'tw-error' : 
+        toast.type === 'warning' ? 'tw-warn' : 'tw-info'
+      ]"
+      x-transition:enter="transition ease-out duration-200"
+      x-transition:enter-start="opacity-0 translate-x-4"
+      x-transition:enter-end="opacity-100 translate-x-0"
+      x-transition:leave="transition ease-in duration-150"
+      x-transition:leave-start="opacity-100 translate-x-0"
+      x-transition:leave-end="opacity-0 translate-x-4"
+    >
+      <div class="flex items-center gap-3 p-4">
+        <!-- 簡化的圖標 -->
+        <div 
+          class="w-5 h-5 rounded-full flex-shrink-0"
+          :class="toast.type === 'success' ? 'bg-green-500' : toast.type === 'error' ? 'bg-red-500' : 'bg-blue-500'"
+        ></div>
+        <span class="flex-1" x-text="toast.message"></span>
+        <button 
+          @click="removeToast(toast.id)" 
+          class="text-gray-400 hover:text-gray-600 transition-colors"
+          aria-label="關閉通知"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </template>
+</div>
 <section class="calculator-page calculator-spacing" 
-        x-data="password_change"
-        x-bind:class="{ 
-          'banner-hidden': !$store.banner.visible,
-          'banner-transitioning': $store.banner.isTransitioning
-        }">
+         x-data="password_change"
+         x-bind:class="{ 
+           'banner-hidden': !$store.banner.visible,
+           'banner-transitioning': $store.banner.isTransitioning
+         }">
   <!-- 修改密碼彈窗 -->
   <div x-show="showPasswordModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
     <!-- 背景遮罩 -->
@@ -245,24 +289,125 @@
                 
                 <!-- 卡片資訊 -->
                 <div class="member-card-info">
-                  <h4 class="member-card-name">{{ card_data.user_card.card.name }}</h4>
-                  <p class="member-card-bank">{{ card_data.user_card.card.bank }}</p>
-                  <p class="member-card-number">{{ card_data.masked_card_number }}</p>
-                  {% if card_data.reward_display %}
-                    <p class="member-card-reward">{{ card_data.reward_display }}</p>
-                  {% else %}
-                    <p class="member-card-reward text-gray-400">無回饋資訊</p>
-                  {% endif %}
+                  <!-- 第一行：銀行名稱 + 卡片名稱 -->
+                  <h4 class="member-card-title">
+                    <span class="member-card-bank">{{ card_data.user_card.card.bank }}</span>
+                    <span class="member-card-name">{{ card_data.user_card.card.name }}</span>
+                  </h4>
+                  
+                  <!-- 第二行：卡號 -->
+                  <p class="member-card-number">卡號 : {{ card_data.masked_card_number }}</p>
+                  
+                  <!-- 分隔線 -->
+                  <hr class="member-card-divider">
+                  
+                  <!-- 第三行開始：前三高回饋項目 -->
+                  <div class="member-card-rewards">
+                    {% if card_data.top_rewards_display %}
+                      {% for reward in card_data.top_rewards_display %}
+                        <p class="member-card-reward">{{ reward }}</p>
+                      {% endfor %}
+                    {% else %}
+                      <p class="member-card-reward text-gray-400">無回饋資訊</p>
+                    {% endif %}
+                  </div>
                 </div>
+                
+                <!-- 分隔線 -->
+                <hr class="member-card-divider">
                 
                 <!-- 操作按鈕 -->
                 <div class="member-card-actions">
-                  <button class="member-card-btn member-card-btn-edit" disabled>
-                    編輯
-                  </button>
+                  <!-- 新增卡號按鈕（僅在尚未登記卡號時顯示） -->
+                  {% if card_data.masked_card_number == "尚未登記卡號" %}
+                    <button @click="showAddCardNumberDialog()" class="member-card-btn member-card-btn-add">
+                      新增卡號
+                    </button>
+                  {% else %}
+                    <button class="member-card-btn member-card-btn-add hidden">
+                      新增卡號
+                    </button>
+                  {% endif %}
+                  
                   <button @click="showDeleteDialog()" class="member-card-btn member-card-btn-delete">
-                    刪除
+                    刪除卡片
                   </button>
+                </div>
+                
+                <!-- 新增卡號選擇對話框 -->
+                <div x-show="showAddCardDialog" 
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0"
+                     x-transition:enter-end="opacity-100"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0"
+                     class="member-add-card-confirm"
+                     @click.away="hideAddCardNumberDialog()">
+                  <div class="member-add-card-dialog">
+                    <h4 class="member-add-card-title">新增卡號</h4>
+                    <p class="member-add-card-message">請選擇新增卡號的方式：</p>
+                    <div class="member-add-card-actions">
+                      <button @click="showManualInputDialog()" 
+                              class="member-add-card-btn member-add-card-btn-manual">
+                        手動輸入
+                      </button>
+                      <button @click="startCameraCapture({{ card_data.user_card.id }})" 
+                              class="member-add-card-btn member-add-card-btn-camera">
+                        擷取卡號
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- 手動輸入卡號對話框 -->
+                <div x-show="showManualInput" 
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0"
+                     x-transition:enter-end="opacity-100"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0"
+                     class="member-manual-input-confirm"
+                     @click.away="hideManualInputDialog()">
+                  <div class="member-manual-input-dialog">
+                    <div class="member-manual-input-header">
+                      <h4 class="member-manual-input-title">請手動輸入信用卡卡號</h4>
+                      <button @click="hideManualInputDialog()" 
+                              class="member-manual-input-close">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                      </button>
+                    </div>
+                    <div class="member-manual-input-content">
+                      <div class="member-manual-input-field">
+                        <label class="member-manual-input-label">
+                          <span class="text-red-500">* </span>信用卡卡號：
+                        </label>
+                        <input type="text" 
+                               x-model="manualCardNumber"
+                               placeholder="請輸入16位卡號"
+                               maxlength="19"
+                               class="member-manual-input-text"
+                               @input="formatCardInput($event)">
+                        <p class="member-manual-input-hint">
+                          請輸入16位卡號
+                        </p>
+                      </div>
+                    </div>
+                    <div class="member-manual-input-actions">
+                      <button @click="hideManualInputDialog()" 
+                              class="member-manual-input-btn member-manual-input-btn-cancel">
+                        取消
+                      </button>
+                      <button @click="confirmManualInput({{ card_data.user_card.id }})" 
+                              class="member-manual-input-btn member-manual-input-btn-confirm"
+                              :disabled="!manualCardNumber || manualCardNumber.length < 16">
+                        確認使用
+                      </button>
+                    </div>
+                  </div>
                 </div>
                 
                 <!-- 刪除確認對話框 -->
@@ -313,6 +458,11 @@
         </div>
       </div>
     {% endif %}
+  </div>
+  
+  <!-- 攝影機模態框 -->
+  <div x-data="card_camera()" @open-camera.window="openCamera($event.detail)">
+    {% include 'components/card_camera_modal.html' %}
   </div>
 </section>
 {% endblock %}

@@ -6,6 +6,9 @@ export default (config = {}) => ({
   canvas: null,
   ctx: null,
   
+  // 當前操作的卡片 ID
+  currentCardId: null,
+  
   // API 呼叫狀態
   processing: false,
   cardNumber: '',
@@ -21,12 +24,6 @@ export default (config = {}) => ({
   showEdit: false,
   editNumber: '',
   
-  // Toast 訊息狀態
-  toast: {
-    show: false,
-    message: '',
-    type: 'info'
-  },
   
   // 初始化
   init() {
@@ -42,7 +39,12 @@ export default (config = {}) => ({
   },
   
   // 開啟攝影機
-  async openCamera() {
+  async openCamera(eventData) {
+    // 保存當前操作的卡片 ID
+    console.log('openCamera called with eventData:', eventData);
+    this.currentCardId = eventData?.cardId || null;
+    console.log('currentCardId set to:', this.currentCardId);
+    
     try {
       this.error = '';
       this.showModal = true;
@@ -297,25 +299,70 @@ export default (config = {}) => ({
       this.error = '';
     }
     
-    // 使用 Alpine.js 狀態管理 Toast
-    this.toast.show = true;
-    this.toast.message = message;
-    this.toast.type = type;
-    
-    // 自動隱藏 Toast
-    setTimeout(() => {
-      this.toast.show = false;
-    }, 3000);
+    // 使用全域 toast 系統
+    if (window.showToast) {
+      window.showToast(message, type);
+    }
   },
   
   // 確認編輯的卡號
-  confirmCardNumber() {
-    if (this.editNumber.length >= 12) {
-      this.cardNumber = this.editNumber;
-      this.recognizedCardNumber = this.editNumber; // 同步更新 recognizedCardNumber
-      this.showEdit = false;
-    } else {
-      alert('請輸入完整的卡號（至少12位數字）');
+  async confirmCardNumber() {
+    // 移除所有非數字字符
+    const cleanNumber = this.editNumber.replace(/\D/g, '');
+    
+    // 驗證卡號格式
+    const validation = this.validateCardNumber(cleanNumber);
+    if (!validation.isValid) {
+      if (window.showToast) {
+        window.showToast(validation.message, 'error');
+      }
+      return;
+    }
+    
+    console.log('confirmCardNumber - currentCardId:', this.currentCardId);
+    if (!this.currentCardId) {
+      console.log('No currentCardId found!');
+      if (window.showToast) {
+        window.showToast('錯誤：無法識別卡片 ID', 'error');
+      }
+      return;
+    }
+    
+    try {
+      // 調用 API 保存卡號
+      const response = await fetch(`/users/card/${this.currentCardId}/add-number/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': this.getCSRFToken(),
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          card_number: cleanNumber
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        if (window.showToast) {
+          window.showToast('卡號新增成功！', 'success');
+        }
+        this.showEdit = false;
+        this.closeCamera();
+        // 延遲重新載入頁面
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        if (window.showToast) {
+          window.showToast(data.message || '新增失敗', 'error');
+        }
+      }
+    } catch (error) {
+      console.error('Save card number error:', error);
+      if (window.showToast) {
+        window.showToast('新增失敗，請稍後再試', 'error');
+      }
     }
   },
   
@@ -388,7 +435,7 @@ export default (config = {}) => ({
     const cleaned = oldValue.replace(/\D/g, '');
     
     // 限制最多16位數字
-    const limited = cleaned.substring(0, 16);
+    const limited = cleaned.substring(0, 19);
     
     // 每4位加空格
     const formatted = limited.replace(/(.{4})/g, '$1 ').trim();
@@ -422,5 +469,29 @@ export default (config = {}) => ({
   // 獲取 CSRF Token
   getCSRFToken() {
     return this.csrfToken || '';
+  },
+  
+  // 驗證卡號格式
+  validateCardNumber(cardNumber) {
+    // 檢查長度：12-19 位數字
+    if (cardNumber.length < 12 || cardNumber.length > 19) {
+      return { 
+        isValid: false, 
+        message: '卡號長度必須在12-19位之間' 
+      };
+    }
+    
+    // 檢查格式：只允許數字
+    if (!/^\d+$/.test(cardNumber)) {
+      return { 
+        isValid: false, 
+        message: '卡號只能包含數字' 
+      };
+    }
+    
+    return { 
+      isValid: true, 
+      message: '卡號格式正確' 
+    };
   }
 });

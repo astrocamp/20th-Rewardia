@@ -83,39 +83,155 @@
   }
 
   .member-card-info {
-    @apply p-4 lg:p-5;
+    @apply p-3 lg:p-4; /* 減少 padding */
   }
 
-  .member-card-name {
-    @apply text-lg lg:text-xl font-bold text-gray-800 mb-2 leading-tight;
+  /* 卡片標題（銀行名稱 + 卡片名稱） */
+  .member-card-title {
+    @apply mb-2 leading-tight; /* 減少 margin */
   }
-
   .member-card-bank {
-    @apply text-sm lg:text-base text-gray-600 mb-2 font-semibold;
+    @apply text-lg md:text-lg lg:text-xl font-bold text-gray-800 mr-2; /* 手機/平板：18px，桌機：20px */
+  }
+  .member-card-name {
+    @apply text-lg md:text-lg lg:text-xl font-bold text-gray-800; /* 手機/平板：18px，桌機：20px */
   }
 
+  /* 卡號 */
   .member-card-number {
-    @apply text-base text-gray-500 mb-2 font-semibold;
+    @apply text-base text-gray-500 mb-2 font-semibold; /* 減少 margin */
   }
 
+  /* 分隔線 */
+  .member-card-divider {
+    @apply border-t border-gray-200 my-2; /* 減少 margin */
+  }
+
+  /* 回饋項目 */
+  .member-card-rewards {
+    @apply space-y-0.5; /* 減少間距 */
+  }
   .member-card-reward {
-    @apply text-base font-bold text-gray-700;
+    @apply text-base font-semibold text-gray-700; /* 16px，font-semibold */
+  }
+
+  /* 第二條分隔線與回饋資訊之間的間距 */
+  .member-card-rewards + .member-card-divider {
+    @apply mt-1; /* 回饋資訊與分隔線之間 */
+  }
+
+  /* 第二條分隔線與按鈕之間的間距 */
+  .member-card-divider + .member-card-actions {
+    @apply pt-1; /* 分隔線與按鈕之間 */
   }
 
   .member-card-actions {
-    @apply flex justify-between p-4 lg:p-5 pt-1 gap-3;
+    @apply flex justify-end p-3 lg:p-4 gap-3; /* 改為 justify-end，按鈕靠右對齊 */
   }
 
   .member-card-btn {
-    @apply flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200;
+    @apply px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200;
+    /* 移除 flex-1，改用固定寬度 */
+    min-width: 120px; /* 設定最小寬度 */
+    flex: 0 0 auto; /* 不自動伸縮 */
   }
 
-  .member-card-btn-edit {
-    @apply text-gray-600 bg-gray-100 border border-gray-300 hover:bg-gray-200 cursor-not-allowed opacity-50;
+  .member-card-btn-add {
+    @apply text-white bg-blue-600 border border-blue-600 hover:bg-blue-700;
   }
 
   .member-card-btn-delete {
     @apply text-white bg-red-600 border border-red-600 hover:bg-red-700;
+  }
+
+  /* ========== Add Card Number Dialog ========== */
+  .member-add-card-confirm {
+    @apply fixed inset-0 z-50 overflow-y-auto bg-black/50;
+  }
+
+  .member-add-card-dialog {
+    @apply relative bg-white rounded-lg shadow-xl max-w-md mx-auto mt-20 p-6;
+  }
+
+  .member-add-card-title {
+    @apply text-lg font-semibold text-gray-900 mb-2;
+  }
+
+  .member-add-card-message {
+    @apply text-gray-600 mb-4;
+  }
+
+  .member-add-card-actions {
+    @apply flex justify-between gap-4;
+  }
+
+  .member-add-card-btn {
+    @apply flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200;
+  }
+
+  .member-add-card-btn-manual {
+    @apply text-white bg-green-600 hover:bg-green-700 border border-green-600;
+  }
+
+  .member-add-card-btn-camera {
+    @apply text-white bg-blue-600 hover:bg-blue-700 border border-blue-600;
+  }
+
+  /* ========== Manual Input Dialog ========== */
+  .member-manual-input-confirm {
+    @apply fixed inset-0 z-[60] overflow-y-auto bg-black/50;
+  }
+
+  .member-manual-input-dialog {
+    @apply relative bg-white rounded-lg shadow-xl w-[500px] max-w-[90vw] mx-auto mt-20;
+  }
+
+  .member-manual-input-header {
+    @apply flex items-center justify-between p-6 border-b border-gray-200;
+  }
+
+  .member-manual-input-title {
+    @apply text-lg font-semibold text-gray-900 m-0;
+  }
+
+  .member-manual-input-close {
+    @apply text-gray-400 bg-none border-none cursor-pointer p-1 hover:text-gray-600;
+  }
+
+  .member-manual-input-content {
+    @apply p-6;
+  }
+
+  .member-manual-input-field {
+    @apply mb-4;
+  }
+
+  .member-manual-input-label {
+    @apply block text-sm font-medium text-gray-700 mb-2;
+  }
+
+  .member-manual-input-text {
+    @apply w-full p-3 border border-gray-300 rounded text-base font-mono focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+  }
+
+  .member-manual-input-hint {
+    @apply text-xs text-gray-500 mt-1 mb-0;
+  }
+
+  .member-manual-input-actions {
+    @apply flex justify-between gap-4 p-6 border-t border-gray-200;
+  }
+
+  .member-manual-input-btn {
+    @apply flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200;
+  }
+
+  .member-manual-input-btn-cancel {
+    @apply text-gray-600 bg-gray-100 border border-gray-300 hover:bg-gray-200;
+  }
+
+  .member-manual-input-btn-confirm {
+    @apply text-white bg-blue-600 border border-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:border-gray-400;
   }
 
   /* ========== Delete Confirmation Dialog ========== */
