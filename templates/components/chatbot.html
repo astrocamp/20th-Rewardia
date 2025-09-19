@@ -52,12 +52,13 @@
       <!-- 空狀態 -->
       <div x-show="messages.length === 0" class="chatbot-empty-state">
         {% if user.is_authenticated %}
-          <p class="text-lg font-medium">Hi, {{ user.first_name|default:user.username }}！</p>
+          <p class="text-lg font-medium">Hi, {{ user.first_name|default:user.username }}</p>
         {% else %}
           <p class="text-lg">你好</p>
         {% endif %}
         <p class="text-lg">歡迎來Rewardia</p>
         <p class="text-lg">我來帶你認識這世界</p>
+        <p class="text-lg">你也可以直接輸入"優惠試算"或"註冊"，我就會陪伴你過去喔</p>
       </div>
 
       <!-- 訊息列表 -->

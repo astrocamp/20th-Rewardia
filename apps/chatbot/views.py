@@ -6,7 +6,7 @@ from django.views.decorators.http import require_http_methods
 import json
 import logging
 import google.generativeai as genai
-from .services import ChatbotResponseBuilder
+from .intent_analyzer import ChatbotResponseBuilder
 
 # 設定日誌記錄器
 logger = logging.getLogger(__name__)
