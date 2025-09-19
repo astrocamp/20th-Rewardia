@@ -13,7 +13,7 @@ from apps.chatbot.config import (
     NAVIGATION_KEYWORDS, COMPARISON_KEYWORDS, PERSONAL_RECOMMENDATION_KEYWORDS, 
     CARD_COMPARISON_RECOMMENDATION_KEYWORDS, RESPONSE_MESSAGES, PAGE_MAPPING,
     INTENT_KEYWORDS, FORMAT_CONFIG, DATABASE_CONFIG, ERROR_DETECTION_CONFIG, 
-    DYNAMIC_RESPONSE_TEMPLATES
+    DYNAMIC_RESPONSE_TEMPLATES, CATEGORY_KEYWORDS
 )
 
 # 設定日誌記錄器
@@ -325,18 +325,40 @@ class ChatbotResponseBuilder:
         elif any(indicator in user_message for indicator in card_benefit_indicators):
             intent["is_card_benefit_question"] = True
             
-            # 從對話歷史中提取銀行資訊
-            if conversation_history:
-                for msg in conversation_history[-DATABASE_CONFIG['conversation_history_limit']:]:  # 檢查最近對話
-                    if msg.get('type') == 'ai':
-                        ai_content = msg.get('content', '')
-                        # 檢查AI回應中是否提到銀行
-                        for standard_name, config in BANK_MAPPING.items():
-                            for keyword in config['keywords']:
-                                if keyword in ai_content:
-                                    if standard_name not in intent["context_banks"]:
-                                        intent["context_banks"].append(standard_name)
-                                    break
+        # 從對話歷史中提取上下文資訊（銀行、類別、卡片等）
+        if conversation_history:
+            for msg in conversation_history[-DATABASE_CONFIG['conversation_history_limit']:]:  # 檢查最近對話
+                if msg.get('type') == 'ai':
+                    ai_content = msg.get('content', '')
+                    
+                    # 提取銀行資訊
+                    for standard_name, config in BANK_MAPPING.items():
+                        for keyword in config['keywords']:
+                            if keyword in ai_content:
+                                if standard_name not in intent["context_banks"]:
+                                    intent["context_banks"].append(standard_name)
+                                break
+                    
+                    # 提取類別資訊
+                    context_categories = ChatbotResponseBuilder._extract_categories_from_history(ai_content)
+                    for category in context_categories:
+                        if category not in intent.get("context_categories", []):
+                            if "context_categories" not in intent:
+                                intent["context_categories"] = []
+                            intent["context_categories"].append(category)
+
+    @staticmethod
+    def _extract_categories_from_history(ai_content):
+        """從對話歷史中提取類別資訊"""
+        categories = []
+        
+        for category, keywords in CATEGORY_KEYWORDS.items():
+            for keyword in keywords:
+                if keyword in ai_content:
+                    categories.append(category)
+                    break
+        
+        return categories
 
     @staticmethod
     def _analyze_bank_intent(intent, user_message):
@@ -481,6 +503,10 @@ class ChatbotResponseBuilder:
             intent["is_highest_query"] = has_highest
             intent["is_bank_limited"] = has_bank_limited
             
+            # 如果沒有明確的類別，嘗試從上下文獲取
+            if not intent.get("categories") and intent.get("context_categories"):
+                intent["categories"] = intent["context_categories"]
+            
             # 分析比較類型
             if any(sep in user_message for sep in INTENT_KEYWORDS['comparison_separators']):
                 # 特定卡片比較：A卡與B卡
@@ -536,6 +562,21 @@ class ChatbotResponseBuilder:
         banks = intent.get("banks", [])
         is_highest = intent.get("is_highest_query", False)
         is_bank_limited = intent.get("is_bank_limited", False)
+        
+        # 如果沒有明確的類別，嘗試從上下文獲取
+        if not categories and intent.get("context_categories"):
+            categories = intent["context_categories"]
+        
+        # 如果還是沒有類別，但有用戶卡片，提供用戶卡片的比較
+        if not categories and user_id:
+            user_cards = ChatbotDataService.get_user_cards(user_id)
+            if user_cards:
+                # 從用戶卡片中提取可能的類別
+                context_categories = intent.get("context_categories", [])
+                if context_categories:
+                    categories = context_categories
+                else:
+                    return RESPONSE_MESSAGES['comparison']['no_category_specified']
         
         if not categories:
             return RESPONSE_MESSAGES['comparison']['no_category_specified']
@@ -1082,7 +1123,13 @@ class ChatbotResponseBuilder:
             context += RESPONSE_MESSAGES['context']['analysis_3']
             context += RESPONSE_MESSAGES['context']['analysis_4']
             context += RESPONSE_MESSAGES['context']['analysis_5']
+            context += RESPONSE_MESSAGES['context']['analysis_6']
+            context += RESPONSE_MESSAGES['context']['analysis_7']
             context += RESPONSE_MESSAGES['context']['analysis_conclusion']
+            context += RESPONSE_MESSAGES['context']['context_examples']
+            context += RESPONSE_MESSAGES['context']['example_1']
+            context += RESPONSE_MESSAGES['context']['example_2']
+            context += RESPONSE_MESSAGES['context']['example_3']
         
         return context
 
