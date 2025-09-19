@@ -1,5 +1,5 @@
 // Related HTML: templates/pages/main.html
-export default () => ({
+export default (params = {}) => ({
   selectedBank: '',
   selectedReward: '',
   selectedMerchant: '',
@@ -15,6 +15,8 @@ export default () => ({
   banks: [],
   merchants: [],
   viewMode: 'grid', // 'grid' for card view (畫面b), 'list' for search results (畫面a)
+  userCardIds: params.userCardIds || [], // 用戶的卡片 ID 列表
+  isAuthenticated: params.isAuthenticated || false, // 是否已登入
   
   // 使用 API 獲取資料進行初始化
   async init() {
@@ -481,5 +483,10 @@ export default () => ({
         window.RewardiaLogger.error("Error restoring all merchants:", error);
       }
     }
+  },
+
+  // 檢查卡片是否為用戶的卡片
+  isUserCard(cardId) {
+    return this.isAuthenticated && this.userCardIds.includes(cardId);
   }
 });

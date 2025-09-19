@@ -44,7 +44,14 @@
 </section>
 
 <!-- 卡片總覽區塊 -->
-<section class="mx-4 sm:mx-6 lg:mx-10 my-8 sm:my-12 lg:my-16" x-data="main_search" x-cloak>
+<section class="mx-4 sm:mx-6 lg:mx-10 my-8 sm:my-12 lg:my-16" x-data="main_search({
+  userCardIds: [
+    {% for card_id in user_card_ids %}
+    {{ card_id }}{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ],
+  isAuthenticated: {{ is_authenticated|yesno:"true,false" }}
+})" x-cloak>
   <!-- 卡片總覽標題 -->
   <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-8 sm:mb-12 text-left font-sans leading-tight">
     卡片總覽
@@ -102,7 +109,13 @@
           </div>
           <!-- 卡片資訊 -->
           <div class="card-info-container">
-            <h3 x-text="card.name" class="card-title"></h3>
+            <div class="card-title-container">
+              <h3 x-text="card.name" class="card-title"></h3>
+              <!-- 你的卡片標籤 -->
+              <template x-if="isUserCard(card.id)">
+                <span class="user-card-label">你的卡片</span>
+              </template>
+            </div>
             <p x-text="card.bank" class="card-bank"></p>
             <!-- 主要優惠 -->
             <template x-if="card.rewards && card.rewards.length > 0">
@@ -140,7 +153,13 @@
         <div class="list-card-left">
           <!-- 上方：卡片名稱和銀行 -->
           <div class="list-card-header">
-            <h3 x-text="card.name" class="list-card-title"></h3>
+            <div class="list-card-title-container">
+              <h3 x-text="card.name" class="list-card-title"></h3>
+              <!-- 你的卡片標籤 -->
+              <template x-if="isUserCard(card.id)">
+                <span class="list-user-card-label">你的卡片</span>
+              </template>
+            </div>
             <p x-text="card.bank" class="list-card-bank"></p>
           </div>
           <!-- 下方：信用卡圖片 -->
