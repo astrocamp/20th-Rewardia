@@ -52,10 +52,32 @@ def get_rewards(request):
 
 
 @api_view(["GET"])
-def get_category_rewards(request, category):
+def get_category_rate(request, bank_name, card_id, category_name):
     reward_category = (
         RewardCategory.objects.select_related("card")
-        .filter(category=category, is_active=True)
+        .filter(
+            card__bank=bank_name,
+            card__id=card_id,
+            category=category_name,
+            is_active=True,
+        )
+        .order_by("-max_rate")
+    )
+    serializer = RewardSerializer(reward_category, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def get_merchant_rate(request, bank_name, card_id, category_name, scope_name):
+    reward_category = (
+        RewardCategory.objects.select_related("card")
+        .filter(
+            card__bank=bank_name,
+            card__id=card_id,
+            category=category_name,
+            scope=scope_name,
+            is_active=True,
+        )
         .order_by("-max_rate")
     )
     serializer = RewardSerializer(reward_category, many=True)
@@ -89,7 +111,7 @@ def get_cards(request, bank):
 
 
 @api_view(["GET"])
-@authentication_classes([TokenAuthentication])
+# @authentication_classes([TokenAuthentication])
 def get_user_cards(request, id):
     if request.user.id != id:
         return Response(status=403)
