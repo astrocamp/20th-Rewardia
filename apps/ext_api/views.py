@@ -1,6 +1,5 @@
 # Create your views here.
 from rest_framework.response import Response
-from django.contrib.auth.models import User
 from apps.ext_api.serializers import (
     RewardSerializer,
     UserCardSerializer,
@@ -12,27 +11,23 @@ from apps.users.models import UserCard
 from rest_framework.decorators import (
     api_view,
     authentication_classes,
-    permission_classes,
 )
 from django.db.models.functions import Coalesce
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from rest_framework import status
 import json
 import os
+import cv2
+import numpy as np
+import base64
+import logging
+import re
+import requests
 
 os.environ["OPENCV_IO_ENABLE_OPENEXR"] = "1"
 # 設定無頭模式
 os.environ["QT_QPA_PLATFORM"] = "offscreen"
-import cv2
-import numpy as np
-from PIL import Image
-import io
-import base64
-import logging
-from google.cloud import vision
-import re
 
 # 設定日誌記錄器
 logger = logging.getLogger(__name__)
@@ -321,8 +316,6 @@ def perform_ocr(image):
         image_base64 = base64.b64encode(image_bytes).decode("utf-8")
 
         # 使用 REST API 呼叫 Google Cloud Vision
-        import requests
-
         url = f"https://vision.googleapis.com/v1/images:annotate?key={settings.GOOGLE_CLOUD_VISION_API_KEY}"
 
         payload = {

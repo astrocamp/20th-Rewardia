@@ -1,7 +1,6 @@
 import logging
 from django.contrib import messages
 from django.contrib.auth import login, logout
-from django.core.exceptions import ValidationError
 
 # 獲取 logger 實例
 logger = logging.getLogger(__name__)

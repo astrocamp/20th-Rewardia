@@ -19,6 +19,7 @@
 <!-- 主要登入表單 -->
 <form class="space-y-3" 
       x-data="login_form" 
+      x-cloak
       novalidate
       method="post"
       action="{% url 'sessions:login' %}"
