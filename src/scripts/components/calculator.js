@@ -44,9 +44,11 @@ function autoCalculate() {
         scopeSelect && scopeSelect.value &&
         amountInput && amountInput.value &&
         form && form.checkValidity()) {
-
-        console.log('Auto calculate triggered');
-
+        
+        if (window.RewardiaLogger) {
+          window.RewardiaLogger.info('Auto calculate triggered');
+        }
+        
         // 獲取 CSRF token
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
@@ -70,7 +72,9 @@ function autoCalculate() {
             }
         })
         .catch(error => {
-            console.error('計算錯誤:', error);
+            if (window.RewardiaLogger) {
+              window.RewardiaLogger.error('計算錯誤:', error);
+            }
         });
     }
 }

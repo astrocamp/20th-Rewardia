@@ -33,7 +33,9 @@ export default () => ({
       
       this.initializeView();
     } catch (error) {
-      console.error("Error fetching initial data:", error);
+      if (window.RewardiaLogger) {
+        window.RewardiaLogger.error("Error fetching initial data:", error);
+      }
     }
   },
   
@@ -455,7 +457,9 @@ export default () => ({
       // 更新店家選項
       this.merchants = data.merchants || [];
     } catch (error) {
-      console.error("Error loading merchants by category:", error);
+      if (window.RewardiaLogger) {
+        window.RewardiaLogger.error("Error loading merchants by category:", error);
+      }
       // 發生錯誤時恢復所有店家選項
       this.restoreAllMerchants();
     }
@@ -473,7 +477,9 @@ export default () => ({
       // 恢復所有店家選項
       this.merchants = data.merchants || [];
     } catch (error) {
-      console.error("Error restoring all merchants:", error);
+      if (window.RewardiaLogger) {
+        window.RewardiaLogger.error("Error restoring all merchants:", error);
+      }
     }
   }
 });

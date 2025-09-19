@@ -56,7 +56,9 @@ document.addEventListener('alpine:init', () => {
             try {
                 this.banner.height = this.$refs.topBanner?.offsetHeight || 0;
             } catch (error) {
-                console.warn('Header initialization error:', error);
+                if (window.RewardiaLogger) {
+                  window.RewardiaLogger.warn('Header initialization error:', error);
+                }
             }
         },
 

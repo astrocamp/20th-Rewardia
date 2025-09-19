@@ -31,7 +31,9 @@ function sanitizeText(text) {
       .replace(/\n\s*\n\s*\n/g, '\n\n')// 清理多餘的換行
       .trim();                         // 移除首尾空白
   } catch (error) {
-    console.warn('文字清理失敗:', error);
+    if (window.RewardiaLogger) {
+      window.RewardiaLogger.warn('文字清理失敗:', error);
+    }
     return text || '';
   }
 }
@@ -72,14 +74,18 @@ function loadFromSession() {
         chatbotMemory.isOpen = data.isOpen;
         chatbotMemory.windowState = data.windowState || createDefaultWindowState();
       } else {
-        console.warn('聊天記錄資料格式不正確，重置為預設值');
+        if (window.RewardiaLogger) {
+          window.RewardiaLogger.warn('聊天記錄資料格式不正確，重置為預設值');
+        }
         chatbotMemory.messages = [];
         chatbotMemory.isOpen = false;
         chatbotMemory.windowState = createDefaultWindowState();
       }
     }
   } catch (e) {
-    console.warn('無法載入聊天記錄:', e);
+    if (window.RewardiaLogger) {
+      window.RewardiaLogger.warn('無法載入聊天記錄:', e);
+    }
     chatbotMemory.messages = [];
     chatbotMemory.isOpen = false;
     chatbotMemory.windowState = createDefaultWindowState();
@@ -100,7 +106,9 @@ function saveToSession() {
       };
       sessionStorage.setItem(CONSTANTS.STORAGE_KEY, JSON.stringify(dataToSave));
     } catch (e) {
-      console.warn('無法儲存聊天記錄:', e);
+      if (window.RewardiaLogger) {
+        window.RewardiaLogger.warn('無法儲存聊天記錄:', e);
+      }
     }
   }, CONSTANTS.SAVE_THROTTLE_DELAY);
 }
@@ -226,7 +234,9 @@ export default function chatbot() {
         });
 
       } catch (error) {
-        console.error('Chatbot API error:', error);
+        if (window.RewardiaLogger) {
+          window.RewardiaLogger.error('Chatbot API error:', error);
+        }
         this.errorMessage = error.message || '無法連接到 AI 服務，請稍後再試';
         this.messages.push({
           type: 'ai',
@@ -348,7 +358,9 @@ export default function chatbot() {
           this.performLogout();
           break;
         default:
-          console.warn('未知的導航目標:', target);
+          if (window.RewardiaLogger) {
+            window.RewardiaLogger.warn('未知的導航目標:', target);
+          }
       }
     },
 
