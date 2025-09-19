@@ -16,7 +16,7 @@ from rest_framework.decorators import (
 )
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.backends import ModelBackend
-from django.db.models import Max, Case, When, Value, DecimalField
+from django.db.models import Case, When, Value, DecimalField
 from collections import defaultdict
 import json
 import logging
@@ -25,6 +25,14 @@ from apps.cards.models import CreditCard
 from apps.cards.storage import MediaStorage
 from apps.rewards.models import RewardCategory
 from .models import UserCard
+
+
+def get_card_image_url(card):
+    """取得卡片圖片 URL 的共用函數"""
+    if card.image:
+        storage = MediaStorage()
+        return storage.url(card.image.name)
+    return None
 
 
 def register(request):
@@ -56,10 +64,7 @@ def prepare_card_form_context(
     processed_cards = []
     for card in cards:
         # 處理圖片 URL
-        image_url = None
-        if card.image:
-            storage = MediaStorage()
-            image_url = storage.url(card.image.name)
+        image_url = get_card_image_url(card)
         
         processed_cards.append({
             'id': card.id,
@@ -132,10 +137,7 @@ def member_zone(request):
         processed_cards = []
         for user_card in user_cards:
             # 處理圖片 URL
-            image_url = None
-            if user_card.card.image:
-                storage = MediaStorage()
-                image_url = storage.url(user_card.card.image.name)
+            image_url = get_card_image_url(user_card.card)
             
             # 處理卡號
             masked_card_number = user_card.get_masked_card_number() if user_card.card_number_encrypted else "尚未登記卡號"
@@ -181,32 +183,6 @@ def member_zone(request):
     return render(request, "users/member_zone.html", context)
 
 
-# API 端點：根據銀行名稱返回該銀行的所有信用卡（JSON 格式）
-def get_cards_by_bank(request, bank_name):
-    try:
-        # 取得該銀行的所有啟用信用卡
-        cards = (
-            CreditCard.objects.filter(bank=bank_name)
-            .only("id", "name")
-            .order_by("name")
-        )
-
-        # 轉換為 JSON 格式
-        cards_data = [{"id": card.id, "name": card.name} for card in cards]
-
-        return JsonResponse(
-            {
-                "success": True,
-                "bank_name": bank_name,
-                "cards": cards_data,
-                "message": f"載入 {bank_name} 的 {len(cards_data)} 張信用卡",
-            }
-        )
-
-    except Exception as e:
-        return JsonResponse(
-            {"success": False, "cards": [], "message": "找不到指定的銀行"}, status=404
-        )
 
 
 @login_required

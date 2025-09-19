@@ -19,8 +19,6 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from rest_framework import status
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
 import json
 import os
 
@@ -34,7 +32,6 @@ import io
 import base64
 import logging
 from google.cloud import vision
-import os
 import re
 
 # 設定日誌記錄器

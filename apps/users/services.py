@@ -1,8 +1,6 @@
 import logging
 from django.contrib import messages
 from django.contrib.auth.models import User
-from apps.cards.models import CreditCard
-from apps.users.models import UserCard
 
 logger = logging.getLogger(__name__)
 
