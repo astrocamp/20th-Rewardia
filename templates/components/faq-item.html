@@ -2,7 +2,7 @@
 <div class="faq-qa-item">
   <!-- 問題部分 -->
   <div class="faq-question cursor-pointer" @click="toggleItem('{{ item_id }}')">
-    <span class="faq-question-text">{{ question_text }}</span>
+    <div class="faq-question-text">{{ question_text }}</div>
     <button class="faq-toggle-btn">
       <svg class="faq-arrow-icon" :class="{ 'rotate-180': isOpen('{{ item_id }}') }" viewBox="0 0 24 24" fill="none" stroke="currentColor">
         <path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>

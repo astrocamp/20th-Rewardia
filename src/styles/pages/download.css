@@ -4,7 +4,7 @@
   /* ========== Download Page Buttons ========== */
   .download-btn-primary {
     @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-blue-600 hover:bg-blue-700;
-    @apply w-full min-h-12 shadow-sm max-w-64 inline-flex items-center justify-center no-underline;
+    @apply w-auto min-h-12 shadow-sm max-w-64 inline-flex items-center justify-center no-underline;
   }
 
   .download-btn-primary:hover {
@@ -69,16 +69,17 @@
     .download-btn-secondary,
     .download-btn-chrome,
     .download-btn-app {
-      @apply max-w-none min-h-11 text-sm p-3;
+      @apply min-h-11 text-sm p-3;
     }
 
     .download-btn-banner {
-      @apply max-w-none min-w-0;
+      @apply max-w-64 min-w-0;
     }
 
     .download-banner-content {
       @apply max-w-full pr-0;
     }
+
 
     .download-section-simple {
       @apply p-4;
