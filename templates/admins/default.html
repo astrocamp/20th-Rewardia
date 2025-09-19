@@ -13,8 +13,8 @@
       referrerpolicy="no-referrer"
     />
     {%load static%}
-    <link rel="stylesheet" href="{% static 'styles/style.css' %}" />
-    <script type="module" src="{% static 'scripts/app.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'styles/style.css' %}?v={{ STATIC_VERSION }}" />
+    <script type="module" src="{% static 'scripts/app.js' %}?v={{ STATIC_VERSION }}"></script>
   </head>
   <body x-data="header()" @scroll.window="handleScroll()" @resize.window="closeMobileMenu()">
     {% include 'admins/admin_header.html' %}

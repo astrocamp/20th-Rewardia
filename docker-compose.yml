@@ -49,6 +49,7 @@ services:
       - AWS_S3_REGION_NAME=${AWS_S3_REGION_NAME}
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - GOOGLE_CLOUD_VISION_API_KEY=${GOOGLE_CLOUD_VISION_API_KEY}
+      - FERNET_KEY=${FERNET_KEY}
 
     volumes:
       - ./public:/app/public

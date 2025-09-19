@@ -7,12 +7,12 @@
   <div class="mx-auto max-w-[1360px] px-5 md:px-8">
     <!-- 區塊標題：新增卡片 -->
     {% if is_edit_mode %}
-        <h2 class="text-[36px] leading-[0.98] font-bold text-black mb-6" style="margin-top: 5px;">編輯卡片</h2>
+      <h2 class="text-[36px] leading-[0.98] font-bold text-black mb-6" style="margin-top: 5px;">編輯卡片</h2>
     {% else %}
-        <h2 class="text-[36px] leading-[0.98] font-bold text-black mb-6" style="margin-top: 5px;">新增卡片</h2>
+      <h2 class="text-[36px] leading-[0.98] font-bold text-black mb-6" style="margin-top: 5px;">新增卡片</h2>
     {% endif %}
 
-    <!-- 啟動 Alpine.js 並傳入卡片資料 -->
+    <!-- 使用 HTMX 處理表單 -->
     <div class="bg-white rounded-lg overflow-hidden"
          x-data="{
            ...card_form({
@@ -48,7 +48,7 @@
 
         <!-- 兩欄布局 -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-8">
-          
+
           <!-- 左側：表單區域 -->
           <div class="space-y-6 lg:order-1 order-2">
             {% if user_card %}
@@ -120,14 +120,14 @@
                        maxlength="19"
                        x-model="manualCardNumber"
                        @input="formatCardInput($event)">
-                
+
               </div>
 
               <!-- 隱藏的卡號輸入欄位 -->
               <input type="hidden" id="card-number-input" name="card_number" x-model="recognizedCardNumber">
 
             </form>
-            
+
             <!-- 按鈕排列：擷取卡號靠左，取消與新增卡片靠右 -->
             <div class="flex justify-between items-start">
               <!-- 左側：擷取卡號按鈕和說明文字 -->
@@ -143,14 +143,14 @@
                 </button>
                 <p class="text-sm text-gray-600 mt-1">使用攝影機自動識別信用卡卡號</p>
               </div>
-              
+
               <!-- 取消與新增卡片按鈕 - 靠右 -->
               <div class="flex gap-4">
-                <a href="{% url 'users:member_zone' %}" 
+                <a href="{% url 'users:member_zone' %}"
                    class="inline-flex items-center justify-center rounded-lg w-[132px] h-[52px] px-6 font-medium transition-colors duration-200 select-none bg-[#E5E7EB] text-gray-900 hover:bg-gray-300 active:bg-gray-400">
                   取消
                 </a>
-                
+
                 {% if user_card %}
                   <button type="button"
                           @click="submitForm($event)"
@@ -176,25 +176,25 @@
             <div class="flex-1 bg-white rounded-lg p-4 shadow-sm flex flex-col">
               <!-- 卡片圖片 -->
               <div class="flex-1 flex items-center justify-center">
-                <img id="card-preview-img" 
-                     src="" 
-                     alt="卡片預覽" 
+                <img id="card-preview-img"
+                     src=""
+                     alt="卡片預覽"
                      class="w-full max-w-sm mx-auto rounded-lg shadow-md object-contain"
                      x-show="selectedCard && cardPreview.imageUrl"
                      x-bind:src="cardPreview.imageUrl">
-                <div x-show="!selectedCard || !cardPreview.imageUrl" 
+                <div x-show="!selectedCard || !cardPreview.imageUrl"
                      class="w-full max-w-sm mx-auto h-32 bg-gray-200 rounded-lg flex items-center justify-center">
                   <span class="text-gray-500">請選擇卡片</span>
                 </div>
               </div>
-              
+
               <!-- 卡片資訊 - 水平排列在最下方左側 -->
               <div class="flex items-center gap-3 mt-4">
-                <h5 id="card-preview-name" 
+                <h5 id="card-preview-name"
                     class="text-lg md:text-lg lg:text-xl font-bold text-gray-900"
                     x-text="cardPreview.name || '請選擇卡片'"></h5>
                 <span class="text-gray-400">|</span>
-                <p id="card-preview-bank" 
+                <p id="card-preview-bank"
                    class="text-base font-semibold text-gray-600"
                    x-text="cardPreview.bank || '-'"></p>
               </div>
@@ -206,8 +206,6 @@
         {% include 'components/card_camera_modal.html' %}
       </div>
     </div>
-    
-    
   </div>
 </section>
 

@@ -185,6 +185,35 @@ def member_zone(request):
 
 
 
+def get_cards_by_bank_htmx(request):
+    bank_name = request.GET.get('bank_name', '')
+
+    if not bank_name:
+        return render(request, 'users/partials/card_options.html', {
+            'cards': [],
+            'message': '請選擇發卡銀行'
+        })
+
+    try:
+        # 取得該銀行的所有啟用信用卡
+        cards = (
+            CreditCard.objects.filter(bank=bank_name, is_active=True)
+            .only("id", "name")
+            .order_by("name")
+        )
+
+        return render(request, 'users/partials/card_options.html', {
+            'cards': cards,
+            'bank_name': bank_name
+        })
+
+    except Exception as e:
+        return render(request, 'users/partials/card_options.html', {
+            'cards': [],
+            'message': '載入卡片時發生錯誤'
+        })
+
+
 @login_required
 def card_form(request, card_id=None):
     # 判斷是新增還是編輯模式
