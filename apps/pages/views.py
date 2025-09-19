@@ -25,7 +25,20 @@ def tos(request):
 
 
 def main(request):
-    return render(request, "pages/main.html")
+    # 獲取用戶的卡片 ID 列表（如果已登入）
+    user_card_ids = []
+    if request.user.is_authenticated:
+        from apps.users.models import UserCard
+        user_card_ids = list(
+            UserCard.objects.filter(user=request.user, is_active=True)
+            .values_list('card_id', flat=True)
+        )
+    
+    context = {
+        'user_card_ids': user_card_ids,
+        'is_authenticated': request.user.is_authenticated
+    }
+    return render(request, "pages/main.html", context)
 
 
 def faq(request):

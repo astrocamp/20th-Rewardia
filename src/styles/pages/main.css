@@ -124,9 +124,17 @@
   .list-card-header {
     @apply mb-3;
   }
+
+  .list-card-title-container {
+    @apply flex items-center gap-3 mb-1;
+  }
   
   .list-card-title {
-    @apply text-2xl font-semibold text-gray-700 mb-1 leading-snug;
+    @apply text-2xl font-semibold text-gray-700 leading-snug;
+  }
+
+  .list-user-card-label {
+    @apply text-lg font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md;
   }
   
   .list-card-bank {
@@ -194,16 +202,24 @@
     @apply p-4 lg:p-6;
   }
   
+  .card-title-container {
+    @apply flex items-center justify-between mb-2;
+  }
+
   .card-title {
-    @apply text-lg lg:text-xl font-bold text-gray-800 mb-2 leading-tight;
+    @apply text-lg lg:text-xl font-bold text-gray-800 leading-tight;
+  }
+
+  .user-card-label {
+    @apply text-sm lg:text-base font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md;
   }
   
   .card-bank {
-    @apply text-sm lg:text-base text-gray-600 mb-3;
+    @apply text-sm lg:text-base text-gray-600;
   }
   
   .card-main-reward {
-    @apply mt-3 pt-3 border-t border-gray-100;
+    @apply mt-auto pt-3 border-t border-gray-100;
   }
   
   .reward-highlight-item {
