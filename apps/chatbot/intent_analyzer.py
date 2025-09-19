@@ -1,11 +1,12 @@
 # Chatbot 意圖分析服務
 from apps.chatbot.config import (
-    BANK_MAPPING, COMMON_KEYWORDS, PERSONAL_QUERY_KEYWORDS, REWARD_TYPE_KEYWORDS, 
-    NAVIGATION_KEYWORDS, COMPARISON_KEYWORDS, PERSONAL_RECOMMENDATION_KEYWORDS, 
-    CARD_COMPARISON_RECOMMENDATION_KEYWORDS, RESPONSE_MESSAGES, PAGE_MAPPING,
-    INTENT_KEYWORDS, FORMAT_CONFIG, DATABASE_CONFIG, CATEGORY_KEYWORDS
+    BANK_MAPPING, COMMON_KEYWORDS, NAVIGATION_KEYWORDS, COMPARISON_KEYWORDS, 
+    PERSONAL_RECOMMENDATION_KEYWORDS, CARD_COMPARISON_RECOMMENDATION_KEYWORDS, 
+    RESPONSE_MESSAGES, PAGE_MAPPING, INTENT_KEYWORDS, FORMAT_CONFIG, 
+    DATABASE_CONFIG, CATEGORY_KEYWORDS
 )
 from .data_service import ChatbotDataService
+from .knowledge_base import SYSTEM_PROMPT
 
 
 class ChatbotResponseBuilder:
@@ -401,3 +402,291 @@ class ChatbotResponseBuilder:
                     if keyword in user_message:
                         intent["comparison_category"] = keyword
                         break
+
+    @staticmethod
+    def build_context_prompt(intent, user_id=None):
+        """根據分析後的意圖建構上下文提示詞"""
+        
+        context = SYSTEM_PROMPT
+        
+        # 添加用戶資訊
+        if user_id:
+            user_cards = ChatbotDataService.get_user_cards(user_id)
+            if user_cards:
+                context += RESPONSE_MESSAGES['user_info']['header']
+                for card in user_cards:
+                    context += f"- {card['card__bank']} {card['card__name']}"
+                    if card['nickname']:
+                        context += f"{RESPONSE_MESSAGES['user_info']['nickname_prefix']}{card['nickname']}{RESPONSE_MESSAGES['user_info']['nickname_suffix']}"
+                    if card['is_primary']:
+                        context += RESPONSE_MESSAGES['user_info']['primary_marker']
+                    context += "\n"
+        
+        # 添加通用資料庫資訊 (可考慮快取)
+        context += RESPONSE_MESSAGES['database_info']['header']
+        context += RESPONSE_MESSAGES['database_info']['description']
+        
+        banks = ChatbotDataService.get_supported_banks()
+        context += RESPONSE_MESSAGES['database_info']['supported_banks']
+        for bank in banks[:DATABASE_CONFIG['max_banks_display']]: context += f"- {bank}\n"
+        if len(banks) > DATABASE_CONFIG['max_banks_display']: 
+            context += RESPONSE_MESSAGES['database_info']['more_banks'].format(count=len(banks))
+        
+        categories = ChatbotDataService.get_reward_categories()
+        context += RESPONSE_MESSAGES['database_info']['categories']
+        for category in categories[:DATABASE_CONFIG['max_categories_display']]: context += f"- {category}\n"
+        if len(categories) > DATABASE_CONFIG['max_categories_display']: 
+            context += RESPONSE_MESSAGES['database_info']['more_categories'].format(count=len(categories))
+        
+        total_cards = len(ChatbotDataService.get_all_active_cards())
+        context += RESPONSE_MESSAGES['database_info']['total_cards'].format(count=total_cards)
+        
+        # 處理特定卡片優惠問題
+        if intent.get("is_card_benefit_question", False):
+            context += RESPONSE_MESSAGES['card_benefit']['header']
+            context += RESPONSE_MESSAGES['card_benefit']['description']
+            
+            # 提取卡片名稱
+            user_message = intent.get("raw_message", "")
+            card_name = None
+            bank_name = None
+            
+            # 從用戶訊息中提取銀行名稱
+            for bank, config in BANK_MAPPING.items():
+                for keyword in config['keywords']:
+                    if keyword in user_message:
+                        bank_name = bank
+                        break
+                if bank_name:
+                    break
+            
+            # 動態提取卡片名稱：從資料庫中所有卡片名稱進行匹配
+            all_cards = ChatbotDataService.get_all_active_cards()
+            for card in all_cards:
+                card_full_name = card['name']
+                # 檢查完整卡片名稱是否在用戶訊息中
+                if card_full_name in user_message:
+                    card_name = card_full_name
+                    break
+                # 檢查卡片名稱的關鍵部分（去除銀行名稱前綴）
+                card_key_part = card_full_name.replace(card['bank'], '').strip()
+                if card_key_part and card_key_part in user_message:
+                    card_name = card_full_name
+                    break
+            
+            # 如果沒有找到完整匹配，嘗試部分匹配
+            if not card_name and bank_name:
+                for card in all_cards:
+                    if bank_name in card['bank']:
+                        # 檢查卡片名稱是否包含用戶訊息中的關鍵字
+                        card_words = card['name'].split()
+                        for word in card_words:
+                            if len(word) > 2 and word in user_message:
+                                card_name = card['name']
+                                break
+                        if card_name:
+                            break
+            
+            if card_name:
+                context += f"{RESPONSE_MESSAGES['card_benefit']['query_prefix']}{card_name}{RESPONSE_MESSAGES['card_benefit']['query_suffix']}"
+                # 查詢該卡片的回饋資料
+                rewards = ChatbotDataService._get_reward_queryset_with_sorting().filter(
+                    card__name=card_name
+                )
+                if rewards.exists():
+                    for reward in rewards:
+                        rate_display = ChatbotDataService._format_reward_rate(reward.min_rate, reward.max_rate)
+                        context += f"- {reward.category}/{reward.scope}: {rate_display} {reward.reward_type}\n"
+                else:
+                    context += RESPONSE_MESSAGES['card_benefit']['no_data'].format(name=card_name)
+            else:
+                context += RESPONSE_MESSAGES['card_benefit']['unrecognized']
+
+        # 處理上下文相關問題
+        if intent.get("is_context_question", False) and intent.get("context_banks"):
+            context += RESPONSE_MESSAGES['context_question']['header']
+            context += RESPONSE_MESSAGES['context_question']['description'].format(banks=', '.join(intent['context_banks']))
+            
+            # 如果問的是特定類別的回饋
+            if intent["categories"]:
+                for bank in intent["context_banks"]:
+                    for category in intent["categories"]:
+                        context += f"{RESPONSE_MESSAGES['context_question']['bank_category_prefix']}{bank} 在 {category}{RESPONSE_MESSAGES['context_question']['bank_category_suffix']}"
+                        # 查詢該銀行在該類別的回饋
+                        rewards = ChatbotDataService.get_cards_by_category(category)
+                        bank_rewards = [r for r in rewards if bank in r.get('bank', '')]
+                        if bank_rewards:
+                            for reward in bank_rewards:
+                                rate = f"{reward.get('min_rate', '') or ''}-{reward.get('max_rate', '') or ''}".strip('-')
+                                rate_display = f"{rate}{FORMAT_CONFIG['rate_suffix']}" if rate else FORMAT_CONFIG['unknown_rate']
+                                context += f"- {reward['card_name']}: {rate_display} {reward['reward_type']}\n"
+                        else:
+                            context += RESPONSE_MESSAGES['context_question']['no_bank_data'].format(bank=bank, category=category)
+            else:
+                # 如果沒有指定類別，提供該銀行的所有回饋資料
+                for bank in intent["context_banks"]:
+                    context += f"\n### {bank} 的回饋資料：\n"  # 這個可以保持原樣，因為是動態的銀行名稱
+                    rewards = ChatbotDataService._get_reward_queryset_with_sorting().filter(
+                        card__bank__icontains=bank
+                    )
+                    if rewards.exists():
+                        for reward in rewards[:10]:
+                            rate_display = ChatbotDataService._format_reward_rate(reward.min_rate, reward.max_rate)
+                            context += f"- {reward.card.name}: {reward.category} {rate_display} {reward.reward_type}\n"
+                    else:
+                        context += f"- 資料庫中沒有 {bank} 的回饋資料\n"  # 這個可以保持原樣，因為是動態的銀行名稱
+
+        # 根據意圖添加特定上下文
+        if intent["banks"] and intent["has_card_keyword"]:
+            for bank in intent["banks"]:
+                # 如果同時問了類別，提供該銀行在該類別的回饋
+                if intent["categories"]:
+                    context += RESPONSE_MESSAGES['bank_cards']['header'].format(bank=bank)
+                    for category in intent["categories"]:
+                        rewards = ChatbotDataService.get_cards_by_category(category)
+                        bank_rewards = [r for r in rewards if bank in r['bank']]
+                        if bank_rewards:
+                            context += RESPONSE_MESSAGES['bank_cards']['category_rewards'].format(category=category)
+                            for reward in bank_rewards:
+                                rate = f"{reward.get('min_rate', '') or ''}-{reward.get('max_rate', '') or ''}".strip('-')
+                                rate_display = f"{rate}{FORMAT_CONFIG['rate_suffix']}" if rate else FORMAT_CONFIG['unknown_rate']
+                                context += f"- {reward['card_name']}: {rate_display} {reward['reward_type']}\n"
+                        else:
+                            context += RESPONSE_MESSAGES['bank_cards']['no_category_rewards'].format(category=category)
+                else:
+                    # 否則，提供該銀行的卡片列表
+                    cards = ChatbotDataService.get_cards_by_bank(bank)
+                    if cards:
+                        context += RESPONSE_MESSAGES['bank_cards']['header'].format(bank=bank)
+                        for card in cards[:5]: context += f"- {card['name']}\n"
+                
+                # 如果意圖包含回饋或比較，也提供回饋資料
+                if intent["has_reward_keyword"] or intent["is_comparison"]:
+                    rewards = ChatbotDataService._get_reward_queryset_with_sorting().filter(
+                        card__bank__icontains=bank
+                    )
+                    if rewards.exists():
+                        context += RESPONSE_MESSAGES['bank_rewards']['header'].format(bank=bank)
+                        for reward in rewards[:5]:
+                            rate_display = ChatbotDataService._format_reward_rate(reward.min_rate, reward.max_rate)
+                            context += f"- {reward.card.name}: {reward.category} {rate_display} {reward.reward_type}\n"
+        
+        # 添加知識庫資訊
+        from .knowledge_base import REWARDIA_KNOWLEDGE_BASE
+        context += RESPONSE_MESSAGES['platform_info']['header']
+        context += RESPONSE_MESSAGES['platform_info']['main_features'].format(
+            features=', '.join(REWARDIA_KNOWLEDGE_BASE['website_info']['main_features'])
+        )
+        
+        return context
+
+    @staticmethod
+    def build_context_prompt_with_history(intent, user_id=None, conversation_history=None):
+        """根據意圖和對話歷史建立上下文提示詞"""
+        # 建立基本上下文
+        context = ChatbotResponseBuilder.build_context_prompt(intent, user_id)
+        
+        # 添加對話歷史和上下文分析
+        if conversation_history and len(conversation_history) > 0:
+            context += RESPONSE_MESSAGES['context']['conversation_history']
+            context += RESPONSE_MESSAGES['context']['history_description']
+            
+            for msg in conversation_history[-6:]:  # 只取最近6條
+                if msg.get('type') == 'user':
+                    context += f"{RESPONSE_MESSAGES['context']['user_prefix']}{msg.get('content', '')}\n"
+                elif msg.get('type') == 'ai':
+                    context += f"{RESPONSE_MESSAGES['context']['ai_prefix']}{msg.get('content', '')}\n"
+            
+            # 分析對話上下文
+            context += RESPONSE_MESSAGES['context']['context_analysis']
+            context += RESPONSE_MESSAGES['context']['analysis_points']
+            context += RESPONSE_MESSAGES['context']['analysis_1']
+            context += RESPONSE_MESSAGES['context']['analysis_2']
+            context += RESPONSE_MESSAGES['context']['analysis_3']
+            context += RESPONSE_MESSAGES['context']['analysis_4']
+            context += RESPONSE_MESSAGES['context']['analysis_5']
+            context += RESPONSE_MESSAGES['context']['analysis_6']
+            context += RESPONSE_MESSAGES['context']['analysis_7']
+            context += RESPONSE_MESSAGES['context']['analysis_conclusion']
+            context += RESPONSE_MESSAGES['context']['context_examples']
+            context += RESPONSE_MESSAGES['context']['example_1']
+            context += RESPONSE_MESSAGES['context']['example_2']
+            context += RESPONSE_MESSAGES['context']['example_3']
+        
+        return context
+
+    @staticmethod
+    def validate_response(response, user_message, user_id=None):
+        """驗證 AI 回應是否包含虛假的卡片名稱"""
+        try:
+            # 基本驗證邏輯
+            if not response or response.strip() == "":
+                return "抱歉，我無法處理您的問題，請稍後再試或聯繫客服。"
+            
+            # 檢查回應長度
+            if len(response) > 1000:
+                response = response[:1000] + "..."
+            
+            # 改為使用動態產生的列表
+            if any(keyword in user_message for keyword in ChatbotResponseBuilder._bank_related_keywords):
+                # 獲取所有真實的卡片名稱
+                all_cards = ChatbotDataService.get_all_active_cards()
+                real_card_names = {card['name'] for card in all_cards}
+                
+                # 檢查回應中是否包含虛假的卡片名稱
+                lines = response.split('\n')
+                validated_lines = []
+                
+                for line in lines:
+                    # 如果是條列式項目（以 - 開頭）
+                    if line.strip().startswith('-'):
+                        card_name = line.strip()[1:].strip()
+                        # 檢查是否是真實的卡片名稱（支援部分匹配）
+                        is_real_card = any(
+                            real_name in card_name or card_name in real_name
+                            for real_name in real_card_names
+                        )
+                        if is_real_card:
+                            validated_lines.append(line)
+                        else:
+                            # 如果是虛假的卡片名稱，跳過這一行
+                            continue
+                    else:
+                        validated_lines.append(line)
+                
+                response = '\n'.join(validated_lines)
+            
+            return response
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error validating response: {str(e)}")
+            return response  # 如果驗證失敗，返回原始回應
+
+    @staticmethod
+    def enhance_response_with_data(response, intent, user_id=None, current_page=''):
+        """根據意圖增強 AI 回應"""
+        user_message = intent.get("raw_message", "")
+
+        # 處理導航意圖（優先處理）
+        if intent.get("is_navigation", False):
+            return ChatbotResponseBuilder._handle_navigation_intent(intent, user_id, current_page)
+
+        # 處理比較意圖（優先處理）
+        if intent.get("is_comparison", False):
+            from .comparison_service import ComparisonService
+            return ComparisonService._handle_comparison_intent(intent, user_id)
+
+        # 處理個人化推薦意圖（優先處理）
+        if intent.get("is_personal_recommendation", False):
+            return ChatbotResponseBuilder._handle_personal_recommendation_intent(intent, user_id)
+
+        # 處理卡片比較推薦意圖（優先處理）
+        if intent.get("is_card_comparison_recommendation", False):
+            return ChatbotResponseBuilder._handle_card_comparison_recommendation_intent(intent, user_id)
+
+        # 未登入防護：偵測個人查詢關鍵字但沒有 user_id 時，直接回覆尚未登入
+        if (not user_id) and any(keyword in user_message for keyword in COMMON_KEYWORDS):
+            return "你尚未登入"
+        
+        return response
