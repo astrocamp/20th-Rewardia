@@ -2,52 +2,9 @@
 {% block title %}會員專區 - Rewardia{%endblock %}
 {% block content %}
 
-<!-- Toast 容器 -->
-        <div 
-          id="member-zone-toasts" 
-          class="fixed top-4 right-4 z-[9999] space-y-2"
-  x-data="member_zone_toast()"
-  @show-toast.window="addToast($event.detail)"
-  x-init="console.log('member_zone_toast initialized')"
-  x-show="toasts.length > 0"
->
-  <template x-for="toast in toasts" :key="toast.id">
-    <div 
-      :class="[
-        'tw-toast min-w-80 max-w-96',
-        toast.type === 'success' ? 'tw-success' : 
-        toast.type === 'error' ? 'tw-error' : 
-        toast.type === 'warning' ? 'tw-warn' : 'tw-info'
-      ]"
-      x-transition:enter="transition ease-out duration-200"
-      x-transition:enter-start="opacity-0 translate-x-4"
-      x-transition:enter-end="opacity-100 translate-x-0"
-      x-transition:leave="transition ease-in duration-150"
-      x-transition:leave-start="opacity-100 translate-x-0"
-      x-transition:leave-end="opacity-0 translate-x-4"
-    >
-      <div class="flex items-center gap-3 p-4">
-        <!-- 簡化的圖標 -->
-        <div 
-          class="w-5 h-5 rounded-full flex-shrink-0"
-          :class="toast.type === 'success' ? 'bg-green-500' : toast.type === 'error' ? 'bg-red-500' : 'bg-blue-500'"
-        ></div>
-        <span class="flex-1" x-text="toast.message"></span>
-        <button 
-          @click="removeToast(toast.id)" 
-          class="text-gray-400 hover:text-gray-600 transition-colors"
-          aria-label="關閉通知"
-        >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
-      </div>
-    </div>
-  </template>
-</div>
 <section class="calculator-page calculator-spacing" 
          x-data="password_change"
+         x-cloak
          x-bind:class="{ 
            'banner-hidden': !$store.banner.visible,
            'banner-transitioning': $store.banner.isTransitioning
@@ -285,7 +242,7 @@
             <div class="member-cards-container">
               <div class="member-cards-grid">
               {% for card_data in processed_cards %}
-              <div class="member-card-item" x-data="member_zone()">
+              <div class="member-card-item" data-card-id="{{ card_data.user_card.id }}" x-data="member_zone()" x-cloak>
                 <!-- 卡片圖片 -->
                 <div class="member-card-image-container">
                   {% if card_data.image_url %}

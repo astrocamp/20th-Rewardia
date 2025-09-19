@@ -40,9 +40,7 @@ export default (config = {}) => ({
   // 開啟攝影機
   async openCamera(eventData) {
     // 保存當前操作的卡片 ID
-    console.log('openCamera called with eventData:', eventData);
     this.currentCardId = eventData?.cardId || null;
-    console.log('currentCardId set to:', this.currentCardId);
     
     // 判斷是否為 card_form 模式
     this.isCardFormMode = eventData?.isCardForm || false;
@@ -92,12 +90,16 @@ export default (config = {}) => ({
     const video = this.$refs.video;
     
     if (!frame) {
-      console.error('找不到取景框元素');
+      if (window.RewardiaLogger) {
+        window.RewardiaLogger.error('找不到取景框元素');
+      }
       return false;
     }
     
     if (!video) {
-      console.error('找不到 video 元素');
+      if (window.RewardiaLogger) {
+        window.RewardiaLogger.error('找不到 video 元素');
+      }
       return false;
     }
     
@@ -313,7 +315,9 @@ export default (config = {}) => ({
     const message = error?.message || defaultMessage;
     this.error = message;
     this.showMessage(message, 'error');
-    console.error('操作失敗:', error);
+    if (window.RewardiaLogger) {
+      window.RewardiaLogger.error('操作失敗:', error);
+    }
   },
   
   // 顯示訊息（統一處理成功/錯誤）
@@ -344,9 +348,7 @@ export default (config = {}) => ({
       return;
     }
     
-    console.log('confirmCardNumber - currentCardId:', this.currentCardId);
     if (!this.currentCardId) {
-      console.log('No currentCardId found!');
       if (window.showToast) {
         window.showToast('錯誤：無法識別卡片 ID', 'error');
       }
@@ -384,7 +386,9 @@ export default (config = {}) => ({
         }
       }
     } catch (error) {
-      console.error('Save card number error:', error);
+      if (window.RewardiaLogger) {
+        window.RewardiaLogger.error('儲存卡號錯誤:', error);
+      }
       if (window.showToast) {
         window.showToast('新增失敗，請稍後再試', 'error');
       }
@@ -435,7 +439,6 @@ export default (config = {}) => ({
       visibleInput.value = formattedNumber;
       // 觸發 input 事件以更新 Alpine.js 的數據綁定
       visibleInput.dispatchEvent(new Event('input', { bubbles: true }));
-      console.log('Card number filled to visible input field:', formattedNumber);
     }
     
     // 查找隱藏的卡號輸入欄位
@@ -444,11 +447,12 @@ export default (config = {}) => ({
       hiddenInput.value = cardNumber.replace(/\s/g, ''); // 隱藏欄位使用無空格的格式
       // 觸發 input 事件以更新 Alpine.js 的數據綁定
       hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
-      console.log('Card number filled to hidden input field:', cardNumber.replace(/\s/g, ''));
     }
     
     if (!visibleInput && !hiddenInput) {
-      console.warn('No card number input fields found');
+      if (window.RewardiaLogger) {
+        window.RewardiaLogger.warn('找不到卡號輸入欄位');
+      }
     }
   },
   

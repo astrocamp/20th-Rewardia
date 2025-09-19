@@ -21,25 +21,7 @@ import memberZoneComponent from './components/member_zone.js';
 
 window.Alpine = Alpine;
 
-// 全域 toast 函數
-window.showToast = function(message, type = 'info') {
-  // 創建 toast 資料
-  const toastId = 'toast-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-  const toastData = {
-    id: toastId,
-    message,
-    type,
-    visible: true
-  };
-  
-  // 調試信息
-  console.log('showToast called:', toastData);
-  
-  // 觸發自定義事件，讓頁面處理 toast 顯示
-  window.dispatchEvent(new CustomEvent('show-toast', { 
-    detail: toastData 
-  }));
-};
+// 全域 toast 函數已移至 message.js
 
 Alpine.data("main_search", mainSearchComponent);
 Alpine.data("card_form", cardFormComponent);
@@ -55,20 +37,5 @@ Alpine.data("card_camera", cardCameraComponent);
 Alpine.data("password_change", passwordChangeComponent);
 Alpine.data("member_zone", memberZoneComponent);
 
-// Toast 組件
-Alpine.data("member_zone_toast", () => ({
-  toasts: [],
-  addToast(detail) {
-    console.log('member_zone_toast addToast called:', detail);
-    this.toasts.push(detail);
-    console.log('Current toasts:', this.toasts);
-    // 3 秒後自動移除
-    setTimeout(() => this.removeToast(detail.id), 3000);
-  },
-  removeToast(id) {
-    this.toasts = this.toasts.filter(t => t.id !== id);
-    console.log('Toast removed, remaining:', this.toasts);
-  }
-}));
 
 Alpine.start();

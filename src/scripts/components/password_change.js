@@ -167,7 +167,9 @@ export default () => ({
         }
       }
     } catch (error) {
-      console.error('修改密碼錯誤:', error);
+      if (window.RewardiaLogger) {
+        window.RewardiaLogger.error('修改密碼錯誤:', error);
+      }
       this.passwordChangeErrors.general = '網路錯誤，請稍後再試';
     } finally {
       this.isSubmittingPassword = false;

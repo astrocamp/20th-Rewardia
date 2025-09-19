@@ -46,7 +46,9 @@ const schedulerControl = () => ({
         this.schedule = { ...this.schedule, ...schedule };
       }
     } catch (error) {
-      console.error('載入排程狀態失敗:', error);
+      if (window.RewardiaLogger) {
+        window.RewardiaLogger.error('載入排程狀態失敗:', error);
+      }
     }
   },
 
@@ -88,7 +90,9 @@ const schedulerControl = () => ({
       }
 
     } catch (error) {
-      console.error('更新排程失敗:', error);
+      if (window.RewardiaLogger) {
+        window.RewardiaLogger.error('更新排程失敗:', error);
+      }
       this.showError('更新排程失敗');
     } finally {
       this.isLoading = false;
@@ -114,7 +118,9 @@ const schedulerControl = () => ({
       }
 
     } catch (error) {
-      console.error('切換排程狀態失敗:', error);
+      if (window.RewardiaLogger) {
+        window.RewardiaLogger.error('切換排程狀態失敗:', error);
+      }
       this.schedule.enabled = !this.schedule.enabled;
       this.showError('切換排程狀態失敗');
     } finally {
@@ -144,7 +150,9 @@ const schedulerControl = () => ({
       }
 
     } catch (error) {
-      console.error('執行爬蟲失敗:', error);
+      if (window.RewardiaLogger) {
+        window.RewardiaLogger.error('執行爬蟲失敗:', error);
+      }
       this.showError('執行爬蟲失敗');
     } finally {
       this.isLoading = false;
@@ -159,7 +167,9 @@ const schedulerControl = () => ({
         this.crawledRecords = data.records;
       }
     } catch (error) {
-      console.error('載入爬蟲記錄失敗:', error);
+      if (window.RewardiaLogger) {
+        window.RewardiaLogger.error('載入爬蟲記錄失敗:', error);
+      }
     }
   },
 
@@ -171,7 +181,9 @@ const schedulerControl = () => ({
         this.analysisRecords = data.records;
       }
     } catch (error) {
-      console.error('載入分析記錄失敗:', error);
+      if (window.RewardiaLogger) {
+        window.RewardiaLogger.error('載入分析記錄失敗:', error);
+      }
     }
   },
 

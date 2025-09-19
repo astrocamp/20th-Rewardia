@@ -149,13 +149,6 @@ export default (config = {}) => ({
       if (cardIdInput) cardIdInput.value = this.selectedCard;
       if (cardNumberInput) cardNumberInput.value = this.recognizedCardNumber || '';
       
-      // 調試信息
-      console.log('Form submission debug:', {
-        bank_name: this.selectedBank,
-        card_id: this.selectedCard,
-        card_number: this.recognizedCardNumber,
-        manualCardNumber: this.manualCardNumber
-      });
       
       // 提交表單
       form.submit();

@@ -17,7 +17,9 @@ export default () => ({
       const data = await this.apiRequest('/admins/api/cards/');
       this.cards = data.cards;
     } catch (error) {
-      console.error('載入信用卡資料失敗:', error);
+      if (window.RewardiaLogger) {
+        window.RewardiaLogger.error('載入信用卡資料失敗:', error);
+      }
       this.showError('載入信用卡資料失敗');
     }
   },
@@ -84,7 +86,9 @@ export default () => ({
       await this.uploadSingleCard(cardId);
       this.showSuccess('圖片上傳成功');
     } catch (error) {
-      console.error('上傳圖片失敗:', error);
+      if (window.RewardiaLogger) {
+        window.RewardiaLogger.error('上傳圖片失敗:', error);
+      }
       this.showError('上傳圖片失敗: ' + error.message);
     } finally {
       this.isLoading = false;
@@ -104,7 +108,9 @@ export default () => ({
       await this.deleteSingleCard(cardId);
       this.showSuccess('圖片刪除成功');
     } catch (error) {
-      console.error('刪除圖片失敗:', error);
+      if (window.RewardiaLogger) {
+        window.RewardiaLogger.error('刪除圖片失敗:', error);
+      }
       this.showError('刪除圖片失敗: ' + error.message);
     } finally {
       this.isLoading = false;
@@ -131,7 +137,9 @@ export default () => ({
       const results = await this.processCardsBatch(selectedCardIds, operation);
       this.handleBatchResults(results, actionName);
     } catch (error) {
-      console.error(`批次${actionName}過程中發生錯誤:`, error);
+      if (window.RewardiaLogger) {
+        window.RewardiaLogger.error(`批次${actionName}過程中發生錯誤:`, error);
+      }
       this.showError(`批次${actionName}過程中發生錯誤`);
       this.isLoading = false;
       this.selectedCards = [];
@@ -172,7 +180,9 @@ export default () => ({
         results.success++;
       } catch (error) {
         results.error++;
-        console.error(`卡片 ${cardId} ${operation === 'upload' ? '上傳' : '刪除'}失敗:`, error);
+        if (window.RewardiaLogger) {
+          window.RewardiaLogger.error(`卡片 ${cardId} ${operation === 'upload' ? '上傳' : '刪除'}失敗:`, error);
+        }
       }
     }
     
@@ -330,30 +340,21 @@ export default () => ({
   
   // 顯示成功訊息
   showSuccess(message) {
-    console.log('Success:', message);
-    this.showToast(message, 'success');
+    if (window.RewardiaLogger) {
+      window.RewardiaLogger.info('成功:', message);
+    }
+    if (window.showToast) {
+      window.showToast(message, 'success');
+    }
   },
   
   // 顯示錯誤訊息
   showError(message) {
-    console.error('Error:', message);
-    this.showToast(message, 'error');
-  },
-
-  // 顯示 toast 訊息
-  showToast(message, type = 'info') {
-    // 創建 toast 資料
-    const toastId = 'toast-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-    const toastData = {
-      id: toastId,
-      message,
-      type,
-      visible: true
-    };
-    
-    // 觸發自定義事件，讓頁面處理 toast 顯示
-    window.dispatchEvent(new CustomEvent('show-toast', { 
-      detail: toastData 
-    }));
+    if (window.RewardiaLogger) {
+      window.RewardiaLogger.error('錯誤:', message);
+    }
+    if (window.showToast) {
+      window.showToast(message, 'error');
+    }
   }
 });

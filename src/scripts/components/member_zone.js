@@ -94,19 +94,21 @@ export default function memberZoneComponent() {
         
         if (data.success) {
           if (window.showToast) {
-            window.showToast('卡號新增成功！', 'success');
+            window.showToast(data.message || '卡號新增成功！', 'success');
           }
           this.hideManualInputDialog();
           setTimeout(() => {
             window.location.reload();
-          }, 3000);
+          }, 3000); // 恢復正常的 3 秒重新載入
         } else {
           if (window.showToast) {
             window.showToast(data.message || '新增失敗', 'error');
           }
         }
       } catch (error) {
-        console.error('Add card number error:', error);
+        if (window.RewardiaLogger) {
+          window.RewardiaLogger.error('新增卡號錯誤:', error);
+        }
         if (window.showToast) {
           window.showToast('新增失敗，請稍後再試', 'error');
         }
@@ -115,11 +117,9 @@ export default function memberZoneComponent() {
     
     // 開始相機擷取
     startCameraCapture(cardId) {
-      console.log('startCameraCapture called with cardId:', cardId);
       this.hideAddCardNumberDialog();
       // 觸發全域事件開啟相機，並傳遞卡片 ID
       this.$dispatch('open-camera', { cardId: cardId });
-      console.log('Dispatched open-camera event with cardId:', cardId);
     },
     
     // 刪除卡片
@@ -154,10 +154,22 @@ export default function memberZoneComponent() {
           if (window.showToast) {
             window.showToast('刪除成功！', 'success');
           }
-          // 重新載入頁面
+          
+          // 立即從頁面移除卡片元素，提供即時視覺反饋
+          const cardElement = document.querySelector(`[data-card-id="${cardId}"]`);
+          if (cardElement) {
+            cardElement.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+            cardElement.style.opacity = '0';
+            cardElement.style.transform = 'translateX(-100%)';
+            setTimeout(() => {
+              cardElement.remove();
+            }, 300);
+          }
+          
+          // 稍後重新載入頁面以確保數據同步
           setTimeout(() => {
             window.location.reload();
-          }, 3000);
+          }, 1000);
         } else {
           // 顯示錯誤訊息
           if (window.showToast) {
@@ -166,7 +178,9 @@ export default function memberZoneComponent() {
           this.isDeleting = false;
         }
       } catch (error) {
-        console.error('Delete card error:', error);
+        if (window.RewardiaLogger) {
+          window.RewardiaLogger.error('刪除卡片錯誤:', error);
+        }
         if (window.showToast) {
           window.showToast('刪除失敗，請稍後再試', 'error');
         }
