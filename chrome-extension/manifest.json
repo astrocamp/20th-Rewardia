@@ -14,12 +14,12 @@
   },
   "permissions":["storage","tabs"],
   "host_permissions": [
-    "https://rewardia.net/*"
+    "https://rewardia.net/*","http://localhost:8000/*"
   ],
 
  "content_scripts": [
    {
-     "matches": ["*://www.eslite.com/*","*://www.klook.com/*","*://24h.pchome.com.tw/*","*://www.momoshop.com.tw/*","*://cart.momoshop.com.tw/*", "https://rewardia.net/*"],
+     "matches": ["*://www.eslite.com/*","*://www.klook.com/*","*://24h.pchome.com.tw/*","*://www.momoshop.com.tw/*","*://cart.momoshop.com.tw/*", "https://rewardia.net/*","http://localhost:8000/*"],
      "css": ["content_scripts/content_script.css"],
      "js": ["content_scripts/content_script.js"]
    }

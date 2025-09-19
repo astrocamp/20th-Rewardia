@@ -1,4 +1,5 @@
-const token_url = "https://rewardia.net/users/api/get_token";
+const base_url = "http://localhost:8000";
+const token_url = `${base_url}/users/api/get_token`;
 
 const merchantMap = {
   momo: "momo購物",
@@ -12,7 +13,7 @@ async function get_current_url() {
 }
 
 async function get_rewards(merchant) {
-  const url = `https://rewardia.net/api/rewards/scope/${merchant}`;
+  const url = `${base_url}/api/rewards/scope/${merchant}`;
   const response = await fetch(url);
   const data = await response.json();
   return data;
@@ -32,7 +33,7 @@ async function get_merchant_data() {
 
 async function get_user_cards(token, id) {
   try {
-    const user_cards_url = `https://rewardia.net/api/users/${id}/cards/`;
+    const user_cards_url = `${base_url}/api/users/${id}/cards/`;
     const response = await fetch(user_cards_url, {
       headers: {
         Authorization: `Token ${token}`,
@@ -91,6 +92,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       const merchant_data = await get_merchant_data();
       // 取第一個，因為第一個是最大值
       sendResponse({ data: merchant_data?.[0], cards: user_cards });
+    })();
+
+    return true;
+  }
+
+  if (message.action === "get_user_cards") {
+    (async () => {
+      const token = await get_auth_token();
+      const userID = await get_userID();
+      const cards = await get_user_cards(token, userID);
+      sendResponse({ data: cards });
     })();
 
     return true;
