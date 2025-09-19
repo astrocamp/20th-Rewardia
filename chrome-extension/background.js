@@ -61,9 +61,11 @@ async function fetch_token(url) {
   const data = await resp.json();
 
   if (data.token) {
-    chrome.storage.local.set({ authToken: data.token });
-    chrome.storage.local.set({ username: data.username });
-    chrome.storage.local.set({ userID: data.user_id });
+    chrome.storage.local.set({
+      authToken: data.token,
+      username: data.username,
+      userID: data.user_id,
+    });
   }
   return;
 }
