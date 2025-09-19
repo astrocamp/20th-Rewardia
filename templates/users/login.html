@@ -28,7 +28,7 @@
   <div class="register-field-container">
     <label for="username" class="register-label">帳號</label>
     <div class="register-relative-container">
-      <input type="text" id="username" name="username" placeholder="請輸入您的帳號" class="register-input" required
+      <input type="text" id="username" name="username" placeholder="請輸入您的帳號" class="register-input" autocomplete="username" required
             x-model="formData.username"
             @blur="validateField('username')">
     </div>
@@ -44,6 +44,7 @@
                 name="password"
                 placeholder="請輸入您的密碼"
                 class="register-input pr-12"
+                autocomplete="current-password"
                 required
                 x-model="formData.password"
                 @blur="validateField('password')">

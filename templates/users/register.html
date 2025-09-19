@@ -41,6 +41,7 @@
         x-model="formData.username"
         @input="clearFieldError('username')"
         @blur="validateField('username')"
+        autocomplete="username"
         required>
     </div>
     <div x-show="errors.username" class="text-error text-sm mt-1" x-text="errors.username"></div>
@@ -62,6 +63,7 @@
         x-model="formData.email"
         @input="clearFieldError('email')"
         @blur="validateField('email')"
+        autocomplete="email"
         required>
     </div>
     <div x-show="errors.email" class="text-error text-sm mt-1" x-text="errors.email"></div>
@@ -81,6 +83,7 @@
         x-model="formData.password"
         @input="clearFieldError('password')"
         @blur="validateField('password')"
+        autocomplete="new-password"
         required>
       <button 
         type="button" 
@@ -113,6 +116,7 @@
         x-model="formData.confirm_password"
         @input="clearFieldError('confirm_password')"
         @blur="validateField('confirm_password')"
+        autocomplete="new-password"
         required>
       <button 
         type="button" 
@@ -147,11 +151,11 @@
     >
     <label for="agree_terms" class="text-lg text-gray-700 font-normal leading-relaxed">
       我同意網站
-      <a href="#" id="service-terms" class="register-link">
+      <a href="{% url 'pages:tos' %}" id="service-terms" class="register-link" target="_blank">
         服務條款
       </a>
       及
-      <a href="#" id="privacy-policy" class="register-link">
+      <a href="{% url 'pages:privacy' %}" id="privacy-policy" class="register-link" target="_blank">
         隱私權政策
       </a>
     </label>

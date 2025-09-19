@@ -143,7 +143,7 @@
 {% comment %}
 使用方式:
 {% include 'components/auth-shared.html' with component="terms-checkbox" %}
-  我同意網站<a href="#" class="register-link">服務條款</a>及<a href="#" class="register-link">隱私權政策</a>
+  我同意網站<a href="{% url 'pages:tos' %}" class="register-link" target="_blank">服務條款</a>及<a href="{% url 'pages:privacy' %}" class="register-link" target="_blank">隱私權政策</a>
 {% include 'components/auth-shared.html' with component="terms-checkbox-end" %}
 {% endcomment %}
 {% if component == "terms-checkbox" %}

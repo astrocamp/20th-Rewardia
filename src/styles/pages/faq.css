@@ -39,11 +39,19 @@
   }
 
   .faq-question {
-    @apply flex items-center justify-between p-4 transition-colors duration-200 min-h-[60px] cursor-default;
+    @apply flex items-center justify-between p-4 transition-colors duration-200 min-h-[60px] cursor-pointer;
+  }
+
+  .faq-question:hover {
+    @apply bg-gray-50;
+  }
+
+  .faq-question * {
+    @apply cursor-pointer;
   }
 
   .faq-question-text {
-    @apply text-lg font-bold text-dark-gray flex-1 pr-4 font-sans leading-relaxed cursor-default;
+    @apply text-lg font-bold text-dark-gray flex-1 pr-4 font-sans leading-relaxed cursor-pointer block w-full;
   }
 
   .faq-toggle-btn {
