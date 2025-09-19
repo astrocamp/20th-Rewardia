@@ -1,7 +1,8 @@
+const base_url = "http://localhost:8000";
 const bank_select = document.querySelector("#bank_select");
 const card_select = document.querySelector("#card_select");
 const submit = document.querySelector("#new_card_submit");
-const banks_url = "https://rewardia.net/api/banks/";
+const banks_url = `${base_url}/api/banks/`;
 
 async function get_auth_token() {
   const result = await chrome.storage.local.get(["authToken"]);
@@ -25,7 +26,7 @@ await get_banks();
 
 async function get_cards(bank) {
   card_select.innerHTML = "<option>選擇卡片</option>";
-  const cards_url = `https://rewardia.net/api/banks/${bank}/cards`;
+  const cards_url = `${base_url}/api/banks/${bank}/cards`;
   const response = await fetch(cards_url);
   const cards = await response.json();
 
@@ -45,7 +46,7 @@ bank_select.addEventListener("change", async function () {
 
 submit.addEventListener("click", async function (e) {
   e.preventDefault();
-  const new_card_url = `https://rewardia.net/api/users/new_card/${card_select.value}`;
+  const new_card_url = `${base_url}/api/users/new_card/${card_select.value}`;
 
   const token = await get_auth_token();
   const response = await fetch(new_card_url, {

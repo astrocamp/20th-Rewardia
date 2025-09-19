@@ -1,5 +1,6 @@
-const token_url = "https://rewardia.net/users/api/get_token";
-const member_zone = "https://rewardia.net/users/member";
+const base_url = "http://localhost:8000";
+const token_url = `${base_url}/users/api/get_token`;
+const member_zone = `${base_url}/users/member`;
 
 let loggedin = false;
 
@@ -36,7 +37,7 @@ const account_content = document.querySelector(".account_content");
 function return_login_view() {
   const login_view = `<div class="login_view">
         <div class="login_img"><i class="fa-solid fa-gifts"></i></div>
-        <a target="_blank" href="https://rewardia.net/sessions/login/"
+        <a target="_blank" href="${base_url}/sessions/login/"
           ><button class="btn login_btn">立即登入/註冊</button></a
         >
       </div>`;
@@ -80,7 +81,7 @@ async function get_userID() {
 
 // 顯示使用者卡片相關
 async function get_user_cards(token, id) {
-  const user_cards_url = `https://rewardia.net/api/users/${id}/cards/`;
+  const user_cards_url = `${base_url}/api/users/${id}/cards/`;
   const user_cards = document.querySelector(".user_cards");
   const response = await fetch(user_cards_url, {
     headers: {
@@ -121,7 +122,7 @@ async function get_user_cards(token, id) {
       confirm_btn.addEventListener("click", async function () {
         const card_id = btn.dataset.id;
 
-        const delete_card_url = `https://rewardia.net/api/users/delete_card/${card_id}/`;
+        const delete_card_url = `${base_url}/api/users/delete_card/${card_id}/`;
 
         const token = await get_auth_token();
         const response = await fetch(delete_card_url, {

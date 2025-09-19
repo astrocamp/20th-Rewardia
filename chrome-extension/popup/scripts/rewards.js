@@ -1,7 +1,8 @@
+const base_url = "http://localhost:8000";
 const rewards_content = document.querySelector(".rewards_content");
 
 async function get_rewards(merchant) {
-  const url = `https://rewardia.net/api/rewards/scope/${merchant}`;
+  const url = `${base_url}/api/rewards/scope/${merchant}`;
 
   const response = await fetch(url);
   const data = await response.json();

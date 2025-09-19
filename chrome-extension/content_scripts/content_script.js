@@ -1,3 +1,4 @@
+const base_url = "http://localhost:8000";
 const current_host = window.location.hostname;
 const current_url = window.location.href;
 
@@ -57,7 +58,7 @@ async function show_rewardia_popup() {
   }, 3000);
 }
 
-if (current_url == "https://rewardia.net/users/member/") {
+if (current_url == `${base_url}/users/member/`) {
   chrome.runtime.sendMessage({
     action: "open_loggedin",
   });
