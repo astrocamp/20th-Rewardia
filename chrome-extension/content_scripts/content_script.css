@@ -121,19 +121,63 @@
     transform: scale(1.1);
   }
 /* 自動填入信用卡號相關 */
-.card_selector td {
+.card_selector {
+  font-size: 14px;
+  vertical-align: middle;
+  padding: 15px 20px;
+  margin-left: 30px;
+  margin-top: 10px;
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+  color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 400px !important;
+}
+
+.card_selector img {
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+.card_list {
+  margin: 8px 0 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card_list li {
+  font-size: 13px;
+  margin: 6px 0;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  border-left: 3px solid #60a5fa;
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+}
+
+.card_list li:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(2px);
+  transition: all 0.2s ease;
+}
+/* .card_selector td {
+  font-size: 14px;
   vertical-align: middle;
   padding-left: 5px;
+  background-color: #032885;
+  color: white;
+  border-radius: 20px;
+  padding: 20px;
 }
 
-.card_selector th.selector_head {
-  vertical-align: middle;
+.card_list {
+  width: 50%;
 }
 
-.reward_price {
-  padding-top: 5px;
+.card_list li {
   font-size: 12px;
-  height: 20px;
+  margin: 5px 0;
 }
 
 #card_select {
@@ -142,4 +186,4 @@
   height: 30px;
   border: solid 2px #13b8ff;
   vertical-align: middle;
-}
+} */
