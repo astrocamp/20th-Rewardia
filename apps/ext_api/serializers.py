@@ -18,13 +18,24 @@ class RewardSerializer(serializers.HyperlinkedModelSerializer):
         fields = ["card", "category", "scope", "min_rate", "max_rate", "reward_type"]
 
 
+class MinRewardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RewardCategory
+        fields = ["category", "scope", "min_rate", "max_rate", "reward_type"]
+
+
 class UserCardSerializer(serializers.ModelSerializer):
     card = CardSerializer(read_only=True)
-    partial_card_num = serializers.SerializerMethodField()
+    rewards = serializers.SerializerMethodField()
+    # partial_card_num = serializers.SerializerMethodField()
 
     class Meta:
         model = UserCard
-        fields = ["user", "card"]
+        fields = ["user", "card", "rewards"]
 
-    def get_partial_card_num():
-        pass
+    def get_rewards(self, obj):
+        rewards = obj.card.reward_categories.all()
+        return MinRewardSerializer(rewards, many=True).data
+
+    # def get_partial_card_num():
+    #     pass

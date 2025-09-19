@@ -144,6 +144,7 @@ if (current_url.includes("cart")) {
 }
 
 // 填寫信用卡資訊相關
+
 function get_user_cards() {
   return new Promise((resolve) => {
     chrome.runtime.sendMessage(
@@ -157,23 +158,65 @@ function get_user_cards() {
   });
 }
 
-function display_cards(cards) {
-  const credit_card_area = document.querySelector("#cardTbody");
-  const price = document.querySelector("#paySumB").textContent;
-  const card_selector = document.createElement("tr");
-  card_selector.className = "card_selector";
-  card_selector.innerHTML = `<th class="selector_head"><img src="${chrome.runtime.getURL(
-    "images/Rewardia_16.png"
-  )}">使用者</br>信用卡：</th><td><select id="card_select" name="card" required>
-              <option>選擇卡片</option>
-            </select><p class="reward_price">回饋金額：${price}</p></td>`;
-  const card_select = card_selector.querySelector("#card_select");
+function return_reward(rewards, price) {
+  if (rewards.min_rate && rewards.max_rate) {
+    const max_card_rate_result = (price * (rewards.max_rate / 100)).toFixed(2);
+    const min_card_rate_result = (price * (rewards.min_rate / 100)).toFixed(2);
+    const result = `${min_card_rate_result} - ${max_card_rate_result}`;
+    return result;
+  } else if (rewards.min_rate == null) {
+    const card_rate = rewards.max_rate;
+    const result = (price * (card_rate / 100)).toFixed(2);
+    return result;
+  } else if (rewards.max_rate == null) {
+    const card_rate = rewards.min_rate;
+    const result = (price * (card_rate / 100)).toFixed(2);
+    return result;
+  }
+}
 
+function check_reward_scope(card, price) {
+  if (card.rewards.scope == "momo購物") {
+    const reward = `${return_reward(card.rewards, price)}元`;
+    return reward;
+  } else if (card.rewards.scope == "國內") {
+    const reward = `${return_reward(card.rewards, price)}元`;
+    return reward;
+  } else {
+    return `無適用回饋`;
+  }
+}
+
+function display_cards(cards) {
+  // momo購物車元素
+  const credit_card_box = document.querySelector("#cardPaymentBox");
+  const price = Number(
+    document.querySelector("#paySumB").textContent.trim().replace(/,/g, "")
+  );
+
+  // 創造使用者卡片選單
+  const card_selector = document.createElement("div");
+  card_selector.className = "card_selector";
+  card_selector.innerHTML = `<img src="${chrome.runtime.getURL(
+    "images/Rewardia_16.png"
+  )}">使用者信用卡：<ul class="card_list"></ul>`;
+  credit_card_box.insertAdjacentElement("beforeend", card_selector);
+
+  // 卡片選項
+  const card_list = card_selector.querySelector(".card_list");
   cards.forEach((card) => {
-    const card_selection = `<option value="${card.card.id}">${card.card.name}</option>`;
-    card_select.insertAdjacentHTML("beforeend", card_selection);
+    const reward = check_reward_scope(card, price);
+    const card_items = `<li class="card_item" data-id="${card.card.id}"><div>${card.card.name} ${reward}</div></li>`;
+    card_list.insertAdjacentHTML("beforeend", card_items);
   });
-  credit_card_area.insertAdjacentElement("beforeend", card_selector);
+
+  // 回傳使用者選擇
+  const card_item = document.querySelectorAll(".card_item");
+  card_item.forEach((card_item) => {
+    card_item.addEventListener("click", function () {
+      console.log(`${card_item.textContent}`);
+    });
+  });
 }
 
 function fill_card_num(card_num) {
@@ -196,14 +239,14 @@ function fill_card_num(card_num) {
 
 if (current_url.includes("cart.momoshop.com.tw")) {
   const observer = new MutationObserver(async (mutations) => {
-    const card_num_1 = document.querySelector("#cardNo_1");
+    const credit_card_box = document.querySelector("#cardPaymentBox");
     const cards = await get_user_cards();
-    if (card_num_1) {
-      card_num_1.addEventListener("focus", function () {
-        card_num_1.value = 4111;
-        display_cards(cards);
-      });
+    console.log(cards);
+    if (credit_card_box) {
+      observer.disconnect();
+      display_cards(cards);
     }
+
     // fill_card_num();
   });
   observer.observe(document.body, {

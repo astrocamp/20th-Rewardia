@@ -110,7 +110,7 @@ def get_cards(request, bank):
 
 
 @api_view(["GET"])
-@authentication_classes([TokenAuthentication])
+# @authentication_classes([TokenAuthentication])
 def get_user_cards(request, id):
     if request.user.id != id:
         return Response(status=403)
