@@ -1,3 +1,5 @@
+const token_url = "https://rewardia.net/users/api/get_token";
+
 const merchantMap = {
   momo: "momo購物",
   pchome: "pchome",
@@ -48,6 +50,24 @@ async function get_user_cards(token, id) {
   }
 }
 
+async function fetch_token(url) {
+  const resp = await fetch(url, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const data = await resp.json();
+
+  if (data.token) {
+    chrome.storage.local.set({ authToken: data.token });
+    chrome.storage.local.set({ username: data.username });
+    chrome.storage.local.set({ userID: data.user_id });
+  }
+  return;
+}
+
 async function get_auth_token() {
   const result = await chrome.storage.local.get(["authToken"]);
   return result.authToken;
@@ -82,5 +102,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
   if (message.action === "open_extension") {
     chrome.action.openPopup();
+  }
+});
+
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  if (changeInfo.status === "complete" && tab.url.includes("rewardia.net")) {
+    await fetch_token(token_url);
   }
 });

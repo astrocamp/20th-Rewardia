@@ -21,9 +21,11 @@ async function fetch_token(url) {
   const data = await resp.json();
 
   if (data.token) {
-    chrome.storage.local.set({ authToken: data.token });
-    chrome.storage.local.set({ username: data.username });
-    chrome.storage.local.set({ userID: data.user_id });
+    chrome.storage.local.set({
+      authToken: data.token,
+      username: data.username,
+      userID: data.user_id,
+    });
   }
   return;
 }
@@ -152,19 +154,22 @@ async function get_user_cards(token, id) {
   user_cards.insertAdjacentHTML("beforeend", new_card_btn);
 }
 
+const login_btn = document.querySelector(".login_btn");
+
 // 確認登入狀態，並做出對應的事情
 async function check_login_status() {
   return_login_view();
-  // 一開始叫先確認有沒有token
   let token = await get_auth_token();
   let username = await get_username();
   let userID = await get_userID();
-
   if (!token) {
-    await fetch_token(token_url);
-    token = await get_auth_token();
-    username = await get_username();
-    userID = await get_userID();
+    let cur_url = await get_current_url();
+    if (cur_url.includes("https://rewardia.net/")) {
+      await fetch_token(token_url);
+      token = await get_auth_token();
+      username = await get_username();
+      userID = await get_userID();
+    }
   }
   if (token && username) {
     loggedin = true;
