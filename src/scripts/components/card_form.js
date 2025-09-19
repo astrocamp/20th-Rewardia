@@ -42,8 +42,8 @@ export default (config = {}) => ({
       (card) => card.bankName === bankName
     );
 
-    // 防呆：如果目前選中的卡不屬於新銀行 → 清空
-    if (!this.availableCards.some((card) => card.id === this.selectedCard)) {
+    // 防呆：如果目前選中的卡不屬於新銀行 → 清空（但編輯模式保留初始值）
+    if (!this.availableCards.some((card) => card.id == this.selectedCard)) {
       this.selectedCard = "";
       this.clearCardPreview();
     }

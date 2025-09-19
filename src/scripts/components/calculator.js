@@ -93,7 +93,34 @@ function triggerCalculation() {
     }
 }
 
+// 重置下游欄位函數
+function resetDownstreamFields(fieldIds) {
+    fieldIds.forEach(fieldId => {
+        const element = document.getElementById(fieldId);
+        if (element) {
+            if (element.tagName === 'SELECT') {
+                // 重置 select 欄位到預設狀態
+                element.selectedIndex = 0;
+                // 如果有預設的 disabled option，確保它被選中
+                const defaultOption = element.querySelector('option[selected][disabled]');
+                if (defaultOption) {
+                    defaultOption.selected = true;
+                }
+            } else if (element.tagName === 'INPUT') {
+                // 重置 input 欄位
+                element.value = '';
+            } else {
+                // 重置結果顯示區域
+                if (fieldId === 'result_value') {
+                    element.textContent = '請選擇欄位進行計算';
+                }
+            }
+        }
+    });
+}
+
 // 將函數綁定到全域供 HTMX 使用
 window.triggerCalculation = triggerCalculation;
 window.clearForm = clearForm;
 window.scrollToResult = scrollToResult;
+window.resetDownstreamFields = resetDownstreamFields;
