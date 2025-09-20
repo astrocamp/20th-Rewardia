@@ -42,6 +42,7 @@ async function get_user_cards(token, id) {
     });
     if (!response.ok) {
       console.error(`抓使用者卡片出現錯誤: ${response.status}`);
+      return [];
     }
     const cards = await response.json();
     return cards;
@@ -88,7 +89,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         get_auth_token(),
         get_userID(),
       ]);
-      const user_cards = await get_user_cards(token, userID);
+      const user_cards = (token, userID)
+        ? await get_user_cards(token, userID)
+        : [];
       const merchant_data = await get_merchant_data();
       // 取第一個，因為第一個是最大值
       sendResponse({ data: merchant_data?.[0], cards: user_cards });
