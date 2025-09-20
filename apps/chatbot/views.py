@@ -61,7 +61,7 @@ async def chat_api(request):
             def get_user_id_sync():
                 return request.user.id if request.user.is_authenticated else None
             
-            user_id = await sync_to_async(get_user_id_sync, thread_sensitive=False)()
+            user_id = await sync_to_async(get_user_id_sync, thread_sensitive=True)()
             
             # Get conversation history
             conversation_history = data.get('conversation_history', [])

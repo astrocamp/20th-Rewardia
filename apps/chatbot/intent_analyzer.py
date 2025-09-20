@@ -1,23 +1,43 @@
 # Chatbot 意圖分析服務
+import re
+import logging
+import time
 from apps.chatbot.config import (
     BANK_MAPPING, COMMON_KEYWORDS, NAVIGATION_KEYWORDS, COMPARISON_KEYWORDS, 
     PERSONAL_RECOMMENDATION_KEYWORDS, CARD_COMPARISON_RECOMMENDATION_KEYWORDS, 
     RESPONSE_MESSAGES, PAGE_MAPPING, INTENT_KEYWORDS, FORMAT_CONFIG, 
-    DATABASE_CONFIG, CATEGORY_KEYWORDS
+    DATABASE_CONFIG, CATEGORY_KEYWORDS, PERSONAL_QUERY_KEYWORDS
 )
 from .data_service import ChatbotDataService
-from .knowledge_base import SYSTEM_PROMPT
+from .knowledge_base import SYSTEM_PROMPT, REWARDIA_KNOWLEDGE_BASE
+from .comparison_service import ComparisonService
 
 
 class ChatbotResponseBuilder:
     """AI 助理回應建構器"""
 
+    # 類級別快取
+    _all_cards_cache = None
+    _cache_timestamp = None
+    
     # 動態產生一份包含所有銀行關鍵字的列表
-    _bank_related_keywords = ['信用卡', '卡', '銀行', '信託'] + [
+    _bank_related_keywords = INTENT_KEYWORDS['bank_related_keywords'] + [
         keyword 
         for bank_config in BANK_MAPPING.values() 
         for keyword in bank_config['keywords']
     ]
+
+    @classmethod
+    def _get_all_cards_cached(cls):
+        """獲取快取的所有卡片資料"""
+        current_time = time.time()
+        
+        # 如果快取不存在或超過5分鐘，重新查詢
+        if cls._all_cards_cache is None or (cls._cache_timestamp and current_time - cls._cache_timestamp > 300):
+            cls._all_cards_cache = ChatbotDataService.get_all_active_cards()
+            cls._cache_timestamp = current_time
+        
+        return cls._all_cards_cache
 
     @staticmethod
     def _create_base_intent(user_message):
@@ -94,6 +114,10 @@ class ChatbotResponseBuilder:
             intent["is_context_question"] = True
         elif any(indicator in user_message for indicator in card_benefit_indicators):
             intent["is_card_benefit_question"] = True
+            # 檢查是否為「全部優惠」查詢
+            all_benefits_keywords = [kw for kw in INTENT_KEYWORDS['card_benefit_indicators'] if '全部' in kw or '所有' in kw]
+            if any(keyword in user_message for keyword in all_benefits_keywords):
+                intent["is_all_benefits_query"] = True
             
         # 從對話歷史中提取上下文資訊（銀行、類別、卡片等）
         if conversation_history:
@@ -116,6 +140,15 @@ class ChatbotResponseBuilder:
                             if "context_categories" not in intent:
                                 intent["context_categories"] = []
                             intent["context_categories"].append(category)
+                    
+                    # 提取用戶卡片資訊
+                    context_user_cards = ChatbotResponseBuilder._extract_user_cards_from_history(ai_content)
+                    if context_user_cards:
+                        if "context_user_cards" not in intent:
+                            intent["context_user_cards"] = []
+                        for card in context_user_cards:
+                            if card not in intent["context_user_cards"]:
+                                intent["context_user_cards"].append(card)
 
     @staticmethod
     def _extract_categories_from_history(ai_content):
@@ -129,6 +162,45 @@ class ChatbotResponseBuilder:
                     break
         
         return categories
+
+    @staticmethod
+    def _extract_user_cards_from_history(ai_content):
+        """從對話歷史中提取用戶卡片資訊"""
+        # 檢查是否包含用戶卡片列表的標題
+        user_card_indicators = INTENT_KEYWORDS['user_card_indicators']
+        
+        if any(indicator in ai_content for indicator in user_card_indicators):
+            user_cards = []
+            lines = ai_content.split('\n')
+            for line in lines:
+                line = line.strip()
+                # 匹配格式：- 銀行名稱 卡片名稱
+                if line.startswith('- ') and len(line) > 2:
+                    card_info = line[2:].strip()  # 移除 "- "
+                    # 移除可能的暱稱和主要卡片標記
+                    card_info = card_info.split(' (')[0]  # 移除暱稱部分
+                    card_info = card_info.split(' [')[0]  # 移除主要卡片標記
+                    # 移除回饋率資訊（例如：富邦 momo卡: 6.83% 現金回饋 -> 富邦 momo卡）
+                    card_info = card_info.split(':')[0].strip()
+                    if card_info and len(card_info.split()) >= 2:  # 確保有銀行名稱和卡片名稱
+                        user_cards.append(card_info)
+            return user_cards
+        
+        # 如果沒有找到標準格式，嘗試從包含「您的」的句子中提取卡片名稱
+        if "您的" in ai_content or "您" in ai_content:
+            # 匹配模式：玉山 玉山Unicard 或類似的格式
+            pattern = r'([\u4e00-\u9fff]+)\s+([\u4e00-\u9fff]+[A-Za-z]+[\u4e00-\u9fff]*)'
+            matches = re.findall(pattern, ai_content)
+            for match in matches:
+                if len(match) == 2:
+                    bank_name, card_name = match
+                    # 直接檢查卡片名稱是否在資料庫中
+                    all_cards = ChatbotResponseBuilder._get_all_cards_cached()
+                    for card in all_cards:
+                        if card['name'] == card_name:
+                            return [card_name]
+        
+        return []
 
     @staticmethod
     def _analyze_bank_intent(intent, user_message):
@@ -292,6 +364,9 @@ class ChatbotResponseBuilder:
             elif has_highest:
                 # 最高回饋查詢
                 intent["comparison_type"] = "highest_reward"
+            elif any(keyword in user_message for keyword in COMPARISON_KEYWORDS['better_than_card_indicators']):
+                # 比某張卡片更高的查詢
+                intent["comparison_type"] = "better_than_card"
             else:
                 # 一般比較查詢
                 intent["comparison_type"] = "general_comparison"
@@ -378,7 +453,7 @@ class ChatbotResponseBuilder:
                 intent["card_comparison_type"] = "unlimited"
             
             # 提取用戶卡片名稱
-            all_cards = ChatbotDataService.get_all_active_cards()
+            all_cards = ChatbotResponseBuilder._get_all_cards_cached()
             for card in all_cards:
                 card_name = card['name']
                 if card_name in user_message:
@@ -409,6 +484,9 @@ class ChatbotResponseBuilder:
         
         context = SYSTEM_PROMPT
         
+        # 使用類級別快取
+        all_cards = ChatbotResponseBuilder._get_all_cards_cached()
+        
         # 添加用戶資訊
         if user_id:
             user_cards = ChatbotDataService.get_user_cards(user_id)
@@ -438,7 +516,7 @@ class ChatbotResponseBuilder:
         if len(categories) > DATABASE_CONFIG['max_categories_display']: 
             context += RESPONSE_MESSAGES['database_info']['more_categories'].format(count=len(categories))
         
-        total_cards = len(ChatbotDataService.get_all_active_cards())
+        total_cards = len(all_cards)
         context += RESPONSE_MESSAGES['database_info']['total_cards'].format(count=total_cards)
         
         # 處理特定卡片優惠問題
@@ -461,7 +539,6 @@ class ChatbotResponseBuilder:
                     break
             
             # 動態提取卡片名稱：從資料庫中所有卡片名稱進行匹配
-            all_cards = ChatbotDataService.get_all_active_cards()
             for card in all_cards:
                 card_full_name = card['name']
                 # 檢查完整卡片名稱是否在用戶訊息中
@@ -494,9 +571,17 @@ class ChatbotResponseBuilder:
                     card__name=card_name
                 )
                 if rewards.exists():
-                    for reward in rewards:
-                        rate_display = ChatbotDataService._format_reward_rate(reward.min_rate, reward.max_rate)
-                        context += f"- {reward.category}/{reward.scope}: {rate_display} {reward.reward_type}\n"
+                    # 如果是「全部優惠」查詢，顯示所有回饋
+                    if intent.get("is_all_benefits_query", False):
+                        context += f"{card_name} 的所有優惠包括：\n"
+                        for reward in rewards:
+                            rate_display = ChatbotDataService._format_reward_rate(reward.min_rate, reward.max_rate)
+                            context += f"- {reward.category}/{reward.scope}: {rate_display} {reward.reward_type}\n"
+                    else:
+                        # 一般查詢，按原邏輯處理
+                        for reward in rewards:
+                            rate_display = ChatbotDataService._format_reward_rate(reward.min_rate, reward.max_rate)
+                            context += f"- {reward.category}/{reward.scope}: {rate_display} {reward.reward_type}\n"
                 else:
                     context += RESPONSE_MESSAGES['card_benefit']['no_data'].format(name=card_name)
             else:
@@ -572,7 +657,6 @@ class ChatbotResponseBuilder:
                             context += f"- {reward.card.name}: {reward.category} {rate_display} {reward.reward_type}\n"
         
         # 添加知識庫資訊
-        from .knowledge_base import REWARDIA_KNOWLEDGE_BASE
         context += RESPONSE_MESSAGES['platform_info']['header']
         context += RESPONSE_MESSAGES['platform_info']['main_features'].format(
             features=', '.join(REWARDIA_KNOWLEDGE_BASE['website_info']['main_features'])
@@ -630,7 +714,7 @@ class ChatbotResponseBuilder:
             # 改為使用動態產生的列表
             if any(keyword in user_message for keyword in ChatbotResponseBuilder._bank_related_keywords):
                 # 獲取所有真實的卡片名稱
-                all_cards = ChatbotDataService.get_all_active_cards()
+                all_cards = ChatbotResponseBuilder._get_all_cards_cached()
                 real_card_names = {card['name'] for card in all_cards}
                 
                 # 檢查回應中是否包含虛假的卡片名稱
@@ -658,7 +742,6 @@ class ChatbotResponseBuilder:
             
             return response
         except Exception as e:
-            import logging
             logger = logging.getLogger(__name__)
             logger.error(f"Error validating response: {str(e)}")
             return response  # 如果驗證失敗，返回原始回應
@@ -672,10 +755,56 @@ class ChatbotResponseBuilder:
         if intent.get("is_navigation", False):
             return ChatbotResponseBuilder._handle_navigation_intent(intent, user_id, current_page)
 
-        # 處理比較意圖（優先處理）
+        # 處理比較意圖（優先處理，特別是「比某張卡片更高」的查詢）
         if intent.get("is_comparison", False):
-            from .comparison_service import ComparisonService
-            return ComparisonService._handle_comparison_intent(intent, user_id)
+            return ComparisonService.handle_comparison_intent(intent, user_id)
+
+        # 處理特定卡片優惠查詢
+        if intent.get("is_card_benefit_question", False):
+            return ChatbotResponseBuilder._handle_card_benefit_query(intent)
+
+        # 處理基於上下文的用戶卡片查詢
+        if intent.get("context_user_cards") and intent.get("categories"):
+            context_cards = intent["context_user_cards"]
+            categories = intent["categories"]
+            is_highest_query = intent.get("is_highest_query", False)
+            
+            if len(context_cards) > 0 and len(categories) > 0:
+                category = categories[0]  # 使用第一個類別
+                matching_cards = []
+                
+                for card_info in context_cards:
+                    # 查詢該卡片的回饋資料
+                    card_rewards = ChatbotDataService.get_card_all_rewards(card_info)
+                    category_rewards = [r for r in card_rewards if category in r.get('category', '') or category in r.get('scope', '') or category in r.get('reward_type', '')]
+                    
+                    if category_rewards:
+                        # 找到該類別的最佳回饋
+                        best_reward = max(category_rewards, key=lambda x: float(x.get('max_rate', 0) or x.get('min_rate', 0) or 0))
+                        rate_display = ChatbotDataService._format_reward_rate_from_dict(best_reward)
+                        matching_cards.append({
+                            'name': card_info,
+                            'rate': rate_display,
+                            'reward_type': best_reward['reward_type'],
+                            'rate_value': float(best_reward.get('max_rate', 0) or best_reward.get('min_rate', 0) or 0)
+                        })
+                
+                if matching_cards:
+                    if is_highest_query:
+                        # 如果是「最高」查詢，找到回饋率最高的卡片
+                        best_card = max(matching_cards, key=lambda x: x['rate_value'])
+                        return f"在您的卡片中，{category}回饋最高的是：\n- {best_card['name']}: {best_card['rate']} {best_card['reward_type']}"
+                    else:
+                        # 一般查詢，列出所有匹配的卡片
+                        title = f"在您的卡片中，{category}回饋的卡片有：\n"
+                        card_lines = [
+                            f"- {card['name']}: {card['rate']} {card['reward_type']}"
+                            for card in matching_cards
+                        ]
+                        return title + '\n'.join(card_lines)
+                else:
+                    return f"很抱歉，您持有的卡片中沒有提供{category}回饋的卡片。"
+
 
         # 處理個人化推薦意圖（優先處理）
         if intent.get("is_personal_recommendation", False):
@@ -685,8 +814,365 @@ class ChatbotResponseBuilder:
         if intent.get("is_card_comparison_recommendation", False):
             return ChatbotResponseBuilder._handle_card_comparison_recommendation_intent(intent, user_id)
 
+        # 處理個人卡片查詢（優先處理）
+        if user_id and any(keyword in user_message for keyword in PERSONAL_QUERY_KEYWORDS):
+            user_cards = ChatbotDataService.get_user_cards(user_id)
+            if user_cards:
+                response = RESPONSE_MESSAGES['user_cards']['header']
+                for card in user_cards:
+                    response += f"- {card['card__bank']} {card['card__name']}"
+                    if card['nickname']:
+                        response += f"{RESPONSE_MESSAGES['user_info']['nickname_prefix']}{card['nickname']}{RESPONSE_MESSAGES['user_info']['nickname_suffix']}"
+                    if card['is_primary']:
+                        response += RESPONSE_MESSAGES['user_info']['primary_marker']
+                    response += "\n"
+                return response
+            else:
+                return RESPONSE_MESSAGES['personal']['no_cards_set']
+
+
         # 未登入防護：偵測個人查詢關鍵字但沒有 user_id 時，直接回覆尚未登入
-        if (not user_id) and any(keyword in user_message for keyword in COMMON_KEYWORDS):
+        if (not user_id) and any(keyword in user_message for keyword in PERSONAL_QUERY_KEYWORDS):
+            return "你尚未登入"
+
+        return response
+
+    @staticmethod
+    def _handle_navigation_intent(intent, user_id=None, current_page=''):
+        """處理導航意圖"""
+        nav_type = intent.get("navigation_type")
+        nav_target = intent.get("navigation_target")
+        
+        # 會員專區相關導航
+        if nav_type == "member_area":
+            if user_id:
+                # 已登入：檢查是否已在會員專區
+                # 這裡需要檢查當前頁面，暫時假設不在會員專區
+                return f"NAVIGATE:member_area:{RESPONSE_MESSAGES['navigation']['member_area']}"
+            else:
+                # 未登入
+                return RESPONSE_MESSAGES['navigation']['login_required']
+        
+        # 一般頁面導航
+        elif nav_type == "general_page":
+            # 檢查是否已在目標頁面（暫時假設不在）
+            page_name = PAGE_MAPPING['general_pages'].get(nav_target, nav_target)
+            message = RESPONSE_MESSAGES['navigation']['general_pages'].get(nav_target, f"好的，我帶你去{page_name}")
+            return f"NAVIGATE:{nav_target}:{message}"
+
+    @staticmethod
+    def _handle_personal_recommendation_intent(intent, user_id=None):
+        """處理個人化推薦意圖"""
+        if not user_id:
             return "你尚未登入"
         
-        return response
+        recommendation_type = intent.get("recommendation_type")
+        categories = intent.get("categories", [])
+        banks = intent.get("banks", [])
+        
+        if not categories:
+            return RESPONSE_MESSAGES['recommendation']['no_category_specified']
+        
+        category = categories[0]  # 使用第一個類別
+        
+        if recommendation_type == "better_cards":
+            # 推薦更好的卡片
+            if banks:
+                # 限定銀行
+                bank = banks[0]
+                user_cards = ChatbotDataService.get_user_cards(user_id)
+                if not user_cards:
+                    return RESPONSE_MESSAGES['recommendation']['no_user_cards']
+                
+                # 使用第一張用戶卡片
+                user_card = user_cards[0]
+                user_card_name = f"{user_card['card__bank']} {user_card['card__name']}"
+                return ChatbotResponseBuilder._get_better_cards_in_bank(user_card_name, bank, category)
+            else:
+                # 不限銀行
+                user_cards = ChatbotDataService.get_user_cards(user_id)
+                if not user_cards:
+                    return RESPONSE_MESSAGES['recommendation']['no_user_cards']
+                
+                # 使用第一張用戶卡片
+                user_card = user_cards[0]
+                user_card_name = f"{user_card['card__bank']} {user_card['card__name']}"
+                return ChatbotResponseBuilder._get_better_cards_unlimited(user_card_name, category)
+        
+        return RESPONSE_MESSAGES['recommendation']['general_recommendation']
+
+    @staticmethod
+    def _handle_card_comparison_recommendation_intent(intent, user_id=None):
+        """處理卡片比較推薦意圖"""
+        if not user_id:
+            return "你尚未登入"
+        
+        comparison_type = intent.get("card_comparison_type")
+        categories = intent.get("categories", [])
+        
+        if not categories:
+            return RESPONSE_MESSAGES['recommendation']['no_category_specified']
+        
+        category = categories[0]
+        user_cards = ChatbotDataService.get_user_cards(user_id)
+        
+        if not user_cards:
+            return RESPONSE_MESSAGES['recommendation']['no_user_cards']
+        
+        if len(user_cards) < 2:
+            return RESPONSE_MESSAGES['recommendation']['need_multiple_cards']
+        
+        if comparison_type == "compare_user_cards":
+            # 比較用戶的卡片
+            card1 = user_cards[0]
+            card2 = user_cards[1]
+            
+            card1_name = f"{card1['card__bank']} {card1['card__name']}"
+            card2_name = f"{card2['card__bank']} {card2['card__name']}"
+            
+            return ChatbotResponseBuilder._compare_specific_cards([card1_name, card2_name], category)
+        
+        return RESPONSE_MESSAGES['recommendation']['general_comparison']
+
+    @staticmethod
+    def _get_better_cards_in_bank(user_card_name, bank, category):
+        """取得特定銀行中比用戶卡片更好的卡片"""
+        # 先查詢用戶卡片的回饋率
+        user_card_rewards = ChatbotDataService.get_card_all_rewards(user_card_name)
+        user_category_rewards = [r for r in user_card_rewards if category in r.get('category', '') or category in r.get('scope', '') or category in r.get('reward_type', '')]
+        
+        if not user_category_rewards:
+            return RESPONSE_MESSAGES['recommendation']['no_comparison_data'].format(card_name=user_card_name, category=category)
+        
+        # 取得用戶卡片在該類別的最高回饋率
+        user_best_reward = max(user_category_rewards, key=lambda x: float(x.get('max_rate', 0) or x.get('min_rate', 0) or 0))
+        user_rate = float(user_best_reward.get('max_rate', 0) or user_best_reward.get('min_rate', 0) or 0)
+        
+        # 查詢該銀行的其他卡片
+        all_cards = ChatbotResponseBuilder._get_all_cards_cached()
+        bank_cards = [card for card in all_cards if bank in card['bank'] and card['name'] != user_card_name]
+        
+        better_cards = []
+        for card in bank_cards:
+            card_rewards = ChatbotDataService.get_card_all_rewards(card['name'])
+            category_rewards = [r for r in card_rewards if category in r.get('category', '') or category in r.get('scope', '') or category in r.get('reward_type', '')]
+            
+            if category_rewards:
+                best_reward = max(category_rewards, key=lambda x: float(x.get('max_rate', 0) or x.get('min_rate', 0) or 0))
+                card_rate = float(best_reward.get('max_rate', 0) or best_reward.get('min_rate', 0) or 0)
+                
+                if card_rate > user_rate:
+                    better_cards.append({
+                        'name': card['name'],
+                        'bank': card['bank'],
+                        'rate': card_rate,
+                        'reward': best_reward
+                    })
+        
+        if better_cards:
+            # 按回饋率排序
+            better_cards.sort(key=lambda x: x['rate'], reverse=True)
+            best_card = better_cards[0]
+            rate_display = ChatbotDataService._format_reward_rate_from_dict(best_card['reward'])
+            
+            return RESPONSE_MESSAGES['recommendation']['better_card_in_bank'].format(
+                bank=bank, card_name=user_card_name, category=category, 
+                name=best_card['name'], rate=rate_display, type=best_card['reward']['reward_type']
+            )
+        else:
+            return RESPONSE_MESSAGES['recommendation']['no_better_card_in_bank'].format(
+                bank=bank, card_name=user_card_name, category=category
+            )
+
+    @staticmethod
+    def _get_better_cards_unlimited(user_card_name, category):
+        """取得不限銀行中比用戶卡片更好的卡片"""
+        # 先查詢用戶卡片的回饋率
+        user_card_rewards = ChatbotDataService.get_card_all_rewards(user_card_name)
+        user_category_rewards = [r for r in user_card_rewards if category in r.get('category', '') or category in r.get('scope', '') or category in r.get('reward_type', '')]
+        
+        if not user_category_rewards:
+            return RESPONSE_MESSAGES['recommendation']['no_comparison_data'].format(card_name=user_card_name, category=category)
+        
+        # 取得用戶卡片在該類別的最高回饋率
+        user_best_reward = max(user_category_rewards, key=lambda x: float(x.get('max_rate', 0) or x.get('min_rate', 0) or 0))
+        user_rate = float(user_best_reward.get('max_rate', 0) or user_best_reward.get('min_rate', 0) or 0)
+        
+        # 查詢所有其他卡片的回饋
+        all_cards = ChatbotResponseBuilder._get_all_cards_cached()
+        other_cards = [card for card in all_cards if card['name'] != user_card_name]
+        
+        better_cards = []
+        for card in other_cards:
+            card_rewards = ChatbotDataService.get_card_all_rewards(card['name'])
+            category_rewards = [r for r in card_rewards if category in r.get('category', '') or category in r.get('scope', '') or category in r.get('reward_type', '')]
+            
+            if category_rewards:
+                best_reward = max(category_rewards, key=lambda x: float(x.get('max_rate', 0) or x.get('min_rate', 0) or 0))
+                card_rate = float(best_reward.get('max_rate', 0) or best_reward.get('min_rate', 0) or 0)
+                
+                if card_rate > user_rate:
+                    better_cards.append({
+                        'name': card['name'],
+                        'bank': card['bank'],
+                        'rate': card_rate,
+                        'reward': best_reward
+                    })
+        
+        if better_cards:
+            # 按回饋率排序
+            better_cards.sort(key=lambda x: x['rate'], reverse=True)
+            best_card = better_cards[0]
+            rate_display = ChatbotDataService._format_reward_rate_from_dict(best_card['reward'])
+            
+            return RESPONSE_MESSAGES['recommendation']['better_card_unlimited'].format(
+                card_name=user_card_name, category=category, 
+                bank=best_card['bank'], name=best_card['name'], 
+                rate=rate_display, type=best_card['reward']['reward_type']
+            )
+        else:
+            return RESPONSE_MESSAGES['recommendation']['no_better_card_unlimited'].format(
+                card_name=user_card_name, category=category
+            )
+
+    @staticmethod
+    def _compare_specific_cards(card_names, category):
+        """比較特定卡片"""
+        # 查詢兩張卡片的回饋資料
+        all_cards = ChatbotResponseBuilder._get_all_cards_cached()
+        card_data = []
+        
+        for card_name in card_names:
+            # 尋找匹配的卡片
+            matched_card = None
+            for card in all_cards:
+                if card_name in card['name'] or card['name'] in card_name:
+                    matched_card = card
+                    break
+            
+            if matched_card:
+                # 查詢該卡片的回饋資料
+                rewards = ChatbotDataService.get_card_all_rewards(matched_card['name'])
+                category_rewards = [r for r in rewards if category in r.get('category', '') or category in r.get('scope', '') or category in r.get('reward_type', '')]
+                card_data.append({
+                    'name': matched_card['name'],
+                    'bank': matched_card['bank'],
+                    'rewards': category_rewards
+                })
+        
+        if len(card_data) < 2:
+            return RESPONSE_MESSAGES['comparison']['no_cards_found']
+        
+        # 比較回饋率
+        title = RESPONSE_MESSAGES['comparison']['comparison_title'].format(category=category)
+        card_lines = []
+        
+        for card in card_data:
+            if card['rewards']:
+                best_reward = max(card['rewards'], key=lambda x: float(x.get('max_rate', 0) or x.get('min_rate', 0) or 0))
+                rate_display = ChatbotDataService._format_reward_rate_from_dict(best_reward)
+                card_lines.append(f"- {card['bank']} {card['name']}: {rate_display} {best_reward['reward_type']}")
+            else:
+                card_lines.append(RESPONSE_MESSAGES['comparison']['no_reward'].format(
+                    bank=card['bank'], name=card['name'], category=category
+                ))
+        
+        return title + '\n'.join(card_lines)
+
+    @staticmethod
+    def _handle_card_benefit_query(intent):
+        """處理特定卡片優惠查詢"""
+        user_message = intent.get("raw_message", "")
+        
+        # 提取卡片名稱
+        card_name = None
+        bank_name = None
+        
+        # 如果是「這張卡」、「這張」等代詞查詢，嘗試從上下文提取
+        if any(keyword in user_message for keyword in ["這張卡", "這張", "那張卡", "那張"]):
+            # 從對話歷史中提取卡片名稱
+            card_name = ChatbotResponseBuilder._extract_card_name_from_context(intent)
+        
+        # 從用戶訊息中提取銀行名稱
+        for bank, config in BANK_MAPPING.items():
+            for keyword in config['keywords']:
+                if keyword in user_message:
+                    bank_name = bank
+                    break
+            if bank_name:
+                break
+        
+        # 動態提取卡片名稱：從資料庫中所有卡片名稱進行匹配
+        all_cards = ChatbotResponseBuilder._get_all_cards_cached()
+        for card in all_cards:
+            card_full_name = card['name']
+            # 檢查完整卡片名稱是否在用戶訊息中
+            if card_full_name in user_message:
+                card_name = card_full_name
+                break
+            # 檢查卡片名稱的關鍵部分（去除銀行名稱前綴）
+            card_key_part = card_full_name.replace(card['bank'], '').strip()
+            if card_key_part and card_key_part in user_message:
+                card_name = card_full_name
+                break
+        
+        # 如果沒有找到完整匹配，嘗試部分匹配
+        if not card_name and bank_name:
+            for card in all_cards:
+                if bank_name in card['bank']:
+                    # 檢查卡片名稱是否包含用戶訊息中的關鍵字
+                    card_words = card['name'].split()
+                    for word in card_words:
+                        if len(word) > 2 and word in user_message:
+                            card_name = card['name']
+                            break
+                    if card_name:
+                        break
+        
+        if card_name:
+            # 查詢該卡片的回饋資料
+            rewards = ChatbotDataService.get_card_all_rewards(card_name)
+            if rewards:
+                # 如果是「全部優惠」查詢，顯示所有回饋
+                if intent.get("is_all_benefits_query", False):
+                    title = f"{card_name} 的所有優惠包括：\n"
+                    reward_lines = [
+                        f"- {reward['category']}/{reward['scope']}: {ChatbotDataService._format_reward_rate_from_dict(reward)} {reward['reward_type']}"
+                        for reward in rewards
+                    ]
+                    return title + '\n'.join(reward_lines)
+                else:
+                    # 一般查詢，顯示所有回饋
+                    title = f"{card_name} 提供的優惠包括：\n"
+                    reward_lines = [
+                        f"- {reward['category']}/{reward['scope']}: {ChatbotDataService._format_reward_rate_from_dict(reward)} {reward['reward_type']}"
+                        for reward in rewards
+                    ]
+                    return title + '\n'.join(reward_lines)
+            else:
+                return f"{card_name} 目前沒有回饋資料。"
+        else:
+            return "無法識別您詢問的卡片名稱，請提供更詳細的資訊。"
+
+    @staticmethod
+    def _extract_card_name_from_context(intent):
+        """從對話上下文中提取卡片名稱"""
+        # 檢查是否有 context_user_cards（從用戶卡片查詢中提取的）
+        context_user_cards = intent.get("context_user_cards", [])
+        if context_user_cards:
+            # 返回第一個用戶卡片名稱
+            return context_user_cards[0]
+        
+        # 檢查是否有 context_banks（從銀行查詢中提取的）
+        context_banks = intent.get("context_banks", [])
+        if context_banks:
+            # 如果有銀行上下文，返回該銀行的第一個卡片
+            bank_name = context_banks[0]
+            # 移除「銀行」後綴進行匹配
+            bank_name_clean = bank_name.replace('銀行', '').strip()
+            all_cards = ChatbotResponseBuilder._get_all_cards_cached()
+            for card in all_cards:
+                if bank_name_clean in card['bank'] or bank_name in card['bank']:
+                    return card['name']
+        
+        return None

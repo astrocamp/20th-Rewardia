@@ -23,14 +23,3 @@ def handle_database_errors(default_return=None, log_error=True):
     return decorator
 
 
-def validate_response(response, user_message, user_id=None):
-    """驗證回應內容"""
-    # 基本驗證邏輯
-    if not response or response.strip() == "":
-        return "抱歉，我無法處理您的問題，請稍後再試或聯繫客服。"
-    
-    # 檢查回應長度
-    if len(response) > 1000:
-        response = response[:1000] + "..."
-    
-    return response

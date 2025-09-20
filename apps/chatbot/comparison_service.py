@@ -65,6 +65,10 @@ class ComparisonService:
                 # 不限銀行
                 return ComparisonService.get_highest_reward_unlimited(category)
                 
+        elif comparison_type == "better_than_card":
+            # 比某張卡片更高的查詢
+            return ComparisonService.get_better_cards_than_user_card(intent, user_id, category)
+                
         else:
             # 一般比較查詢
             if is_bank_limited and banks:
@@ -233,5 +237,65 @@ class ComparisonService:
                     rate_display = ChatbotDataService._format_reward_rate(reward.min_rate, reward.max_rate)
                     response += f"- {reward.card.bank} {reward.card.name}: {rate_display} {reward.reward_type}\n"
                 return response
+
+    @staticmethod
+    def get_better_cards_than_user_card(intent, user_id, category):
+        """找出比用戶卡片回饋更高的所有卡片"""
+        
+        # 從對話歷史中提取用戶的最高回饋卡片
+        context_user_cards = intent.get("context_user_cards", [])
+        if not context_user_cards:
+            return "很抱歉，無法識別您要比較的卡片。"
+        
+        # 找到用戶卡片中該類別的最高回饋
+        user_highest_rate = 0
+        user_card_name = ""
+        
+        for card_info in context_user_cards:
+            card_rewards = ChatbotDataService.get_card_all_rewards(card_info)
+            category_rewards = [r for r in card_rewards if category in r.get('category', '') or category in r.get('scope', '') or category in r.get('reward_type', '')]
+            
+            if category_rewards:
+                best_reward = max(category_rewards, key=lambda x: float(x.get('max_rate', 0) or x.get('min_rate', 0) or 0))
+                rate_value = float(best_reward.get('max_rate', 0) or best_reward.get('min_rate', 0) or 0)
+                
+                if rate_value > user_highest_rate:
+                    user_highest_rate = rate_value
+                    user_card_name = card_info
+        
+        if user_highest_rate == 0:
+            return f"很抱歉，您的卡片中沒有 {category} 回饋資料。"
+        
+        # 查詢所有卡片中比用戶最高回饋更高的卡片
+        all_rewards = ChatbotDataService._get_reward_queryset_with_sorting().filter(
+            Q(category__icontains=category) | Q(scope__icontains=category) | Q(reward_type__icontains=category)
+        ).select_related('card')
+        
+        better_cards = []
+        for reward in all_rewards:
+            # 計算該回饋的數值（使用 max_rate 或 min_rate）
+            reward_rate = float(reward.max_rate or reward.min_rate or 0)
+            
+            # 如果回饋率比用戶的最高回饋更高
+            if reward_rate > user_highest_rate:
+                # 檢查是否為用戶的卡片（避免重複）
+                card_name = f"{reward.card.bank} {reward.card.name}"
+                if card_name not in context_user_cards:
+                    better_cards.append({
+                        'card': reward.card,
+                        'reward': reward,
+                        'rate': reward_rate
+                    })
+        
+        if better_cards:
+            # 按回饋率排序
+            better_cards.sort(key=lambda x: x['rate'], reverse=True)
+            
+            response = f"比您的 {user_card_name} 在 {category} 回饋更高的卡片有：\n\n"
+            for card_data in better_cards[:10]:  # 顯示前10張
+                rate_display = ChatbotDataService._format_reward_rate(card_data['reward'].min_rate, card_data['reward'].max_rate)
+                response += f"- {card_data['card'].bank} {card_data['card'].name}: {rate_display} {card_data['reward'].reward_type}\n"
+            
+            return response
         else:
-            return RESPONSE_MESSAGES['comparison']['no_data_found'].format(category=category)
+            return f"很抱歉，目前沒有比您的 {user_card_name} 在 {category} 回饋更高的卡片。您的卡片已經是該類別回饋最高的選擇之一！"
