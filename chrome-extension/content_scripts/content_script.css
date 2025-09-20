@@ -120,6 +120,8 @@
   50% {
     transform: scale(1.1);
   }
+}
+
 /* 自動填入信用卡號相關 */
 .card_selector {
   font-size: 14px;
@@ -168,29 +170,3 @@
   justify-content: space-between;
   align-items: center;
 }
-/* .card_selector td {
-  font-size: 14px;
-  vertical-align: middle;
-  padding-left: 5px;
-  background-color: #032885;
-  color: white;
-  border-radius: 20px;
-  padding: 20px;
-}
-
-.card_list {
-  width: 50%;
-}
-
-.card_list li {
-  font-size: 12px;
-  margin: 5px 0;
-}
-
-#card_select {
-  width: auto;
-  background-color: white;
-  height: 30px;
-  border: solid 2px #13b8ff;
-  vertical-align: middle;
-} */

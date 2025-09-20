@@ -233,23 +233,24 @@ function display_cards(cards) {
   });
 }
 
-function fill_card_num(card_num) {
-  const card_num_1 = document.querySelector("#cardNo_1");
-  const card_num_2 = document.querySelector("#cardNo_2");
-  const card_num_3_hidden = document.querySelector("#cardNo_3");
-  const card_num_3 = document.querySelector("#cardNo_3_temp");
-  const card_num_4 = document.querySelector("#cardNo_4");
+// 下一次處理填寫信用卡資料的issue處理
+// function fill_card_num(card_num) {
+//   const card_num_1 = document.querySelector("#cardNo_1");
+//   const card_num_2 = document.querySelector("#cardNo_2");
+//   const card_num_3_hidden = document.querySelector("#cardNo_3");
+//   const card_num_3 = document.querySelector("#cardNo_3_temp");
+//   const card_num_4 = document.querySelector("#cardNo_4");
 
-  if (card_num_1) {
-    card_num_1.addEventListener("focus", function () {});
+//   if (card_num_1) {
+//     card_num_1.addEventListener("focus", function () {});
 
-    // card_num_1.value = 4111;
-    // card_num_2.value = 1111;
-    // card_num_3_hidden.value = 1111;
-    // card_num_3.value = "****";
-    // card_num_4.value = 1111;
-  }
-}
+//     // card_num_1.value = 4111;
+//     // card_num_2.value = 1111;
+//     // card_num_3_hidden.value = 1111;
+//     // card_num_3.value = "****";
+//     // card_num_4.value = 1111;
+//   }
+// }
 
 if (current_url.includes("cart.momoshop.com.tw")) {
   const observer = new MutationObserver(async (mutations) => {
@@ -260,8 +261,6 @@ if (current_url.includes("cart.momoshop.com.tw")) {
       observer.disconnect();
       display_cards(cards);
     }
-
-    // fill_card_num();
   });
   observer.observe(document.body, {
     childList: true,
