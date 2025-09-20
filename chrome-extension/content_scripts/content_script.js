@@ -64,17 +64,6 @@ if (current_url == `${base_url}/users/member/`) {
   });
 }
 
-if (current_url.includes("https://rewardia.net/")) {
-  const log_out_btn = document.querySelector(
-    "form[action='/sessions/logout/']"
-  );
-  log_out_btn.addEventListener("click", function () {
-    chrome.runtime.sendMessage({
-      action: "log_out",
-    });
-  });
-}
-
 // 顯示回饋金額在momo網站相關
 async function display_momo_rewards(rate, card, is_user_card) {
   const checkout_price = document.querySelector(".checkout-item");
@@ -126,7 +115,7 @@ if (current_url.includes("cart")) {
             action: "calculate",
           },
           async (response) => {
-            if (!response?.data || !response?.cards) return;
+            if (!response?.data || response.cards.length == 0) return;
             const card = response.data;
             const max_rate = Number(card.max_rate);
             const card_name = card.card.name;
