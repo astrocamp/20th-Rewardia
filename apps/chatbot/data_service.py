@@ -155,9 +155,27 @@ class ChatbotDataService:
     @handle_database_errors(default_return=[])
     def get_card_all_rewards(card_name):
         """取得特定卡片的所有回饋"""
-        rewards = ChatbotDataService._get_reward_queryset_with_sorting().filter(
-            card__name=card_name
-        ).select_related('card')
+        # 如果 card_name 包含銀行名稱（格式：銀行名稱 卡片名稱），則提取卡片名稱
+        if ' ' in card_name:
+            parts = card_name.split(' ', 1)
+            if len(parts) == 2:
+                bank_name, actual_card_name = parts
+                # 先嘗試完整匹配
+                rewards = ChatbotDataService._get_reward_queryset_with_sorting().filter(
+                    card__name=card_name
+                ).select_related('card')
+                
+                # 如果沒有找到，嘗試只用卡片名稱匹配
+                if not rewards.exists():
+                    rewards = ChatbotDataService._get_reward_queryset_with_sorting().filter(
+                        card__name=actual_card_name,
+                        card__bank__icontains=bank_name
+                    ).select_related('card')
+        else:
+            # 如果沒有空格，直接使用原始名稱
+            rewards = ChatbotDataService._get_reward_queryset_with_sorting().filter(
+                card__name=card_name
+            ).select_related('card')
         
         result = []
         for reward in rewards:
