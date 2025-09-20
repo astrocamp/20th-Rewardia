@@ -1,4 +1,4 @@
-const base_url = "http://localhost:8000";
+const base_url = "https://rewardia.net/";
 const bank_select = document.querySelector("#bank_select");
 const card_select = document.querySelector("#card_select");
 const submit = document.querySelector("#new_card_submit");

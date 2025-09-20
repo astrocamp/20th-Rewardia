@@ -161,6 +161,13 @@
   transform: translateX(2px);
   transition: all 0.2s ease;
 }
+
+.card_item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
 /* .card_selector td {
   font-size: 14px;
   vertical-align: middle;

@@ -1,4 +1,4 @@
-const base_url = "http://localhost:8000";
+const base_url = "https://rewardia.net/";
 const current_host = window.location.hostname;
 const current_url = window.location.href;
 
@@ -159,32 +159,43 @@ function get_user_cards() {
   });
 }
 
-function return_reward(rewards, price) {
-  if (rewards.min_rate && rewards.max_rate) {
-    const max_card_rate_result = (price * (rewards.max_rate / 100)).toFixed(2);
-    const min_card_rate_result = (price * (rewards.min_rate / 100)).toFixed(2);
-    const result = `${min_card_rate_result} - ${max_card_rate_result}`;
+function return_reward(reward, price) {
+  if (reward.min_rate && reward.max_rate) {
+    const max_card_rate_result = (price * (reward.max_rate / 100)).toFixed(2);
+    const min_card_rate_result = (price * (reward.min_rate / 100)).toFixed(2);
+    const result = `回饋${min_card_rate_result} - ${max_card_rate_result}元`;
     return result;
-  } else if (rewards.min_rate == null) {
-    const card_rate = rewards.max_rate;
+  } else if (reward.min_rate == null) {
+    const card_rate = reward.max_rate;
     const result = (price * (card_rate / 100)).toFixed(2);
-    return result;
-  } else if (rewards.max_rate == null) {
-    const card_rate = rewards.min_rate;
+    return `最高回饋 ${result}元`;
+  } else if (reward.max_rate == null) {
+    const card_rate = reward.min_rate;
     const result = (price * (card_rate / 100)).toFixed(2);
-    return result;
+    return `最低回饋 ${result}元`;
   }
 }
 
-function check_reward_scope(card, price) {
-  if (card.rewards.scope == "momo購物") {
-    const reward = `${return_reward(card.rewards, price)}元`;
-    return reward;
-  } else if (card.rewards.scope == "國內") {
-    const reward = `${return_reward(card.rewards, price)}元`;
-    return reward;
+// 篩選出有momo或國內回饋的回饋資訊
+function check_reward_scope(rewards) {
+  const momo_reward = rewards.filter((reward) => reward.scope == "momo購物");
+  const domestic_reward = rewards.filter((reward) => reward.scope == "國內");
+  if (momo_reward.length > 0) {
+    return momo_reward;
+  } else if (domestic_reward.length > 0) {
+    return domestic_reward;
   } else {
-    return `無適用回饋`;
+    return [];
+  }
+}
+
+function calculate_numeric_reward(reward, price) {
+  if ((reward.max_rate && reward.min_rate) || reward.min_rate == null) {
+    const max_card_rate_result = (price * (reward.max_rate / 100)).toFixed(2);
+    return max_card_rate_result;
+  } else if (reward.max_rate == null) {
+    const result = (price * (reward.min_rate / 100)).toFixed(2);
+    return result;
   }
 }
 
@@ -205,18 +216,31 @@ function display_cards(cards) {
 
   // 卡片選項
   const card_list = card_selector.querySelector(".card_list");
-  cards.forEach((card) => {
-    const reward = check_reward_scope(card, price);
-    const card_items = `<li class="card_item" data-id="${card.card.id}"><div>${card.card.name} ${reward}</div></li>`;
-    card_list.insertAdjacentHTML("beforeend", card_items);
+
+  const cards_with_rewards = cards.map((card) => {
+    let displayed_reward;
+    let numeric_reward;
+
+    const reward = check_reward_scope(card.rewards);
+    if (reward.length == 0) {
+      displayed_reward = `無適用回饋`;
+      numeric_reward = 0;
+    } else {
+      displayed_reward = return_reward(reward[0], price);
+      // 計算一個回饋的值作為排序使用
+      numeric_reward = calculate_numeric_reward(reward[0], price);
+    }
+
+    return { ...card, displayed_reward, numeric_reward };
   });
 
-  // 回傳使用者選擇
-  const card_item = document.querySelectorAll(".card_item");
-  card_item.forEach((card_item) => {
-    card_item.addEventListener("click", function () {
-      console.log(`${card_item.textContent}`);
-    });
+  cards_with_rewards.sort((a, b) => {
+    return Number(b.numeric_reward) - Number(a.numeric_reward);
+  });
+
+  cards_with_rewards.forEach((card) => {
+    const card_items = `<li class="card_item" data-id="${card.card.id}"><div>${card.card.name}</div><div>${card.displayed_reward}</div></li>`;
+    card_list.insertAdjacentHTML("beforeend", card_items);
   });
 }
 
@@ -242,7 +266,7 @@ if (current_url.includes("cart.momoshop.com.tw")) {
   const observer = new MutationObserver(async (mutations) => {
     const credit_card_box = document.querySelector("#cardPaymentBox");
     const cards = await get_user_cards();
-    console.log(cards);
+
     if (credit_card_box) {
       observer.disconnect();
       display_cards(cards);
