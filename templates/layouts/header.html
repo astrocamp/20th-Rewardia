@@ -15,11 +15,7 @@
           <!-- 中間內容（在 sm+ 置中；手機只顯示 icon，文字隱藏） -->
           <div class="flex items-center gap-3 sm:gap-4 sm:justify-center sm:col-start-2">
             <!-- 圓形 icon：手機保留 -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 shrink-0" viewBox="0 0 256 256" fill="white" aria-hidden="true">
-              <g transform="scale(5.12,5.12)">
-                <path d="M25,2c-12.6907,0 -23,10.3093 -23,23c0,12.69071 10.3093,23 23,23c12.69071,0 23,-10.30929 23,-23c0,-12.6907 -10.30929,-23 -23,-23zM25,4c7.98798,0 14.92565,4.44503 18.47656,11h-18.47656c-0.03784,-0.00019 -0.07566,0.00176 -0.11328,0.00586c-5.14785,0.05824 -9.37505,4.02951 -9.83984,9.07227l-7.01172,-11.42773c3.81644,-5.2367 9.97965,-8.65039 16.96484,-8.65039zM6.82422,14.50195l9.65234,15.72852c0.03315,0.05638 0.07174,0.10936 0.11523,0.1582c0.00065,0.0013 0.0013,0.00261 0.00195,0.00391c1.78145,2.76595 4.88117,4.60742 8.40625,4.60742c1.41306,0 2.75633,-0.29827 3.97656,-0.83008l-6.65625,11.6543c-10.34035,-1.31441 -18.32031,-10.12311 -18.32031,-20.82422c0,-3.83026 1.03757,-7.40847 2.82422,-10.49805zM25,17c4.43012,0 8,3.56988 8,8c0,1.42117 -0.37032,2.75159 -1.01562,3.90625c-0.00065,0.00065 -0.0013,0.0013 -0.00195,0.00195c-0.01238,0.01913 -0.02411,0.03867 -0.03516,0.05859c-1.37555,2.41054 -3.96378,4.0332 -6.94727,4.0332c-4.43012,0 -8,-3.56988 -8,-8c0,-4.43012 3.56988,-8 8,-8zM30.97266,17h13.44922c1.01492,2.46534 1.57813,5.16577 1.57813,8c0,11.60982 -9.39018,21 -21,21c-0.15783,0 -0.31371,-0.00827 -0.4707,-0.01172l9.1543,-16.0293c0.02207,-0.03774 0.04165,-0.07689 0.05859,-0.11719c0.79908,-1.43612 1.25781,-3.08613 1.25781,-4.8418c0,-3.27139 -1.58894,-6.17407 -4.02734,-8z"/>
-              </g>
-            </svg>
+            {% include 'components/icon.html' with name="chrome-extension" size="w-6 h-6" class="shrink-0" %}
 
             <!-- 文字：手機隱藏，sm+ 顯示 -->
             <div class="hidden sm:block leading-tight">
@@ -36,9 +32,7 @@
 
           <!-- 右側關閉：手機 & 桌機都顯示，靠最右 -->
           <button class="banner-close-btn justify-self-end p-1 inline-flex" aria-label="關閉" @click.prevent="$store.banner.close()">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
+            {% include 'components/icon.html' with name="close" size="w-6 h-6" %}
           </button>
         </div>
       </div>
@@ -69,9 +63,7 @@
           <!-- 已登入：大畫面顯示用戶名 + 登出按鈕 -->
           <div class="hidden md:flex items-center space-x-3">
             <div class="flex items-center space-x-2 text-gray-700">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-              </svg>
+              {% include 'components/icon.html' with name="user" size="w-5 h-5" %}
               <span class="max-w-20 truncate">{{ user.username }}</span>
             </div>
           </div>
@@ -106,9 +98,7 @@
                 @click="toggleMobileMenu()"
                 @click.outside="closeMobileMenu()">
           <!-- 三條線 icon -->
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M4 6h16M4 12h16M4 18h16" stroke-width="2" stroke-linecap="round"/>
-          </svg>
+          {% include 'components/icon.html' with name="menu" size="w-5 h-5" %}
         </button>
       </div>
     </div>

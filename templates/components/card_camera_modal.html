@@ -23,9 +23,7 @@
         <h3 class="text-base sm:text-lg font-semibold text-gray-900 m-0">信用卡卡號識別</h3>
         <button @click="closeCamera()" 
                 class="text-gray-400 bg-none border-none cursor-pointer p-1 hover:text-gray-600">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
+          {% include 'components/icon.html' with name="close" size="w-6 h-6" %}
         </button>
       </div>
       
@@ -79,9 +77,7 @@
              x-transition
              class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
           <div class="flex">
-            <svg class="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
+            {% include 'components/icon.html' with name="warning" size="w-5 h-5" class="text-red-400 mr-2" %}
             <p class="text-sm text-red-700 m-0" x-text="error"></p>
           </div>
         </div>
@@ -101,9 +97,7 @@
           <button x-show="error && retries < maxRetries"
                   @click="retryCapture()"
                   class="inline-flex items-center px-4 sm:px-10 py-2 sm:py-4 bg-orange-500 text-white border-none rounded-lg cursor-pointer font-medium text-xs sm:text-base">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-            </svg>
+            {% include 'components/icon.html' with name="retry" size="w-4 h-4" class="mr-2" %}
             重新拍照
           </button>
           
@@ -111,9 +105,7 @@
           <button x-show="error && retries >= maxRetries"
                   @click="openManualInput()"
                   class="inline-flex items-center px-4 sm:px-10 py-2 sm:py-4 bg-gray-500 text-white border-none rounded-lg cursor-pointer font-medium text-xs sm:text-base"
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-            </svg>
+            {% include 'components/icon.html' with name="edit" size="w-4 h-4" class="mr-2" %}
             手動輸入
           </button>
           
@@ -155,9 +147,7 @@
         <h3 class="text-base sm:text-lg font-semibold text-gray-900 m-0">請確認掃描後信用卡卡號</h3>
         <button @click="cancelEdit()" 
                 class="text-gray-400 bg-none border-none cursor-pointer p-1 hover:text-gray-600">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
+          {% include 'components/icon.html' with name="close" size="w-6 h-6" %}
         </button>
       </div>
       
@@ -198,12 +188,10 @@
           <div :class="luhnValid ? 'bg-green-50 border-green-200 text-green-800' : 'bg-yellow-50 border-yellow-200 text-yellow-800'"
                class="p-3 rounded border">
             <div class="flex items-center">
-              <svg :class="luhnValid ? 'text-green-500' : 'text-yellow-500'" 
-                   class="w-5 h-5 mr-2" 
-                   fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                      :d="luhnValid ? 'M5 13l4 4L19 7' : 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'"></path>
-              </svg>
+              <div class="w-5 h-5 mr-2">
+                <div x-show="luhnValid">{% include 'components/icon.html' with name="check" size="w-5 h-5" class="text-green-500" %}</div>
+                <div x-show="!luhnValid">{% include 'components/icon.html' with name="warning" size="w-5 h-5" class="text-yellow-500" %}</div>
+              </div>
               <span class="text-sm font-medium" 
                     x-text="luhnValid ? '卡號格式驗證通過' : '掃描的結果可能不正確，請您務必檢查'"></span>
             </div>
@@ -219,9 +207,7 @@
         </button>
         <button @click="retryRecognition()"
                 class="inline-flex items-center px-3 py-2 bg-green-500 text-white border-none rounded cursor-pointer font-medium text-xs">
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-          </svg>
+          {% include 'components/icon.html' with name="retry" size="w-4 h-4" class="mr-2" %}
           重新辨識
         </button>
         <button @click="confirmCardNumber()"

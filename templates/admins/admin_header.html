@@ -27,9 +27,7 @@
                 aria-controls="mobile-menu" aria-expanded="false" aria-label="打開主選單"
                 @click="toggleMobileMenu()">
 
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M4 6h16M4 12h16M4 18h16" stroke-width="2" stroke-linecap="round"/>
-          </svg>
+          {% include 'components/icon.html' with name="menu" size="w-5 h-5" %}
         </button>
       </div>
     </div>
