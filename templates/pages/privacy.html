@@ -66,15 +66,11 @@
           <ul class="space-y-3 text-gray-700">
 
             <li class="flex items-start">
-              <svg class="w-5 h-5 text-green-600 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-              </svg>
+              {% include 'components/icon.html' with name="success" size="w-5 h-5" class="text-green-600 mt-0.5 mr-3 flex-shrink-0" %}
               定期進行資安檢測及弱點掃描，確保系統安全性
             </li>
             <li class="flex items-start">
-              <svg class="w-5 h-5 text-green-600 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-              </svg>
+              {% include 'components/icon.html' with name="success" size="w-5 h-5" class="text-green-600 mt-0.5 mr-3 flex-shrink-0" %}
               採用業界標準的安全措施保護資料傳輸及儲存
             </li>
           </ul>
@@ -143,10 +139,7 @@
 
         <div class="bg-gray-50 rounded-lg p-4 space-y-2">
           <div class="flex items-center">
-            <svg class="w-5 h-5 text-gray-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
-              <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
-            </svg>
+            {% include 'components/icon.html' with name="email" size="w-5 h-5" class="text-gray-500 mr-3" %}
             <span class="text-gray-700">電子郵件：<a href="mailto:legosthes@gmail.com" class="text-blue-600 hover:text-blue-800">legosthes@gmail.com</a></span>
           </div>
 

@@ -50,13 +50,8 @@
                 @click="showOldPassword = !showOldPassword"
                 :aria-label="showOldPassword ? '隱藏密碼' : '顯示密碼'"
               >
-                <svg x-show="!showOldPassword" class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                </svg>
-                <svg x-show="showOldPassword" class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
-                </svg>
+                <div x-show="!showOldPassword">{% include 'components/icon.html' with name="eye" size="h-5 w-5" class="text-gray-400" %}</div>
+                <div x-show="showOldPassword">{% include 'components/icon.html' with name="eye-off" size="h-5 w-5" class="text-gray-400" %}</div>
               </button>
             </div>
             <div x-show="passwordChangeErrors.old_password" class="text-red-500 text-sm mt-1" x-text="passwordChangeErrors.old_password"></div>
@@ -84,13 +79,8 @@
                 @click="showNewPassword = !showNewPassword"
                 :aria-label="showNewPassword ? '隱藏密碼' : '顯示密碼'"
               >
-                <svg x-show="!showNewPassword" class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                </svg>
-                <svg x-show="showNewPassword" class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
-                </svg>
+                <div x-show="!showNewPassword">{% include 'components/icon.html' with name="eye" size="h-5 w-5" class="text-gray-400" %}</div>
+                <div x-show="showNewPassword">{% include 'components/icon.html' with name="eye-off" size="h-5 w-5" class="text-gray-400" %}</div>
               </button>
             </div>
             <div x-show="passwordChangeErrors.new_password" class="text-red-500 text-sm mt-1" x-text="passwordChangeErrors.new_password"></div>
@@ -118,13 +108,8 @@
                 @click="showConfirmNewPassword = !showConfirmNewPassword"
                 :aria-label="showConfirmNewPassword ? '隱藏密碼' : '顯示密碼'"
               >
-                <svg x-show="!showConfirmNewPassword" class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                </svg>
-                <svg x-show="showConfirmNewPassword" class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
-                </svg>
+                <div x-show="!showConfirmNewPassword">{% include 'components/icon.html' with name="eye" size="h-5 w-5" class="text-gray-400" %}</div>
+                <div x-show="showConfirmNewPassword">{% include 'components/icon.html' with name="eye-off" size="h-5 w-5" class="text-gray-400" %}</div>
               </button>
             </div>
             <div x-show="passwordChangeErrors.confirm_new_password" class="text-red-500 text-sm mt-1" x-text="passwordChangeErrors.confirm_new_password"></div>
@@ -189,10 +174,7 @@
         <div class="member-section-bg">
           <div class="member-section-header">
             <div class="flex items-center gap-3">
-              <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
+              {% include 'components/icon.html' with name="user" size="w-6 h-6" class="text-gray-600" %}
               <h3 class="member-section-title">會員資料</h3>
             </div>
             {% if not has_google_oauth %}
@@ -228,10 +210,7 @@
         <div class="member-section-bg">
           <div class="member-section-header">
             <div class="flex items-center gap-3">
-              <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                      d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-              </svg>
+              {% include 'components/icon.html' with name="card" size="w-6 h-6" class="text-gray-600" %}
               <h3 class="member-section-title">我的卡片</h3>
             </div>
             <a href="{% url 'users:card_new' %}" class="ui-btn ui-btn-primary">+ 新增卡片</a>
@@ -249,9 +228,7 @@
                     <img src="{{ card_data.image_url }}" alt="{{ card_data.user_card.card.name }}" class="member-card-image">
                   {% else %}
                     <div class="member-card-placeholder">
-                      <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                      </svg>
+                      {% include 'components/icon.html' with name="image" size="w-12 h-12" class="text-gray-400" %}
                     </div>
                   {% endif %}
                 </div>
@@ -344,9 +321,7 @@
                       <h4 class="member-manual-input-title">請手動輸入信用卡卡號</h4>
                       <button @click="hideManualInputDialog()" 
                               class="member-manual-input-close">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
+                        {% include 'components/icon.html' with name="close" size="w-6 h-6" %}
                       </button>
                     </div>
                     <div class="member-manual-input-content">
@@ -415,12 +390,7 @@
             <div class="member-empty-content">
               <div class="member-empty-icon">
                 <!-- 文件圖標-->
-                <svg width="80" height="90" viewBox="0 0 80 90" fill="none">
-                  <rect width="79.19" height="89.24" rx="8" fill="#E5E7EB" />
-                  <line x1="20.5" y1="38.2" x2="59.5" y2="38.2" stroke="#BEC1C6" stroke-width="7" stroke-linecap="round" />
-                  <line x1="20.5" y1="51.2" x2="59.5" y2="51.2" stroke="#BEC1C6" stroke-width="7" stroke-linecap="round" />
-                  <line x1="20.5" y1="64.2" x2="59.5" y2="64.2" stroke="#BEC1C6" stroke-width="7" stroke-linecap="round" />
-                </svg>
+                {% include 'components/icon.html' with name="document" size="80x90" %}
               </div>
               <p class="member-empty-text">目前沒有資料</p>
             </div>

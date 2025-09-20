@@ -17,13 +17,13 @@
           <!-- 簡單小圖示 -->
           <div class="mt-0.5">
             {% if 'tw-success' in message.tags %}
-              <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z"/></svg>
+              {% include 'components/icon.html' with name="success" size="h-5 w-5" %}
             {% elif 'tw-error' in message.tags %}
-              <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11V5H9v2h2zm0 8v-6H9v6h2z"/></svg>
+              {% include 'components/icon.html' with name="error" size="h-5 w-5" %}
             {% elif 'tw-warn' in message.tags %}
-              <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M8.257 3.099c.765-1.36 2.721-1.36 3.486 0l6.518 11.59c.75 1.335-.213 2.99-1.743 2.99H3.482c-1.53 0-2.493-1.655-1.743-2.99L8.257 3.1zM11 14a1 1 0 10-2 0 1 1 0 002 0zm-1-2a1 1 0 01-1-1V8a1 1 0 112 0v3a1 1 0 01-1 1z"/></svg>
+              {% include 'components/icon.html' with name="warning" size="h-5 w-5" %}
             {% else %}
-              <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M18 10A8 8 0 11.001 10 8 8 0 0118 10zM9 9V5h2v4H9zm0 6v-4h2v4H9z"/></svg>
+              {% include 'components/icon.html' with name="info" size="h-5 w-5" %}
             {% endif %}
           </div>
 
@@ -31,9 +31,7 @@
 
           <button type="button" class="opacity-70 hover:opacity-100"
                   onclick="this.closest('.tw-toast').remove()" aria-label="關閉通知">
-            <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M10 8.586l4.95-4.95 1.414 1.415L11.414 10l4.95 4.95-1.414 1.415L10 11.414l-4.95 4.95-1.414-1.415L8.586 10l-4.95-4.95L5.05 3.636 10 8.586z" clip-rule="evenodd"/>
-            </svg>
+            {% include 'components/icon.html' with name="close" size="h-4 w-4" %}
           </button>
         </div>
       </div>
@@ -61,24 +59,16 @@
         <!-- 圖標 -->
         <div class="mt-0.5">
           <template x-if="toast.type === 'success'">
-            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z"/>
-            </svg>
+            {% include 'components/icon.html' with name="success" size="h-5 w-5" %}
           </template>
           <template x-if="toast.type === 'error'">
-            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11V5H9v2h2zm0 8v-6H9v6h2z"/>
-            </svg>
+            {% include 'components/icon.html' with name="error" size="h-5 w-5" %}
           </template>
           <template x-if="toast.type === 'warning'">
-            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M8.257 3.099c.765-1.36 2.721-1.36 3.486 0l6.518 11.59c.75 1.335-.213 2.99-1.743 2.99H3.482c-1.53 0-2.493-1.655-1.743-2.99L8.257 3.1zM11 14a1 1 0 10-2 0 1 1 0 002 0zm-1-2a1 1 0 01-1-1V8a1 1 0 112 0v3a1 1 0 01-1 1z"/>
-            </svg>
+            {% include 'components/icon.html' with name="warning" size="h-5 w-5" %}
           </template>
           <template x-if="toast.type !== 'success' && toast.type !== 'error' && toast.type !== 'warning'">
-            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M18 10A8 8 0 11.001 10 8 8 0 0118 10zM9 9V5h2v4H9zm0 6v-4h2v4H9z"/>
-            </svg>
+            {% include 'components/icon.html' with name="info" size="h-5 w-5" %}
           </template>
         </div>
         
@@ -88,9 +78,7 @@
                 class="opacity-70 hover:opacity-100" 
                 @click="removeToast(toast.id)"
                 aria-label="關閉通知">
-          <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M10 8.586l4.95-4.95 1.414 1.415L11.414 10l4.95 4.95-1.414 1.415L10 11.414l-4.95 4.95-1.414-1.415L8.586 10l-4.95-4.95L5.05 3.636 10 8.586z" clip-rule="evenodd"/>
-          </svg>
+          {% include 'components/icon.html' with name="close" size="h-4 w-4" %}
         </button>
       </div>
     </div>
