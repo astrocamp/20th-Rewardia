@@ -10,8 +10,6 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt /build/requirements.txt
 RUN pip install --no-cache-dir --user -r requirements.txt
 
-RUN python -m spacy download zh_core_web_md
-
 FROM python:3.13-slim as production
 
 WORKDIR /app
@@ -39,6 +37,9 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean
 
 COPY --from=builder /root/.local /root/.local
+
+# 安裝 spaCy 中文模型（最小化方案）
+RUN python -m spacy download zh_core_web_md
 
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 

@@ -5,7 +5,7 @@ services:
     image: postgres:16-alpine
     container_name: rewardia-postgres
     environment:
-      POSTGRES_DB: rewardia_db
+      POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
@@ -59,6 +59,7 @@ services:
     restart: unless-stopped
 
   nginx-proxy-manager:
+    profiles: ["optional"]
     image: jc21/nginx-proxy-manager:latest
     container_name: nginx-proxy-manager
     restart: unless-stopped

@@ -63,6 +63,46 @@ class CreditCard(models.Model):
     def __str__(self):
         return f"{self.bank} {self.name}"
 
+    def update_active_status(self):
+        """根據是否有關聯的 RewardCategory 更新 is_active 狀態"""
+        from apps.rewards.models import RewardCategory
+
+        # 檢查是否有活躍的 RewardCategory 關聯到此卡片
+        has_active_rewards = RewardCategory.objects.filter(
+            card=self,
+            is_active=True
+        ).exists()
+
+        # 如果沒有活躍的回饋規則，設定為 inactive
+        if not has_active_rewards and self.is_active:
+            self.is_active = False
+            self.save(update_fields=['is_active'])
+        # 如果有活躍的回饋規則，確保卡片也是 active
+        elif has_active_rewards and not self.is_active:
+            self.is_active = True
+            self.save(update_fields=['is_active'])
+
+    @classmethod
+    def update_all_active_status(cls):
+        """批量更新所有信用卡的 active 狀態"""
+        from apps.rewards.models import RewardCategory
+
+        # 獲取所有有活躍回饋規則的卡片 ID
+        active_card_ids = RewardCategory.objects.filter(
+            is_active=True
+        ).values_list('card_id', flat=True).distinct()
+
+        # 更新有回饋規則的卡片為 active
+        cls.objects.filter(id__in=active_card_ids).update(is_active=True)
+
+        # 更新沒有回饋規則的卡片為 inactive
+        cls.objects.exclude(id__in=active_card_ids).update(is_active=False)
+
+        return {
+            'active_cards': len(active_card_ids),
+            'inactive_cards': cls.objects.filter(is_active=False).count()
+        }
+
     def save(self, *args, **kwargs):
         self.bank = self.format_bank_name(self.bank)
 

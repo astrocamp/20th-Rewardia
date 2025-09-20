@@ -290,7 +290,7 @@ def main_crawler():
         start_time = time.time()
         # 透過 VPN 連線到本地的 Selenium Grid
         home_selenium_url = os.environ.get("HOME_SELENIUM_URL")
-        driver = webdriver.Remote(command_executor=home_selenium_url, options=options)
+        driver = webdriver.Remote(command_executor="host.docker.internal:4444", options=options)
         category_urls = crawl_roo_urls(driver)
         crawl_roo_cards(driver, category_urls)
 
