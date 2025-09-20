@@ -102,7 +102,7 @@
     </td>
     <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
         <div class="flex items-center">
-            <div class="w-2 h-2 rounded-full mr-2 {% if reward.confidence >= 90 %}bg-green-500{% elif reward.confidence >= 80 %}bg-yellow-500{% else %}bg-red-500{% endif %}"></div>
+            <div class="w-2 h-2 rounded-full mr-2 {% if reward.confidence >= 0.9 %}bg-green-500{% elif reward.confidence >= 0.8 %}bg-yellow-500{% else %}bg-red-500{% endif %}"></div>
             {{ reward.confidence }}
         </div>
     </td>

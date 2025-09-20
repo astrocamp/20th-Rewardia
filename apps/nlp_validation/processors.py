@@ -510,7 +510,7 @@ class RewardRateExtractor:
             for keyword in keywords:
                 if keyword in sentence:
                     return reward_type
-        return "unknown"
+        return "其他回饋"
 
     def record_extraction_results(self, sentence, classification, rates):
         """記錄結果"""

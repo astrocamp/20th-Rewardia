@@ -31,12 +31,36 @@
       <!-- head -->
       <thead>
         <tr>
-          <th>ID</th>
-          <th>信用卡</th>
-          <th>銀行</th>
-          <th>發行中</th>
-          <th>建立時間</th>
-          <th>最近更新時間</th>
+          <th class="text-center">ID</th>
+          <th class="text-center">信用卡</th>
+          <th class="text-center">銀行</th>
+          <th class="text-center">
+            <div class="flex items-center justify-center gap-1">
+              發行中
+              <div class="flex flex-col">
+                <a href="?sort=is_active_desc" class="text-gray-400 hover:text-gray-600 text-xs">▲</a>
+                <a href="?sort=is_active_asc" class="text-gray-400 hover:text-gray-600 text-xs">▼</a>
+              </div>
+            </div>
+          </th>
+          <th class="text-center">
+            <div class="flex items-center justify-center gap-1">
+              建立時間
+              <div class="flex flex-col">
+                <a href="?sort=created_at_desc" class="text-gray-400 hover:text-gray-600 text-xs">▲</a>
+                <a href="?sort=created_at_asc" class="text-gray-400 hover:text-gray-600 text-xs">▼</a>
+              </div>
+            </div>
+          </th>
+          <th class="text-center">
+            <div class="flex items-center justify-center gap-1">
+              最近更新時間
+              <div class="flex flex-col">
+                <a href="?sort=updated_at_desc" class="text-gray-400 hover:text-gray-600 text-xs">▲</a>
+                <a href="?sort=updated_at_asc" class="text-gray-400 hover:text-gray-600 text-xs">▼</a>
+              </div>
+            </div>
+          </th>
         </tr>
       </thead>
       <tbody id="card_body">

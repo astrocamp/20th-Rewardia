@@ -63,16 +63,14 @@ class RewardCategory(models.Model):
         unique_together = [["card", "category", "scope"]]
 
     def save(self, *args, **kwargs):
-        """重寫 save 方法，自動更新關聯卡片的狀態"""
+        """自動更新關聯卡片的狀態"""
         super().save(*args, **kwargs)
-        # 每次儲存 RewardCategory 後，更新關聯卡片的 active 狀態
         self.card.update_active_status()
 
     def delete(self, *args, **kwargs):
-        """重寫 delete 方法，刪除後更新關聯卡片的狀態"""
+        """刪除後更新關聯卡片的狀態"""
         card = self.card
         super().delete(*args, **kwargs)
-        # 刪除 RewardCategory 後，更新關聯卡片的 active 狀態
         card.update_active_status()
 
     def __str__(self):
@@ -118,7 +116,7 @@ class PendingReward(models.Model):
         verbose_name="信用卡",
     )
 
-    # NLP 提取資料
+    # NLP
     nlp_category = models.CharField("NLP分類", max_length=50)
     nlp_scope = models.CharField("NLP範圍", max_length=50)
     extracted_sentence = models.TextField("提取句子")
@@ -161,25 +159,21 @@ class PendingReward(models.Model):
 
     def save(self, *args, **kwargs):
         """重寫 save 方法，加入自動審核邏輯"""
-        # 如果是新建記錄且信心度大於 0.7，自動審核通過
         is_new_approved = False
-        if not self.pk and self.confidence > 0.7 and self.status == self.Status.PENDING:
+        if not self.pk and self.confidence > Decimal('0.7') and self.status == self.Status.PENDING:
             self.status = self.Status.APPROVED
             is_new_approved = True
 
         super().save(*args, **kwargs)
 
-        # 如果是自動審核通過，自動建立/更新 RewardCategory
         if is_new_approved:
             reward_category = self.approve_and_create_reward_category()
-            # 更新關聯卡片的 active 狀態
             if reward_category:
                 self.card.update_active_status()
 
     def approve_and_create_reward_category(self):
-        """通過審核並建立/更新RewardCategory"""
+        """建立/更新RewardCategory"""
         if self.status == self.Status.APPROVED:
-            # 使用 update_or_create 處理重複情況，如果已存在則更新
             reward_category, created = RewardCategory.objects.update_or_create(
                 card=self.card,
                 category=self.nlp_category,

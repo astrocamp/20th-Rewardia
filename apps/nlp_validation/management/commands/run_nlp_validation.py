@@ -41,8 +41,6 @@ class Command(BaseCommand):
         classifier = SemanticClassifier(config)
         rate_extractor = RewardRateExtractor(config)
         bank_card_extractor = BankCardExtractor(config)
-
-        # 從 CrawledData 模型讀取所有爬蟲資料
         crawled_data = CrawledData.objects.filter(is_active=True).order_by("created_at")
 
         if not crawled_data.exists():
@@ -135,7 +133,6 @@ class Command(BaseCommand):
                 if not filtered:
                     unique_filtered = []
                 else:
-                    # 批次處理所有句子的向量
                     filtered_docs = list(classifier.nlp.pipe(filtered, batch_size=50))
                     sentence_to_doc = dict(zip(filtered, filtered_docs))
 
@@ -169,8 +166,6 @@ class Command(BaseCommand):
                 if context_sentences:
                     main_sentences = [sent for sent, _ in context_sentences]
                     context_texts = [context for _, context in context_sentences]
-                    # 優化批次處理效能
-
                     batch_size = int(os.environ.get("NLP_BATCH_SIZE", 50))
                     batch_size = min(batch_size, len(main_sentences))
 
@@ -185,7 +180,6 @@ class Command(BaseCommand):
                         # 8. 先檢查回饋率（快速過濾）
                         rates = rate_extractor.extract_rates_from_sentence(sent)
 
-                        # 只有找到回饋率才做語義分類
                         if rates and len(rates) > 0:
                             main_doc = (
                                 main_docs[j - 1] if j - 1 < len(main_docs) else None
@@ -201,7 +195,6 @@ class Command(BaseCommand):
                                 sent, context_text, main_doc, context_doc
                             )
                         else:
-                            # 沒有回饋率，跳過分類
                             classification = {"matches": []}
 
                         # 10. 記錄提取結果
@@ -212,7 +205,6 @@ class Command(BaseCommand):
                         # 11. 建立 PendingReward 記錄
                         for result in results_list:
                             if result["rates_found"] > 0:
-                                # 檢查是否已有相同規則 (避免重複)
                                 reward_key = f"{credit_card.id}_{result['category']}_{result['scope']}_{result['min_rate']}_{result['max_rate']}"
                                 existing = existing_rewards.get(reward_key)
 
@@ -285,7 +277,6 @@ class Command(BaseCommand):
         self.stdout.write(f"平均時間 {(total_time / len(test_cases)):.3f} 秒/張")
         self.stdout.write(self.style.SUCCESS("所有結果已儲存到 PendingReward 模型"))
 
-        # 創建分析統計記錄
         try:
             average_time = total_time / len(test_cases) if len(test_cases) > 0 else 0
 
