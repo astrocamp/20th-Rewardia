@@ -1,4 +1,4 @@
-const base_url = "http://localhost:8000";
+const base_url = "https://rewardia.net/";
 const token_url = `${base_url}/users/api/get_token`;
 
 const merchantMap = {
