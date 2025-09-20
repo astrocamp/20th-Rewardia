@@ -16,6 +16,7 @@ from django.db.models.functions import Coalesce
 from rest_framework.authentication import TokenAuthentication
 from django.utils import timezone
 from rest_framework import status
+from django.conf import settings
 import json
 import os
 import cv2
@@ -299,8 +300,6 @@ def perform_ocr(image):
     使用 Google Cloud Vision API 進行 OCR
     """
     try:
-        from django.conf import settings
-
         # 檢查是否有 API Key
         if (
             not hasattr(settings, "GOOGLE_CLOUD_VISION_API_KEY")

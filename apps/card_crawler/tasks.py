@@ -1,12 +1,11 @@
 from celery import shared_task
 from django.core.management import call_command
 from io import StringIO
+from celery.utils.log import get_task_logger
 
 
 @shared_task
 def crawl_roo_task():
-    from celery.utils.log import get_task_logger
-
     logger = get_task_logger(__name__)
     with StringIO() as output:
         crawl_success = False

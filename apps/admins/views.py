@@ -4,7 +4,7 @@ from apps.cards.models import CreditCard
 from django.contrib import messages
 from django.views.decorators.http import require_POST, require_GET, require_http_methods
 from django.http import HttpResponse, JsonResponse
-from apps.rewards.models import PendingReward, RewardCategory
+from apps.rewards.models import PendingReward
 from django.db.models import Q, Count
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.base import ContentFile
@@ -14,6 +14,7 @@ from django.core.cache import cache
 import json
 from django_celery_beat.models import PeriodicTask, CrontabSchedule
 from apps.card_crawler.models import CrawledRecord
+from apps.card_crawler.tasks import crawl_roo_task
 from apps.nlp_validation.models import AnalysisStatistics
 from celery import current_app
 from django_celery_results.models import TaskResult
@@ -418,7 +419,6 @@ def api_upload_image(request):
             try:
                 card.image.seek(0)
                 image_content = card.image.read()
-                from django.core.files.base import ContentFile
 
                 content = ContentFile(image_content)
 
@@ -713,7 +713,6 @@ def api_run_now(request):
     """立即執行爬蟲任務"""
     try:
         # 使用 Celery 立即執行任務
-        from apps.card_crawler.tasks import crawl_roo_task
         result = crawl_roo_task.delay()
 
         return JsonResponse({
