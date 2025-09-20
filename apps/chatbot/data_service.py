@@ -1,7 +1,7 @@
 # Chatbot 資料庫查詢服務
 import logging
-from django.db.models import Q, Value, DecimalField
-from django.db.models.functions import Coalesce
+from django.db.models import Q, Value, DecimalField, CharField
+from django.db.models.functions import Coalesce, Concat
 from apps.cards.models import CreditCard
 from apps.rewards.models import RewardCategory
 from apps.users.models import UserCard, User
@@ -197,9 +197,6 @@ class ChatbotDataService:
         if ChatbotDataService._cached_categories is None:
             try:
                 # 從 reward_categories 表格獲取消費類別、範圍和回饋類型
-                from django.db.models import Value, CharField
-                from django.db.models.functions import Concat
-                
                 categories = RewardCategory.objects.filter(
                     is_active=True
                 ).annotate(

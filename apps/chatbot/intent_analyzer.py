@@ -6,7 +6,8 @@ from apps.chatbot.config import (
     BANK_MAPPING, COMMON_KEYWORDS, NAVIGATION_KEYWORDS, COMPARISON_KEYWORDS, 
     PERSONAL_RECOMMENDATION_KEYWORDS, CARD_COMPARISON_RECOMMENDATION_KEYWORDS, 
     RESPONSE_MESSAGES, PAGE_MAPPING, INTENT_KEYWORDS, FORMAT_CONFIG, 
-    DATABASE_CONFIG, CATEGORY_KEYWORDS, PERSONAL_QUERY_KEYWORDS
+    DATABASE_CONFIG, CATEGORY_KEYWORDS, PERSONAL_QUERY_KEYWORDS, CARD_NAME_CLEANING,
+    ERROR_DETECTION_CONFIG, DYNAMIC_RESPONSE_TEMPLATES
 )
 from .data_service import ChatbotDataService
 from .knowledge_base import SYSTEM_PROMPT, REWARDIA_KNOWLEDGE_BASE
@@ -328,6 +329,33 @@ class ChatbotResponseBuilder:
         return RESPONSE_MESSAGES['navigation']['default']
 
     @staticmethod
+    def _clean_card_name(card_name):
+        """清理卡片名稱，移除不必要的後綴和前綴"""
+        if not card_name or not isinstance(card_name, str):
+            return ""
+        
+        # 移除前後空白
+        card_name = card_name.strip()
+        
+        # 移除前綴
+        for prefix in CARD_NAME_CLEANING['prefixes_to_remove']:
+            if card_name.startswith(prefix):
+                card_name = card_name[len(prefix):].strip()
+        
+        # 移除後綴
+        for suffix in CARD_NAME_CLEANING['suffixes_to_remove']:
+            if card_name.endswith(suffix):
+                card_name = card_name[:-len(suffix)].strip()
+        
+        # 移除類別相關後綴
+        for category_suffix in CARD_NAME_CLEANING['category_suffixes']:
+            # 檢查是否以類別後綴結尾
+            if card_name.endswith(category_suffix):
+                card_name = card_name[:-len(category_suffix)].strip()
+        
+        return card_name.strip()
+
+    @staticmethod
     def _analyze_comparison_intent(intent, user_message):
         """分析比較意圖的詳細信息"""
         # 檢查是否為比較查詢
@@ -358,8 +386,16 @@ class ChatbotResponseBuilder:
                     if sep in user_message:
                         parts = user_message.split(sep)
                         if len(parts) >= 2:
-                            comparison_cards = [part.strip() for part in parts[:2]]
-                            break
+                            # 清理卡片名稱，移除不必要的後綴和前綴
+                            cleaned_cards = []
+                            for part in parts[:2]:
+                                cleaned_card = ChatbotResponseBuilder._clean_card_name(part.strip())
+                                if cleaned_card:  # 確保不是空字串
+                                    cleaned_cards.append(cleaned_card)
+                            
+                            if len(cleaned_cards) >= 2:
+                                comparison_cards = cleaned_cards
+                                break
                 intent["comparison_cards"] = comparison_cards
             elif has_highest:
                 # 最高回饋查詢
@@ -759,8 +795,8 @@ class ChatbotResponseBuilder:
         if intent.get("is_comparison", False):
             return ComparisonService.handle_comparison_intent(intent, user_id)
 
-        # 處理特定卡片優惠查詢
-        if intent.get("is_card_benefit_question", False):
+        # 處理特定卡片優惠查詢（但如果是類別查詢，優先處理類別）
+        if intent.get("is_card_benefit_question", False) and not intent.get("categories"):
             return ChatbotResponseBuilder._handle_card_benefit_query(intent)
 
         # 處理基於上下文的用戶卡片查詢
@@ -834,6 +870,54 @@ class ChatbotResponseBuilder:
         # 未登入防護：偵測個人查詢關鍵字但沒有 user_id 時，直接回覆尚未登入
         if (not user_id) and any(keyword in user_message for keyword in PERSONAL_QUERY_KEYWORDS):
             return "你尚未登入"
+
+        # Fallback 機制：檢查 AI 回應是否包含錯誤指示詞，並主動查詢資料庫補充正確資訊
+        # 條件：有類別且（沒有特定銀行 或 包含「所有銀行」關鍵字）
+        has_all_banks_keyword = any(keyword in user_message for keyword in ERROR_DETECTION_CONFIG['all_banks_keywords'])
+        if intent["categories"] and (not intent["banks"] or has_all_banks_keyword):
+            # 檢查是否有錯誤的「沒有資料」回答
+            error_indicators = ERROR_DETECTION_CONFIG['error_indicators']
+            has_error_response = any(indicator in response for indicator in error_indicators)
+            
+            # 計算回應中的卡片數量
+            card_lines = [line for line in response.split('\n') if line.strip().startswith('-')]
+            card_count = len(card_lines)
+            
+            # 取得用戶原始訊息
+            user_message = intent.get("raw_message", "")
+            
+            # 如果沒有條列式內容、有錯誤回答、或卡片數量不足，則補充正確資料
+            # 對於「所有銀行」問題，期望更多卡片；對於一般問題，至少3張
+            expected_min_cards = DATABASE_CONFIG['expected_min_cards_all_banks'] if has_all_banks_keyword else DATABASE_CONFIG['expected_min_cards_general']
+            
+            if not any(line.strip().startswith('-') for line in response.split('\n')) or has_error_response or card_count < expected_min_cards:
+                for category in intent["categories"]:
+                    # 檢查是否詢問「最高」或「最好」的回饋
+                    is_highest_only = any(keyword in user_message for keyword in ERROR_DETECTION_CONFIG['highest_keywords'])
+                    
+                    # 根據問題類型決定返回的卡片數量
+                    limit = 1 if is_highest_only else 5
+                    rewards = ChatbotDataService.get_cards_by_category(category, limit)
+                    
+                    if rewards:
+                        # 如果有錯誤回答或卡片數量不足，先清除原始內容
+                        if has_error_response or card_count < expected_min_cards:
+                            response = ""
+                        
+                        # 根據問題類型選擇合適的標題
+                        if is_highest_only:
+                            response += f"\n\n{DYNAMIC_RESPONSE_TEMPLATES['highest_reward'].format(category=category)}\n"
+                        else:
+                            # 根據問題類型選擇更合適的標題
+                            if any(keyword in user_message for keyword in ERROR_DETECTION_CONFIG['list_query_keywords']):
+                                response += f"\n\n{DYNAMIC_RESPONSE_TEMPLATES['category_cards'].format(category=category)}\n"
+                            else:
+                                response += f"\n\n{DYNAMIC_RESPONSE_TEMPLATES['best_reward_cards'].format(category=category)}\n"
+                        
+                        # 補充正確的卡片推薦列表
+                        for reward in rewards:
+                            rate_display = ChatbotDataService._format_reward_rate_from_dict(reward)
+                            response += f"- {reward['bank']} {reward['card_name']}: {rate_display} {reward['reward_type']}\n"
 
         return response
 

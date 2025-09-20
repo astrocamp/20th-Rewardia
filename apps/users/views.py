@@ -18,6 +18,10 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.backends import ModelBackend
 from django.db.models import Case, When, Value, DecimalField
 from collections import defaultdict
+try:
+    from allauth.socialaccount.models import SocialAccount
+except ImportError:
+    SocialAccount = None
 import json
 import logging
 import re
@@ -100,13 +104,12 @@ def member_zone(request):
     if request.user.is_authenticated:
         # 檢查用戶是否有 Google OAuth 關聯
         has_google_oauth = False
-        try:
-            from allauth.socialaccount.models import SocialAccount
+        if SocialAccount:
             has_google_oauth = SocialAccount.objects.filter(
                 user=request.user, 
                 provider='google'
             ).exists()
-        except ImportError:
+        else:
             # 如果 allauth 沒有安裝或導入失敗，預設為 False
             pass
         

@@ -2,14 +2,13 @@ from django.shortcuts import render
 from .data.faq_content import FAQ_DATA
 from apps.cards.models import CreditCard
 from apps.rewards.models import RewardCategory
+from apps.users.models import UserCard
 from django.http import HttpResponse, JsonResponse
-from django.db.models import Prefetch
 from django.utils.html import escape
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.messages import get_messages
 from apps.cards.storage import MediaStorage
 from .forms import RewardCalculatorForm
-import json
 
 
 def download(request):
@@ -28,7 +27,6 @@ def main(request):
     # 獲取用戶的卡片 ID 列表（如果已登入）
     user_card_ids = []
     if request.user.is_authenticated:
-        from apps.users.models import UserCard
         user_card_ids = list(
             UserCard.objects.filter(user=request.user, is_active=True)
             .values_list('card_id', flat=True)

@@ -1,6 +1,8 @@
 from django.db import models
 from django.core.validators import FileExtensionValidator
+from django.core.files.base import ContentFile
 from PIL import Image
+from io import BytesIO
 import re
 
 
@@ -99,9 +101,6 @@ class CreditCard(models.Model):
                 # 檢查是否為 S3 檔案或已存在的檔案
                 if not hasattr(self.image, 'file'):
                     return
-                from PIL import Image
-                from io import BytesIO
-                from django.core.files.base import ContentFile
 
                 # 從上傳的檔案讀取圖片
                 self.image.seek(0)

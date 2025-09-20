@@ -167,14 +167,8 @@ class ComparisonService:
             if is_highest_only:
                 # 只返回最高回饋的卡片，如果有相同數值則並列
                 best_reward = rewards.first()
-                best_rate = float(best_reward.max_rate or best_reward.min_rate or 0)
-                
                 # 找出所有相同最高回饋率的卡片
-                same_rate_rewards = rewards.filter(
-                    Q(max_rate=best_reward.max_rate, min_rate=best_reward.min_rate) |
-                    Q(max_rate=best_reward.max_rate) |
-                    Q(min_rate=best_reward.min_rate)
-                )
+                same_rate_rewards = rewards.filter(sort_rate=best_reward.sort_rate)
                 
                 if same_rate_rewards.count() == 1:
                     rate_display = ChatbotDataService._format_reward_rate(best_reward.min_rate, best_reward.max_rate)
@@ -209,14 +203,8 @@ class ComparisonService:
             if is_highest_only:
                 # 只返回最高回饋的卡片，如果有相同數值則並列
                 best_reward = rewards.first()
-                best_rate = float(best_reward.max_rate or best_reward.min_rate or 0)
-                
                 # 找出所有相同最高回饋率的卡片
-                same_rate_rewards = rewards.filter(
-                    Q(max_rate=best_reward.max_rate, min_rate=best_reward.min_rate) |
-                    Q(max_rate=best_reward.max_rate) |
-                    Q(min_rate=best_reward.min_rate)
-                )
+                same_rate_rewards = rewards.filter(sort_rate=best_reward.sort_rate)
                 
                 if same_rate_rewards.count() == 1:
                     rate_display = ChatbotDataService._format_reward_rate(best_reward.min_rate, best_reward.max_rate)
