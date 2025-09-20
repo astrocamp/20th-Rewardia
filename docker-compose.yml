@@ -70,6 +70,7 @@ services:
     volumes:
       - nginx-data:/data
       - nginx-letsencrypt:/etc/letsencrypt
+      - ./public:/var/www/rewardia/public:ro
     environment:
       DB_ENGINE: postgres
       DB_HOST: rewardia-postgres

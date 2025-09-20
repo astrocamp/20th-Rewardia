@@ -6,11 +6,8 @@ from django.views.decorators.http import require_POST, require_GET, require_http
 from django.http import HttpResponse, JsonResponse
 from apps.rewards.models import PendingReward
 from django.db.models import Q, Count
-from django.views.decorators.csrf import csrf_exempt
-from django.core.files.base import ContentFile
 from apps.cards.storage import MediaStorage
 from django.core.paginator import Paginator
-from django.core.cache import cache
 import json
 from django_celery_beat.models import PeriodicTask, CrontabSchedule
 from apps.card_crawler.models import CrawledRecord
@@ -18,7 +15,7 @@ from apps.card_crawler.tasks import crawl_roo_task
 from apps.nlp_validation.models import AnalysisStatistics
 from celery import current_app
 from django_celery_results.models import TaskResult
-from datetime import datetime, timedelta
+from datetime import  timedelta
 from django.utils import timezone
 
 
@@ -42,9 +39,20 @@ def _get_paginated_rewards_for_bulk_action(request):
     return page_obj.object_list, status_filter, page_number
 
 
-# 卡片頁面
 def cards(request):
-    cards = CreditCard.objects.order_by("-updated_at")
+    sort_param = request.GET.get('sort', '')
+
+    sort_mappings = {
+        'is_active_desc': ('-is_active', '-updated_at'),
+        'is_active_asc': ('is_active', '-updated_at'),
+        'created_at_desc': ('-created_at',),
+        'created_at_asc': ('created_at',),
+        'updated_at_desc': ('-updated_at',),
+        'updated_at_asc': ('updated_at',),
+    }
+    order_by_args = sort_mappings.get(sort_param, ('-updated_at',))
+    cards = CreditCard.objects.order_by(*order_by_args)
+
     return render(
         request,
         "admins/cards.html",
@@ -117,7 +125,6 @@ def delete_card(request, id):
 
 def rewards(request):
     """主要的rewards管理頁面"""
-    # 只在第一頁執行重複檢測
     page_number = request.GET.get("page", 1)
     if str(page_number) == "1":
         PendingReward.detect_and_soft_delete_duplicates()
@@ -133,7 +140,6 @@ def rewards(request):
 
     pending_rewards = pending_rewards.order_by("-created_at")
 
-    # 分頁處理
     paginator = Paginator(pending_rewards, 50)  # 一頁50筆
     page_obj = paginator.get_page(page_number)
 
