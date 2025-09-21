@@ -15,6 +15,7 @@ from rest_framework.decorators import (
     permission_classes,
 )
 from django.db.models.functions import Coalesce
+from django.shortcuts import get_object_or_404
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
@@ -103,7 +104,7 @@ def get_banks(request):
 
 
 @api_view(["GET"])
-def get_cards(request, bank):
+def get_bank_cards(request, bank):
     cards = CreditCard.objects.filter(bank=bank).order_by("-updated_at")
     serializer = CardSerializer(cards, many=True)
     return Response(serializer.data)
@@ -125,8 +126,8 @@ def get_user_cards(request, id):
 @authentication_classes([TokenAuthentication])
 def new_user_card(request, id):
     try:
-        card = CreditCard.objects.get(id=id)
-        user_card = UserCard.objects.update_or_create(
+        card = get_object_or_404(CreditCard, id=id)
+        UserCard.objects.update_or_create(
             user=request.user, card=card, defaults={"added_date": timezone.now()}
         )
 
@@ -139,7 +140,7 @@ def new_user_card(request, id):
 @authentication_classes([TokenAuthentication])
 def delete_user_card(request, id):
     try:
-        user_card = UserCard.objects.get(user=request.user, card__id=id)
+        user_card = get_object_or_404(UserCard, user=request.user, card__id=id)
         user_card.delete()
 
         return Response(status=204)
