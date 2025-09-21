@@ -45,6 +45,9 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 COPY . /app/
 
+# 設定建構時間環境變數（在構建時生成）
+RUN echo "BUILD_TIME=$(date +%Y%m%d%H%M)" >> /app/.env
+
 COPY .pg_service.conf /app/.pg_service.conf
 COPY .pg_db_pass /app/.pg_db_pass
 RUN chmod 600 /app/.pg_db_pass

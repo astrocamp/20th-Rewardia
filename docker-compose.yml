@@ -59,7 +59,6 @@ services:
     restart: unless-stopped
 
   nginx-proxy-manager:
-    profiles: ["optional"]
     image: jc21/nginx-proxy-manager:latest
     container_name: nginx-proxy-manager
     restart: unless-stopped
