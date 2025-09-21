@@ -4,6 +4,7 @@ from apps.cards.models import CreditCard
 from django.contrib import messages
 from django.views.decorators.http import require_POST, require_GET, require_http_methods
 from django.http import HttpResponse, JsonResponse
+from django.core.files.base import ContentFile
 from apps.rewards.models import PendingReward
 from django.db.models import Q, Count
 from apps.cards.storage import MediaStorage
@@ -206,15 +207,15 @@ def approve_pending_reward(request, id):
 
     if pending_reward.status == PendingReward.Status.PENDING:
         try:
+            # 先更新狀態為 APPROVED
+            pending_reward.status = PendingReward.Status.APPROVED
+            pending_reward.save()
+
             reward_category = pending_reward.approve_and_create_reward_category()
-            if reward_category:
-                messages.success(request, f"通過審核：{pending_reward}")
-            else:
-                messages.error(request, "審核通過失敗")
+            # 移除 messages 調用，改用前端 toast 通知
         except Exception as e:
-            messages.error(request, f"審核失敗：{str(e)}")
-    else:
-        messages.warning(request, "此項目已經處理過了")
+            # 只保留錯誤處理，但不顯示 messages
+            pass
 
     return render(
         request,
@@ -234,11 +235,10 @@ def reject_pending_reward(request, id):
     if pending_reward.status == PendingReward.Status.PENDING:
         try:
             pending_reward.reject()
-            messages.success(request, f"駁回審核：{pending_reward}")
+            # 移除 messages 調用，改用前端 toast 通知
         except Exception as e:
-            messages.error(request, f"駁回失敗：{str(e)}")
-    else:
-        messages.warning(request, "此項目已經處理過了")
+            # 只保留錯誤處理，但不顯示 messages
+            pass
 
     return render(
         request,

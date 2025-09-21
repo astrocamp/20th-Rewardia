@@ -1,5 +1,11 @@
 // Related HTML: templates/admins/scheduler.html
 const schedulerControl = () => ({
+  // 動態版本路徑
+  get versionPath() {
+    const pathParts = window.location.pathname.split('/').filter(part => part);
+    return pathParts[0];
+  },
+
   // 基本狀態
   schedule: {
     hour: 8,
@@ -36,12 +42,19 @@ const schedulerControl = () => ({
   // 載入排程狀態
   async loadScheduleStatus() {
     try {
-      const data = await this.apiRequest('/admins/scheduler/api/status/');
+      const data = await this.apiRequest(`/${this.versionPath}/scheduler/api/status/`);
       if (data.success) {
         // 確保 current_task 為 null 時不會出錯
         const schedule = data.schedule;
         if (!schedule.current_task) {
           schedule.current_task = null;
+        }
+        // 確保 hour 和 minute 是數字類型
+        if (schedule.hour !== undefined) {
+          schedule.hour = parseInt(schedule.hour);
+        }
+        if (schedule.minute !== undefined) {
+          schedule.minute = parseInt(schedule.minute);
         }
         this.schedule = { ...this.schedule, ...schedule };
       }
@@ -75,7 +88,7 @@ const schedulerControl = () => ({
 
       this.isLoading = true;
 
-      const data = await this.apiRequest('/admins/scheduler/api/update/', {
+      const data = await this.apiRequest(`/${this.versionPath}/scheduler/api/update/`, {
         method: 'POST',
         body: JSON.stringify({
           hour: hour,
@@ -104,7 +117,7 @@ const schedulerControl = () => ({
     try {
       this.isLoading = true;
 
-      const data = await this.apiRequest('/admins/scheduler/api/toggle/', {
+      const data = await this.apiRequest(`/${this.versionPath}/scheduler/api/toggle/`, {
         method: 'POST'
       });
 
@@ -133,7 +146,7 @@ const schedulerControl = () => ({
     try {
       this.isLoading = true;
 
-      const data = await this.apiRequest('/admins/scheduler/api/run-now/', {
+      const data = await this.apiRequest(`/${this.versionPath}/scheduler/api/run-now/`, {
         method: 'POST'
       });
 
@@ -162,7 +175,7 @@ const schedulerControl = () => ({
   // 載入爬蟲執行記錄
   async loadCrawledRecords() {
     try {
-      const data = await this.apiRequest('/admins/scheduler/api/crawled-records/');
+      const data = await this.apiRequest(`/${this.versionPath}/scheduler/api/crawled-records/`);
       if (data.success) {
         this.crawledRecords = data.records;
       }
@@ -176,7 +189,7 @@ const schedulerControl = () => ({
   // 載入分析記錄
   async loadAnalysisRecords() {
     try {
-      const data = await this.apiRequest('/admins/scheduler/api/analysis-records/');
+      const data = await this.apiRequest(`/${this.versionPath}/scheduler/api/analysis-records/`);
       if (data.success) {
         this.analysisRecords = data.records;
       }

@@ -1,5 +1,11 @@
 // Related HTML: templates/admins/image_upload.html
 export default () => ({
+  // 動態版本路徑
+  get versionPath() {
+    const pathParts = window.location.pathname.split('/').filter(part => part);
+    return pathParts[0];
+  },
+
   cards: [], // 信用卡資料陣列
   selectedFiles: {}, // 儲存選擇的檔案 {cardId: {file, preview, name}}
   selectedCards: [], // 選中的卡片 ID 陣列
@@ -14,7 +20,7 @@ export default () => ({
   // 載入信用卡資料
   async loadCards() {
     try {
-      const data = await this.apiRequest('/admins/api/cards/');
+      const data = await this.apiRequest(`/${this.versionPath}/api/cards/`);
       this.cards = data.cards;
     } catch (error) {
       if (window.RewardiaLogger) {
@@ -221,7 +227,7 @@ export default () => ({
     formData.append('card_id', cardId);
     formData.append('csrfmiddlewaretoken', this.getCSRFToken());
     
-    const result = await this.apiRequest('/admins/api/upload-image/', {
+    const result = await this.apiRequest(`/${this.versionPath}/api/upload-image/`, {
       method: 'POST',
       body: formData
     });
@@ -245,7 +251,7 @@ export default () => ({
     formData.append('card_id', cardId);
     formData.append('csrfmiddlewaretoken', this.getCSRFToken());
     
-    const result = await this.apiRequest('/admins/api/delete-image/', {
+    const result = await this.apiRequest(`/${this.versionPath}/api/delete-image/`, {
       method: 'POST',
       body: formData
     });

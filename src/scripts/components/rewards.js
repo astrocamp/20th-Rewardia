@@ -95,6 +95,51 @@ function initLoadingOverlay() {
     });
 }
 
+// HTMX 事件監聽：自動顯示操作成功通知
+function initHtmxNotifications() {
+    document.body.addEventListener('htmx:afterSwap', function(evt) {
+        // 檢查是否是審核操作
+        const url = evt.detail.xhr.responseURL;
+        if (url.includes('/approve/') || url.includes('/reject/')) {
+            // 檢查響應是否成功（狀態碼 200）
+            if (evt.detail.xhr.status === 200) {
+                // 嘗試從更新後的行中獲取卡片信息
+                const updatedRow = evt.detail.elt;
+                let cardName = '';
+                let category = '';
+
+                if (updatedRow) {
+                    const cardNameCell = updatedRow.querySelector('td:nth-child(2)');
+                    const categoryCell = updatedRow.querySelector('td:nth-child(3)');
+
+                    if (cardNameCell) cardName = cardNameCell.textContent.trim();
+                    if (categoryCell) category = categoryCell.textContent.trim();
+                }
+
+                let message = '';
+                let type = 'success';
+
+                if (url.includes('/approve/')) {
+                    message = cardName && category ?
+                        `✅ ${cardName} - ${category} 審核通過` :
+                        '✅ 審核通過，已新增至獎勵資料庫';
+                    type = 'success';
+                } else if (url.includes('/reject/')) {
+                    message = cardName && category ?
+                        `❌ ${cardName} - ${category} 審核駁回` :
+                        '❌ 審核駁回，已移除此項目';
+                    type = 'warning';
+                }
+
+                // 使用現有的 toast 系統顯示通知
+                if (window.showToast && message) {
+                    window.showToast(message, type);
+                }
+            }
+        }
+    });
+}
+
 // 批量操作載入效果
 function showLoadingAndSubmit(button, url, confirmMessage) {
     if (confirm(confirmMessage)) {
@@ -130,6 +175,7 @@ function showLoadingAndSubmit(button, url, confirmMessage) {
 function initRewardsPage() {
     initRewardsTableInteraction();
     initLoadingOverlay();
+    initHtmxNotifications();
 }
 
 // 頁面載入完成時初始化
@@ -142,5 +188,6 @@ export default {
     initRewardsPage,
     initRewardsTableInteraction,
     initLoadingOverlay,
+    initHtmxNotifications,
     showLoadingAndSubmit
 };
