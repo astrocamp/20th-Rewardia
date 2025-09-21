@@ -27,15 +27,15 @@ class MinRewardSerializer(serializers.ModelSerializer):
 class UserCardSerializer(serializers.ModelSerializer):
     card = CardSerializer(read_only=True)
     rewards = serializers.SerializerMethodField()
-    # partial_card_num = serializers.SerializerMethodField()
+    card_number = serializers.SerializerMethodField()
 
     class Meta:
         model = UserCard
-        fields = ["user", "card", "rewards"]
+        fields = ["user", "card", "rewards", "card_number"]
 
     def get_rewards(self, obj):
         rewards = obj.card.reward_categories.all()
         return MinRewardSerializer(rewards, many=True).data
 
-    # def get_partial_card_num():
-    #     pass
+    def get_card_number(self, obj):
+        return obj.get_card_number()

@@ -36,7 +36,12 @@ FERNET_KEY = os.getenv("FERNET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["rewardia.net", "www.rewardia.net", "localhost", "127.0.0.1",]
+ALLOWED_HOSTS = [
+    "rewardia.net",
+    "www.rewardia.net",
+    "localhost",
+    "127.0.0.1",
+]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://rewardia.net",
