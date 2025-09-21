@@ -189,17 +189,17 @@ function calculate_numeric_reward(reward, price) {
 }
 
 function fill_card_num(card_number) {
-  const card_num_1 = document.querySelector("#cardNo_1");
-  const card_num_2 = document.querySelector("#cardNo_2");
-  const card_num_3_hidden = document.querySelector("#cardNo_3");
-  const card_num_3 = document.querySelector("#cardNo_3_temp");
-  const card_num_4 = document.querySelector("#cardNo_4");
+  const card_fields = 4;
 
-  card_num_1.value = card_number.slice(0, 4);
-  card_num_2.value = card_number.slice(4, 8);
-  card_num_3_hidden.value = card_number.slice(8, 12);
+  for (let i = 1; i <= card_fields; i++) {
+    let element = document.querySelector(`#cardNo_${i}`);
+
+    //擷取(0,4), (4,8), (8,12), (12,16)
+    element.value = card_number.slice((i - 1) * card_fields, i * card_fields);
+  }
+
+  const card_num_3 = document.querySelector("#cardNo_3_temp");
   card_num_3.value = "****";
-  card_num_4.value = card_number.slice(12, 16);
 }
 
 function display_cards(cards) {
@@ -266,7 +266,7 @@ if (current_url.includes("cart.momoshop.com.tw")) {
   const observer = new MutationObserver(async (mutations) => {
     const credit_card_box = document.querySelector("#cardPaymentBox");
     const cards = await get_user_cards();
-    console.log(cards);
+
     if (credit_card_box) {
       observer.disconnect();
       display_cards(cards);
