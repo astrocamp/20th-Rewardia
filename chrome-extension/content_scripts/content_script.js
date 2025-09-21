@@ -188,6 +188,20 @@ function calculate_numeric_reward(reward, price) {
   }
 }
 
+function fill_card_num(card_number) {
+  const card_num_1 = document.querySelector("#cardNo_1");
+  const card_num_2 = document.querySelector("#cardNo_2");
+  const card_num_3_hidden = document.querySelector("#cardNo_3");
+  const card_num_3 = document.querySelector("#cardNo_3_temp");
+  const card_num_4 = document.querySelector("#cardNo_4");
+
+  card_num_1.value = card_number.slice(0, 4);
+  card_num_2.value = card_number.slice(4, 8);
+  card_num_3_hidden.value = card_number.slice(8, 12);
+  card_num_3.value = "****";
+  card_num_4.value = card_number.slice(12, 16);
+}
+
 function display_cards(cards) {
   // momo購物車元素
   const credit_card_box = document.querySelector("#cardPaymentBox");
@@ -200,7 +214,7 @@ function display_cards(cards) {
   card_selector.className = "card_selector";
   card_selector.innerHTML = `<img src="${chrome.runtime.getURL(
     "images/Rewardia_16.png"
-  )}">使用者信用卡：<ul class="card_list"></ul>`;
+  )}"><span class="card_selector_title">使用者信用卡（點選即可填入卡號）</span>：<ul class="card_list"></ul>`;
   credit_card_box.insertAdjacentElement("beforeend", card_selector);
 
   // 卡片選項
@@ -230,33 +244,29 @@ function display_cards(cards) {
   cards_with_rewards.forEach((card) => {
     const card_items = `<li class="card_item" data-id="${card.card.id}"><div>${card.card.name}</div><div>${card.displayed_reward}</div></li>`;
     card_list.insertAdjacentHTML("beforeend", card_items);
+
+    const card_item = document.querySelector(`li[data-id='${card.card.id}']`);
+    card_item.addEventListener("click", function () {
+      //選擇卡片最上方的標題
+      const card_selector_title = document.querySelector(
+        ".card_selector_title"
+      );
+      if (card.card_number == null) {
+        card_selector_title.textContent =
+          "使用者信用卡（點選即可填入卡號）：無適用卡號";
+      } else {
+        card_selector_title.textContent = "使用者信用卡（點選即可填入卡號）";
+        fill_card_num(card.card_number);
+      }
+    });
   });
 }
-
-// 下一次處理填寫信用卡資料的issue處理
-// function fill_card_num(card_num) {
-//   const card_num_1 = document.querySelector("#cardNo_1");
-//   const card_num_2 = document.querySelector("#cardNo_2");
-//   const card_num_3_hidden = document.querySelector("#cardNo_3");
-//   const card_num_3 = document.querySelector("#cardNo_3_temp");
-//   const card_num_4 = document.querySelector("#cardNo_4");
-
-//   if (card_num_1) {
-//     card_num_1.addEventListener("focus", function () {});
-
-//     // card_num_1.value = 4111;
-//     // card_num_2.value = 1111;
-//     // card_num_3_hidden.value = 1111;
-//     // card_num_3.value = "****";
-//     // card_num_4.value = 1111;
-//   }
-// }
 
 if (current_url.includes("cart.momoshop.com.tw")) {
   const observer = new MutationObserver(async (mutations) => {
     const credit_card_box = document.querySelector("#cardPaymentBox");
     const cards = await get_user_cards();
-
+    console.log(cards);
     if (credit_card_box) {
       observer.disconnect();
       display_cards(cards);
