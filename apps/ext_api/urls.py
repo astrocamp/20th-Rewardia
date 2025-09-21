@@ -27,8 +27,8 @@ urlpatterns = [
     ),
     path(
         "banks/<bank>/cards/",
-        views.get_cards,
-        name="get_cards",
+        views.get_bank_cards,
+        name="get_bank_cards",
     ),
     path(
         "find_rate/<str:bank_name>/<int:card_id>/<str:category_name>",
