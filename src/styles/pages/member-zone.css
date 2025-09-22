@@ -91,28 +91,13 @@
     @apply hover:shadow-xl transition-shadow duration-200;
     @apply transition-all duration-300; /* 平滑過渡效果 */
     
-    /* 固定寬高 */
-    @apply h-[450px] w-72 flex-shrink-0; /* 固定高度 450px，固定寬度 288px */
+    /* 固定寬高 + Flexbox 布局 */
+    @apply h-[450px] w-72 flex-shrink-0 flex flex-col; /* 固定高度 450px，固定寬度 288px，垂直 Flexbox */
   }
 
-  /* 當螢幕寬度小於650px時，卡牌不換行，水平滾動 */
-  @media (max-width: 650px) {
-    .member-cards-grid {
-      /* 切換回 flex 佈局以支援水平滾動 */
-      display: flex;
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      gap: 8px;
-      justify-content: flex-start;
-    }
-    
-    .member-card-item {
-      @apply flex-none; /* 不縮放 */
-    }
-  }
 
   .member-card-image-container {
-    @apply relative h-40 sm:h-44 lg:h-48 flex items-center justify-center p-2;
+    @apply relative h-40 flex items-center justify-center p-2 flex-shrink-0; /* 固定高度 160px，不縮放 */
   }
 
   .member-card-image {
@@ -124,7 +109,7 @@
   }
 
   .member-card-info {
-    @apply p-3 lg:p-4; /* 減少 padding */
+    @apply p-3 lg:p-4 flex-1 flex flex-col; /* 佔用剩餘空間，垂直 Flexbox */
   }
 
   /* 卡片標題（銀行名稱 + 卡片名稱） */
@@ -132,10 +117,10 @@
     @apply mb-2 leading-tight; /* 減少 margin */
   }
   .member-card-bank {
-    @apply text-lg md:text-lg lg:text-xl font-bold text-gray-800 mr-2; /* 手機/平板：18px，桌機：20px */
+    @apply text-lg font-bold text-gray-800 mr-2; /* 固定 18px */
   }
   .member-card-name {
-    @apply text-lg md:text-lg lg:text-xl font-bold text-gray-800; /* 手機/平板：18px，桌機：20px */
+    @apply text-lg font-bold text-gray-800; /* 固定 18px */
   }
 
   /* 卡號 */
@@ -150,10 +135,11 @@
 
   /* 回饋項目 */
   .member-card-rewards {
-    @apply space-y-0.5; /* 減少間距 */
+    @apply space-y-0.5 flex-1 flex flex-col justify-start; /* 佔用剩餘空間，垂直排列 */
+    min-height: 80px; /* 確保最小高度，即使少於3項也保持空間 */
   }
   .member-card-reward {
-    @apply text-base font-semibold text-gray-700; /* 16px，font-semibold */
+    @apply text-base font-semibold text-gray-700 flex-shrink-0; /* 16px，font-semibold，不縮放 */
   }
 
   /* 第二條分隔線與回饋資訊之間的間距 */
@@ -167,7 +153,7 @@
   }
 
   .member-card-actions {
-    @apply flex justify-between p-3 lg:p-4 gap-3; /* 改為 justify-between，左右對齊 */
+    @apply flex justify-between px-4 lg:px-6 py-3 lg:py-4 gap-3 flex-shrink-0; /* 確保左右內邊距一致，不縮放 */
   }
 
   /* 當只有刪除按鈕時，靠右對齊 */
@@ -177,7 +163,7 @@
 
   .member-card-btn {
     @apply px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200;
-    @apply w-32 flex-shrink-0; /* 使用 Tailwind 的 w-32 (128px) 和 flex-shrink-0 */
+    @apply w-28 flex-shrink-0; /* 調整為 w-28 (112px) 讓按鈕更緊湊 */
   }
 
   .member-card-btn.hidden {
@@ -345,23 +331,20 @@
     /* 移除響應式卡片網格設定，使用固定寬度 */
     
     .member-card-image-container {
-      @apply h-36;
+      @apply h-40 flex-shrink-0; /* 固定高度 160px，與桌機版一致 */
     }
     
     .member-card-info {
       @apply p-3;
     }
     
-    .member-card-name {
-      @apply text-base;
-    }
     
     .member-card-actions {
-      @apply p-3 pt-1 gap-1;
+      @apply px-4 py-3 gap-3; /* 與桌機版保持一致的內邊距 */
     }
     
     .member-card-btn {
-      @apply px-3 py-1 text-xs;
+      @apply px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 w-28 flex-shrink-0; /* 與桌機版保持一致 */
     }
     
     .member-info-grid {
