@@ -11,7 +11,7 @@
 [![Google Cloud](https://img.shields.io/badge/Google_Cloud-Vision-4285F4.svg)](https://cloud.google.com/vision)
 [![Selenium](https://img.shields.io/badge/Selenium-4.35-43B02A.svg)](https://selenium.dev/)
 [![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-4285F4.svg)](https://developer.chrome.com/docs/extensions/)
-<br><br>
+
 # Rewardia 專案簡介
 
 **Rewardia 是一個智能信用卡回饋比較平台，解決用戶在面對複雜信用卡回饋規則時的困惑。透過 Chrome Extension 與自動化爬蟲，為用戶提供即時、準確的信用卡回饋比較服務。**
@@ -21,7 +21,6 @@
 - **每次都在猶豫** ：「現在刷這張，會不會錯過更高回饋？」
 
 ![Rewardia專案介紹](https://rewardia-web-pic.s3.ap-southeast-2.amazonaws.com/web-pic/readme_0920.jpg)
-<br><br>
 
 ---
 
@@ -32,7 +31,7 @@
 - **PostgreSQL 16**
 - **Redis 7**
 - **Docker & Docker Compose**
-<br><br>
+
 ---
 
 ## 技術架構
@@ -78,7 +77,7 @@
 
 - **Version Control System** : Git
 - **Repository Hosting** : GitHub
-<br><br>
+
 ---
 
 ## 專案成員
@@ -89,8 +88,6 @@
 | 朱怡潔 Yichieh | [yichieh10002](https://github.com/yichieh10002/) | 後台回饋審核系統、前端架構設計、個人卡片功能系統、試算系統、React 前端 for Chrome Extension |
 | 張聖晞 Samuel | [legosthes](https://github.com/legosthes/) | 後台卡片控制系統、爬蟲資料擷取功能、Chrome Extension 後端與專用 API、資料庫設計與架構 |
 | 游志平 Brad | [ZhiPingYou](https://github.com/ZhiPingYou/) | 會員註冊與登入、首頁搜尋、後台圖片管理系統、前端架構規劃、AI 助理、第三方認證整合、影像辨識 |
-
-<br>
 
 ---
 
@@ -119,7 +116,7 @@
 - **回饋規則複雜** ：面對「滿額加碼」、「通路限定」等門檻與上限規則時感到困惑
 - **選擇困難** ：外送、超商、網購等消費場景，不確定哪張信用卡最划算
 - **錯失優惠** ：每次刷卡時猶豫是否會錯過更高的回饋
-<br><br>
+
 ---
 
 ## Chrome Extension 介紹
@@ -161,36 +158,3 @@
 ### Rewardia ｜讓你通路、門檻一次搞定，回饋不遺漏。
 
 ---
-
-
-
-
-<!-- ### 莊于申 Ethan - [GitHub](https://github.com/YSzEthan/)
-
-- **後台排程控制系統**
-- **資料清洗與 NLP 分析**
-- **網站部署**
-- **資料庫設計與架構**
-
-### 朱怡潔 Yichieh - [GitHub](https://github.com/yichieh10002/)
-
-- **後台回饋審核系統**
-- **前端架構設計**
-- **個人卡片功能系統**
-- **試算系統**
-- **外掛前端**
-
-### 張聖晞 Samuel Chang - [GitHub](https://github.com/legosthes/)
-
-- **後台卡片控制系統**
-- **爬蟲資料擷取功能**
-- **外掛後端與專用 API**
-- **資料庫設計與架構**
-
-### 游志平 Brad Yu - [GitHub](https://github.com/ZhiPingYou/)
-
-- **圖片管理系統**
-- **前端架構規劃**
-- **AI 助理**
-- **第三方認證整合**
-- **影像辨識** -->
