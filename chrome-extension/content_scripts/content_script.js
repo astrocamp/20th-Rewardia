@@ -166,11 +166,13 @@ function return_reward(reward, price) {
 }
 
 // 篩選出有momo或國內回饋的回饋資訊
-function check_reward_scope(rewards) {
-  const momo_reward = rewards.filter((reward) => reward.scope == "momo購物");
+function check_reward_scope(rewards, merchant_name) {
+  const merchant_reward = rewards.filter(
+    (reward) => reward.scope == merchant_name
+  );
   const domestic_reward = rewards.filter((reward) => reward.scope == "國內");
-  if (momo_reward.length > 0) {
-    return momo_reward;
+  if (merchant_reward.length > 0) {
+    return merchant_reward;
   } else if (domestic_reward.length > 0) {
     return domestic_reward;
   } else {
@@ -202,7 +204,7 @@ function fill_card_num(card_number) {
   card_num_3.value = "****";
 }
 
-function display_cards(cards) {
+function display_cards(cards, merchant_name) {
   // momo購物車元素
   const credit_card_box = document.querySelector("#cardPaymentBox");
   const price = Number(
@@ -224,7 +226,7 @@ function display_cards(cards) {
     let displayed_reward;
     let numeric_reward;
 
-    const reward = check_reward_scope(card.rewards);
+    const reward = check_reward_scope(card.rewards, merchant_name);
     if (reward.length == 0) {
       displayed_reward = `無適用回饋`;
       numeric_reward = 0;
@@ -262,14 +264,14 @@ function display_cards(cards) {
   });
 }
 
-if (current_url.includes("cart.momoshop.com.tw")) {
+if (current_url.includes("cart") && current_url.includes(merchant)) {
   const observer = new MutationObserver(async (mutations) => {
     const credit_card_box = document.querySelector("#cardPaymentBox");
     const cards = await get_user_cards();
 
     if (credit_card_box) {
       observer.disconnect();
-      display_cards(cards);
+      display_cards(cards, merchantMap[merchant]);
     }
   });
   observer.observe(document.body, {
