@@ -65,15 +65,15 @@ if (current_url == `${base_url}/users/member/`) {
 }
 
 // 顯示回饋金額在momo網站相關
-async function display_momo_rewards(rate, card, is_user_card) {
+function extract_price_from_element(selector) {
+  const element = document.querySelector(selector);
+  let price = Number(element.textContent.trim().replace(/,/g, "").slice(1));
+
+  return price;
+}
+
+async function display_momo_rewards(price, rate, card, is_user_card) {
   const checkout_price = document.querySelector(".checkout-item");
-  let price = Number(
-    document
-      .querySelector(".checkout-content-price.final-price")
-      .textContent.trim()
-      .replace(/,/g, "")
-      .slice(1)
-  );
 
   let reward = (price * (rate / 100)).toFixed(2);
 
@@ -92,7 +92,7 @@ async function display_momo_rewards(rate, card, is_user_card) {
   }
 }
 
-if (current_url.includes("cart")) {
+if (current_url.includes("cart") && current_url.includes(merchant)) {
   const checkout_price = document.querySelector(
     ".checkout-content-price.final-price"
   );
@@ -100,12 +100,8 @@ if (current_url.includes("cart")) {
     let last_price = 0;
 
     function check_price() {
-      const price = Number(
-        document
-          .querySelector(".checkout-content-price.final-price")
-          .textContent.trim()
-          .replace(/,/g, "")
-          .slice(1)
+      const price = extract_price_from_element(
+        ".checkout-content-price.final-price"
       );
 
       if (price !== last_price) {
@@ -123,7 +119,12 @@ if (current_url.includes("cart")) {
               return card.card.name;
             });
             const is_user_card = user_cards.includes(card_name);
-            await display_momo_rewards(max_rate, card_name, is_user_card);
+            await display_momo_rewards(
+              price,
+              max_rate,
+              card_name,
+              is_user_card
+            );
           }
         );
       }
