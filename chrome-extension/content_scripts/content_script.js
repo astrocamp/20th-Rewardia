@@ -67,6 +67,7 @@ if (current_url == `${base_url}/users/member/`) {
 // 顯示回饋金額在momo網站相關
 function extract_price_from_element(selector) {
   const element = document.querySelector(selector);
+  if (!element) return null;
   let price = Number(element.textContent.trim().replace(/,/g, "").slice(1));
 
   return price;
