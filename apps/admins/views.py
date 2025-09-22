@@ -18,6 +18,7 @@ from celery import current_app
 from django_celery_results.models import TaskResult
 from datetime import  timedelta
 from django.utils import timezone
+from django.core.files.base import ContentFile
 
 
 def _get_last_modified_str(card_instance):
