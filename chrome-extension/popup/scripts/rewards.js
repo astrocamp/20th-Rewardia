@@ -1,4 +1,4 @@
-const base_url = "https://rewardia.net/";
+const base_url = "https://rewardia.net";
 const rewards_content = document.querySelector(".rewards_content");
 
 async function get_rewards(merchant) {

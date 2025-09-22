@@ -1,4 +1,4 @@
-const base_url = "https://rewardia.net/";
+const base_url = "https://rewardia.net";
 const current_host = window.location.hostname;
 const current_url = window.location.href;
 
@@ -60,7 +60,7 @@ async function show_rewardia_popup() {
 
 if (current_url == `${base_url}/users/member/`) {
   chrome.runtime.sendMessage({
-    action: "open_loggedin",
+    action: "change_login_icon",
   });
 }
 

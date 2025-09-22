@@ -1,4 +1,4 @@
-const base_url = "https://rewardia.net/";
+const base_url = "https://rewardia.net";
 const token_url = `${base_url}/users/api/get_token`;
 
 const merchantMap = {
@@ -111,8 +111,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
-  if (message.action === "open_loggedin") {
-    chrome.action.openPopup();
+  if (message.action === "change_login_icon") {
     chrome.action.setIcon({
       path: "images/Rewardia-loggedin.png",
     });
