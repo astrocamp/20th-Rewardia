@@ -9,7 +9,7 @@ const CONSTANTS = {
   CONVERSATION_HISTORY_LENGTH: 6, // 傳遞最近對話數量
   // 視窗尺寸限制
   MIN_WINDOW_WIDTH: 250,
-  MIN_WINDOW_HEIGHT: 300,
+  MIN_WINDOW_HEIGHT: 350,
   MAX_WINDOW_SCALE: 2, // 最大縮放倍數
   // 視窗預設設定
   DEFAULT_WINDOW: {
@@ -155,7 +155,24 @@ export default function chatbot() {
       // 頁面載入時確保滾動到最新位置
       this.$nextTick(() => {
         this.scrollToBottom();
+        // 初始化時檢查位置，確保不會跑出畫面外
+        this.adjustWindowPosition();
       });
+      
+      // 監聽視窗大小變化，確保聊天框不會跑出畫面外
+      window.addEventListener('resize', () => {
+        this.adjustWindowPosition();
+      });
+      
+      // 使用 MutationObserver 監聽 DOM 變化
+      this.setupMutationObserver();
+      
+      // 定期檢查位置（每100ms檢查一次，更頻繁）
+      this.positionCheckInterval = setInterval(() => {
+        if (this.isOpen) {
+          this.adjustWindowPosition();
+        }
+      }, 100);
     },
 
     // 儲存到記憶體和 sessionStorage
@@ -208,18 +225,31 @@ export default function chatbot() {
       if (this.isOpen) {
         this.closeChat();
       } else {
+        // 如果畫面高度小於最小高度，不開啟對話框
+        if (window.innerHeight < CONSTANTS.MIN_WINDOW_HEIGHT) {
+          return;
+        }
         this.openChat();
       }
     },
 
     // 開啟聊天視窗
     openChat() {
+      // 如果畫面高度小於最小高度，不開啟對話框
+      if (window.innerHeight < CONSTANTS.MIN_WINDOW_HEIGHT) {
+        return;
+      }
+      
       this.isOpen = true;
       this.errorMessage = '';
       this.saveToMemory();
       this.focusInput();
       // 確保聊天記錄滾動到最新位置
       this.scrollToBottom();
+      // 開啟時檢查位置，確保不會跑出畫面外
+      this.$nextTick(() => {
+        this.adjustWindowPosition();
+      });
     },
 
     // 關閉聊天視窗
@@ -229,6 +259,40 @@ export default function chatbot() {
       // 關閉視窗時重置為預設大小和位置
       this.windowState = createDefaultWindowState();
       this.saveToMemory();
+    },
+
+    // 設置 MutationObserver 監聽 DOM 變化
+    setupMutationObserver() {
+      if (typeof MutationObserver !== 'undefined') {
+        this.mutationObserver = new MutationObserver(() => {
+          if (this.isOpen) {
+            this.$nextTick(() => {
+              this.adjustWindowPosition();
+            });
+          }
+        });
+        
+        // 監聽整個 document 的變化
+        this.mutationObserver.observe(document.body, {
+          childList: true,
+          subtree: true,
+          attributes: true,
+          attributeFilter: ['style', 'class']
+        });
+      }
+    },
+
+    // 清理定時器
+    destroy() {
+      if (this.positionCheckInterval) {
+        clearInterval(this.positionCheckInterval);
+        this.positionCheckInterval = null;
+      }
+      
+      if (this.mutationObserver) {
+        this.mutationObserver.disconnect();
+        this.mutationObserver = null;
+      }
     },
 
     // 發送訊息
@@ -525,6 +589,8 @@ export default function chatbot() {
     stopDrag() {
       if (this.isDragging) {
         this.isDragging = false;
+        // 拖拽結束後檢查位置
+        this.adjustWindowPosition();
         this.saveToMemory();
       }
     },
@@ -575,18 +641,68 @@ export default function chatbot() {
     stopResize() {
       if (this.isResizing) {
         this.isResizing = false;
+        // 調整大小後立即檢查位置
+        this.adjustWindowPosition();
+        this.saveToMemory();
+      }
+    },
+
+    // 調整視窗位置，確保不會跑出畫面外
+    adjustWindowPosition() {
+      if (!this.isOpen) return; // 如果聊天框未開啟，不執行調整
+      
+      // 如果畫面高度小於最小高度，關閉對話框
+      if (window.innerHeight < CONSTANTS.MIN_WINDOW_HEIGHT) {
+        this.closeChat();
+        return;
+      }
+      
+      // 計算最大允許的寬度和高度（留出更多邊距）
+      const maxWidth = window.innerWidth - 32; // 左右各留 16px
+      const maxHeight = window.innerHeight - 32; // 上下各留 16px
+      
+      // 記錄調整前的狀態
+      const oldWidth = this.windowState.width;
+      const oldHeight = this.windowState.height;
+      const oldRight = this.windowState.right;
+      const oldBottom = this.windowState.bottom;
+      
+      // 強制限制寬度
+      this.windowState.width = Math.max(CONSTANTS.MIN_WINDOW_WIDTH, Math.min(this.windowState.width, maxWidth));
+      
+      // 強制限制高度
+      this.windowState.height = Math.max(CONSTANTS.MIN_WINDOW_HEIGHT, Math.min(this.windowState.height, maxHeight));
+      
+      // 計算邊界
+      const maxLeft = window.innerWidth - this.windowState.width;
+      const maxTop = window.innerHeight - this.windowState.height;
+      
+      // 確保不會超出邊界
+      this.windowState.right = Math.max(0, Math.min(maxLeft, this.windowState.right));
+      this.windowState.bottom = Math.max(0, Math.min(maxTop, this.windowState.bottom));
+      
+      // 如果有調整，儲存狀態
+      if (oldWidth !== this.windowState.width || oldHeight !== this.windowState.height || 
+          oldRight !== this.windowState.right || oldBottom !== this.windowState.bottom) {
         this.saveToMemory();
       }
     },
 
     // 取得視窗樣式
     get windowStyle() {
+      // 每次計算樣式時都檢查位置
+      if (this.isOpen) {
+        this.adjustWindowPosition();
+      }
+      
       const windowPos = this.getWindowPosition();
       return {
         width: `${this.windowState.width}px`,
         height: `${this.windowState.height}px`,
-        left: `${Math.max(0, windowPos.left)}px`,
-        top:  `${Math.max(0, windowPos.top)}px`
+        '--chatbot-left': `${Math.max(0, windowPos.left)}px`,
+        '--chatbot-top': `${Math.max(0, windowPos.top)}px`,
+        '--chatbot-width': `${this.windowState.width}px`,
+        '--chatbot-height': `${this.windowState.height}px`
       };
     }
   };
