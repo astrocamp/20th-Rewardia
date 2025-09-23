@@ -2,7 +2,9 @@
 
 @theme {
   @keyframes typing {
-    0%, 80%, 100% {
+    0%,
+    80%,
+    100% {
       transform: scale(0);
       opacity: 0.5;
     }
@@ -34,9 +36,12 @@
 /* 聊天視窗容器 */
 .chatbot-window {
   @apply fixed rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden;
-  @apply bg-[linear-gradient(180deg,#B8F5E6_0%,#FFFFFF_100%)];
-  @apply border-2 border-[#34D399];
-  @apply min-w-[250px] min-h-[300px] select-none transition-none;
+  @apply bg-[linear-gradient(180deg,#b4ccff_0%,#FFFFFF_100%)];
+  @apply border-2 border-[#6a8cb7];
+  @apply min-w-[250px] min-h-[350px] select-none transition-none;
+  /* 強制限制位置，確保不會超出螢幕邊界 */
+  left: max(16px, min(var(--chatbot-left, 0px), calc(100vw - var(--chatbot-width, 280px) - 16px))) !important;
+  top: max(16px, min(var(--chatbot-top, 0px), calc(100vh - var(--chatbot-height, 350px) - 16px))) !important;
   /* 預設大小和位置由 JavaScript 動態設定 */
 }
 
@@ -52,8 +57,7 @@
 
 /* 聊天視窗標題列 */
 .chatbot-header {
-  @apply p-4 flex-shrink-0 flex items-center justify-between border-b border-emerald-300/30 bg-white/10;
-  @apply cursor-move; /* 標題列可拖拽 */
+  @apply p-4 flex-shrink-0 flex items-center justify-between border-b border-[#7b89a8]/30 cursor-move;
 }
 
 .chatbot-title {
@@ -70,10 +74,10 @@
 
 /* 聊天訊息區域 */
 .chatbot-messages {
-  @apply flex-1 overflow-y-auto overflow-x-hidden p-4 bg-transparent min-h-[200px] h-[calc(100%-140px)];
+  @apply flex-1 overflow-y-auto overflow-x-hidden p-4 min-h-[200px] h-[calc(100%-140px)];
   /* 保留原生 CSS：Firefox 滾動條樣式，Tailwind 沒有對應的 utility */
   scrollbar-width: thin;
-  scrollbar-color: #34d399 transparent;
+  scrollbar-color: #45466b transparent;
 }
 
 /* 保留原生 CSS：Webkit 瀏覽器滾動條樣式，必須使用偽元素選擇器 */
@@ -136,7 +140,7 @@
 
 /* 輸入區域 */
 .chatbot-input-area {
-  @apply p-4 flex-shrink-0 mt-auto border-t border-emerald-300/30 bg-white/80;
+  @apply p-4 flex-shrink-0 mt-auto border-t border-[#7b89a8]/30 bg-white/80;
 }
 
 .chatbot-input {
@@ -160,11 +164,28 @@
 }
 
 /* 響應式設計 */
+@media (max-width: 1024px) {
+  /* 中等螢幕時限制最大寬度和高度，避免跑出畫面 */
+  .chatbot-window {
+    max-width: calc(100vw - 2rem);
+    max-height: calc(100vh - 2rem);
+  }
+}
+
 @media (max-width: 768px) {
-  /* 小螢幕模式下完全隱藏 chatbot */
+  /* 小螢幕時進一步限制尺寸 */
+  .chatbot-window {
+    max-width: calc(100vw - 1rem);
+    max-height: calc(100vh - 1rem);
+    min-width: 250px;
+    min-height: 350px;
+  }
+}
+
+@media (max-width: 640px) {
+  /* 小螢幕模式下完全隱藏 chatbot（與漢堡選單斷點一致） */
   .chatbot-float-btn,
   .chatbot-window {
     @apply hidden;
   }
 }
-
