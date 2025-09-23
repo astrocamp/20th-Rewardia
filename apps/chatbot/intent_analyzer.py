@@ -943,6 +943,10 @@ class ChatbotResponseBuilder:
                 message = RESPONSE_MESSAGES['navigation']['general_pages'].get(nav_target, f"好的，我帶你去{page_name}")
                 return f"NAVIGATE:{nav_target}:{message}"
         
+        # Chrome擴充功能下載
+        elif nav_type == "chrome_extension":
+            return f"NAVIGATE:chrome_extension:{RESPONSE_MESSAGES['navigation']['chrome_extension']}"
+        
         # 登出
         elif nav_type == "logout":
             if user_id:
