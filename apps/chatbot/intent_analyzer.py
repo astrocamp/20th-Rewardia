@@ -281,52 +281,6 @@ class ChatbotResponseBuilder:
                     intent["navigation_target"] = nav_type
                     break
 
-    @staticmethod
-    def _handle_navigation_intent(intent, user_id=None, current_page=''):
-        """處理導航意圖"""
-        nav_type = intent.get("navigation_type")
-        nav_target = intent.get("navigation_target")
-        
-        # 會員專區相關導航
-        if nav_type == "member_area":
-            if user_id:
-                # 已登入：檢查是否已在會員專區
-                # 這裡需要檢查當前頁面，暫時假設不在會員專區
-                return f"NAVIGATE:member_area:{RESPONSE_MESSAGES['navigation']['member_area']}"
-            else:
-                # 未登入
-                return RESPONSE_MESSAGES['navigation']['login_required']
-        
-        # 一般頁面導航
-        elif nav_type == "general_page":
-            # 檢查是否已在目標頁面（暫時假設不在）
-            page_name = PAGE_MAPPING['general_pages'].get(nav_target, nav_target)
-            message = RESPONSE_MESSAGES['navigation']['general_pages'].get(nav_target, f"好的，我帶你去{page_name}")
-            return f"NAVIGATE:{nav_target}:{message}"
-        
-        # 新增卡片導航
-        elif nav_type == "add_card":
-            if user_id:
-                # 已登入：無論在哪個頁面都回傳導航指令，讓前端處理具體邏輯
-                return f"NAVIGATE:add_card:{RESPONSE_MESSAGES['navigation']['add_card']}"
-            else:
-                # 未登入
-                return RESPONSE_MESSAGES['navigation']['login_required']
-        
-        # 登入註冊頁面導航
-        elif nav_type == "auth_page":
-            page_name = PAGE_MAPPING['auth_pages'].get(nav_target, nav_target)
-            message = RESPONSE_MESSAGES['navigation']['auth_pages'].get(nav_target, f"好的，我帶你去{page_name}")
-            return f"NAVIGATE:{nav_target}:{message}"
-        
-        # 登出
-        elif nav_type == "logout":
-            if user_id:
-                return f"NAVIGATE:logout:{RESPONSE_MESSAGES['navigation']['logout']}"
-            else:
-                return RESPONSE_MESSAGES['navigation']['not_logged_in']
-        
-        return RESPONSE_MESSAGES['navigation']['default']
 
     @staticmethod
     def _clean_card_name(card_name):
@@ -927,22 +881,76 @@ class ChatbotResponseBuilder:
         nav_type = intent.get("navigation_type")
         nav_target = intent.get("navigation_target")
         
+        # 登入頁面導航
+        if nav_type == "auth_page" and nav_target == "login":
+            if user_id:
+                # 已登入：回覆已經登入
+                return RESPONSE_MESSAGES['navigation']['already_logged_in']
+            else:
+                # 未登入：導航到登入頁面
+                return f"NAVIGATE:login:{RESPONSE_MESSAGES['navigation']['auth_pages']['login']}"
+        
+        # 註冊頁面導航
+        elif nav_type == "auth_page" and nav_target == "register":
+            if user_id:
+                # 已登入：回覆已經註冊
+                return RESPONSE_MESSAGES['navigation']['already_registered']
+            else:
+                # 未登入：導航到註冊頁面
+                return f"NAVIGATE:register:{RESPONSE_MESSAGES['navigation']['auth_pages']['register']}"
+        
+        # 新增卡片導航
+        elif nav_type == "add_card":
+            if user_id:
+                # 已登入：檢查是否在新增卡片頁面
+                if current_page == '/users/cards/new/':
+                    return RESPONSE_MESSAGES['navigation']['already_here']
+                else:
+                    return f"NAVIGATE:add_card:{RESPONSE_MESSAGES['navigation']['add_card']}"
+            else:
+                # 未登入：要求先登入
+                return RESPONSE_MESSAGES['navigation']['login_required']
+        
         # 會員專區相關導航
-        if nav_type == "member_area":
+        elif nav_type == "member_area":
             if user_id:
                 # 已登入：檢查是否已在會員專區
-                # 這裡需要檢查當前頁面，暫時假設不在會員專區
-                return f"NAVIGATE:member_area:{RESPONSE_MESSAGES['navigation']['member_area']}"
+                if current_page == '/users/member/':
+                    return RESPONSE_MESSAGES['navigation']['already_here']
+                else:
+                    return f"NAVIGATE:member_area:{RESPONSE_MESSAGES['navigation']['member_area']}"
             else:
                 # 未登入
                 return RESPONSE_MESSAGES['navigation']['login_required']
         
         # 一般頁面導航
         elif nav_type == "general_page":
-            # 檢查是否已在目標頁面（暫時假設不在）
-            page_name = PAGE_MAPPING['general_pages'].get(nav_target, nav_target)
-            message = RESPONSE_MESSAGES['navigation']['general_pages'].get(nav_target, f"好的，我帶你去{page_name}")
-            return f"NAVIGATE:{nav_target}:{message}"
+            # 檢查是否已在目標頁面
+            if nav_target == "home" and current_page == '/':
+                return RESPONSE_MESSAGES['navigation']['already_here']
+            elif nav_target == "download" and current_page == '/download/':
+                return RESPONSE_MESSAGES['navigation']['already_here']
+            elif nav_target == "calculator" and current_page == '/calculator/':
+                return RESPONSE_MESSAGES['navigation']['already_here']
+            elif nav_target == "about" and current_page == '/about/':
+                return RESPONSE_MESSAGES['navigation']['already_here']
+            elif nav_target == "privacy" and current_page == '/privacy/':
+                return RESPONSE_MESSAGES['navigation']['already_here']
+            elif nav_target == "tos" and current_page == '/tos/':
+                return RESPONSE_MESSAGES['navigation']['already_here']
+            else:
+                page_name = PAGE_MAPPING['general_pages'].get(nav_target, nav_target)
+                message = RESPONSE_MESSAGES['navigation']['general_pages'].get(nav_target, f"好的，我帶你去{page_name}")
+                return f"NAVIGATE:{nav_target}:{message}"
+        
+        # 登出
+        elif nav_type == "logout":
+            if user_id:
+                return f"NAVIGATE:logout:{RESPONSE_MESSAGES['navigation']['logout']}"
+            else:
+                return RESPONSE_MESSAGES['navigation']['not_logged_in']
+        
+        return RESPONSE_MESSAGES['navigation']['default']
 
     @staticmethod
     def _handle_personal_recommendation_intent(intent, user_id=None):

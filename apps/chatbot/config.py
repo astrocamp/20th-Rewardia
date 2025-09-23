@@ -154,7 +154,9 @@ NAVIGATION_KEYWORDS = {
         'home': ["去首頁", "首頁"],
         'download': ["去下載專區", "下載專區"],
         'calculator': ["去優惠試算", "優惠試算"],
-        'about': ["去關於功能", "關於功能"]
+        'about': ["去關於功能", "關於功能"],
+        'privacy': ["隱私權政策", "去隱私權政策", "隱私權"],
+        'tos': ["服務條款", "去服務條款", "條款"]
     },
     # 新增卡片相關
     'add_card': ["擷取卡號", "擷取卡片", "去新增卡片", "新增卡片", "加卡片", "去加卡片"],
@@ -239,18 +241,22 @@ CARD_COMPARISON_RECOMMENDATION_KEYWORDS = {
 # 回應訊息配置
 RESPONSE_MESSAGES = {
     'navigation': {
-        'member_area': "好的，我帶你去",
+        'member_area': "好的，我帶你去會員專區",
         'already_here': "這裡就是了喔", 
         'login_required': "請先登入會員",
         'logout': "好的，記得常回來喔",
         'not_logged_in': "您尚未登入",
         'default': "好的，我帶你去",
-        'add_card': "好的，我帶你去",
+        'add_card': "好的，我帶你去新增卡片",
+        'already_logged_in': "你已經登入了喔",
+        'already_registered': "你已經註冊過了喔",
         'general_pages': {
             'home': "好的，我帶你去首頁",
             'download': "好的，我帶你去下載專區",
             'calculator': "好的，我帶你去優惠試算", 
-            'about': "好的，我帶你去關於功能"
+            'about': "好的，我帶你去關於功能",
+            'privacy': "好的，我帶你去隱私權政策",
+            'tos': "好的，我帶你去服務條款"
         },
         'auth_pages': {
             'login': "好的，我帶你去登入頁面",
@@ -379,7 +385,9 @@ PAGE_MAPPING = {
         'home': '首頁',
         'download': '下載專區', 
         'calculator': '優惠試算',
-        'about': '關於功能'
+        'about': '關於功能',
+        'privacy': '隱私權政策',
+        'tos': '服務條款'
     },
     'auth_pages': {
         'login': '登入頁面',

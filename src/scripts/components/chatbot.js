@@ -113,6 +113,24 @@ function saveToSession() {
   }, CONSTANTS.SAVE_THROTTLE_DELAY);
 }
 
+// 立即儲存到 sessionStorage（用於導航時）
+function saveToSessionImmediate() {
+  try {
+    const dataToSave = {
+      ...chatbotMemory,
+      messages: chatbotMemory.messages.map(msg => ({
+        ...msg,
+        timestamp: msg.timestamp.toISOString()
+      }))
+    };
+    sessionStorage.setItem(CONSTANTS.STORAGE_KEY, JSON.stringify(dataToSave));
+  } catch (e) {
+    if (window.RewardiaLogger) {
+      window.RewardiaLogger.warn('無法立即儲存聊天記錄:', e);
+    }
+  }
+}
+
 // 頁面載入時立即載入
 loadFromSession();
 
@@ -139,6 +157,15 @@ export default function chatbot() {
       chatbotMemory.isOpen = this.isOpen;
       chatbotMemory.windowState = { ...this.windowState };
       saveToSession();
+    },
+
+    // 立即儲存到記憶體和 sessionStorage（用於導航時）
+    saveToMemoryImmediate() {
+      const limitedMessages = this.messages.slice(-CONSTANTS.MAX_HISTORY_LENGTH);
+      chatbotMemory.messages = [...limitedMessages];
+      chatbotMemory.isOpen = this.isOpen;
+      chatbotMemory.windowState = { ...this.windowState };
+      saveToSessionImmediate();
     },
 
     // 切換聊天視窗顯示狀態
@@ -292,7 +319,13 @@ export default function chatbot() {
       const target = parts[1];
       const message = parts.slice(2).join(':');
       this.messages.push({ type: 'ai', content: message, timestamp: new Date() });
-      this.$nextTick(() => { this.executeNavigation(target); });
+      this.scrollToBottom(); // 確保UI更新
+      
+      // 立即儲存聊天記錄（不使用延遲）
+      this.saveToMemoryImmediate();
+      
+      // 使用 setTimeout 確保儲存完成後再執行導航
+      setTimeout(() => { this.executeNavigation(target); }, 50);
     },
 
     // 執行具體的導航動作
@@ -337,6 +370,22 @@ export default function chatbot() {
             this.focusInput();
           } else {
             window.location.href = '/faq/';
+          }
+          break;
+        case 'privacy':
+          if (currentPath === '/privacy/') {
+            this.messages.push({ type: 'ai', content: '這裡就是了喔', timestamp: new Date() });
+            this.focusInput();
+          } else {
+            window.location.href = '/privacy/';
+          }
+          break;
+        case 'tos':
+          if (currentPath === '/tos/') {
+            this.messages.push({ type: 'ai', content: '這裡就是了喔', timestamp: new Date() });
+            this.focusInput();
+          } else {
+            window.location.href = '/tos/';
           }
           break;
         case 'add_card':
