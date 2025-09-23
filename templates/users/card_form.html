@@ -128,41 +128,41 @@
 
             </form>
 
-            <!-- 按鈕排列：擷取卡號靠左，取消與新增卡片靠右 -->
-            <div class="flex justify-between items-start">
-              <!-- 左側：擷取卡號按鈕和說明文字 -->
-              <div class="flex flex-col">
+            <!-- 按鈕排列：小螢幕垂直排列，大螢幕水平排列 -->
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+              <!-- 擷取卡號按鈕和說明文字 -->
+              <div class="flex flex-col order-1 sm:order-1">
                 <button type="button"
                         @click="openCamera({ isCardForm: true })"
-                        class="inline-flex items-center px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors w-fit">
+                        class="inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors w-full sm:w-fit">
                   {% include 'components/icon.html' with name="camera" size="w-5 h-5" class="mr-2" %}
                   擷取卡號
                 </button>
-                <p class="text-sm text-gray-600 mt-1">使用攝影機自動識別信用卡卡號</p>
+                <p class="text-sm text-gray-600 mt-1">使用攝影機識別卡號</p>
               </div>
 
-              <!-- 取消與新增卡片按鈕 - 靠右 -->
-              <div class="flex gap-4">
-                <a href="{% url 'users:member_zone' %}"
-                   class="inline-flex items-center justify-center rounded-lg w-[132px] h-[52px] px-6 font-medium transition-colors duration-200 select-none bg-[#E5E7EB] text-gray-900 hover:bg-gray-300 active:bg-gray-400">
-                  取消
-                </a>
-
+              <!-- 新增卡片與取消按鈕 -->
+              <div class="flex flex-col sm:flex-row gap-4 order-2 sm:order-2">
                 {% if user_card %}
                   <button type="button"
                           @click="submitForm($event)"
-                          class="inline-flex items-center justify-center rounded-lg w-[132px] h-[52px] px-6 font-medium transition-colors duration-200 select-none bg-[#2060B9] text-white hover:bg-[#1c55a4] active:bg-[#184a90] disabled:bg-[#9BB6DD] disabled:cursor-not-allowed disabled:opacity-70">
+                          class="inline-flex items-center justify-center rounded-lg w-full sm:w-[132px] h-[52px] px-6 font-medium transition-colors duration-200 select-none bg-[#2060B9] text-white hover:bg-[#1c55a4] active:bg-[#184a90] disabled:bg-[#9BB6DD] disabled:cursor-not-allowed disabled:opacity-70">
                     更新卡片
                   </button>
                 {% else %}
                   <button type="button"
                           @click="submitForm($event)"
                           :disabled="!selectedBank || !selectedCard"
-                          class="inline-flex items-center justify-center rounded-lg w-[132px] h-[52px] px-6 font-medium transition-colors duration-200 select-none bg-[#2060B9] text-white hover:bg-[#1c55a4] active:bg-[#184a90] disabled:bg-[#9BB6DD] disabled:cursor-not-allowed disabled:opacity-70"
+                          class="inline-flex items-center justify-center rounded-lg w-full sm:w-[132px] h-[52px] px-6 font-medium transition-colors duration-200 select-none bg-[#2060B9] text-white hover:bg-[#1c55a4] active:bg-[#184a90] disabled:bg-[#9BB6DD] disabled:cursor-not-allowed disabled:opacity-70"
                           :class="(!selectedBank || !selectedCard) ? 'bg-[#9BB6DD] cursor-not-allowed opacity-70' : 'bg-[#2060B9] hover:bg-[#1c55a4] active:bg-[#184a90]'">
                     新增卡片
                   </button>
                 {% endif %}
+
+                <a href="{% url 'users:member_zone' %}"
+                   class="inline-flex items-center justify-center rounded-lg w-full sm:w-[132px] h-[52px] px-6 font-medium transition-colors duration-200 select-none bg-[#E5E7EB] text-gray-900 hover:bg-gray-300 active:bg-gray-400">
+                  取消
+                </a>
               </div>
             </div>
           </div>
@@ -173,15 +173,24 @@
             <div class="flex-1 bg-white rounded-lg p-4 shadow-sm flex flex-col">
               <!-- 卡片圖片 -->
               <div class="flex-1 flex items-center justify-center">
-                <img id="card-preview-img"
-                     src=""
-                     alt="卡片預覽"
-                     class="w-full max-w-sm mx-auto rounded-lg shadow-md object-contain"
-                     x-show="selectedCard && cardPreview.imageUrl"
-                     x-bind:src="cardPreview.imageUrl">
-                <div x-show="!selectedCard || !cardPreview.imageUrl"
-                     class="w-full max-w-sm mx-auto h-32 bg-gray-200 rounded-lg flex items-center justify-center">
-                  <span class="text-gray-500">請選擇卡片</span>
+                <!-- 固定尺寸的圖片容器 -->
+                <div class="w-full max-w-lg mx-auto h-64 bg-white rounded-lg shadow-md flex items-center justify-center relative overflow-hidden border border-gray-200">
+                  <!-- 有圖片時顯示 -->
+                  <img id="card-preview-img"
+                       src=""
+                       alt="卡片預覽"
+                       class="w-full h-full object-contain rounded-lg"
+                       x-show="selectedCard && cardPreview.imageUrl"
+                       x-bind:src="cardPreview.imageUrl">
+                  
+                  <!-- 沒有圖片時的佔位符 -->
+                  <div x-show="!selectedCard || !cardPreview.imageUrl"
+                       class="flex flex-col items-center justify-center text-gray-400">
+                    <div class="w-16 h-16 mb-2">
+                      {% include 'components/icon.html' with name="image" size="w-full h-full" %}
+                    </div>
+                    <span class="text-sm">請選擇卡片</span>
+                  </div>
                 </div>
               </div>
 
