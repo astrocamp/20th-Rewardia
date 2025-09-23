@@ -158,6 +158,8 @@ NAVIGATION_KEYWORDS = {
         'privacy': ["隱私權政策", "去隱私權政策", "隱私權"],
         'tos': ["服務條款", "去服務條款", "條款"]
     },
+    # Chrome擴充功能下載
+    'chrome_extension': ["下載", "chrome", "插件", "外掛", "plugin", "extension"],
     # 新增卡片相關
     'add_card': ["擷取卡號", "擷取卡片", "去新增卡片", "新增卡片", "加卡片", "去加卡片"],
     # 登出相關
@@ -248,6 +250,7 @@ RESPONSE_MESSAGES = {
         'not_logged_in': "您尚未登入",
         'default': "好的，我帶你去",
         'add_card': "好的，我帶你去新增卡片",
+        'chrome_extension': "聰明的選擇",
         'already_logged_in': "你已經登入了喔",
         'already_registered': "你已經註冊過了喔",
         'general_pages': {

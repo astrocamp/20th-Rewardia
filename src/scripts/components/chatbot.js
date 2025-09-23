@@ -150,6 +150,14 @@ export default function chatbot() {
     // IME 輸入法狀態
     isComposing: false,
 
+    // 初始化方法
+    init() {
+      // 頁面載入時確保滾動到最新位置
+      this.$nextTick(() => {
+        this.scrollToBottom();
+      });
+    },
+
     // 儲存到記憶體和 sessionStorage
     saveToMemory() {
       const limitedMessages = this.messages.slice(-CONSTANTS.MAX_HISTORY_LENGTH);
@@ -168,6 +176,33 @@ export default function chatbot() {
       saveToSessionImmediate();
     },
 
+    // 清除聊天記錄並關閉對話框
+    clearChatHistory() {
+      // 清除記憶體中的聊天記錄
+      this.messages = [];
+      chatbotMemory.messages = [];
+      
+      // 關閉對話框
+      this.isOpen = false;
+      chatbotMemory.isOpen = false;
+      
+      // 清除錯誤訊息
+      this.errorMessage = '';
+      
+      // 重置視窗狀態為預設值
+      this.windowState = createDefaultWindowState();
+      chatbotMemory.windowState = createDefaultWindowState();
+      
+      // 立即清除 sessionStorage
+      try {
+        sessionStorage.removeItem(CONSTANTS.STORAGE_KEY);
+      } catch (e) {
+        if (window.RewardiaLogger) {
+          window.RewardiaLogger.warn('無法清除聊天記錄:', e);
+        }
+      }
+    },
+
     // 切換聊天視窗顯示狀態
     toggleChat() {
       if (this.isOpen) {
@@ -183,6 +218,8 @@ export default function chatbot() {
       this.errorMessage = '';
       this.saveToMemory();
       this.focusInput();
+      // 確保聊天記錄滾動到最新位置
+      this.scrollToBottom();
     },
 
     // 關閉聊天視窗
@@ -282,7 +319,15 @@ export default function chatbot() {
     scrollToBottom() {
       this.$nextTick(() => {
         const container = this.$refs.messagesContainer;
-        if (container) container.scrollTop = container.scrollHeight;
+        if (container) {
+          container.scrollTop = container.scrollHeight;
+          // 確保滾動完成，使用 setTimeout 作為備用
+          setTimeout(() => {
+            if (container) {
+              container.scrollTop = container.scrollHeight;
+            }
+          }, 50);
+        }
       });
     },
 
@@ -403,6 +448,12 @@ export default function chatbot() {
         case 'register':
           window.location.href = '/users/register/';
           break;
+        case 'chrome_extension':
+          // 延遲2秒後開啟Chrome Web Store下載頁面
+          setTimeout(() => {
+            window.open('https://chromewebstore.google.com/detail/rewardia/ahmfkgkefmandfahccfbbpfffnphkakl', '_blank');
+          }, 1000);
+          break;
         case 'logout':
           this.performLogout();
           break;
@@ -415,6 +466,9 @@ export default function chatbot() {
 
     // 執行登出
     performLogout() {
+      // 登出前先清除聊天記錄並關閉對話框
+      this.clearChatHistory();
+      
       const form = document.createElement('form');
       form.method = 'POST';
       form.action = '/accounts/logout/';
