@@ -9,6 +9,7 @@
      x-transition:leave-end="opacity-0"
      class="fixed inset-0 z-[9999] bg-black/80"
      @keydown.escape="closeCamera()"
+     @keydown.window.space.prevent="if(showModal) { captureAndRecognize(); }"
      x-cloak>
   
   <!-- 背景遮罩 -->
@@ -62,8 +63,7 @@
               
               <!-- 對齊指示器 -->
               <div class="absolute top-[65%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-center">
-                <div class="text-sm mb-2">請將信用卡對準此框</div>
-                <div class="text-xs opacity-75">確保卡號清晰可見</div>
+                <div class="text-sm mb-2">卡號對準此框並確保清晰</div>
               </div>
             </div>
           </div>
@@ -93,14 +93,6 @@
                   x-text="processing ? '識別中...' : '拍照識別'">
           </button>
           
-          <!-- 重新拍照按鈕 -->
-          <button x-show="error && retries < maxRetries"
-                  @click="retryCapture()"
-                  class="inline-flex items-center px-4 sm:px-10 py-2 sm:py-4 bg-orange-500 text-white border-none rounded-lg cursor-pointer font-medium text-xs sm:text-base">
-            {% include 'components/icon.html' with name="retry" size="w-4 h-4" class="mr-2" %}
-            重新拍照
-          </button>
-          
           <!-- 手動輸入按鈕 -->
           <button x-show="error && retries >= maxRetries"
                   @click="openManualInput()"
@@ -119,7 +111,7 @@
         
         <!-- 使用說明 -->
         <div class="mt-4 text-center text-sm text-gray-500">
-          <p class="m-0">請將信用卡對準取景框，確保卡號清晰可見後點擊拍照</p>
+          <p class="m-0">卡號對準白色虛線框並確保清晰後可點擊拍照或按空白鍵</p>
         </div>
       </div>
     </div>
@@ -193,7 +185,7 @@
                 <div x-show="!luhnValid">{% include 'components/icon.html' with name="warning" size="w-5 h-5" class="text-yellow-500" %}</div>
               </div>
               <span class="text-sm font-medium" 
-                    x-text="luhnValid ? '卡號格式驗證通過' : '掃描的結果可能不正確，請您務必檢查'"></span>
+                    x-text="luhnValid ? '卡號格式驗證通過' : '掃描的結果可能不正確，請您務必檢查或手動修改'"></span>
             </div>
           </div>
         </div>

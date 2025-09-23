@@ -195,7 +195,7 @@ def process_card_image(image_file):
         # 3. OCR 識別
         ocr_result = perform_ocr(processed_image)
         if ocr_result is None:
-            return {"success": False, "error": "OCR 處理失敗"}
+            return {"success": False, "error": "OCR 處理失敗，請重新拍照"}
 
         card_number = ocr_result.get("card_number")
         full_text = ocr_result.get("full_text", "")
