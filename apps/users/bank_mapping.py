@@ -3,6 +3,42 @@
 根據附件提供的中英文對照表建立映射關係
 """
 
+
+def luhn_check(card_number: str) -> bool:
+    """
+    使用 Luhn 演算法驗證信用卡號的有效性
+    
+    Args:
+        card_number: 信用卡號（純數字字串）
+        
+    Returns:
+        是否為有效的信用卡號
+    """
+    if not card_number or not card_number.isdigit():
+        return False
+    
+    # 移除所有非數字字符
+    clean_number = ''.join(filter(str.isdigit, card_number))
+    
+    # 信用卡號長度檢查（通常為 13-19 位）
+    if len(clean_number) < 13 or len(clean_number) > 19:
+        return False
+    
+    # Luhn 演算法
+    def luhn_checksum(card_num):
+        def digits_of(n):
+            return [int(d) for d in str(n)]
+        
+        digits = digits_of(card_num)
+        odd_digits = digits[-1::-2]
+        even_digits = digits[-2::-2]
+        checksum = sum(odd_digits)
+        for d in even_digits:
+            checksum += sum(digits_of(d * 2))
+        return checksum % 10
+    
+    return luhn_checksum(clean_number) == 0
+
 # 英文銀行名稱 -> 中文銀行名稱對照表
 BANK_NAME_MAPPING = {
     # 從附件中英文對照表提取
@@ -34,11 +70,11 @@ BANK_NAME_MAPPING = {
     'Chinatrust Commercial Bank': '中國信託',
     'DBS Bank (Taiwan), Ltd.': '東亞',
     'E.Sun Commercial Bank': '玉山',
-    'E SUN COMMERCIAL BANK': '玉山',  # API 返回的全大寫格式
+    'E SUN COMMERCIAL BANK': '玉山', 
     
     # 可能的其他變體名稱
     'CITIBANK TAIWAN LTD': '花旗',
-    'CITIBANK N.A.': '美國',  # API 返回的格式
+    'CITIBANK N.A.': '花旗',  
     'CATHAY UNITED BANK': '國泰',
     'BANK SINOPAC': '永豐',
     'TAIPEI FUBON BANK': '富邦',
@@ -46,11 +82,8 @@ BANK_NAME_MAPPING = {
     'CHINATRUST BANK': '中國信託',
     'ESUN BANK': '玉山',
     'E.SUN BANK': '玉山',
-    'UNION BANK OF TAIWAN': '聯邦',  # API 返回的全大寫格式，對應資料庫中的名稱
+    'UNION BANK OF TAIWAN': '聯邦', 
 }
-
-# 反向映射：中文 -> 英文（用於驗證）
-CHINESE_TO_ENGLISH_MAPPING = {v: k for k, v in BANK_NAME_MAPPING.items()}
 
 
 def get_chinese_bank_name(english_name: str) -> str:
@@ -76,34 +109,17 @@ def get_chinese_bank_name(english_name: str) -> str:
         if eng_key.upper() == english_name_upper:
             return chn_value
     
-    # 嘗試部分匹配（處理可能的變體）
+    # 嘗試部分匹配（處理可能的變體）- 使用更精確的匹配策略
     for eng_key, chn_value in BANK_NAME_MAPPING.items():
-        if english_name_upper in eng_key.upper() or eng_key.upper() in english_name_upper:
+        eng_key_upper = eng_key.upper()
+        # 只允許輸入名稱是鍵名的一部分，且長度至少為 3 個字符
+        if ((english_name_upper in eng_key_upper and len(english_name_upper) >= 3) or
+            (eng_key_upper in english_name_upper and len(eng_key_upper) >= 3)):
             return chn_value
     
     # 找不到對照，返回原英文名稱
     return english_name
 
-
-def get_english_bank_name(chinese_name: str) -> str:
-    """
-    根據中文銀行名稱取得對應的英文名稱
-    
-    Args:
-        chinese_name: 中文銀行名稱
-        
-    Returns:
-        英文銀行名稱，如果找不到對照則返回原中文名稱
-    """
-    if not chinese_name:
-        return ""
-    
-    # 直接查找
-    if chinese_name in CHINESE_TO_ENGLISH_MAPPING:
-        return CHINESE_TO_ENGLISH_MAPPING[chinese_name]
-    
-    # 找不到對照，返回原中文名稱
-    return chinese_name
 
 
 def is_bank_name_mapped(english_name: str) -> bool:

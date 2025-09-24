@@ -85,6 +85,18 @@ class BINAPIService:
         if not isinstance(data, dict):
             return False
         
+        # 檢查是否為 API 錯誤回應
+        if 'error' in data:
+            error_code = data.get('error', '')
+            error_message = data.get('message', '')
+            
+            if error_code == '1004' and 'Usage Limit Exceeded' in error_message:
+                logger.error(f"BIN API 使用限制已達上限: {data}")
+                return False
+            else:
+                logger.warning(f"BIN API 返回錯誤: {data}")
+                return False
+        
         # 檢查必要欄位
         required_fields = ['bin', 'bank']
         for field in required_fields:

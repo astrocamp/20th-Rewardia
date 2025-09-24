@@ -1,6 +1,6 @@
 """
 BIN 服務整合模組
-直接使用外部 API 服務進行銀行辨識，不使用本地快取
+使用外部 API 服務進行銀行辨識(目前上限一天20次查詢free)
 """
 import logging
 from typing import Optional, Dict, Any
@@ -60,7 +60,7 @@ class BINService:
                 'card_type': '',
                 'card_level': '',
                 'country': '',
-                'message': '銀行辨識失敗，請手動選擇發卡銀行名稱'
+                'message': '銀行辨識服務暫時無法使用，請手動選擇發卡銀行名稱'
             }
     
     def _format_result(self, api_data: Dict[str, Any]) -> Dict[str, Any]:

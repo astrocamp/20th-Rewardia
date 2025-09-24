@@ -267,7 +267,6 @@ def get_scopes_by_category(request):
     return HttpResponse('<option value="" selected disabled>請先選擇消費類別</option>')
 
 
-@csrf_exempt
 def calculate_reward(request):
     """計算信用卡回饋 - 使用 Django Form 驗證"""
     if request.method == "POST":
