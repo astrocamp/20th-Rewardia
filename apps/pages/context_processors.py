@@ -1,7 +1,6 @@
 import os
 from datetime import datetime
 
-
 def get_build_version():
     # 優先使用環境變數中的建構時間
     build_time = os.environ.get("BUILD_TIME")

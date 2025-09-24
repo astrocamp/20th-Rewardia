@@ -9,6 +9,14 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.messages import get_messages
 from apps.cards.storage import MediaStorage
 from .forms import RewardCalculatorForm
+from django.shortcuts import redirect
+
+def custom_404(request, exception):
+    # 如果是 API 路徑，返回 JSON 格式的 404
+    if request.path.startswith('/api/'):
+        return JsonResponse({'error': 'Not found'}, status=404)
+    # 其他路徑重導向首頁
+    return redirect('/')
 
 
 def download(request):
@@ -31,7 +39,7 @@ def main(request):
             UserCard.objects.filter(user=request.user, is_active=True)
             .values_list('card_id', flat=True)
         )
-    
+
     context = {
         'user_card_ids': user_card_ids,
         'is_authenticated': request.user.is_authenticated
@@ -98,12 +106,12 @@ def get_main_data(request):
         else:
             # 如果沒有圖片，不顯示圖片
             image_url = None
-        
+
         all_cards_data.append({
             'id': card.id,
             'name': card.name,
             'bank': card.bank,
-            'image': image_url,  
+            'image': image_url,
             'rewards': rewards_data
         })
 
