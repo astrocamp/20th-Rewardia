@@ -11,5 +11,6 @@ urlpatterns = [
     path("card/<int:card_id>/add-number/", views.card_add_number, name="card_add_number"),
     path("cards/<int:card_id>/delete/", views.card_delete, name="card_delete"),
     path("api/get_token", views.get_token, name="get_token"),
+    path("api/identify-bank/", views.identify_bank_by_bin, name="identify_bank_by_bin"),
     path("change-password/", views.change_password, name="change_password"),
 ]

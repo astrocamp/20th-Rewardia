@@ -29,6 +29,7 @@ from apps.cards.models import CreditCard
 from apps.cards.storage import MediaStorage
 from apps.rewards.models import RewardCategory
 from .models import UserCard
+from .bin_service import bin_service
 
 
 def get_card_image_url(card):
@@ -560,3 +561,57 @@ def change_password(request):
         return JsonResponse({'success': False, 'message': '無效的 JSON 資料'}, status=400)
     except Exception as e:
         return JsonResponse({'success': False, 'message': f'修改密碼失敗：{str(e)}'}, status=500)
+
+
+@api_view(["POST"])
+@authentication_classes([SessionAuthentication])
+@permission_classes([IsAuthenticated])
+def identify_bank_by_bin(request):
+    """
+    根據信用卡前6碼辨識發卡銀行
+    
+    接收格式: {"bin_code": "123456"}
+    返回格式: {
+        "success": true/false,
+        "bank_name_chinese": "銀行中文名稱",
+        "bank_name_english": "銀行英文名稱",
+        "message": "訊息",
+        "from_cache": true/false
+    }
+    """
+    try:
+        # 解析請求資料
+        data = json.loads(request.body)
+        bin_code = data.get('bin_code', '').strip()
+        
+        if not bin_code:
+            return JsonResponse({
+                'success': False,
+                'message': 'BIN 碼不能為空'
+            }, status=400)
+        
+        # 驗證 BIN 碼格式
+        if len(bin_code) != 6 or not bin_code.isdigit():
+            return JsonResponse({
+                'success': False,
+                'message': 'BIN 碼必須是6位數字'
+            }, status=400)
+        
+        # 使用 BIN 服務進行辨識
+        result = bin_service.identify_bank_by_bin(bin_code)
+        
+        # 返回結果
+        return JsonResponse(result)
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'success': False,
+            'message': '無效的 JSON 資料'
+        }, status=400)
+    except Exception as e:
+        logger = logging.getLogger(__name__)
+        logger.error(f"銀行辨識 API 錯誤: {e}")
+        return JsonResponse({
+            'success': False,
+            'message': '銀行辨識服務暫時無法使用'
+        }, status=500)

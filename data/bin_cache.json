@@ -1,0 +1,26 @@
+{
+  "515735": {
+    "bin": "515735",
+    "bank": "CITIBANK N.A.",
+    "card": "MASTERCARD",
+    "type": "CREDIT",
+    "level": "WORLD",
+    "country": "UNITED STATES",
+    "countrycode": "US",
+    "website": "",
+    "phone": "",
+    "valid": "true"
+  },
+  "999999": {
+    "bin": "999999",
+    "bank": "MASTERCARD - INTERNAL ICAS",
+    "card": "LOCAL BRAND",
+    "type": "CREDIT",
+    "level": "",
+    "country": "KOREA, REPUBLIC OF",
+    "countrycode": "KR",
+    "website": "",
+    "phone": "",
+    "valid": "true"
+  }
+}

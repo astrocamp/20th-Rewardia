@@ -20,6 +20,9 @@ GOOGLE_CLOUD_VISION_API_KEY = os.getenv("GOOGLE_CLOUD_VISION_API_KEY")
 # 信用卡號碼加密金鑰
 FERNET_KEY = os.getenv("FERNET_KEY")
 
+# BIN API Key (用於信用卡銀行辨識)
+BIN_API_KEY = os.getenv("BIN_API_KEY")
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
