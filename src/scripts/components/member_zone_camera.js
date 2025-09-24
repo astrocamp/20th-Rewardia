@@ -428,7 +428,7 @@ export default (config = {}) => ({
   },
   
   // 智能格式化卡號輸入（保持游標位置）
-  formatCardInput(event) {
+  formatCameraCardInput(event) {
     const input = event.target;
     const cursorPosition = input.selectionStart;
     const oldValue = input.value;

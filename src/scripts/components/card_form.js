@@ -10,6 +10,10 @@ export default (config = {}) => ({
   // 新增：相機擷取的卡號
   recognizedCardNumber: "",
   
+  // 新增：BIN 辨識相關狀態
+  bankRecognitionInProgress: false,
+  bankRecognitionMessage: "",
+  
   // 新增：卡片預覽資料
   cardPreview: {
     name: "",
@@ -83,11 +87,50 @@ export default (config = {}) => ({
 
   // 新增：處理手動卡號輸入
   formatCardInput(event) {
-    // 只限制長度，不自動清理非數字字符
-    let value = event.target.value;
-    // 移除長度限制，讓使用者可以輸入完整的卡號
-    this.manualCardNumber = value;
-    event.target.value = value;
+    const input = event.target;
+    const cursorPosition = input.selectionStart;
+    const oldValue = input.value;
+    
+    // 移除非數字字符
+    const cleaned = oldValue.replace(/\D/g, '');
+    
+    // 限制最多16位數字
+    const limited = cleaned.substring(0, 16);
+    
+    // 每4位加空格
+    const formatted = limited.replace(/(.{4})/g, '$1 ').trim();
+    
+    // 設置新值
+    input.value = formatted;
+    this.manualCardNumber = formatted;
+    
+    // 計算新的游標位置
+    let newCursorPosition = cursorPosition;
+    
+    // 如果刪除了字符，游標位置需要調整
+    if (formatted.length < oldValue.length) {
+      const deletedChars = oldValue.length - formatted.length;
+      newCursorPosition = Math.max(0, cursorPosition - deletedChars);
+    } else if (formatted.length > oldValue.length) {
+      const addedChars = formatted.length - oldValue.length;
+      newCursorPosition = cursorPosition + addedChars;
+    }
+    
+    // 設置游標位置
+    this.$nextTick(() => {
+      input.setSelectionRange(newCursorPosition, newCursorPosition);
+    });
+    
+    // 檢查是否為16位數字，如果是則自動觸發銀行辨識
+    console.log('卡號輸入檢測:', { formatted, cleanNumber: limited, length: limited.length }); // 調試用
+    
+    if (limited.length === 16) {
+      console.log('觸發銀行辨識，BIN:', limited.substring(0, 6)); // 調試用
+      this.identifyBankByBin(limited.substring(0, 6));
+    } else {
+      // 清除之前的辨識訊息
+      this.bankRecognitionMessage = "";
+    }
   },
 
   // 新增：表單提交前驗證
@@ -153,5 +196,79 @@ export default (config = {}) => ({
       // 提交表單
       form.submit();
     }
+  },
+
+  // 新增：根據 BIN 碼辨識銀行
+  async identifyBankByBin(binCode) {
+    console.log('identifyBankByBin 被調用:', binCode); // 調試用
+    
+    if (!binCode || binCode.length !== 6) {
+      console.log('BIN 碼無效:', binCode); // 調試用
+      return;
+    }
+
+    this.bankRecognitionInProgress = true;
+    this.bankRecognitionMessage = "";
+
+    try {
+      const response = await fetch('/users/api/identify-bank/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': this.getCSRFToken()
+        },
+        body: JSON.stringify({
+          bin_code: binCode
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // 檢查是否有中文對照
+        if (result.has_mapping) {
+          // 有中文對照：自動填入銀行名稱
+          // 自動填入銀行名稱
+          this.selectedBank = result.bank_name_chinese;
+          
+          this.updateAvailableCards(this.selectedBank);
+          this.bankRecognitionMessage = `✓ 銀行辨識成功：${result.bank_name_chinese}`;
+          
+          // 顯示友善提示
+          if (window.showToast) {
+            window.showToast(`銀行辨識成功：${result.bank_name_chinese}`, 'success');
+          }
+        } else {
+          // 無中文對照：不清空選擇，只顯示提示讓用戶手動選擇
+          this.bankRecognitionMessage = `銀行辨識成功：${result.bank_name_english}，但無中文對照，請手動選擇正確的銀行名稱`;
+          
+          // 顯示友善提示
+          if (window.showToast) {
+            window.showToast('銀行辨識成功但無中文對照，請手動選擇銀行名稱', 'warning');
+          }
+        }
+      } else {
+        // 辨識失敗，顯示友善提示
+        this.bankRecognitionMessage = "銀行辨識失敗，請手動選擇銀行名稱";
+        
+        if (window.showToast) {
+          window.showToast('銀行辨識失敗，請手動選擇銀行名稱', 'warning');
+        }
+      }
+    } catch (error) {
+      console.error('BIN 辨識錯誤:', error);
+      this.bankRecognitionMessage = "銀行辨識服務暫時無法使用，請手動選擇銀行名稱";
+      
+      if (window.showToast) {
+        window.showToast('銀行辨識服務暫時無法使用，請手動選擇銀行名稱', 'error');
+      }
+    } finally {
+      this.bankRecognitionInProgress = false;
+    }
+  },
+
+  // 新增：獲取 CSRF Token
+  getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
   }
 });

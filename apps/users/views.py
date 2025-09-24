@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from .forms import UserRegistrationForm
 from .services import UserRegistrationService
 from django.contrib import messages
@@ -29,7 +30,7 @@ from apps.cards.models import CreditCard
 from apps.cards.storage import MediaStorage
 from apps.rewards.models import RewardCategory
 from .models import UserCard
-from .bin_service import bin_service
+from .bin_service import get_bin_service
 
 
 def get_card_image_url(card):
@@ -564,8 +565,7 @@ def change_password(request):
 
 
 @api_view(["POST"])
-@authentication_classes([SessionAuthentication])
-@permission_classes([IsAuthenticated])
+@csrf_exempt
 def identify_bank_by_bin(request):
     """
     根據信用卡前6碼辨識發卡銀行
@@ -580,9 +580,8 @@ def identify_bank_by_bin(request):
     }
     """
     try:
-        # 解析請求資料
-        data = json.loads(request.body)
-        bin_code = data.get('bin_code', '').strip()
+        # 解析請求資料 (使用 DRF 的 request.data)
+        bin_code = request.data.get('bin_code', '').strip()
         
         if not bin_code:
             return JsonResponse({
@@ -598,7 +597,7 @@ def identify_bank_by_bin(request):
             }, status=400)
         
         # 使用 BIN 服務進行辨識
-        result = bin_service.identify_bank_by_bin(bin_code)
+        result = get_bin_service().identify_bank_by_bin(bin_code)
         
         # 返回結果
         return JsonResponse(result)

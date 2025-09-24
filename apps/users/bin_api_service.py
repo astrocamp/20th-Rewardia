@@ -134,5 +134,12 @@ class BINAPIService:
             return False
 
 
-# 全域實例
-bin_api_service = BINAPIService()
+# 全域實例（延遲初始化）
+bin_api_service = None
+
+def get_bin_api_service():
+    """獲取 BIN API 服務實例"""
+    global bin_api_service
+    if bin_api_service is None:
+        bin_api_service = BINAPIService()
+    return bin_api_service
