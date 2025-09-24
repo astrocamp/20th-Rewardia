@@ -111,12 +111,14 @@
           <div class="card-info-container">
             <div class="card-title-container">
               <h3 x-text="card.name" class="card-title"></h3>
+            </div>
+            <div class="card-bank-container">
+              <p x-text="card.bank" class="card-bank"></p>
               <!-- 你的卡片標籤 -->
               <template x-if="isUserCard(card.id)">
                 <span class="user-card-label">你的卡片</span>
               </template>
             </div>
-            <p x-text="card.bank" class="card-bank"></p>
             <!-- 主要優惠 -->
             <template x-if="card.rewards && card.rewards.length > 0">
               <div class="card-main-reward">

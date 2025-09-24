@@ -18,8 +18,7 @@ export default () => ({
     this.isSubmitting = true;
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      this.showMessage('感謝您的訂閱！我們將儘快為您提供服務。', 'success');
-      console.log('還在等訂閱?? 趕快去下載 Chrome extension 吧 !');
+      this.showMessage('還在等訂閱?? 別等了，Rewardia沒有訂閱服務，聰明的你快去下載 Chrome extension 吧 !', 'success');
       this.email = '';
     } catch (error) {
       this.showMessage('訂閱失敗，請稍後再試。', 'error');
@@ -34,6 +33,6 @@ export default () => ({
     setTimeout(() => {
       this.message = '';
       this.messageType = '';
-    }, 3000);
+    }, 10000);
   }
 });
