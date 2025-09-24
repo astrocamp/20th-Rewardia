@@ -15,16 +15,13 @@ class BINCacheService:
     """BIN 碼快取服務類別"""
     
     def __init__(self):
-        # 快取檔案路徑：放在專案根目錄的 data 資料夾
-        self.cache_file = os.path.join(settings.BASE_DIR, 'data', 'bin_cache.json')
+        # 快取檔案路徑：放在 apps/users/data 資料夾
+        self.cache_file = os.path.join(os.path.dirname(__file__), 'data', 'bin_cache.json')
         self.cache = self.load_cache()
     
     def load_cache(self) -> Dict[str, Any]:
         """載入快取資料"""
         try:
-            # 確保 data 目錄存在
-            os.makedirs(os.path.dirname(self.cache_file), exist_ok=True)
-            
             if os.path.exists(self.cache_file):
                 with open(self.cache_file, 'r', encoding='utf-8') as f:
                     cache_data = json.load(f)
@@ -132,5 +129,12 @@ class BINCacheService:
         }
 
 
-# 全域實例
-bin_cache_service = BINCacheService()
+# 全域實例（延遲初始化）
+bin_cache_service = None
+
+def get_bin_cache_service():
+    """獲取 BIN 快取服務實例"""
+    global bin_cache_service
+    if bin_cache_service is None:
+        bin_cache_service = BINCacheService()
+    return bin_cache_service

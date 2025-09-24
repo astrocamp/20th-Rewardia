@@ -6,45 +6,47 @@
 # 英文銀行名稱 -> 中文銀行名稱對照表
 BANK_NAME_MAPPING = {
     # 從附件中英文對照表提取
-    'CITIBANK, N.A.': '花旗銀行台灣',
-    'Cathay United Bank': '國泰世華銀行',
-    'Bank Sinopac': '永豐銀行',
-    'Jih Sun International Bank': '日盛銀行',
-    'Bank of Kaohsiung': '高雄銀行',
-    'Kings Town Bank': '京城銀行',
-    'Land Bank of Taiwan': '土地銀行',
-    'Mega International Commercial Bank': '兆豐國際商業銀行',
-    'Taipei Fubon Commercial Bank': '台北富邦銀行',
-    'Taishin International Bank': '台新銀行',
+    'CITIBANK, N.A.': '花旗',
+    'Cathay United Bank': '國泰',
+    'Bank Sinopac': '永豐',
+    'Jih Sun International Bank': '日盛',
+    'Bank of Kaohsiung': '高雄',
+    'Kings Town Bank': '京城',
+    'Land Bank of Taiwan': '土地',
+    'Mega International Commercial Bank': '兆豐',
+    'Taipei Fubon Commercial Bank': '富邦',
+    'Taishin International Bank': '台新',
     'Taiwan Business Bank': '台灣企銀',
-    'Taiwan Cooperative Bank': '合作金庫銀行',
-    'Taiwan Rakuten Card Inc.': '樂天信用卡',
-    'Taiwan Shin Kong Commercial Bank': '新光銀行',
-    'Union Bank of Taiwan': '聯邦銀行',
-    'Yuanta Commercial Bank': '元大銀行',
-    'Standard Chartered Bank (Taiwan), Ltd.': '渣打銀行',
-    'Sunny Bank': '陽信銀行',
-    'Ta Chong Bank, Ltd.': '大眾銀行',
-    'Taichung Commercial Bank': '台中商業銀行',
-    'Tainan Business Bank': '台南銀行',
-    'First Commercial Bank': '第一銀行',
-    'Fuhwa Commercial Bank': '富華銀行',
-    'HSBC Bank (Taiwan), Ltd.': '滙豐銀行',
-    'Chang Hwa Commercial Bank, Ltd.': '彰化銀行',
-    'Chinatrust Commercial Bank': '中國信託銀行',
-    'DBS Bank (Taiwan), Ltd.': '東亞銀行',
-    'E.Sun Commercial Bank': '玉山銀行',
+    'Taiwan Cooperative Bank': '合庫',
+    'Taiwan Rakuten Card Inc.': '樂天',
+    'Taiwan Shin Kong Commercial Bank': '新光',
+    'Union Bank of Taiwan': '聯邦',
+    'Yuanta Commercial Bank': '元大',
+    'Standard Chartered Bank (Taiwan), Ltd.': '渣打',
+    'Sunny Bank': '陽信',
+    'Ta Chong Bank, Ltd.': '大眾',
+    'Taichung Commercial Bank': '台中',
+    'Tainan Business Bank': '台南',
+    'First Commercial Bank': '第一',
+    'Fuhwa Commercial Bank': '富華',
+    'HSBC Bank (Taiwan), Ltd.': '滙豐',
+    'Chang Hwa Commercial Bank, Ltd.': '彰化',
+    'Chinatrust Commercial Bank': '中國信託',
+    'DBS Bank (Taiwan), Ltd.': '東亞',
+    'E.Sun Commercial Bank': '玉山',
+    'E SUN COMMERCIAL BANK': '玉山',  # API 返回的全大寫格式
     
     # 可能的其他變體名稱
-    'CITIBANK TAIWAN LTD': '花旗銀行台灣',
-    'CITIBANK N.A.': '花旗銀行台灣',  # API 返回的格式
-    'CATHAY UNITED BANK': '國泰世華銀行',
-    'BANK SINOPAC': '永豐銀行',
-    'TAIPEI FUBON BANK': '台北富邦銀行',
-    'TAISHIN BANK': '台新銀行',
-    'CHINATRUST BANK': '中國信託銀行',
-    'ESUN BANK': '玉山銀行',
-    'E.SUN BANK': '玉山銀行',
+    'CITIBANK TAIWAN LTD': '花旗',
+    'CITIBANK N.A.': '美國',  # API 返回的格式
+    'CATHAY UNITED BANK': '國泰',
+    'BANK SINOPAC': '永豐',
+    'TAIPEI FUBON BANK': '富邦',
+    'TAISHIN BANK': '台新',
+    'CHINATRUST BANK': '中國信託',
+    'ESUN BANK': '玉山',
+    'E.SUN BANK': '玉山',
+    'UNION BANK OF TAIWAN': '聯邦',  # API 返回的全大寫格式，對應資料庫中的名稱
 }
 
 # 反向映射：中文 -> 英文（用於驗證）
@@ -114,7 +116,25 @@ def is_bank_name_mapped(english_name: str) -> bool:
     Returns:
         是否有對應的中文名稱
     """
-    return english_name in BANK_NAME_MAPPING
+    if not english_name:
+        return False
+    
+    # 直接查找
+    if english_name in BANK_NAME_MAPPING:
+        return True
+    
+    # 嘗試不區分大小寫的查找
+    english_name_upper = english_name.upper()
+    for eng_key in BANK_NAME_MAPPING.keys():
+        if eng_key.upper() == english_name_upper:
+            return True
+    
+    # 嘗試部分匹配（處理可能的變體）
+    for eng_key in BANK_NAME_MAPPING.keys():
+        if english_name_upper in eng_key.upper() or eng_key.upper() in english_name_upper:
+            return True
+    
+    return False
 
 
 def get_all_mapped_banks() -> dict:

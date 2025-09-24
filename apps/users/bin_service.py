@@ -4,8 +4,8 @@ BIN 服務整合模組
 """
 import logging
 from typing import Optional, Dict, Any
-from .bin_cache_service import bin_cache_service
-from .bin_api_service import bin_api_service
+from .bin_cache_service import get_bin_cache_service
+from .bin_api_service import get_bin_api_service
 from .bank_mapping import get_chinese_bank_name, is_bank_name_mapped
 
 logger = logging.getLogger(__name__)
@@ -15,8 +15,8 @@ class BINService:
     """BIN 服務整合類別"""
     
     def __init__(self):
-        self.cache_service = bin_cache_service
-        self.api_service = bin_api_service
+        self.cache_service = get_bin_cache_service()
+        self.api_service = get_bin_api_service()
     
     def identify_bank_by_bin(self, bin_code: str) -> Dict[str, Any]:
         """
@@ -156,5 +156,12 @@ class BINService:
         return self.api_service.test_api_connection()
 
 
-# 全域實例
-bin_service = BINService()
+# 全域實例（延遲初始化）
+bin_service = None
+
+def get_bin_service():
+    """獲取 BIN 服務實例"""
+    global bin_service
+    if bin_service is None:
+        bin_service = BINService()
+    return bin_service
