@@ -50,6 +50,7 @@ services:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - GOOGLE_CLOUD_VISION_API_KEY=${GOOGLE_CLOUD_VISION_API_KEY}
       - FERNET_KEY=${FERNET_KEY}
+      - BIN_API_KEY=${BIN_API_KEY}
 
     volumes:
       - ./public:/app/public

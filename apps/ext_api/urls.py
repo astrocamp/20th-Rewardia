@@ -6,7 +6,7 @@ app_name = "ext_api"
 
 urlpatterns = [
     path(
-        "rewards/cards/<int:id>",
+        "rewards/cards/<int:id>/",
         views.get_card_rewards,
         name="get_card_rewards",
     ),
@@ -31,17 +31,17 @@ urlpatterns = [
         name="get_bank_cards",
     ),
     path(
-        "find_rate/<str:bank_name>/<int:card_id>/<str:category_name>",
+        "find_rate/<str:bank_name>/<int:card_id>/<str:category_name>/",
         views.get_category_rate,
         name="get_category_rate",
     ),
     path(
-        "find_rate/<str:bank_name>/<int:card_id>/<str:category_name>/<str:scope_name>",
+        "find_rate/<str:bank_name>/<int:card_id>/<str:category_name>/<str:scope_name>/",
         views.get_merchant_rate,
         name="get_merchant_rate",
     ),
     path(
-        "users/new_card/<int:id>",
+        "users/new_card/<int:id>/",
         views.new_user_card,
         name="new_user_card",
     ),

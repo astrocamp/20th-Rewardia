@@ -24,7 +24,7 @@ FERNET_KEY = os.getenv("FERNET_KEY")
 BIN_API_KEY = os.getenv("BIN_API_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "False").lower() in ("true")
 
 ALLOWED_HOSTS = [
     "rewardia.net",
