@@ -203,19 +203,23 @@
   }
   
   .card-title-container {
-    @apply flex items-center justify-between mb-2;
+    @apply mb-2;
   }
 
   .card-title {
     @apply text-lg lg:text-xl font-bold text-gray-800 leading-tight;
   }
 
-  .user-card-label {
-    @apply text-sm lg:text-base font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md;
+  .card-bank-container {
+    @apply flex items-center justify-between mb-2;
   }
   
   .card-bank {
-    @apply text-sm lg:text-base text-gray-600;
+    @apply text-sm lg:text-base font-bold text-gray-600 bg-white px-2 py-1 rounded-md;
+  }
+
+  .user-card-label {
+    @apply text-sm lg:text-base font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md;
   }
   
   .card-main-reward {

@@ -925,18 +925,17 @@ class ChatbotResponseBuilder:
         
         # 一般頁面導航
         elif nav_type == "general_page":
+            # 建立頁面路徑對應表以簡化邏輯
+            page_paths = {
+                "home": "/",
+                "download": "/download/",
+                "calculator": "/calculator/",
+                "about": "/faq/",  # 修正路徑以符合前端導航
+                "privacy": "/privacy/",
+                "tos": "/tos/",
+            }
             # 檢查是否已在目標頁面
-            if nav_target == "home" and current_page == '/':
-                return RESPONSE_MESSAGES['navigation']['already_here']
-            elif nav_target == "download" and current_page == '/download/':
-                return RESPONSE_MESSAGES['navigation']['already_here']
-            elif nav_target == "calculator" and current_page == '/calculator/':
-                return RESPONSE_MESSAGES['navigation']['already_here']
-            elif nav_target == "about" and current_page == '/about/':
-                return RESPONSE_MESSAGES['navigation']['already_here']
-            elif nav_target == "privacy" and current_page == '/privacy/':
-                return RESPONSE_MESSAGES['navigation']['already_here']
-            elif nav_target == "tos" and current_page == '/tos/':
+            if page_paths.get(nav_target) == current_page:
                 return RESPONSE_MESSAGES['navigation']['already_here']
             else:
                 page_name = PAGE_MAPPING['general_pages'].get(nav_target, nav_target)

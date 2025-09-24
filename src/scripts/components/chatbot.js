@@ -7,6 +7,8 @@ const CONSTANTS = {
   DUPLICATE_MESSAGE_THRESHOLD: 3000, // 3秒防重複
   TEXTAREA_MAX_HEIGHT: 120,
   CONVERSATION_HISTORY_LENGTH: 6, // 傳遞最近對話數量
+  // 外部連結
+  CHROME_EXTENSION_URL: 'https://chromewebstore.google.com/detail/rewardia/ahmfkgkefmandfahccfbbpfffnphkakl',
   // 視窗尺寸限制
   MIN_WINDOW_WIDTH: 250,
   MIN_WINDOW_HEIGHT: 350,
@@ -159,20 +161,24 @@ export default function chatbot() {
         this.adjustWindowPosition();
       });
       
-      // 監聽視窗大小變化，確保聊天框不會跑出畫面外
-      window.addEventListener('resize', () => {
-        this.adjustWindowPosition();
-      });
+      // 監聽視窗大小變化，確保聊天框不會跑出畫面外（儲存引用以便清理）
+      this.resizeHandler = () => this.adjustWindowPosition();
+      window.addEventListener('resize', this.resizeHandler);
       
       // 使用 MutationObserver 監聽 DOM 變化
       this.setupMutationObserver();
       
-      // 定期檢查位置（每100ms檢查一次，更頻繁）
+      // 定期檢查位置（降低頻率到500ms，減少效能負擔）
       this.positionCheckInterval = setInterval(() => {
         if (this.isOpen) {
           this.adjustWindowPosition();
         }
-      }, 100);
+      }, 500);
+
+      // 註冊銷毀時的清理邏輯
+      this.$el.addEventListener('alpine:destroy', () => {
+        this.destroy();
+      });
     },
 
     // 儲存到記憶體和 sessionStorage
@@ -272,26 +278,34 @@ export default function chatbot() {
           }
         });
         
-        // 監聽整個 document 的變化
-        this.mutationObserver.observe(document.body, {
+        // 監聽聊天框容器，而不是整個 document（提升效能）
+        this.mutationObserver.observe(this.$el, {
           childList: true,
-          subtree: true,
+          subtree: false,  // 不監聽子節點，減少效能負擔
           attributes: true,
           attributeFilter: ['style', 'class']
         });
       }
     },
 
-    // 清理定時器
+    // 清理定時器和事件監聽器
     destroy() {
+      // 清理 setInterval
       if (this.positionCheckInterval) {
         clearInterval(this.positionCheckInterval);
         this.positionCheckInterval = null;
       }
       
+      // 清理 MutationObserver
       if (this.mutationObserver) {
         this.mutationObserver.disconnect();
         this.mutationObserver = null;
+      }
+      
+      // 清理 resize 監聽器
+      if (this.resizeHandler) {
+        window.removeEventListener('resize', this.resizeHandler);
+        this.resizeHandler = null;
       }
     },
 
@@ -515,7 +529,7 @@ export default function chatbot() {
         case 'chrome_extension':
           // 延遲2秒後開啟Chrome Web Store下載頁面
           setTimeout(() => {
-            window.open('https://chromewebstore.google.com/detail/rewardia/ahmfkgkefmandfahccfbbpfffnphkakl', '_blank');
+            window.open(CONSTANTS.CHROME_EXTENSION_URL, '_blank');
           }, 1000);
           break;
         case 'logout':
