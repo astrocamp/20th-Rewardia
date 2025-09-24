@@ -71,7 +71,7 @@
                           required
                           x-model="selectedBank"
                           @change="onBankChange()">
-                    <option value="" class="text-[#949AA6]">選擇發卡銀行</option>
+                    <option value="" class="text-[#949AA6]">選擇發卡銀行 (你可在下方卡號輸入欄先提供完整卡號，系統即會自動辨識銀行)</option>
                     {% for bank in banks %}
                     <option value="{{ bank.name }}">{{ bank.name }}</option>
                     {% endfor %}
