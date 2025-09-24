@@ -15,7 +15,8 @@ import registerComponent from './components/register.js';
 import subscribeComponent from './components/subscribe.js';
 import imageUploadComponent from './components/image_upload.js';
 import schedulerComponent from './components/scheduler.js';
-import cardCameraComponent from './components/card_camera.js';
+import cardFormCameraComponent from './components/card_form_camera.js';
+import memberZoneCameraComponent from './components/member_zone_camera.js';
 import passwordChangeComponent from './components/password_change.js';
 import memberZoneComponent from './components/member_zone.js';
 
@@ -33,7 +34,8 @@ Alpine.data("toast_fadeout", messageComponent);
 Alpine.data("chatbot", chatbot);
 Alpine.data("imageUpload", imageUploadComponent);
 Alpine.data("schedulerControl", schedulerComponent);
-Alpine.data("card_camera", cardCameraComponent);
+Alpine.data("card_form_camera", cardFormCameraComponent);
+Alpine.data("member_zone_camera", memberZoneCameraComponent);
 Alpine.data("password_change", passwordChangeComponent);
 Alpine.data("member_zone", memberZoneComponent);
 

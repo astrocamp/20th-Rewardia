@@ -12,7 +12,7 @@ export default (config = {}) => ({
   // API 呼叫狀態
   processing: false,
   cardNumber: '',
-  recognizedCardNumber: '', // 為模板中的變數提供定義
+  cardFormRecognizedNumber: '', // 專用於 card_form 的辨識卡號變數
   maskedNumber: '',
   luhnValid: false,
   retries: 0,
@@ -42,8 +42,8 @@ export default (config = {}) => ({
     // 保存當前操作的卡片 ID
     this.currentCardId = eventData?.cardId || null;
     
-    // 判斷是否為 card_form 模式
-    this.isCardFormMode = eventData?.isCardForm || false;
+    // card_form 專用模式
+    this.isCardFormMode = true;
     
     try {
       this.error = '';
@@ -81,7 +81,6 @@ export default (config = {}) => ({
     this.cardNumber = '';
     this.maskedNumber = '';
     this.retries = 0;
-    
   },
   
   // 驗證必要元素
@@ -209,7 +208,6 @@ export default (config = {}) => ({
     const formData = new FormData();
     formData.append('image', imageBlob, 'card_image.jpg');
     
-    
     try {
       const response = await fetch('/api/ocr/vision/', {
         method: 'POST',
@@ -228,59 +226,33 @@ export default (config = {}) => ({
       if (result.success) {
         this.maskedNumber = result.masked || '';
         this.cardNumber = result.card_number || '';
-        this.recognizedCardNumber = result.card_number || ''; // 同步更新 recognizedCardNumber
+        this.cardFormRecognizedNumber = result.card_number || ''; // 使用專用變數
         this.luhnValid = result.luhn_valid || false;
         
         // 檢查是否成功識別到16位卡號
         const cardNumberDigits = this.cardNumber ? this.cardNumber.replace(/\D/g, '') : '';
         
         if (cardNumberDigits.length === 16) {
-          // 識別成功：根據模式決定處理方式
-          if (this.isCardFormMode) {
-            // card_form 模式：直接填入表單欄位
-            this.fillFormField(this.cardNumber);
-            this.showMessage('卡號辨識成功，已填入表單', 'success');
-            this.closeCamera();
-          } else {
-            // member_zone 模式：顯示確認介面
-            this.showMessage('卡號辨識成功，請確認掃描結果', 'success');
-            this.showEdit = true;
-            this.editNumber = this.cardNumber;
-            this.closeCamera();
-          }
+          // 識別成功：直接填入表單欄位
+          this.fillFormField(this.cardNumber);
+          this.showMessage('卡號辨識成功，已填入表單', 'success');
+          this.closeCamera();
         } else {
           // 識別失敗：嘗試錯誤回補
           const fallbackNumber = this.extractLongestNumber(result.full_text || '');
           
-          if (this.isCardFormMode) {
-            // card_form 模式：直接填入部分卡號
-            if (fallbackNumber && fallbackNumber.length >= 10) {
-              this.fillFormField(fallbackNumber);
-              this.showMessage('卡號辨識不完整，已自動填入部分數字，請手動修正', 'info');
-              this.closeCamera();
-            } else {
-              this.showMessage('卡號辨識失敗，請重新拍照', 'error');
-              this.retries++;
-              // 延遲1秒後重新開啟攝影機
-              setTimeout(() => {
-                this.openCamera({ isCardForm: true });
-              }, 1000);
-            }
+          // card_form 模式：直接填入部分卡號
+          if (fallbackNumber && fallbackNumber.length >= 10) {
+            this.fillFormField(fallbackNumber);
+            this.showMessage('卡號辨識不完整，已自動填入部分數字，請手動修正', 'info');
+            this.closeCamera();
           } else {
-            // member_zone 模式：顯示編輯模式
-            if (fallbackNumber && fallbackNumber.length >= 10) {
-              this.showMessage('卡號辨識不完整，已自動填入部分數字，請手動修正', 'info');
-              this.showEdit = true;
-              this.editNumber = this.formatCardNumber(fallbackNumber);
-              this.closeCamera();
-            } else {
-              this.showMessage('卡號辨識失敗，請重新拍照', 'error');
-              this.retries++;
-              // 延遲1秒後重新開啟攝影機
-              setTimeout(() => {
-                this.openCamera();
-              }, 1000);
-            }
+            this.showMessage('卡號辨識失敗，請重新拍照', 'error');
+            this.retries++;
+            // 延遲1秒後重新開啟攝影機
+            setTimeout(() => {
+              this.openCamera({ isCardForm: true });
+            }, 1000);
           }
         }
       } else {
@@ -420,12 +392,8 @@ export default (config = {}) => ({
   // 重新辨識
   retryRecognition() {
     this.resetAllState();
-    // 重新開啟攝影機，保持當前模式
-    if (this.isCardFormMode) {
-      this.openCamera({ isCardForm: true });
-    } else {
-      this.openCamera();
-    }
+    // 重新開啟攝影機，保持 card_form 模式
+    this.openCamera({ isCardForm: true });
   },
   
   // 填入表單欄位（card_form 模式專用）
@@ -455,7 +423,6 @@ export default (config = {}) => ({
       }
     }
   },
-  
   
   // 格式化卡號顯示（每4位加空格）
   formatCardNumber(cardNumber) {
