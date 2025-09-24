@@ -1,10 +1,9 @@
 """
 BIN 服務整合模組
-整合快取服務和外部 API 服務，提供完整的銀行辨識功能
+直接使用外部 API 服務進行銀行辨識，不使用本地快取
 """
 import logging
 from typing import Optional, Dict, Any
-from .bin_cache_service import get_bin_cache_service
 from .bin_api_service import get_bin_api_service
 from .bank_mapping import get_chinese_bank_name, is_bank_name_mapped
 
@@ -15,7 +14,6 @@ class BINService:
     """BIN 服務整合類別"""
     
     def __init__(self):
-        self.cache_service = get_bin_cache_service()
         self.api_service = get_bin_api_service()
     
     def identify_bank_by_bin(self, bin_code: str) -> Dict[str, Any]:
@@ -34,7 +32,6 @@ class BINService:
             - card_level: 卡片等級
             - country: 發卡國家
             - message: 訊息
-            - from_cache: 是否來自快取
         """
         if not bin_code or len(bin_code) != 6:
             return {
@@ -44,30 +41,16 @@ class BINService:
                 'card_type': '',
                 'card_level': '',
                 'country': '',
-                'message': '無效的 BIN 碼格式',
-                'from_cache': False
+                'message': '無效的 BIN 碼格式'
             }
         
-        # 步驟 1: 先查本地快取
-        cached_result = self.cache_service.get_bank_by_bin(bin_code)
-        
-        if cached_result:
-            logger.info(f"從快取中找到 BIN {bin_code} 的銀行資訊")
-            return self._format_result(cached_result, from_cache=True)
-        
-        # 步驟 2: 查詢外部 API
-        logger.info(f"快取中沒有 BIN {bin_code} 的資訊，查詢外部 API")
+        # 直接查詢外部 API
+        logger.info(f"查詢外部 API 辨識 BIN {bin_code}")
         api_result = self.api_service.query_bin_api(bin_code)
         
         if api_result:
-            # 步驟 3: 儲存到快取
-            success = self.cache_service.add_bin_record(bin_code, api_result)
-            if success:
-                logger.info(f"成功將 BIN {bin_code} 的資訊儲存到快取")
-            else:
-                logger.warning(f"儲存 BIN {bin_code} 的資訊到快取失敗")
-            
-            return self._format_result(api_result, from_cache=False)
+            logger.info(f"成功從外部 API 辨識 BIN {bin_code}")
+            return self._format_result(api_result)
         else:
             logger.warning(f"外部 API 無法辨識 BIN {bin_code}")
             return {
@@ -77,17 +60,15 @@ class BINService:
                 'card_type': '',
                 'card_level': '',
                 'country': '',
-                'message': '銀行辨識失敗，請手動選擇發卡銀行名稱',
-                'from_cache': False
+                'message': '銀行辨識失敗，請手動選擇發卡銀行名稱'
             }
     
-    def _format_result(self, api_data: Dict[str, Any], from_cache: bool) -> Dict[str, Any]:
+    def _format_result(self, api_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         格式化 API 回應資料
         
         Args:
             api_data: API 回應的原始資料
-            from_cache: 是否來自快取
             
         Returns:
             格式化後的結果
@@ -118,7 +99,6 @@ class BINService:
                 'website': api_data.get('website', '').strip(),
                 'phone': api_data.get('phone', '').strip(),
                 'valid': api_data.get('valid', 'false'),
-                'from_cache': from_cache,
                 'has_mapping': has_mapping
             }
             
@@ -139,17 +119,8 @@ class BINService:
                 'card_type': '',
                 'card_level': '',
                 'country': '',
-                'message': '資料處理失敗',
-                'from_cache': from_cache
+                'message': '資料處理失敗'
             }
-    
-    def get_cache_stats(self) -> Dict[str, Any]:
-        """取得快取統計資訊"""
-        return self.cache_service.get_cache_stats()
-    
-    def clear_cache(self) -> bool:
-        """清空快取"""
-        return self.cache_service.clear_cache()
     
     def test_api_connection(self) -> bool:
         """測試 API 連線"""

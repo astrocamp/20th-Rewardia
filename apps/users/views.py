@@ -575,8 +575,7 @@ def identify_bank_by_bin(request):
         "success": true/false,
         "bank_name_chinese": "銀行中文名稱",
         "bank_name_english": "銀行英文名稱",
-        "message": "訊息",
-        "from_cache": true/false
+        "message": "訊息"
     }
     """
     try:
