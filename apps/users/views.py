@@ -565,7 +565,6 @@ def change_password(request):
 
 
 @api_view(["POST"])
-@csrf_exempt
 def identify_bank_by_bin(request):
     """
     根據信用卡前6碼辨識發卡銀行

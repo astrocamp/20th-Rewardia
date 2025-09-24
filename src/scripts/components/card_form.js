@@ -13,6 +13,7 @@ export default (config = {}) => ({
   // 新增：BIN 辨識相關狀態
   bankRecognitionInProgress: false,
   bankRecognitionMessage: "",
+  lastLuhnCheckResult: null, // 記錄上次 Luhn 檢查結果
   
   // 新增：卡片預覽資料
   cardPreview: {
@@ -122,14 +123,12 @@ export default (config = {}) => ({
     });
     
     // 檢查是否為16位數字，如果是則自動觸發銀行辨識
-    console.log('卡號輸入檢測:', { formatted, cleanNumber: limited, length: limited.length }); // 調試用
-    
     if (limited.length === 16) {
-      console.log('觸發銀行辨識，BIN:', limited.substring(0, 6)); // 調試用
-      this.identifyBankByBin(limited.substring(0, 6));
+      this.identifyBankByBin(limited.substring(0, 6), limited);
     } else {
-      // 清除之前的辨識訊息
+      // 清除之前的辨識訊息和 Luhn 檢查狀態
       this.bankRecognitionMessage = "";
+      this.lastLuhnCheckResult = null;
     }
   },
 
@@ -198,13 +197,62 @@ export default (config = {}) => ({
     }
   },
 
-  // 新增：根據 BIN 碼辨識銀行
-  async identifyBankByBin(binCode) {
-    console.log('identifyBankByBin 被調用:', binCode); // 調試用
+  // 新增：Luhn 演算法驗證信用卡號
+  luhnCheck(cardNumber) {
+    // 移除所有非數字字符
+    const cleanNumber = cardNumber.replace(/\D/g, '');
     
+    // 長度檢查
+    if (cleanNumber.length < 13 || cleanNumber.length > 19) {
+      return false;
+    }
+    
+    // Luhn 演算法
+    let sum = 0;
+    let isEven = false;
+    
+    // 從右到左處理每一位數字
+    for (let i = cleanNumber.length - 1; i >= 0; i--) {
+      let digit = parseInt(cleanNumber.charAt(i), 10);
+      
+      if (isEven) {
+        digit *= 2;
+        if (digit > 9) {
+          digit -= 9;
+        }
+      }
+      
+      sum += digit;
+      isEven = !isEven;
+    }
+    
+    return sum % 10 === 0;
+  },
+
+  // 新增：根據 BIN 碼辨識銀行
+  async identifyBankByBin(binCode, fullCardNumber) {
     if (!binCode || binCode.length !== 6) {
-      console.log('BIN 碼無效:', binCode); // 調試用
       return;
+    }
+
+    // 先進行 Luhn 檢查
+    if (fullCardNumber && !this.luhnCheck(fullCardNumber)) {
+      this.bankRecognitionMessage = "信用卡號格式不正確，請確認卡號是否正確";
+      this.bankRecognitionInProgress = false;
+      
+      // 只有當 Luhn 檢查結果改變時才顯示 toast
+      if (this.lastLuhnCheckResult !== false) {
+        this.lastLuhnCheckResult = false;
+        if (window.showToast) {
+          window.showToast('信用卡號格式不正確，請確認卡號是否正確', 'error');
+        }
+      }
+      return;
+    }
+    
+    // 如果 Luhn 檢查通過，重置狀態
+    if (this.lastLuhnCheckResult === false) {
+      this.lastLuhnCheckResult = true;
     }
 
     this.bankRecognitionInProgress = true;

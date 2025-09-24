@@ -61,7 +61,7 @@
               <!-- 發卡銀行 -->
               <div class="relative">
                 <label for="bankSelect" class="block text-lg text-[#111827] mb-2 font-normal">
-                  <span class="text-red-500">* </span>發卡銀行
+                  <span class="text-red-500">* </span>發卡銀行 (必選)
                 </label>
                 <div class="relative">
                   <select id="bankSelect"
@@ -71,7 +71,7 @@
                           required
                           x-model="selectedBank"
                           @change="onBankChange()">
-                    <option value="" class="text-[#949AA6]">選擇發卡銀行 (你可在下方卡號輸入欄先提供完整卡號，系統即會自動辨識銀行)</option>
+                    <option value="" class="text-[#949AA6]">可在"卡號輸入"欄位先輸入卡號，系統即會辨識銀行</option>
                     {% for bank in banks %}
                     <option value="{{ bank.name }}">{{ bank.name }}</option>
                     {% endfor %}
@@ -83,7 +83,7 @@
               <!-- 卡片 -->
               <div class="relative">
                 <label for="cardSelect" class="block text-lg text-[#111827] mb-2 font-normal">
-                  <span class="text-red-500">* </span>卡片
+                  <span class="text-red-500">* </span>卡片 (必選)
                 </label>
                 <div class="relative">
                   <select id="cardSelect"
@@ -111,12 +111,12 @@
               <!-- 卡號識別 -->
               <div class="relative">
                 <label for="cardNumberInput" class="block text-lg text-[#111827] mb-2 font-normal">
-                  卡號輸入(可選填)
+                  卡號輸入 (選填)
                 </label>
                 <input type="text"
                        id="cardNumberInput"
                        class="w-full h-12 rounded-lg bg-white border border-[#D1D5DB] px-4 text-gray-900 transition-colors duration-200 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                       placeholder="可手動輸入信用卡卡號或按下擷取卡號按鈕開啟相機功能"
+                       placeholder="可輸入信用卡卡號或按下擷取卡號按鈕開啟相機功能"
                        maxlength="19"
                        :value="manualCardNumber"
                        x-on:input="formatCardInput($event)">
