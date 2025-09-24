@@ -14,7 +14,7 @@
 
 # Rewardia 專案簡介
 
-**Rewardia 是一個智能信用卡回饋比較平台，解決用戶在面對複雜信用卡回饋規則時的困惑。透過 Chrome Extension 與自動化爬蟲，為用戶提供即時、準確的信用卡回饋比較服務。**
+**[Rewardia](https://rewardia.net/) 是一個智能信用卡回饋比較平台，解決用戶在面對複雜信用卡回饋規則時的困惑。透過 Chrome Extension 與自動化爬蟲，為用戶提供即時、準確的信用卡回饋比較服務。**
 
 - **身為「刷卡的人」**：外送、超商、網購，總是不確定要刷哪張才最划算？
 - **面對「門檻與上限」**：滿額加碼、通路限定，看半天還是霧煞煞？
@@ -40,7 +40,7 @@
 
 - **Build Tools** : Rollup.js
 - **Core Web Languages** : HTML + CSS + JavaScript
-- **UI Frameworks & Libraries** : React + Tailwind CSS
+- **UI Frameworks & Libraries** : Tailwind CSS + React
 - **Lightweight Interaction Frameworks** : HTMX + Alpine.js
 
 ### 後端技術

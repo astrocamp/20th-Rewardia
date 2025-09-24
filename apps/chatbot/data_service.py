@@ -23,7 +23,10 @@ class ChatbotDataService:
     @staticmethod
     def _get_reward_queryset_with_sorting():
         """取得帶有排序邏輯的 RewardCategory QuerySet"""
-        return RewardCategory.objects.filter(is_active=True).annotate(
+        return RewardCategory.objects.filter(
+            is_active=True,
+            card__is_active=True  # 確保只回傳啟用信用卡的回饋資訊
+        ).annotate(
             sort_rate=Coalesce('max_rate', 'min_rate', Value(0, output_field=DecimalField()))
         ).order_by('-sort_rate')
     
@@ -198,7 +201,8 @@ class ChatbotDataService:
             try:
                 # 從 reward_categories 表格獲取消費類別、範圍和回饋類型
                 categories = RewardCategory.objects.filter(
-                    is_active=True
+                    is_active=True,
+                    card__is_active=True  # 確保只回傳啟用信用卡的回饋資訊
                 ).annotate(
                     combined_category=Concat(
                         'category', Value(' '), 'scope', Value(' '), 'reward_type',
