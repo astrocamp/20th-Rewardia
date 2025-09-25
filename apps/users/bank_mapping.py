@@ -82,7 +82,17 @@ BANK_NAME_MAPPING = {
     'CHINATRUST BANK': '中國信託',
     'ESUN BANK': '玉山',
     'E.SUN BANK': '玉山',
-    'UNION BANK OF TAIWAN': '聯邦', 
+    'UNION BANK OF TAIWAN': '聯邦',
+    'SHANGHAI COMMERCIAL AND SAVINGS BANK, LTD.': '上海商銀',
+    'SHANGHAI COMMERCIAL BANK': '上海商銀',  # 可能的簡稱
+    'KGI Bank': '凱基',
+    'KGI Bank Co., Ltd.': '凱基',
+    'DBS Bank (Taiwan) Ltd.': '星展',
+    'DBS Bank Ltd.': '星展',
+    'O-Bank': '王道',
+    'O-Bank Co., Ltd.': '王道',
+    'Far Eastern International Bank': '遠東',
+    'Far Eastern International Bank Co., Ltd.': '遠東',
 }
 
 
