@@ -4,7 +4,7 @@
   /* ========== Download Page Buttons ========== */
   .download-btn-primary {
     @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-blue-600 hover:bg-blue-700;
-    @apply w-auto min-h-12 shadow-sm max-w-64 inline-flex items-center justify-center no-underline;
+    @apply w-auto min-h-12 shadow-sm max-w-64 inline-flex items-center justify-center no-underline whitespace-nowrap;
   }
 
   .download-btn-primary:hover {
@@ -13,7 +13,7 @@
 
   .download-btn-secondary {
     @apply text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-normal rounded-lg border-none transition-all duration-200 cursor-pointer bg-gray-800 hover:bg-gray-700;
-    @apply w-auto min-h-12 shadow-sm max-w-64 inline-flex items-center justify-center no-underline;
+    @apply w-auto min-h-12 shadow-sm max-w-64 inline-flex items-center justify-center no-underline whitespace-nowrap;
   }
 
   .download-btn-secondary:hover {
@@ -105,7 +105,7 @@
 
   @media (min-width: 641px) and (max-width: 768px) {
     .download-btn-banner {
-      @apply max-w-48 min-w-48;
+      @apply max-w-56 min-w-56;
     }
 
     .download-banner-content {
@@ -123,7 +123,7 @@
 
   @media (min-width: 769px) and (max-width: 1024px) {
     .download-btn-banner {
-      @apply max-w-52 min-w-52;
+      @apply max-w-60 min-w-60;
     }
 
     .download-banner-content {

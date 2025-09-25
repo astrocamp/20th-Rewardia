@@ -38,7 +38,7 @@
   @apply fixed rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden;
   @apply bg-[linear-gradient(180deg,#b4ccff_0%,#FFFFFF_100%)];
   @apply border-2 border-[#6a8cb7];
-  @apply min-w-[250px] min-h-[350px] select-none transition-none;
+  @apply min-w-[280px] min-h-[350px] select-none transition-none;
   /* 強制限制位置，確保不會超出螢幕邊界 */
   left: max(16px, min(var(--chatbot-left, 0px), calc(100vw - var(--chatbot-width, 280px) - 16px))) !important;
   top: max(16px, min(var(--chatbot-top, 0px), calc(100vh - var(--chatbot-height, 350px) - 16px))) !important;
@@ -102,18 +102,7 @@
   @apply flex flex-col items-start justify-center h-full text-left p-6 text-gray-500;
 }
 
-/* 訊息氣泡樣式 */
-.message-bubble {
-  @apply max-w-[85%] p-3 rounded-lg break-words mb-0 my-2 mx-4 text-sm;
-}
-
-.message-user {
-  @apply bg-gray-800 text-white rounded-lg ml-auto mr-4;
-}
-
-.message-ai {
-  @apply bg-white text-gray-900 border border-gray-200 rounded-lg ml-4 mr-auto shadow-sm;
-}
+/* 訊息氣泡樣式 - 已移至 HTML 中使用 Tailwind 類別 */
 
 /* 載入指示器 */
 .chatbot-loading {
@@ -140,17 +129,10 @@
 
 /* 輸入區域 */
 .chatbot-input-area {
-  @apply p-4 flex-shrink-0 mt-auto border-t border-[#7b89a8]/30 bg-white/80;
+  @apply px-3 py-2 flex-shrink-0 mt-auto border-t border-[#7b89a8]/30 bg-white/80;
 }
 
-.chatbot-input {
-  @apply w-full min-h-10 max-h-30 p-3 border-none rounded-lg bg-white text-gray-700 resize-none outline-none text-lg leading-5 transition-all duration-200 shadow-sm;
-}
-
-.chatbot-input:focus {
-  @apply border-blue-500;
-  @apply shadow-[0_0_0_3px_rgba(59,130,246,0.1)];
-}
+/* 輸入框樣式 - 已移至 HTML 中使用 DaisyUI 類別 */
 
 /* 調整大小控制 */
 .chatbot-resize-handle {
@@ -177,7 +159,7 @@
   .chatbot-window {
     max-width: calc(100vw - 1rem);
     max-height: calc(100vh - 1rem);
-    min-width: 250px;
+    min-width: 280px;
     min-height: 350px;
   }
 }
