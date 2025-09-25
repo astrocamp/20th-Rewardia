@@ -65,6 +65,28 @@ let lastMessageContent = '';
 // 從 sessionStorage 載入（頁面跳轉時保留）
 function loadFromSession() {
   try {
+    // 檢查是否有登出標記
+    const isLoggedOut = sessionStorage.getItem('chatbot_logged_out') === 'true';
+    
+    // 檢查用戶是否已登入，如果未登入則清空對話記錄
+    const isLoggedIn = document.body.classList.contains('user-logged-in') || 
+                      document.querySelector('[data-user-id]') !== null;
+    
+    if (!isLoggedIn || isLoggedOut) {
+      // 用戶未登入或剛登出，清空所有聊天記錄
+      chatbotMemory.messages = [];
+      chatbotMemory.isOpen = false;
+      chatbotMemory.windowState = createDefaultWindowState();
+      sessionStorage.removeItem(CONSTANTS.STORAGE_KEY);
+      sessionStorage.removeItem('chatbot_logged_out');
+      return;
+    }
+    
+    // 如果用戶已登入，清除登出標記
+    if (isLoggedIn) {
+      sessionStorage.removeItem('chatbot_logged_out');
+    }
+    
     const saved = sessionStorage.getItem(CONSTANTS.STORAGE_KEY);
     if (saved) {
       const data = JSON.parse(saved);
@@ -133,8 +155,12 @@ function saveToSessionImmediate() {
   }
 }
 
-// 頁面載入時立即載入
-loadFromSession();
+// 頁面載入時立即載入（但延遲到 DOM 載入完成後檢查登入狀態）
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', loadFromSession);
+} else {
+  loadFromSession();
+}
 
 export default function chatbot() {
   return {
@@ -546,6 +572,18 @@ export default function chatbot() {
     performLogout() {
       // 登出前先清除聊天記錄並關閉對話框
       this.clearChatHistory();
+      
+      // 強制清除所有相關的存儲
+      try {
+        sessionStorage.removeItem(CONSTANTS.STORAGE_KEY);
+        localStorage.removeItem(CONSTANTS.STORAGE_KEY);
+        // 設置登出標記，防止頁面載入時恢復對話
+        sessionStorage.setItem('chatbot_logged_out', 'true');
+      } catch (e) {
+        if (window.RewardiaLogger) {
+          window.RewardiaLogger.warn('無法清除存儲:', e);
+        }
+      }
       
       const form = document.createElement('form');
       form.method = 'POST';

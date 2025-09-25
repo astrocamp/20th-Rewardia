@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="{% static 'styles/style.css' %}?v={{ STATIC_VERSION }}">
   <script type="module" src="{% static 'scripts/app.js' %}?v={{ STATIC_VERSION }}"></script>
 </head>
-<body x-data="header()" @scroll.window="handleScroll()">
+<body x-data="header()" @scroll.window="handleScroll()" class="{% if user.is_authenticated %}user-logged-in{% endif %}" {% if user.is_authenticated %}data-user-id="{{ user.id }}"{% endif %}>
     <main class="calculator-page">
       {% include 'layouts/messages.html' %} {% block content %} {% endblock %}
     </main>
