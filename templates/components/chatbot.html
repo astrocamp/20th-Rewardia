@@ -61,28 +61,22 @@
 
       <!-- 訊息列表 -->
       <template x-for="(message, index) in messages" :key="index">
-        <div class="w-full mb-4">
-          <!-- 發送者標籤 -->
-          <div
-            :class="message.type === 'user' ? 'text-right mr-4 mb-1' : 'text-left ml-4 mb-1'"
-          >
-            <span
-              class="text-xs text-gray-500"
-              x-text="message.type === 'user' ? username : 'Rewardia'"
-            ></span>
+        <div class="w-full mb-2">
+          <!-- 用戶訊息 -->
+          <div x-show="message.type === 'user'" class="flex justify-end mb-2">
+            <div class="rounded-2xl px-3.5 py-2.5 max-w-[80%] bg-gradient-to-br from-indigo-500 to-violet-500 text-white shadow-md leading-relaxed whitespace-pre-wrap break-words" x-text="message.content"></div>
           </div>
-          <!-- 訊息氣泡 -->
-          <div
-            class="message-bubble whitespace-pre-wrap"
-            :class="message.type === 'user' ? 'message-user' : 'message-ai'"
-            x-text="message.content"
-          ></div>
+          
+          <!-- AI 訊息 -->
+          <div x-show="message.type === 'ai'" class="flex justify-start mb-2">
+            <div class="rounded-2xl px-3.5 py-2.5 max-w-[80%] bg-white/80 backdrop-blur shadow-sm ring-1 ring-slate-200 text-slate-800 leading-relaxed whitespace-pre-wrap break-words" x-text="message.content"></div>
+          </div>
         </div>
       </template>
 
       <!-- 載入指示器 -->
-      <div x-show="isLoading" class="flex justify-start">
-        <div class="message-bubble message-ai">
+      <div x-show="isLoading" class="flex justify-start mb-2">
+        <div class="rounded-2xl px-3.5 py-2.5 max-w-[80%] bg-white/80 backdrop-blur shadow-sm ring-1 ring-slate-200 text-slate-800 leading-relaxed">
           <div class="chatbot-loading">
             <span>正在思考</span>
             <div class="chatbot-typing-dots">
@@ -100,8 +94,8 @@
       <textarea
         x-model="currentMessage"
         :disabled="isLoading"
-        placeholder="輸入問題並按 Enter 發送"
-        class="chatbot-input"
+        placeholder="輸入訊息（Shift+Enter 換行）"
+        class="textarea textarea-bordered w-full rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-violet-400/70 min-h-10 max-h-20 py-2 px-3 text-sm"
         maxlength="500"
         autocomplete="off"
         x-ref="messageInput"
