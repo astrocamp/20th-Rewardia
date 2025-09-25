@@ -44,7 +44,7 @@
 
   /* ========== Download Page Layout ========== */
   .download-banner-content {
-    @apply relative z-[2] max-w-[50%] pr-8;
+    @apply relative z-[2] max-w-[60%] pr-8;
   }
 
   .download-section-simple {
@@ -77,7 +77,7 @@
     }
 
     .download-banner-content {
-      @apply max-w-full pr-0;
+      @apply max-w-[65%] pr-4;
     }
 
 
@@ -121,13 +121,23 @@
     }
   }
 
-  @media (min-width: 769px) and (max-width: 1024px) {
+  @media (min-width: 769px) and (max-width: 940px) {
     .download-btn-banner {
       @apply max-w-60 min-w-60;
     }
 
     .download-banner-content {
-      @apply max-w-[55%] pr-6;
+      @apply max-w-[60%] pr-6;
+    }
+  }
+
+  @media (min-width: 941px) and (max-width: 1024px) {
+    .download-btn-banner {
+      @apply max-w-60 min-w-60;
+    }
+
+    .download-banner-content {
+      @apply max-w-[60%] pr-6;
     }
 
     .download-feature-image-simple {
@@ -141,7 +151,7 @@
     }
 
     .download-banner-content {
-      @apply max-w-[50%] pr-8;
+      @apply max-w-[60%] pr-8;
     }
 
     .download-feature-image-simple {

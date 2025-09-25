@@ -310,4 +310,39 @@
       @apply min-w-96;
     }
   }
+
+  /* ========== Banner Content Responsive Styles ========== */
+  .download-banner-content {
+    @apply relative z-[2] max-w-[60%] pr-8;
+  }
+
+  @media (max-width: 640px) {
+    .download-banner-content {
+      @apply max-w-[70%] pr-4;
+    }
+  }
+
+  @media (min-width: 641px) and (max-width: 768px) {
+    .download-banner-content {
+      @apply max-w-[60%] pr-6;
+    }
+  }
+
+  @media (min-width: 769px) and (max-width: 940px) {
+    .download-banner-content {
+      @apply max-w-[60%] pr-6;
+    }
+  }
+
+  @media (min-width: 941px) and (max-width: 1024px) {
+    .download-banner-content {
+      @apply max-w-[60%] pr-6;
+    }
+  }
+
+  @media (min-width: 1025px) {
+    .download-banner-content {
+      @apply max-w-[60%] pr-8;
+    }
+  }
 }
