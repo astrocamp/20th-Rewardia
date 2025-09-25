@@ -255,6 +255,13 @@ export default (config = {}) => ({
       this.lastLuhnCheckResult = true;
     }
 
+    // 檢查是否已選擇銀行 - 如果已選擇就不進行 BIN 辨識
+    if (this.selectedBank && this.selectedBank.trim() !== "") {
+      this.bankRecognitionMessage = "已選擇銀行，跳過自動辨識";
+      this.bankRecognitionInProgress = false;
+      return;
+    }
+
     this.bankRecognitionInProgress = true;
     this.bankRecognitionMessage = "";
 
