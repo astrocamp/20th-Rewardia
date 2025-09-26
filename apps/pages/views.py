@@ -10,6 +10,7 @@ from django.contrib.messages import get_messages
 from apps.cards.storage import MediaStorage
 from .forms import RewardCalculatorForm
 from django.shortcuts import redirect
+from django.conf import settings
 
 def custom_404(request, exception):
     # 如果是 API 路徑，返回 JSON 格式的 404
@@ -20,7 +21,10 @@ def custom_404(request, exception):
 
 
 def download(request):
-    return render(request, "pages/download.html")
+    context = {
+        'chrome_web_store_url': settings.CHROME_WEB_STORE_URL
+    }
+    return render(request, "pages/download.html", context)
 
 
 def privacy(request):
@@ -42,13 +46,17 @@ def main(request):
 
     context = {
         'user_card_ids': user_card_ids,
-        'is_authenticated': request.user.is_authenticated
+        'is_authenticated': request.user.is_authenticated,
+        'chrome_web_store_url': settings.CHROME_WEB_STORE_URL
     }
     return render(request, "pages/main.html", context)
 
 
 def faq(request):
-    context = {"faq_categories": FAQ_DATA["categories"]}
+    context = {
+        "faq_categories": FAQ_DATA["categories"],
+        'chrome_web_store_url': settings.CHROME_WEB_STORE_URL
+    }
     return render(request, "pages/faq.html", context)
 
 

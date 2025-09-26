@@ -23,6 +23,9 @@ FERNET_KEY = os.getenv("FERNET_KEY")
 # BIN API Key (用於信用卡銀行辨識)
 BIN_API_KEY = os.getenv("BIN_API_KEY")
 
+# Chrome Web Store 連結
+CHROME_WEB_STORE_URL = "https://chromewebstore.google.com/detail/rewardia/ahmfkgkefmandfahccfbbpfffnphkakl?authuser=0&hl=en"
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False").lower() in ("true")
 
