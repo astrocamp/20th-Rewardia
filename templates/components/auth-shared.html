@@ -113,13 +113,13 @@
 {% include 'components/auth-shared.html' with component="page-container-end" %}
 {% endcomment %}
 {% if component == "page-container" %}
-<div class="min-h-screen bg-gray-50 pb-24 auth-spacing" 
+<div class="min-h-screen bg-white pb-24 auth-spacing" 
      x-bind:class="{ 
        'banner-hidden': !$store.banner.visible,
        'banner-transitioning': $store.banner.isTransitioning
      }">
   <div class="max-w-lg mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+    <div class="bg-white rounded-lg shadow-lg border-2 overflow-hidden" style="border-color: #d1d5db; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);">
       <!-- 頁面標題 -->
       <div class="px-10 pt-10 pb-8">
         <h1 class="text-4xl font-bold text-black font-['Kulim_Park'] leading-tight">
