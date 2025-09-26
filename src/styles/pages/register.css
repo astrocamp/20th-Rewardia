@@ -1,6 +1,31 @@
 /* Primarily corresponds to: templates/users/register.html, templates/users/login.html, templates/components/auth-shared.html */
 
 @layer components {
+  /* ========== Auth Page Layout ========== */
+  .auth-page {
+    @apply bg-white pb-20; /* 與 calculator-page 保持一致，但專門用於認證頁面 */
+  }
+
+  /* ========== Auth Page Spacing ========== */
+  .auth-spacing {
+    margin-top: 7rem; /* 與其他頁面保持一致的間距 */
+    background-color: #ffffff; /* 確保背景為白色 */
+  }
+
+  /* ========== Auth Card Border Enhancement ========== */
+  .auth-card-enhanced {
+    @apply bg-white rounded-lg shadow-lg border-2 border-gray-300 overflow-hidden;
+    border-color: #d1d5db; /* 更明顯的邊框顏色 */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  /* 響應式間距調整 */
+  @media (max-width: 640px) {
+    .auth-spacing {
+      margin-top: 6rem; /* 小螢幕時稍微減少間距 */
+    }
+  }
+
   /* ========== Register Page Specific Styles ========== */
   .register-input {
     @apply w-full h-12 px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors;
