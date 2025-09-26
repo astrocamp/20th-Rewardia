@@ -8,7 +8,8 @@ from apps.chatbot.config import (
     PERSONAL_RECOMMENDATION_KEYWORDS, CARD_COMPARISON_RECOMMENDATION_KEYWORDS, 
     RESPONSE_MESSAGES, PAGE_MAPPING, INTENT_KEYWORDS, FORMAT_CONFIG, 
     DATABASE_CONFIG, CATEGORY_KEYWORDS, PERSONAL_QUERY_KEYWORDS, CARD_NAME_CLEANING,
-    ERROR_DETECTION_CONFIG, DYNAMIC_RESPONSE_TEMPLATES
+    ERROR_DETECTION_CONFIG, DYNAMIC_RESPONSE_TEMPLATES, EXACT_MATCH_CONFIG,
+    TOURISM_CATEGORY_MAPPING, TOURISM_CLARIFICATION_MESSAGES
 )
 from .data_service import ChatbotDataService
 from .knowledge_base import SYSTEM_PROMPT, REWARDIA_KNOWLEDGE_BASE
@@ -52,6 +53,75 @@ class ChatbotResponseBuilder:
             return card_name
         else:
             return f"{bank_name} {card_name}"
+
+    @staticmethod
+    def _check_tourism_category_match(user_message):
+        """檢查旅遊類別匹配，返回精確的旅遊類別或澄清訊息"""
+        clarification_messages = TOURISM_CLARIFICATION_MESSAGES
+        
+        # 檢查每個旅遊類別映射
+        for category, keywords in TOURISM_CATEGORY_MAPPING.items():
+            if any(keyword in user_message for keyword in keywords):
+                # 如果是需要澄清的一般旅遊類別
+                if category == "旅遊" and any(keyword in user_message for keyword in ["旅遊", "出去玩"]):
+                    # 檢查是否有特定的澄清訊息
+                    for ambiguous_key, message in clarification_messages.items():
+                        if ambiguous_key in user_message:
+                            return message
+                    # 預設澄清訊息
+                    return "你指的是「國內旅遊」或「海外旅遊」呢？"
+                else:
+                    # 返回精確匹配的類別
+                    return category
+        
+        # 沒有匹配到任何旅遊類別
+        return None
+
+    @staticmethod
+    def _correct_ambiguous_categories(categories, user_message):
+        """修正模糊類別匹配，避免錯誤的類別識別"""
+        corrected_categories = []
+        
+        for category in categories:
+            # 檢查「中華航空」vs「中華電信」的混淆
+            if category == "中華電信" and ("航空" in user_message or "聯名" in user_message):
+                # 如果用戶詢問的是航空相關，跳過電信類別
+                continue
+            
+            # 檢查「富邦人壽」vs「富邦momo」的混淆
+            if category == "富邦人壽" and "momo" in user_message.lower():
+                # 如果用戶詢問的是momo相關，跳過人壽類別
+                continue
+            # 檢查「富邦人壽」vs「富邦momo」的混淆
+            if category == "富邦產險" and "momo" in user_message.lower():
+                # 如果用戶詢問的是momo相關，跳過產險類別
+                continue
+            
+            # 檢查「中國人壽」vs其他混淆
+            if category == "中國人壽" and ("中信" in user_message or "中國信託" in user_message):
+                # 如果用戶詢問的是中信或中國信託相關，跳過中國人壽類別
+                continue
+            
+            corrected_categories.append(category)
+        
+        return corrected_categories
+
+    @staticmethod
+    def _correct_ambiguous_response(response, user_message):
+        """修正回覆中的模糊類別錯誤"""
+        # 修正「中華電信」錯誤匹配「中華航空」
+        if "中華電信" in response and ("航空" in user_message or "聯名" in user_message):
+            response = response.replace("中華電信", "您的卡片")
+        
+        # 修正「富邦人壽」錯誤匹配「富邦momo」
+        if "富邦人壽" in response and "momo" in user_message.lower():
+            response = response.replace("富邦人壽", "您的卡片")
+        
+        # 修正「中國人壽」錯誤匹配其他類別
+        if "中國人壽" in response and ("momo" in user_message.lower() or "航空" in user_message):
+            response = response.replace("中國人壽", "您的卡片")
+        
+        return response
 
     @staticmethod
     def _create_base_intent(user_message):
@@ -233,6 +303,20 @@ class ChatbotResponseBuilder:
     @staticmethod
     def _analyze_category_intent(intent, user_message):
         """分析消費類別資訊"""
+        # 首先檢查旅遊類別匹配
+        tourism_category_result = ChatbotResponseBuilder._check_tourism_category_match(user_message)
+        
+        # 如果返回澄清訊息，直接設置為澄清回應
+        if tourism_category_result and any(keyword in tourism_category_result for keyword in ["你指的是", "呢？"]):
+            intent["clarification_needed"] = tourism_category_result
+            return
+        
+        # 如果找到精確匹配的旅遊類別，直接使用
+        if tourism_category_result:
+            if tourism_category_result not in intent["categories"]:
+                intent["categories"].append(tourism_category_result)
+            return
+        
         # 找出訊息中提及的消費類別
         # 注意：這裡會執行一次DB查詢，若有效能考量可考慮快取
         for category in ChatbotDataService.get_reward_categories():
@@ -263,47 +347,13 @@ class ChatbotResponseBuilder:
         if not intent.get("card_name"):
             for keyword in COMMON_KEYWORDS:
                 if keyword in user_message:
-                    # 檢查是否為模糊匹配（如「中華」匹配「中華電信」）
-                    # 如果是模糊匹配，需要更嚴格的條件
-                    is_ambiguous_match = False
-                    
-                    # 規則：若模糊比對前2個字一樣，就要再比對後面2個字
-                    # 檢查「中華航空」vs「中華電信」的情況
-                    if keyword == "電信":
-                        # 如果用戶訊息包含「中華」且包含「航空」或「聯名」，則不匹配「電信」
-                        if "中華" in user_message and ("航空" in user_message or "聯名" in user_message):
-                            is_ambiguous_match = True
-                    
-                    # 檢查「富邦momo」vs「富邦人壽」的情況
-                    if keyword == "人壽":
-                        # 如果用戶訊息包含「富邦」且包含「momo」，則不匹配「人壽」
-                        if "富邦" in user_message and "momo" in user_message.lower():
-                            is_ambiguous_match = True
-                    
-                    # 反向檢查
-                    if keyword == "航空" and "中華" in user_message and "電信" in user_message:
-                        is_ambiguous_match = True
-                    
-                    if keyword == "momo" and "富邦" in user_message and "人壽" in user_message:
-                        is_ambiguous_match = True
-                    
-                    if not is_ambiguous_match:
-                        # 額外檢查：直接阻止特定的錯誤匹配
-                        should_skip = False
-                        
-                        # 阻止「電信」匹配「中華航空」相關查詢
-                        if keyword == "電信" and "中華" in user_message and ("航空" in user_message or "聯名" in user_message):
-                            should_skip = True
-                        
-                        # 阻止「人壽」匹配「富邦momo」相關查詢
-                        if keyword == "人壽" and "富邦" in user_message and "momo" in user_message.lower():
-                            should_skip = True
-                        
-                        if not should_skip:
-                            for category in ChatbotDataService.get_reward_categories():
-                                if keyword in category and keyword not in intent["categories"]:
-                                    intent["categories"].append(keyword)
-                                    break
+                    for category in ChatbotDataService.get_reward_categories():
+                        if keyword in category and keyword not in intent["categories"]:
+                            intent["categories"].append(keyword)
+                            break
+        
+        # 使用統一的模糊類別修正函數
+        intent["categories"] = ChatbotResponseBuilder._correct_ambiguous_categories(intent["categories"], user_message)
             
     @staticmethod
     def _analyze_navigation_intent(intent, user_message):
@@ -811,10 +861,7 @@ class ChatbotResponseBuilder:
                 response = '\n'.join(validated_lines)
             
             # 修正回覆中的錯誤類別
-            if "中華電信" in response and ("航空" in user_message or "聯名" in user_message):
-                response = response.replace("中華電信", "您的卡片")
-            if "富邦人壽" in response and "momo" in user_message.lower():
-                response = response.replace("富邦人壽", "您的卡片")
+            response = ChatbotResponseBuilder._correct_ambiguous_response(response, user_message)
             
             return response
         except Exception as e:
@@ -827,11 +874,7 @@ class ChatbotResponseBuilder:
         user_message = intent.get("raw_message", "")
         
         # 最終保險：修正回覆中的錯誤類別
-        if "中華電信" in response and ("航空" in user_message or "聯名" in user_message):
-            response = response.replace("中華電信", "您的卡片")
-        
-        if "富邦人壽" in response and "momo" in user_message.lower():
-            response = response.replace("富邦人壽", "您的卡片")
+        response = ChatbotResponseBuilder._correct_ambiguous_response(response, user_message)
 
         # 處理導航意圖（優先處理）
         if intent.get("is_navigation", False):
@@ -924,11 +967,7 @@ class ChatbotResponseBuilder:
                             response = "您的卡片回饋資訊:\n"
                         
                         # 最後的保險：直接修正回覆文字中的錯誤類別
-                        if "中華電信" in response and ("航空" in user_message or "聯名" in user_message):
-                            response = response.replace("中華電信", "您的卡片")
-                        
-                        if "富邦人壽" in response and "momo" in user_message.lower():
-                            response = response.replace("富邦人壽", "您的卡片")
+                        response = ChatbotResponseBuilder._correct_ambiguous_response(response, user_message)
                         for card in filtered_cards:
                             card_name = ChatbotResponseBuilder._format_card_name(card['card__bank'], card['card__name'])
                             card_rewards = ChatbotDataService.get_card_all_rewards(card_name)
@@ -974,10 +1013,7 @@ class ChatbotResponseBuilder:
                                 response += RESPONSE_MESSAGES['user_info']['primary_marker']
                             response += "\n"
                         # 修正回覆中的錯誤類別
-                        if "中華電信" in response and ("航空" in user_message or "聯名" in user_message):
-                            response = response.replace("中華電信", "您的卡片")
-                        if "富邦人壽" in response and "momo" in user_message.lower():
-                            response = response.replace("富邦人壽", "您的卡片")
+                        response = ChatbotResponseBuilder._correct_ambiguous_response(response, user_message)
                         return response
                     
                     # 列出篩選後的用戶卡片
@@ -990,10 +1026,7 @@ class ChatbotResponseBuilder:
                             response += RESPONSE_MESSAGES['user_info']['primary_marker']
                         response += "\n"
                     # 修正回覆中的錯誤類別
-                    if "中華電信" in response and ("航空" in user_message or "聯名" in user_message):
-                        response = response.replace("中華電信", "您的卡片")
-                    if "富邦人壽" in response and "momo" in user_message.lower():
-                        response = response.replace("富邦人壽", "您的卡片")
+                    response = ChatbotResponseBuilder._correct_ambiguous_response(response, user_message)
                     return response
             else:
                 return RESPONSE_MESSAGES['personal']['no_cards_set']
@@ -1105,12 +1138,8 @@ class ChatbotResponseBuilder:
                             response += f"- {reward['bank']} {reward['card_name']}: {rate_display} {reward['reward_type']}\n"
 
         # 最終保險：修正回覆中的錯誤類別
-        if "中華電信" in response and ("航空" in user_message or "聯名" in user_message):
-            response = response.replace("中華電信", "您的卡片")
-        
-        if "富邦人壽" in response and "momo" in user_message.lower():
-            response = response.replace("富邦人壽", "您的卡片")
-        
+        response = ChatbotResponseBuilder._correct_ambiguous_response(response, user_message)
+
         return response
 
     @staticmethod
@@ -1486,7 +1515,7 @@ class ChatbotResponseBuilder:
                     card_name = card_full_name
                     if hasattr(settings, 'DEBUG') and settings.DEBUG:
                         logger.info(f"模糊匹配成功: {card_name}")
-                    break
+                break
         
         # 如果沒有找到完整匹配，嘗試部分匹配
         if not card_name and bank_name:
@@ -1522,7 +1551,7 @@ class ChatbotResponseBuilder:
                             card_name = card['name']
                             if hasattr(settings, 'DEBUG') and settings.DEBUG:
                                 logger.info(f"富邦momo特殊格式匹配成功: {card_name}")
-                            break
+                        break
         
         if card_name:
             # 將找到的卡片名稱設置到 intent 中，避免關鍵字誤匹配

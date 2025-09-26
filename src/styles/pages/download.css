@@ -1,5 +1,7 @@
 /* Primarily corresponds to: templates/pages/download.html */
 
+@import '../components/banner.css';
+
 @layer components {
   /* ========== Download Page Buttons ========== */
   .download-btn-primary {
@@ -43,9 +45,7 @@
   }
 
   /* ========== Download Page Layout ========== */
-  .download-banner-content {
-    @apply relative z-[2] max-w-[60%] pr-8;
-  }
+  /* .download-banner-content 樣式已移至 src/styles/components/banner.css */
 
   .download-section-simple {
     @apply bg-white rounded-2xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 transition-all duration-300 ease-in-out;
@@ -76,9 +76,7 @@
       @apply max-w-64 min-w-0;
     }
 
-    .download-banner-content {
-      @apply max-w-[65%] pr-4;
-    }
+    /* .download-banner-content 樣式已移至 src/styles/components/banner.css */
 
 
     .download-section-simple {
@@ -108,9 +106,7 @@
       @apply max-w-56 min-w-56;
     }
 
-    .download-banner-content {
-      @apply max-w-[60%] pr-6;
-    }
+    /* .download-banner-content 樣式已移至 src/styles/components/banner.css */
 
     .download-section-simple .flex {
       @apply flex-col gap-6;
@@ -121,24 +117,12 @@
     }
   }
 
-  @media (min-width: 769px) and (max-width: 940px) {
+  @media (min-width: 769px) and (max-width: 1024px) {
     .download-btn-banner {
       @apply max-w-60 min-w-60;
     }
 
-    .download-banner-content {
-      @apply max-w-[60%] pr-6;
-    }
-  }
-
-  @media (min-width: 941px) and (max-width: 1024px) {
-    .download-btn-banner {
-      @apply max-w-60 min-w-60;
-    }
-
-    .download-banner-content {
-      @apply max-w-[60%] pr-6;
-    }
+    /* .download-banner-content 樣式已移至 src/styles/components/banner.css */
 
     .download-feature-image-simple {
       @apply h-48;
@@ -150,9 +134,7 @@
       @apply max-w-60 min-w-60;
     }
 
-    .download-banner-content {
-      @apply max-w-[60%] pr-8;
-    }
+    /* .download-banner-content 樣式已移至 src/styles/components/banner.css */
 
     .download-feature-image-simple {
       @apply h-64;
