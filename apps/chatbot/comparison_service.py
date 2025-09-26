@@ -10,6 +10,21 @@ class ComparisonService:
     """比較邏輯服務"""
 
     @staticmethod
+    def _get_highest_rate_for_card(card_name, category):
+        """根據卡片名稱和類別，找出最高回饋率"""
+        card_rewards = ChatbotDataService.get_card_all_rewards(card_name)
+        category_rewards = [r for r in card_rewards if category in r.get('category', '') or category in r.get('scope', '') or category in r.get('reward_type', '')]
+        
+        if not category_rewards:
+            return None, None
+        
+        # 找到該類別的最高回饋
+        best_reward = max(category_rewards, key=lambda x: float(x.get('max_rate', 0) or x.get('min_rate', 0) or 0))
+        highest_rate = float(best_reward.get('max_rate', 0) or best_reward.get('min_rate', 0) or 0)
+        
+        return highest_rate, best_reward
+
+    @staticmethod
     def handle_comparison_intent(intent, user_id=None):
         """處理比較意圖"""
         comparison_type = intent.get("comparison_type")
@@ -234,15 +249,9 @@ class ComparisonService:
         user_card_name = intent.get("user_card_name")
         if user_card_name:
             # 直接查詢指定卡片的回饋
-            card_rewards = ChatbotDataService.get_card_all_rewards(user_card_name)
-            category_rewards = [r for r in card_rewards if category in r.get('category', '') or category in r.get('scope', '') or category in r.get('reward_type', '')]
-            
-            if not category_rewards:
+            user_highest_rate, best_reward = ComparisonService._get_highest_rate_for_card(user_card_name, category)
+            if user_highest_rate is None:
                 return f"很抱歉，{user_card_name} 在 {category} 類別沒有回饋資料。"
-            
-            # 找到該類別的最高回饋
-            best_reward = max(category_rewards, key=lambda x: float(x.get('max_rate', 0) or x.get('min_rate', 0) or 0))
-            user_highest_rate = float(best_reward.get('max_rate', 0) or best_reward.get('min_rate', 0) or 0)
         else:
             # 從對話歷史中提取用戶的最高回饋卡片
             context_user_cards = intent.get("context_user_cards", [])
@@ -254,16 +263,10 @@ class ComparisonService:
             user_card_name = ""
             
             for card_info in context_user_cards:
-                card_rewards = ChatbotDataService.get_card_all_rewards(card_info)
-                category_rewards = [r for r in card_rewards if category in r.get('category', '') or category in r.get('scope', '') or category in r.get('reward_type', '')]
-                
-                if category_rewards:
-                    best_reward = max(category_rewards, key=lambda x: float(x.get('max_rate', 0) or x.get('min_rate', 0) or 0))
-                    rate_value = float(best_reward.get('max_rate', 0) or best_reward.get('min_rate', 0) or 0)
-                    
-                    if rate_value > user_highest_rate:
-                        user_highest_rate = rate_value
-                        user_card_name = card_info
+                rate_value, _ = ComparisonService._get_highest_rate_for_card(card_info, category)
+                if rate_value is not None and rate_value > user_highest_rate:
+                    user_highest_rate = rate_value
+                    user_card_name = card_info
             
             if not user_card_name:
                 return f"很抱歉，您的卡片在 {category} 類別沒有回饋資料。"
