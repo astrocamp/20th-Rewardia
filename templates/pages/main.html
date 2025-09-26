@@ -4,6 +4,7 @@
 
 {% block content %}
 <!-- 主要橫幅區域 (Banner) -->
+<div class="main-page">
 <section class="relative mx-4 sm:mx-6 lg:mx-10 mb-4 sm:mb-6 lg:mb-8 banner-spacing overflow-hidden"
          x-bind:class="{
            'banner-hidden': !$store.banner.visible,
@@ -207,5 +208,6 @@
   </div>
 </section>
 
+</div>
 {% endblock %}
 

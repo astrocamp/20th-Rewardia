@@ -469,6 +469,50 @@ FORMAT_CONFIG = {
     'min_partial_word_length': 2
 }
 
+# 精確旅遊類別映射配置
+TOURISM_CATEGORY_MAPPING = {
+    # 海外相關類別
+    "海外": ["海外", "出國", "國外", "海外旅遊", "國外旅遊", "海外住宿", "國外住宿", "海外消費", "國外消費", "航空"],
+    
+    # 國內相關類別
+    "國內旅遊": ["國內旅遊", "國內住宿", "國內消費"],
+    
+    # 一般旅遊（需要澄清）
+    "旅遊": ["旅遊", "出去玩"]
+}
+
+# 旅遊類別澄清訊息
+TOURISM_CLARIFICATION_MESSAGES = {
+    "旅遊": "你指的是「國內旅遊」或「海外旅遊」呢？",
+    "出去玩": "你指的是「國內旅遊」或「海外旅遊」呢？"
+}
+
+# 精確匹配配置
+EXACT_MATCH_CONFIG = {
+    # 卡片名稱精確匹配
+    'exact_card_matches': [
+        "中華航空聯名卡",
+        "富邦momo卡",
+        # 可以繼續添加其他需要精確匹配的卡片
+    ],
+    
+    # 類別名稱精確匹配規則
+    'exact_category_rules': {
+        "中華航空": ["航空", "聯名", "china airlines"],
+        "中華電信": ["電信", "通訊", "chunghwa telecom"],
+        "富邦人壽": ["人壽", "保險", "life insurance"],
+        "富邦產險": ["產險", "保險", "property insurance"],
+        "中國人壽": ["人壽", "保險", "life insurance"],
+    },
+    
+    # 模糊查詢澄清訊息
+    'ambiguous_clarification_messages': {
+        "中華": "你指的是\"中華航空\"或\"中華電信\"呢？",
+        "富邦保險": "你指的是\"富邦人壽\"或\"富邦產險\"呢？",
+        "富邦": "你指的是\"富邦人壽\"或\"富邦產險\"呢？"
+    }
+}
+
 # 資料庫查詢配置
 DATABASE_CONFIG = {
     'conversation_history_limit': 6,

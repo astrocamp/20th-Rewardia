@@ -1,47 +1,50 @@
-/* Banner 動態間距樣式 */
-@layer utilities {
-  /* Banner spacing 動態調整 */
-  .banner-spacing {
-    @apply mt-50; /* 預設狀態：banner 可見時，需要較大間距 */
-  }
+@layer components {
+  /* ========== Banner Content Responsive Styles ========== */
+  /* 統一的 banner 內容響應式樣式，用於 main.html, download.html, faq.html */
   
-  /* Banner 隱藏時的間距調整 */
-  .banner-spacing.banner-hidden {
-    @apply mt-32; /* banner 隱藏時，需要較小間距 */
-  }
-  
-  /* Banner spacing 動畫效果 - 只在狀態改變時應用 */
-  .banner-spacing.banner-transitioning {
-    @apply transition-all duration-300 ease-in-out;
-  }
-  
-  /* Auth spacing 動態調整 */
-  .auth-spacing {
-    @apply pt-40; /* 預設狀態：banner 可見時的間距 */
-  }
-  
-  /* Banner 隱藏時的間距調整 */
-  .auth-spacing.banner-hidden {
-    @apply pt-24; /* banner 隱藏時，減少到 6rem */
+  .download-banner-content {
+    @apply relative z-[2] max-w-[60%] pr-8;
   }
 
-  /* Auth spacing 動畫效果 - 只在狀態改變時應用 */
-  .auth-spacing.banner-transitioning {
-    @apply transition-all duration-300 ease-in-out;
+  @media (max-width: 640px) {
+    .download-banner-content {
+      @apply max-w-[65%] pr-4;
+    }
   }
 
-  /* Calculator spacing 動態調整 */
-  .calculator-spacing {
-    @apply mt-50; /* 預設狀態：banner 可見時，需要較大間距 */
-  }
-  
-  /* Banner 隱藏時的間距調整 */
-  .calculator-spacing.banner-hidden {
-    @apply mt-32; /* banner 隱藏時，需要較小間距 */
+  @media (min-width: 641px) and (max-width: 768px) {
+    .download-banner-content {
+      @apply max-w-[60%] pr-6;
+    }
   }
 
-  /* Calculator spacing 動畫效果 - 只在狀態改變時應用 */
-  .calculator-spacing.banner-transitioning {
-    @apply transition-all duration-300 ease-in-out;
+  @media (min-width: 769px) and (max-width: 940px) {
+    .download-banner-content {
+      @apply max-w-[60%] pr-6;
+    }
+  }
+
+  @media (min-width: 941px) and (max-width: 1024px) {
+    .download-banner-content {
+      @apply max-w-[60%] pr-6;
+    }
+  }
+
+  @media (min-width: 1025px) {
+    .download-banner-content {
+      @apply max-w-[60%] pr-8;
+    }
+  }
+
+  /* ========== Main Page Specific Override ========== */
+  /* main.html 頁面需要稍微不同的寬度設定 */
+  .main-page .download-banner-content {
+    @apply relative z-[2] max-w-[60%] pr-8;
+  }
+
+  @media (max-width: 640px) {
+    .main-page .download-banner-content {
+      @apply max-w-[70%] pr-4;
+    }
   }
 }
