@@ -19,7 +19,7 @@
   <body x-data="header()" @scroll.window="handleScroll()" @resize.window="closeMobileMenu()">
     {% include 'admins/admin_header.html' %}
 
-    <main class="pt-20">
+    <main>
       {% include 'layouts/messages.html' %} {% block content %} {% endblock %}
     </main>
 
