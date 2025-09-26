@@ -6,6 +6,10 @@
       @apply bg-white pb-20;
   }
 
+  .calculator-spacing {
+    margin-top: 7rem; /* 112px - for calculator.html */
+  }
+
   .calculator-container {
     @apply mx-auto max-w-[1360px] px-5 md:px-8;
   }

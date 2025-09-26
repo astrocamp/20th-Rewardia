@@ -3,12 +3,12 @@
 {% block content %}
 {% csrf_token %}
 <section
-  class="relative mx-4 sm:mx-6 lg:mx-10 mb-4 sm:mb-6 lg:mb-8 mt-24"
+  class="relative mx-4 sm:mx-6 lg:mx-10 mb-4 sm:mb-6 lg:mb-8 mt-30"
   x-bind:class="{ 'banner-hidden': !$store.banner.visible }"
   x-data="imageUpload"
   x-cloak
 >
-  <div class="my-4 sm:mb-6">
+  <div class="my-4 sm:mb-8">
     <h2 id="image_upload_title" class="text-2xl sm:text-2xl lg:text-2xl font-bold text-black">
       信用卡圖片管理
     </h2>
