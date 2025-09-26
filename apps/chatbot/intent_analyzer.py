@@ -55,6 +55,63 @@ class ChatbotResponseBuilder:
             return f"{bank_name} {card_name}"
 
     @staticmethod
+    def _extract_card_name_from_message(user_message, bank_name=None):
+        """從用戶訊息中提取卡片名稱的統一函數"""
+        all_cards = ChatbotResponseBuilder._get_all_cards_cached()
+        card_name = None
+        matches = []
+        
+        # 第一優先：完整卡片名稱匹配
+        for card in all_cards:
+            card_full_name = card['name']
+            if card_full_name in user_message:
+                card_name = card_full_name
+                break
+        
+        # 第二優先：卡片名稱關鍵部分匹配（去除銀行名稱前綴）
+        if not card_name:
+            for card in all_cards:
+                card_full_name = card['name']
+                card_key_part = card_full_name.replace(card['bank'], '').strip()
+                if card_key_part and card_key_part in user_message:
+                    card_name = card_full_name
+                    break
+        
+        # 第三優先：模糊匹配邏輯，處理空格和銀行名稱差異
+        if not card_name:
+            for card in all_cards:
+                card_full_name = card['name']
+                # 移除所有空格和「銀行」後綴進行比較
+                user_clean = user_message.replace(' ', '').replace('銀行', '').replace('卡', '')
+                card_clean = card_full_name.replace(' ', '').replace('銀行', '').replace('卡', '')
+                
+                # 加入除錯日誌
+                if hasattr(settings, 'DEBUG') and settings.DEBUG and '玉山' in card['bank']:
+                    logger.info(f"比較: 用戶='{user_clean}' vs 卡片='{card_clean}'")
+                
+                if user_clean in card_clean or card_clean in user_clean:
+                    matches.append(card_full_name)
+                    if hasattr(settings, 'DEBUG') and settings.DEBUG:
+                        logger.info(f"模糊匹配候選: {card_full_name}")
+            
+            # 處理匹配結果
+            if len(matches) == 1:
+                card_name = matches[0]
+                if hasattr(settings, 'DEBUG') and settings.DEBUG:
+                    logger.info(f"模糊匹配成功: {card_name}")
+            elif len(matches) > 1:
+                # 最多顯示前3個選項，讓用戶澄清
+                options = matches[:3]
+                if len(options) == 2:
+                    return f"您指的是「{options[0]}」還是「{options[1]}」呢？"
+                else:
+                    return f"您指的是「{options[0]}」、「{options[1]}」還是「{options[2]}」呢？"
+        
+        # 部分匹配邏輯已整合到 _extract_card_name_from_message 函數中
+        
+        return card_name
+
+    @staticmethod
     def _check_tourism_category_match(user_message):
         """檢查旅遊類別匹配，返回精確的旅遊類別或澄清訊息"""
         clarification_messages = TOURISM_CLARIFICATION_MESSAGES
@@ -68,7 +125,7 @@ class ChatbotResponseBuilder:
                     for ambiguous_key, message in clarification_messages.items():
                         if ambiguous_key in user_message:
                             return message
-                    # 預設澄清訊息
+                    # 預設澄清訊息（個人查詢和一般查詢都需要澄清）
                     return "你指的是「國內旅遊」或「海外旅遊」呢？"
                 else:
                     # 返回精確匹配的類別
@@ -556,34 +613,13 @@ class ChatbotResponseBuilder:
                 intent["card_comparison_type"] = "unlimited"
             
             # 提取用戶卡片名稱
-            all_cards = ChatbotResponseBuilder._get_all_cards_cached()
-            
-            # 第一優先：完整卡片名稱匹配
-            for card in all_cards:
-                card_name = card['name']
-                if card_name in user_message:
-                    intent["user_card_name"] = card_name
-                    break
-            
-            # 第二優先：卡片名稱關鍵部分匹配
-            if not intent.get("user_card_name"):
-                for card in all_cards:
-                    card_name = card['name']
-                    card_key_part = card_name.replace(card['bank'], '').strip()
-                    if card_key_part and card_key_part in user_message:
-                        intent["user_card_name"] = card_name
-                        break
-            
-            # 第三優先：模糊匹配邏輯，處理空格和銀行名稱差異
-            if not intent.get("user_card_name"):
-                for card in all_cards:
-                    card_name = card['name']
-                    # 移除所有空格和「銀行」後綴進行比較
-                    user_clean = user_message.replace(' ', '').replace('銀行', '')
-                    card_clean = card_name.replace(' ', '').replace('銀行', '')
-                    if user_clean in card_clean or card_clean in user_clean:
-                        intent["user_card_name"] = card_name
-                        break
+            result = ChatbotResponseBuilder._extract_card_name_from_message(user_message)
+            if isinstance(result, str) and result.startswith("您指的是"):
+                # 返回澄清訊息
+                intent["clarification_needed"] = result
+            else:
+                # 找到確切的卡片名稱
+                intent["user_card_name"] = result
             
             # 提取比較類別
             for category in ChatbotDataService.get_reward_categories():
@@ -908,6 +944,11 @@ class ChatbotResponseBuilder:
             # 清除可能被誤設的卡片優惠查詢標記
             intent["is_card_benefit_question"] = False
             
+            # 首先檢查旅遊類別澄清邏輯
+            tourism_category_result = ChatbotResponseBuilder._check_tourism_category_match(user_message)
+            if tourism_category_result and any(keyword in tourism_category_result for keyword in ["你指的是", "呢？"]):
+                return tourism_category_result
+            
             # 在個人查詢處理開始時就進行錯誤類別檢測和修正
             if "電信" in intent["categories"] and ("航空" in user_message or "聯名" in user_message):
                 # 移除錯誤的電信類別
@@ -990,7 +1031,18 @@ class ChatbotResponseBuilder:
                                 response += f"- {card_name}: {rate_display} {best_reward.get('reward_type', '')}\n"
                         return response
                     else:
-                        return f"您的卡片中沒有 {' '.join(intent['categories'])} 回饋的信用卡。"
+                        # 用戶的卡片中沒有該類別回饋，提供推薦
+                        category_str = ' '.join(intent['categories'])
+                        
+                        # 查詢該類別的最高回饋卡片作為推薦
+                        try:
+                            recommendation = ComparisonService.get_highest_reward_unlimited(category_str)
+                            if recommendation and "很抱歉" not in recommendation:
+                                return f"您的卡片中沒有 {category_str} 回饋的信用卡。我另外推薦你：{recommendation}"
+                            else:
+                                return f"您的卡片中沒有 {category_str} 回饋的信用卡。"
+                        except:
+                            return f"您的卡片中沒有 {category_str} 回饋的信用卡。"
                 else:
                     # 沒有類別篩選：檢查是否有特定銀行篩選
                     filtered_cards = user_cards
@@ -1482,40 +1534,13 @@ class ChatbotResponseBuilder:
         
         # 動態提取卡片名稱：從資料庫中所有卡片名稱進行匹配
         # 優先進行精確匹配，避免關鍵字誤匹配
-        
-        # 第一優先：完整卡片名稱匹配
-        for card in all_cards:
-            card_full_name = card['name']
-            if card_full_name in user_message:
-                card_name = card_full_name
-                break
-        
-        # 第二優先：卡片名稱關鍵部分匹配（去除銀行名稱前綴）
-        if not card_name:
-            for card in all_cards:
-                card_full_name = card['name']
-                card_key_part = card_full_name.replace(card['bank'], '').strip()
-                if card_key_part and card_key_part in user_message:
-                    card_name = card_full_name
-                    break
-        
-        # 第三優先：模糊匹配邏輯，處理空格和銀行名稱差異
-        if not card_name:
-            for card in all_cards:
-                card_full_name = card['name']
-                # 移除所有空格和「銀行」後綴進行比較
-                user_clean = user_message.replace(' ', '').replace('銀行', '').replace('卡', '')
-                card_clean = card_full_name.replace(' ', '').replace('銀行', '').replace('卡', '')
-                
-                # 加入除錯日誌
-                if hasattr(settings, 'DEBUG') and settings.DEBUG and '玉山' in card['bank']:
-                    logger.info(f"比較: 用戶='{user_clean}' vs 卡片='{card_clean}'")
-                
-                if user_clean in card_clean or card_clean in user_clean:
-                    card_name = card_full_name
-                    if hasattr(settings, 'DEBUG') and settings.DEBUG:
-                        logger.info(f"模糊匹配成功: {card_name}")
-                break
+        result = ChatbotResponseBuilder._extract_card_name_from_message(user_message, bank_name)
+        if isinstance(result, str) and result.startswith("您指的是"):
+            # 返回澄清訊息
+            return result
+        else:
+            # 找到確切的卡片名稱
+            card_name = result
         
         # 如果沒有找到完整匹配，嘗試部分匹配
         if not card_name and bank_name:

@@ -50,7 +50,7 @@
       <!-- 空狀態 -->
       <div x-show="messages.length === 0" class="chatbot-empty-state">
         {% if user.is_authenticated %}
-          <p class="text-lg font-medium">Hi, {{ user.first_name|default:user.username }}</p>
+          <p class="text-lg font-bold">Hi, {{ user.first_name|default:user.username }}</p>
         {% else %}
           <p class="text-lg">你好</p>
         {% endif %}
