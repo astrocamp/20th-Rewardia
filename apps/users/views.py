@@ -485,10 +485,10 @@ def card_delete(request, card_id):
 def get_token(request):
     try:
         # 每次插件登入，都只抓最新的token
-        token = AuthToken.objects.filter(user=request.user).latest("created")
+        instance, token = AuthToken.objects.create(user=request.user)
         return Response(
             {
-                "token": token.digest,
+                "token": token,
                 "user_id": request.user.id,
                 "username": request.user.username,
                 "message": "Token retrieved successfully",

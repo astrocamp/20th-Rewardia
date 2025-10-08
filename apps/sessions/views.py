@@ -16,8 +16,6 @@ def login_view(request):
         success, user, error_type = UserAuthenticationService.login_user(request, form)
 
         if success:
-            # 每次登入都會創造新的token
-            AuthToken.objects.create(user=user)
             UserAuthenticationService.handle_login_success(request, user)
             return redirect("users:member_zone")
         else:
