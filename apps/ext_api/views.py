@@ -14,7 +14,7 @@ from rest_framework.decorators import (
 )
 from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404
-from rest_framework.authentication import TokenAuthentication
+from knox.auth import TokenAuthentication
 from django.utils import timezone
 from rest_framework import status
 from django.conf import settings

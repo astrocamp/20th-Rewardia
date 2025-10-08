@@ -2,6 +2,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from django.contrib.messages import constants as messages
 import os
+from datetime import timedelta
 
 load_dotenv()
 
@@ -95,8 +96,8 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.google",  # OAuth 必要：Google OAuth 提供者
     # ------------------------------
     "rest_framework",
-    "rest_framework.authtoken",
     "corsheaders",
+    "knox",
 ]
 
 MIDDLEWARE = [
@@ -281,7 +282,16 @@ CORS_ALLOW_CREDENTIALS = True
 REST_FRAMEWORK = {
     # 設定回傳資料一頁有多少筆
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "DEFAULT_AUTHENTICATION_CLASSES": ("knox.auth.TokenAuthentication",),
     "PAGE_SIZE": 10,
+}
+
+KNOX_TOKEN_MODEL = "knox.AuthToken"
+
+REST_KNOX = {
+    "AUTH_TOKEN_CHARACTER_LENGTH": 64,
+    "TOKEN_TTL": timedelta(hours=10),
+    "AUTO_REFRESH": False,
 }
 
 
