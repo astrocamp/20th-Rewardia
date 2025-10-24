@@ -88,7 +88,7 @@ class SmartSentenceSplitter:
         self.min_sentence_length = self.config["settings"]["min_sentence_length"]
 
     def split_by_comma_with_merge(self, text):
-        """中介符號切句子"""
+        """切句子"""
         parts = [p.strip() for p in text.split("，") if p.strip()]
         if not parts:
             return []
