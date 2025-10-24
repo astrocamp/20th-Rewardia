@@ -8,6 +8,7 @@ wheels/
 
 # Virtual environments
 .venv
+uv.lock
 
 node_modules
 public/*
@@ -16,3 +17,30 @@ public/*
 .env
 .pg_service.conf
 .pg_db_pass
+uv.lock
+
+..pg_db_pass
+..pg_service.conf
+
+.vscode/
+
+# User-uploaded files
+media/
+
+# Development and testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.cache/
+
+# Documentation and demos
+doc/
+chrome-extension/
+src/
+
+# Build tools
+rollup.config.js
+makefile
+package.json
+.claude

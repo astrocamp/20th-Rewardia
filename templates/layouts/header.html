@@ -1,0 +1,116 @@
+<header class="fixed-header bg-white border-b border-gray-200 shadow-sm"
+        x-data="{
+          mobileMenuOpen: false,
+          toggleMobileMenu() { this.mobileMenuOpen = !this.mobileMenuOpen },
+          closeMobileMenu() { this.mobileMenuOpen = false }
+        }"
+        x-cloak>
+  <!-- Top Banner -->
+  <div class="top-banner-container" x-ref="topBanner" x-show="$store.banner.visible" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+    <div id="top-banner" class="bg-gray-900 text-white py-3 sm:py-4">
+      <div class="mx-4 sm:mx-6 lg:mx-10">
+        <!-- 手機：左右兩欄（icon / 按鈕+關閉）; sm+：三欄（左空白 / 中內容 / 右X） -->
+        <div class="grid grid-cols-[auto_auto] justify-between items-center sm:grid-cols-[1fr_auto_1fr]">
+
+          <!-- 中間內容（在 sm+ 置中；手機只顯示 icon，文字隱藏） -->
+          <div class="flex items-center gap-3 sm:gap-4 sm:justify-center sm:col-start-2">
+            <!-- 圓形 icon：手機保留 -->
+            {% include 'components/icon.html' with name="chrome-extension" size="w-6 h-6" class="shrink-0" %}
+
+            <!-- 文字：手機隱藏，sm+ 顯示 -->
+            <div class="hidden sm:block leading-tight">
+              <p class="font-bold">取得 Rewardia 的 Chrome 回小幫手</p>
+              <p class="text-sm text-gray-300">使用 Rewardia 優惠比價小幫手，不錯過任何優惠回饋！</p>
+            </div>
+
+            <!-- 白色按鈕：手機/桌機都顯示 -->
+            <a href="https://chromewebstore.google.com/detail/rewardia/ahmfkgkefmandfahccfbbpfffnphkakl?authuser=0&hl=en"
+              class="ml-2 sm:ml-6 bg-white text-gray-900 px-4 sm:px-6 py-2 rounded-full font-bold text-sm hover:bg-gray-100 whitespace-nowrap shrink-0">
+              免費新增至 Chrome
+            </a>
+          </div>
+
+          <!-- 右側關閉：手機 & 桌機都顯示，靠最右 -->
+          <button class="banner-close-btn justify-self-end p-1 inline-flex" aria-label="關閉" @click.prevent="$store.banner.close()">
+            {% include 'components/icon.html' with name="close" size="w-6 h-6" %}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Header -->
+  <div class="mx-4 sm:mx-6 lg:mx-10">
+    <div class="flex justify-between items-center h-20">
+      <!-- Logo -->
+      <div class="flex-shrink-0">
+        <a href="{% url 'pages:main' %}" class="no-underline" title="回首頁">
+          <h1 class="text-2xl font-bold text-black uppercase tracking-wider">Rewardia</h1>
+        </a>
+      </div>
+
+      <!-- 桌機導覽 -->
+      <nav class="hidden md:flex space-x-8">
+        <a href="{% url 'pages:download' %}" class="text-gray-700 hover:text-gray-900 font-medium">下載專區</a>
+        <a href="{% url 'pages:calculator' %}" class="text-gray-700 hover:text-gray-900 font-medium">優惠試算</a>
+        <a href="{% url 'pages:faq' %}" class="text-gray-700 hover:text-gray-900 font-medium">關於功能</a>
+        <a href="{% url 'users:member_zone' %}" class="text-gray-700 hover:text-gray-900 font-medium">會員專區</a>
+      </nav>
+
+      <!-- 右側：登入/登出 & 漢堡（手機顯示） -->
+      <div class="flex items-center space-x-3">
+        {% if user.is_authenticated %}
+          <!-- 已登入：大畫面顯示用戶名 + 登出按鈕 -->
+          <div class="hidden md:flex items-center space-x-3">
+            <div class="flex items-center space-x-2 text-gray-700">
+              {% include 'components/icon.html' with name="user" size="w-5 h-5" %}
+              <span class="max-w-20 truncate">{{ user.username }}</span>
+            </div>
+          </div>
+
+          <!-- 管理後台連結：僅 superuser 可見 -->
+          {% if user.is_superuser %}
+          <a href="{% url 'admins:cards' %}" class="btn-secondary rounded-lg py-2 px-4 md:px-6">
+            管理後台
+          </a>
+          {% endif %}
+
+          <!-- 登出按鈕 -->
+          <form method="post" action="{% url 'sessions:logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn-outline border rounded-lg py-2 px-4 md:px-6">
+              登出
+            </button>
+          </form>
+
+        {% else %}
+          <!-- 未登入：登入按鈕 -->
+          <a href="{% url 'sessions:login' %}" class="btn-primary rounded-lg py-2 px-4 md:px-6">
+            登入
+          </a>
+
+        {% endif %}
+
+        <!-- 漢堡按鈕：僅手機顯示 -->
+        <button id="menu-toggle"
+                class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100"
+                aria-controls="mobile-menu" aria-expanded="false" aria-label="打開主選單"
+                @click="toggleMobileMenu()"
+                @click.outside="closeMobileMenu()">
+          <!-- 三條線 icon -->
+          {% include 'components/icon.html' with name="menu" size="w-5 h-5" %}
+        </button>
+      </div>
+    </div>
+
+    <!-- 行動選單（預設隱藏） -->
+    <div id="mobile-menu" x-show="mobileMenuOpen" class="md:hidden border-t border-gray-200 pt-3 pb-4 relative z-50">
+      <nav class="flex flex-col space-y-2">
+        <a href="{% url 'pages:download' %}" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">下載專區</a>
+        <a href="{% url 'pages:calculator' %}" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">優惠試算</a>
+        <a href="{% url 'pages:faq' %}" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">關於功能</a>
+        <a href="{% url 'users:member_zone' %}" class="px-2 py-2 rounded-lg text-gray-700 hover:bg-gray-100">會員專區</a>
+      </nav>
+    </div>
+  </div>
+</header>

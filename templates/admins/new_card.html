@@ -1,0 +1,56 @@
+<form
+    id="new_card_form"
+    action="{% url 'admins:new_card' %}"
+    method="post"
+  >
+    {% csrf_token %}
+
+    <div class="py-4 flex flex-col flex-wrap form-card-bg">
+      <h3 class="form-title mb-2">新增卡片</h3>
+      <div class="field-group">
+        <label for="bank" class="field-label required">銀行</label>
+        <select
+          id="bank"
+          name="bank"
+          type="text"
+          class="ui-input"
+          placeholder="輸入銀行"
+          required
+        >
+          <option value="" selected disabled>請選擇銀行</option>
+          {%for bank in banks%}
+          <option value="{{bank}}">{{bank}}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label for="card" class="field-label required">信用卡</label>
+        <input
+          id="card"
+          name="card"
+          type="text"
+          class="ui-input"
+          placeholder="輸入信用卡名"
+          required
+        />
+      </div>
+
+      <div class="field-group flex flex-row items-center">
+        <label for="is_active" class="field-label">發行中？</label>
+        <input
+          id="is_active"
+          name="is_active"
+          class="checkbox mb-2"
+          type="checkbox"
+        />
+      </div>
+
+      <div>
+        <button type="submit" class="ui-btn ui-btn-primary cursor-pointer">
+          新增
+        </button>
+      </div>
+    </div>
+</form>
+

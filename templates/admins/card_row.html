@@ -1,0 +1,39 @@
+<tr id="card-{{card.id}}" class="h-12">
+  <th class="text-center">{{card.id}}</th>
+  <td class="text-center">{{card.name}}</td>
+  <td class="text-center">{{card.bank}}</td>
+
+  {%if card.is_active%}
+  <td class="text-center"><i class="fa-solid fa-check"></i></td>
+  {%else%}
+  <td class="text-center"><i class="fa-solid fa-xmark"></i></td>
+  {%endif%}
+
+  <td class="text-center">{{card.created_at|date:'M d Y'}}</td>
+  <td class="text-center">{{card.updated_at|date:'M d Y'}}</td>
+
+  <td class="text-center text-blue-400">
+
+      <button hx-get="{%url 'admins:edit_card' card.id%}"
+    hx-target="#form_container"
+    hx-swap="innerHTML">
+        <a href="#card_database_title">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </a>
+      </button>
+
+  </td>
+
+  <td class="text-center text-red-400">
+    <form
+        hx-post={%url 'admins:delete_card' card.id%}
+        hx-target="#card-{{card.id}}"
+        hx-swap="outerHTML"
+        hx-confirm="確定要刪除「{{card.name}}」嗎？">
+      {% csrf_token %}
+      <button>
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    </form>
+  </td>
+</tr>

@@ -1,0 +1,24 @@
+<!-- FAQ 完整項目組件（問題 + 答案） -->
+<div class="faq-qa-item">
+  <!-- 問題部分 -->
+  <div class="faq-question cursor-pointer" @click="toggleItem('{{ item_id }}')">
+    <div class="faq-question-text">{{ question_text }}</div>
+    <button class="faq-toggle-btn">
+      {% include 'components/icon.html' with name="chevron-down" size="faq-arrow-icon" class="faq-arrow-icon" %}
+    </button>
+  </div>
+
+  <!-- 答案部分 -->
+  <div class="faq-answer"
+    x-show="isOpen('{{ item_id }}')"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0 transform -translate-y-2"
+    x-transition:enter-end="opacity-100 transform translate-y-0"
+    x-transition:leave="transition ease-in duration-150"
+    x-transition:leave-start="opacity-100 transform translate-y-0"
+    x-transition:leave-end="opacity-0 transform -translate-y-2">
+    <p class="faq-answer-text">
+      {{ answer_text }}
+    </p>
+  </div>
+</div>

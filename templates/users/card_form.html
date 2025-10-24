@@ -1,0 +1,243 @@
+{% extends 'layouts/default.html' %}
+
+{% block title %}新增卡片 - Rewardia{% endblock %}
+
+{% block content %}
+<section class="bg-white" style="margin-top: 130px; padding-bottom: 80px;">
+  <div class="mx-auto max-w-[1360px] px-5 md:px-8">
+    <!-- 區塊標題：新增卡片 -->
+    {% if is_edit_mode %}
+      <h2 class="text-[36px] leading-[0.98] font-bold text-black mb-6" style="margin-top: 5px;">編輯卡片</h2>
+    {% else %}
+      <h2 class="text-[36px] leading-[0.98] font-bold text-black mb-6" style="margin-top: 5px;">新增卡片</h2>
+    {% endif %}
+
+    <!-- 使用 HTMX 處理表單 -->
+    <div class="bg-white rounded-lg overflow-hidden"
+         x-data="{
+           ...card_form({
+           allCards: [
+             {% for card in cards %}
+             {
+               id: {{ card.id }},
+               name: '{{ card.name|escapejs }}',
+               bankName: '{{ card.bank|escapejs }}',
+               imageUrl: '{{ card.image_url|default:""|escapejs }}'
+             }{% if not forloop.last %},{% endif %}
+             {% endfor %}
+           ],
+           {% if is_edit_mode and user_card %}
+           initialBankName: '{{ user_card.card.bank|escapejs }}',
+           initialCardId: {{ user_card.card.id }}
+           {% else %}
+           initialBankName: null,
+           initialCardId: null
+           {% endif %}
+           }),
+           ...card_form_camera()
+         }"
+         x-cloak
+         @open-camera="openCamera()"
+         @open-camera.window="openCamera()">
+
+      <div class="bg-[#F9F9F9] rounded-lg min-h-[407px] p-5 md:p-[21px] md:pt-5 md:pb-8">
+        <!-- 標題列 -->
+        <div class="mb-10 pb-[14px] border-b border-[#D1D5DB]">
+          <h3 class="text-2xl font-bold text-[#5D6970] m-0" style="line-height: 1.21;">我的卡片</h3>
+        </div>
+
+        <!-- 兩欄布局 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-8">
+
+          <!-- 左側：表單區域 -->
+          <div class="space-y-6 lg:order-1 order-2">
+            {% if user_card %}
+            <form id="card-form" method="POST" action="{% url 'users:card_edit' user_card.id %}" class="space-y-6" @submit.prevent="submitForm">
+            {% else %}
+            <form id="card-form" method="POST" action="{% url 'users:card_new' %}" class="space-y-6" @submit.prevent="submitForm">
+            {% endif %}
+              {% csrf_token %}
+
+              <!-- 發卡銀行 -->
+              <div class="relative">
+                <label for="bankSelect" class="block text-lg text-[#111827] mb-2 font-normal">
+                  <span class="text-red-500">* </span>發卡銀行 (必選)
+                </label>
+                <div class="relative">
+                  <select id="bankSelect"
+                          name="bank_name"
+                          class="w-full h-12 rounded-lg bg-white border border-[#D1D5DB] px-4 text-gray-900 transition-colors duration-200 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          aria-label="選擇發卡銀行"
+                          required
+                          x-model="selectedBank"
+                          @change="onBankChange()">
+                    <option value="" class="text-[#949AA6]">可在"卡號輸入"欄位先輸入卡號，系統即會辨識銀行</option>
+                    {% for bank in banks %}
+                    <option value="{{ bank.name }}">{{ bank.name }}</option>
+                    {% endfor %}
+                  </select>
+                  <div class="select-arrow" aria-hidden="true"></div>
+                </div>
+              </div>
+
+              <!-- 卡片 -->
+              <div class="relative">
+                <label for="cardSelect" class="block text-lg text-[#111827] mb-2 font-normal">
+                  <span class="text-red-500">* </span>卡片 (必選)
+                </label>
+                <div class="relative">
+                  <select id="cardSelect"
+                          name="card_id"
+                          class="w-full h-12 rounded-lg bg-white border border-[#D1D5DB] px-4 text-gray-900 transition-colors duration-200 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          aria-label="選擇卡片"
+                          required
+                          x-model="selectedCard"
+                          @change="updateCardPreview()">
+
+                    <!-- Alpine.js 動態產生選項 -->
+                    <option value="" selected disabled class="text-[#949AA6]" x-show="!selectedBank">請先選擇發卡銀行</option>
+                    <option value="" selected disabled class="text-[#949AA6]" x-show="selectedBank && availableCards.length === 0">該銀行暫無可選卡片</option>
+                    <option value="" disabled class="text-[#949AA6]" x-show="selectedBank && availableCards.length > 0">選擇卡片</option>
+
+                    <template x-for="card in availableCards" :key="card.id">
+                      <option :value="card.id" x-text="card.name"></option>
+                    </template>
+
+                  </select>
+                  <div class="select-arrow" aria-hidden="true"></div>
+                </div>
+              </div>
+
+              <!-- 卡號識別 -->
+              <div class="relative">
+                <label for="cardNumberInput" class="block text-lg text-[#111827] mb-2 font-normal">
+                  卡號輸入 (選填)
+                </label>
+                <input type="text"
+                       id="cardNumberInput"
+                       class="w-full h-12 rounded-lg bg-white border border-[#D1D5DB] px-4 text-gray-900 transition-colors duration-200 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                       placeholder="可輸入信用卡卡號或按下擷取卡號按鈕開啟相機功能"
+                       maxlength="19"
+                       :value="manualCardNumber"
+                       x-on:input="formatCardInput($event)">
+
+                <!-- 銀行辨識狀態顯示 -->
+                <div x-show="bankRecognitionInProgress || bankRecognitionMessage" 
+                     class="mt-2 text-sm" 
+                     x-transition>
+                  <!-- 辨識中 -->
+                  <div x-show="bankRecognitionInProgress" 
+                       class="flex items-center text-blue-600">
+                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    正在辨識銀行...
+                  </div>
+                  
+                  <!-- 辨識結果 -->
+                  <div x-show="!bankRecognitionInProgress && bankRecognitionMessage" 
+                       class="flex items-center"
+                       :class="{
+                         'text-green-600': bankRecognitionMessage.includes('成功'),
+                         'text-orange-500': bankRecognitionMessage.includes('失敗'),
+                         'text-gray-600': !bankRecognitionMessage.includes('成功') && !bankRecognitionMessage.includes('失敗')
+                       }">
+                    <span x-text="bankRecognitionMessage"></span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 隱藏的卡號輸入欄位 -->
+              <input type="hidden" id="card-number-input" name="card_number" x-model="recognizedCardNumber">
+
+            </form>
+
+            <!-- 按鈕排列：小螢幕垂直排列，大螢幕水平排列 -->
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+              <!-- 擷取卡號按鈕和說明文字 -->
+              <div class="flex flex-col order-1 sm:order-1">
+                <button type="button"
+                        @click="openCamera({ isCardForm: true })"
+                        class="inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors w-full sm:w-fit">
+                  {% include 'components/icon.html' with name="camera" size="w-5 h-5" class="mr-2" %}
+                  擷取卡號
+                </button>
+                <p class="text-sm text-gray-600 mt-1">使用攝影機識別卡號</p>
+              </div>
+
+              <!-- 新增卡片與取消按鈕 -->
+              <div class="flex flex-col sm:flex-row gap-4 order-2 sm:order-2">
+                {% if user_card %}
+                  <button type="button"
+                          @click="submitForm($event)"
+                          class="inline-flex items-center justify-center rounded-lg w-full sm:w-[132px] h-[52px] px-6 font-medium transition-colors duration-200 select-none bg-[#2060B9] text-white hover:bg-[#1c55a4] active:bg-[#184a90] disabled:bg-[#9BB6DD] disabled:cursor-not-allowed disabled:opacity-70">
+                    更新卡片
+                  </button>
+                {% else %}
+                  <button type="button"
+                          @click="submitForm($event)"
+                          :disabled="!selectedBank || !selectedCard"
+                          class="inline-flex items-center justify-center rounded-lg w-full sm:w-[132px] h-[52px] px-6 font-medium transition-colors duration-200 select-none bg-[#2060B9] text-white hover:bg-[#1c55a4] active:bg-[#184a90] disabled:bg-[#9BB6DD] disabled:cursor-not-allowed disabled:opacity-70"
+                          :class="(!selectedBank || !selectedCard) ? 'bg-[#9BB6DD] cursor-not-allowed opacity-70' : 'bg-[#2060B9] hover:bg-[#1c55a4] active:bg-[#184a90]'">
+                    新增卡片
+                  </button>
+                {% endif %}
+
+                <a href="{% url 'users:member_zone' %}"
+                   class="inline-flex items-center justify-center rounded-lg w-full sm:w-[132px] h-[52px] px-6 font-medium transition-colors duration-200 select-none bg-[#E5E7EB] text-gray-900 hover:bg-gray-300 active:bg-gray-400">
+                  取消
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- 右側：卡片預覽區域 -->
+          <div class="flex flex-col lg:order-2 order-1">
+            <!-- 卡片預覽 -->
+            <div class="flex-1 bg-white rounded-lg p-4 shadow-sm flex flex-col">
+              <!-- 卡片圖片 -->
+              <div class="flex-1 flex items-center justify-center">
+                <!-- 固定尺寸的圖片容器 -->
+                <div class="w-full max-w-lg mx-auto h-64 bg-white rounded-lg shadow-md flex items-center justify-center relative overflow-hidden border border-gray-200">
+                  <!-- 有圖片時顯示 -->
+                  <img id="card-preview-img"
+                       src=""
+                       alt="卡片預覽"
+                       class="w-full h-full object-contain rounded-lg"
+                       x-show="selectedCard && cardPreview.imageUrl"
+                       x-bind:src="cardPreview.imageUrl">
+                  
+                  <!-- 沒有圖片時的佔位符 -->
+                  <div x-show="!selectedCard || !cardPreview.imageUrl"
+                       class="flex flex-col items-center justify-center text-gray-400">
+                    <div class="w-16 h-16 mb-2">
+                      {% include 'components/icon.html' with name="image" size="w-full h-full" %}
+                    </div>
+                    <span class="text-sm">請選擇卡片</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 卡片資訊 - 水平排列在最下方左側 -->
+              <div class="flex items-center gap-3 mt-4">
+                <h5 id="card-preview-name"
+                    class="text-lg md:text-lg lg:text-xl font-bold text-gray-900"
+                    x-text="cardPreview.name || '請選擇卡片'"></h5>
+                <span class="text-gray-400">|</span>
+                <p id="card-preview-bank"
+                   class="text-base font-semibold text-gray-600"
+                   x-text="cardPreview.bank || '-'"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 攝影機模態框 - 移到 x-data 作用域內 -->
+        {% include 'components/card_camera_modal.html' %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends 'admins/default.html' %} {%block content%}
+<section
+  class="relative mx-4 sm:mx-6 lg:mx-10 mb-4 sm:mb-6 lg:mb-8 mt-20 overflow-hidden"
+  x-bind:class="{ 'banner-hidden': !$store.banner.visible }"
+>
+  <div class="my-4 sm:mb-6 flex flex-row items-center">
+    <h2
+      id="card_database_title"
+      class="text-2xl sm:text-2xl lg:text-2xl font-bold text-black"
+    >
+      卡片資料庫
+    </h2>
+
+    <div id="new_card_button">
+      <button
+        hx-get="{% url 'admins:new_card' %}"
+        hx-target="#form_container"
+        hx-swap="innerHTML"
+        hx-disabled-elt="this"
+        class="ui-btn ui-btn-primary cursor-pointer mx-4 my-4"
+      >
+        <a href="#card_database_title"> 新增卡片 </a>
+      </button>
+    </div>
+  </div>
+
+  <div id="form_container"></div>
+
+  <div id="cards_db" class="overflow-x-auto">
+    <table class="table table-zebra w-full">
+      <!-- head -->
+      <thead>
+        <tr>
+          <th class="text-center">ID</th>
+          <th class="text-center">信用卡</th>
+          <th class="text-center">銀行</th>
+          <th class="text-center">
+            <div class="flex items-center justify-center gap-1">
+              發行中
+              <div class="flex flex-col">
+                <a href="?sort=is_active_desc" class="text-gray-400 hover:text-gray-600 text-xs">▲</a>
+                <a href="?sort=is_active_asc" class="text-gray-400 hover:text-gray-600 text-xs">▼</a>
+              </div>
+            </div>
+          </th>
+          <th class="text-center">
+            <div class="flex items-center justify-center gap-1">
+              建立時間
+              <div class="flex flex-col">
+                <a href="?sort=created_at_desc" class="text-gray-400 hover:text-gray-600 text-xs">▲</a>
+                <a href="?sort=created_at_asc" class="text-gray-400 hover:text-gray-600 text-xs">▼</a>
+              </div>
+            </div>
+          </th>
+          <th class="text-center">
+            <div class="flex items-center justify-center gap-1">
+              最近更新時間
+              <div class="flex flex-col">
+                <a href="?sort=updated_at_desc" class="text-gray-400 hover:text-gray-600 text-xs">▲</a>
+                <a href="?sort=updated_at_asc" class="text-gray-400 hover:text-gray-600 text-xs">▼</a>
+              </div>
+            </div>
+          </th>
+        </tr>
+      </thead>
+      <tbody id="card_body">
+        <!-- row 1 -->
+        {%for card in cards%} {%include 'admins/card_row.html'%} {%endfor%}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{%endblock%}

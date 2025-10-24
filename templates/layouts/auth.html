@@ -1,0 +1,30 @@
+{% load static%}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rewardia</title>
+  <link rel="icon" type="image/x-icon" href="https://rewardia-web-pic.s3.ap-southeast-2.amazonaws.com/web-pic/Rewardia_logo.ico">
+  {%load static%}
+  <link rel="stylesheet" href="{% static 'styles/style.css' %}?v={{ STATIC_VERSION }}">
+  <script type="module" src="{% static 'scripts/app.js' %}?v={{ STATIC_VERSION }}"></script>
+</head>
+<body x-data="header()" @scroll.window="handleScroll()" class="{% if user.is_authenticated %}user-logged-in{% endif %}" {% if user.is_authenticated %}data-user-id="{{ user.id }}"{% endif %}>
+    <main class="auth-page">
+      {% include 'layouts/messages.html' %} {% block content %} {% endblock %}
+    </main>
+  {% include 'layouts/header.html' %}
+
+  <!-- AI 聊天機器人組件 - 不在登入和註冊頁面顯示 -->
+  {% if not hide_chatbot %}
+    {% include 'components/chatbot.html' %}
+  {% endif %}
+
+  {% include 'layouts/footer.html' %}
+
+
+
+</body>
+</html>

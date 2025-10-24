@@ -1,0 +1,88 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: rewardia-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - rewardia-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: rewardia-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - rewardia-network
+
+  rewardia:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rewardia-app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - AUTOSTART_WEB=true
+      - AUTOSTART_CRAWLER=true
+      - CRAWLER_SCHEDULE=${CRAWLER_SCHEDULE}
+      - HOME_SELENIUM_URL=${HOME_SELENIUM_URL}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - USE_S3=${USE_S3}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_STORAGE_BUCKET_NAME=${AWS_STORAGE_BUCKET_NAME}
+      - AWS_S3_REGION_NAME=${AWS_S3_REGION_NAME}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GOOGLE_CLOUD_VISION_API_KEY=${GOOGLE_CLOUD_VISION_API_KEY}
+      - FERNET_KEY=${FERNET_KEY}
+      - BIN_API_KEY=${BIN_API_KEY}
+
+    volumes:
+      - ./public:/app/public
+      - app_logs:/var/log/supervisor
+    networks:
+      - rewardia-network
+    restart: unless-stopped
+
+  nginx-proxy-manager:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx-proxy-manager
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "81:81"
+    volumes:
+      - nginx-data:/data
+      - nginx-letsencrypt:/etc/letsencrypt
+      - ./public:/var/www/rewardia/public:ro
+    networks:
+      - rewardia-network
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+  redis_data:
+  app_logs:
+  nginx-data:
+  nginx-letsencrypt:
+
+networks:
+  rewardia-network:
+    driver: bridge

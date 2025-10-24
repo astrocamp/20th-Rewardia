@@ -1,0 +1,61 @@
+{% comment %} 編輯卡片時的表單 {% endcomment %}
+<form
+  action="{% url 'admins:update_card' card.id %}"
+  method="post"
+>
+    {% csrf_token %}
+    <div class="py-4 flex flex-col flex-wrap form-card-bg">
+      <h3 class="form-title mb-2">編輯卡片</h3>
+      <label class="field-label">Card ID: {{card.id}}</label>
+      <div class="field-group">
+        <label for="card_edit" class="field-label">信用卡</label>
+        <input
+          id="card_edit"
+          class="ui-input"
+          name="card_edit"
+          type="text"
+          value="{{card.name}}"
+        />
+      </div>
+
+      <div class="field-group">
+        <label for="bank_edit" class="field-label">銀行</label>
+        <select
+          id="bank_edit"
+          name="bank_edit"
+          type="text"
+          class="ui-input"
+          placeholder="輸入銀行"
+          required
+        >
+          <option value="{{card.bank}}" selected>{{card.bank}}</option>
+          {%for bank in banks%}
+            {%if card.bank != bank%}
+              <option value="{{bank}}">{{bank}}</option>
+            {%endif%}
+          {% endfor %}
+        </select>
+      </div>
+
+
+
+
+      <div class="field-group flex flex-row items-center">
+        <label for="is_active_edit" class="field-label">發行中？</label>
+        {%if card.is_active%}
+        <input id="is_active_edit" class="checkbox mb-2" name="is_active_edit" type="checkbox" checked />
+        {%else%}
+        <input id="is_active_edit" class="checkbox mb-2" name="is_active_edit" type="checkbox" />
+         {%endif%}
+      </div>
+
+
+      <div>
+        <button type="submit" class="ui-btn ui-btn-primary cursor-pointer">
+          儲存
+        </button>
+      </div>
+    </div>
+</form>
+
+

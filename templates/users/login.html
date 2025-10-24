@@ -1,0 +1,78 @@
+{% extends 'layouts/auth.html' %}
+
+{% block title %}登入 - Rewardia{% endblock %}
+
+{% block content %}
+{% include 'components/auth-shared.html' with component="page-container" title="登入" %}
+
+<!-- Django Messages 顯示區域 -->
+{% if messages %}
+  <div class="space-y-2 mb-4" x-data="toast_fadeout" x-show="show">
+    {% for message in messages %}
+      <div class="tw-toast {{ message.tags }}" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+        <span>{{ message }}</span>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<!-- 主要登入表單 -->
+<form class="space-y-3" 
+      x-data="login_form" 
+      x-cloak
+      novalidate
+      method="post"
+      action="{% url 'sessions:login' %}"
+      @submit.prevent="submitForm($event)">
+  {% csrf_token %}
+  <!-- 帳號欄位 -->
+  <div class="register-field-container">
+    <label for="username" class="register-label">帳號</label>
+    <div class="register-relative-container">
+      <input type="text" id="username" name="username" placeholder="請輸入您的帳號" class="register-input" autocomplete="username" required
+            x-model="formData.username"
+            @blur="validateField('username')">
+    </div>
+    <div x-show="errors.username" class="text-error text-sm mt-1" x-text="errors.username"></div>
+  </div>
+
+  <!-- 密碼欄位 -->
+  <div class="register-field-container">
+      <label for="password" class="register-label">密碼</label>
+      <div class="register-relative-container">
+          <input :type="passwordVisible ? 'text' : 'password'"
+                id="password"
+                name="password"
+                placeholder="請輸入您的密碼"
+                class="register-input pr-12"
+                autocomplete="current-password"
+                required
+                x-model="formData.password"
+                @blur="validateField('password')">
+          <button type="button" class="password-toggle-btn" @click="togglePassword()" :aria-label="passwordVisible ? '隱藏密碼' : '顯示密碼'">
+              <div x-show="!passwordVisible">
+                  {% include 'components/icon.html' with name="eye" class="w-6 h-6" %}
+              </div>
+                      <div x-show="passwordVisible">
+          {% include 'components/icon.html' with name="eye-off" class="w-6 h-6" %}
+        </div>
+          </button>
+      </div>
+      <div x-show="errors.password" class="text-error text-sm mt-1" x-text="errors.password"></div>
+  </div>
+
+  <!-- 主要登入按鈕 -->
+  {% include 'components/auth-shared.html' with component="primary-button" button_text="登入" %}
+</form>
+
+<!-- 分隔線 -->
+{% include 'components/auth-shared.html' with component="divider" %}
+
+<!-- Google 登入按鈕 -->
+{% include 'components/auth-shared.html' with component="google-button" action="登入" button_id="google-login" aria_label="使用 Google 帳號登入" %}
+
+<!-- 註冊連結 -->
+{% include 'components/auth-shared.html' with component="bottom-link" prefix_text="還沒有帳戶？" link_text="立即註冊" link_url="users:register" %}
+
+{% include 'components/auth-shared.html' with component="page-container-end" %}
+{% endblock %}

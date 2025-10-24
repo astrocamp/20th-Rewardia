@@ -1,0 +1,213 @@
+{% extends 'layouts/default.html' %}
+
+{% block title %}首頁 - Rewardia{% endblock %}
+
+{% block content %}
+<!-- 主要橫幅區域 (Banner) -->
+<div class="main-page">
+<section class="relative mx-4 sm:mx-6 lg:mx-10 mb-4 sm:mb-6 lg:mb-8 banner-spacing overflow-hidden"
+         x-bind:class="{
+           'banner-hidden': !$store.banner.visible,
+           'banner-transitioning': $store.banner.isTransitioning
+         }">
+  <!-- 頁面標題 - 在 banner 圖上方 -->
+  <div class="mb-4 sm:mb-6">
+    <h2 class="text-4xl font-bold text-black">首頁</h2>
+  </div>
+
+  <!-- Banner 圖區域 -->
+  <div class="relative h-[300px] sm:h-[350px] lg:h-[400px] overflow-hidden rounded-lg">
+    <!-- 背景圖片 -->
+    <div class="absolute inset-0">
+      <img src="https://rewardia-web-pic.s3.ap-southeast-2.amazonaws.com/web-pic/download-index.webp"
+        alt="Rewardia Banner Background"
+        loading="eager"
+        class="w-full h-full object-cover object-[70%_9%]">
+    </div>
+
+    <!-- 內容區域 - 限制在左半邊 -->
+    <div class="relative z-10 flex items-center h-full download-banner-content">
+      <div class="text-white px-4 sm:px-8 lg:px-12">
+        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 lg:mb-8 leading-tight tracking-wide max-w-md sm:max-w-[28rem] lg:max-w-none">
+          每次購物都能<br class="sm:inline md:inline lg:hidden">獲得現金回饋
+        </h1>
+        <div class="flex flex-col lg:flex-row gap-3 sm:gap-4 lg:gap-6 items-start">
+          <a href="{{ chrome_web_store_url }}" id="chrome-download-btn" class="download-btn-secondary download-btn-banner" target="_blank" rel="noopener noreferrer">
+            免費新增至 Chrome
+          </a>
+          <a href="{% url 'sessions:login' %}" id="member-join-btn" class="download-btn-primary download-btn-banner">
+            立即比較，加入會員
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 卡片總覽區塊 -->
+<section class="mx-4 sm:mx-6 lg:mx-10 my-8 sm:my-12 lg:my-16" x-data="main_search({
+  userCardIds: [
+    {% for card_id in user_card_ids %}
+    {{ card_id }}{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ],
+  isAuthenticated: {{ is_authenticated|yesno:"true,false" }}
+})" x-cloak>
+  <!-- 卡片總覽標題 -->
+  <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-8 sm:mb-12 text-left font-sans leading-tight">
+    卡片總覽
+  </h2>
+
+  <!-- 搜尋區域 -->
+  <div class="mb-8">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-300 overflow-hidden">
+      <div class="flex flex-col sm:flex-row search-form-container">
+        <!-- 選擇銀行 -->
+        <div class="flex-1 border-b sm:border-b-0 sm:border-r border-gray-200">
+          <select x-model="selectedBank" @change="onBankChange" class="horizontal-search-select search-select-height search-select-padding">
+            <option value="">選擇銀行</option>
+            <template x-for="bank in banks" :key="bank.code">
+              <option :value="bank.name" x-text="bank.name"></option>
+            </template>
+          </select>
+        </div>
+
+        <!-- 選擇優惠類別 -->
+        <div class="flex-1 border-b sm:border-b-0 sm:border-r border-gray-200">
+          <select x-model="selectedReward" @change="onRewardChange" class="horizontal-search-select search-select-height search-select-padding">
+            <option value="">選擇優惠類別</option>
+            <template x-for="[code, display] in rewardCategoriesChoices" :key="code">
+              <option :value="code" x-text="display"></option>
+            </template>
+          </select>
+        </div>
+
+        <!-- 選擇店家 -->
+        <div class="flex-1 border-b sm:border-b-0 sm:border-r border-gray-200">
+          <select x-model="selectedMerchant" @change="onMerchantChange" class="horizontal-search-select search-select-height search-select-padding">
+            <option value="">選擇店家</option>
+            <template x-for="merchant in merchants" :key="merchant.code">
+              <option :value="merchant.name" x-text="merchant.name"></option>
+            </template>
+          </select>
+        </div>
+
+        <!-- 搜尋輸入 -->
+        <div class="flex-1">
+          <input type="text" x-model="searchKeyword" @input="performSearch" placeholder="請輸入關鍵字" class="horizontal-search-input search-input-height search-input-padding">
+        </div>
+      </div>
+    </div>
+
+  <!-- 卡牌式展示區域（畫面b）- 初始狀態 -->
+          <div x-show="viewMode === 'grid'" class="grid-view-container mt-6 max-h-[80vh] overflow-y-auto" @scroll="handleScroll">
+    <div class="credit-card-grid">
+      <template x-for="card in allCards.slice(0, loadedCount)" :key="card.id">
+        <div class="credit-card-item">
+          <!-- 卡片圖片 -->
+          <div class="card-image-container">
+            <img :src="card.image" :alt="card.name" class="card-image" x-show="card.image">
+          </div>
+          <!-- 卡片資訊 -->
+          <div class="card-info-container">
+            <div class="card-title-container">
+              <h3 x-text="card.name" class="card-title"></h3>
+            </div>
+            <div class="card-bank-container">
+              <p x-text="card.bank" class="card-bank"></p>
+              <!-- 你的卡片標籤 -->
+              <template x-if="isUserCard(card.id)">
+                <span class="user-card-label">你的卡片</span>
+              </template>
+            </div>
+            <!-- 主要優惠 -->
+            <template x-if="card.rewards && card.rewards.length > 0">
+              <div class="card-main-reward">
+                <div class="reward-highlight-item">
+                  <span x-text="card.rewards[0].category" class="reward-category-text"></span>
+                  <span x-text="getRewardRate(card.rewards[0]) + '%'" class="reward-rate-text"></span>
+                  <span x-text="card.rewards[0].reward_type" class="reward-type-text"></span>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <!-- 網格視圖載入更多指示器 -->
+    <div x-show="hasMoreCards()" class="text-center py-6">
+      <div class="text-gray-500">
+        向下滾動載入更多卡片...
+      </div>
+    </div>
+
+    <!-- 網格視圖沒有更多卡片時的提示 -->
+    <div x-show="!hasMoreCards() && allCards.length > 0" class="text-center py-6 text-gray-500">
+      已顯示所有卡片
+    </div>
+  </div>
+
+  <!-- 搜尋結果區域（畫面a）- 搜尋後顯示 -->
+  <div x-show="viewMode === 'list'" class="grid gap-6 mt-6 max-h-[80vh] overflow-y-auto" @scroll="handleScroll">
+    <template x-for="card in allCards.slice(0, loadedCount)" :key="card.id">
+      <div class="card-result-item list-card-layout">
+        <!-- 左側：信用卡名稱和圖片（垂直布局） -->
+        <div class="list-card-left">
+          <!-- 上方：卡片名稱和銀行 -->
+          <div class="list-card-header">
+            <div class="list-card-title-container">
+              <h3 x-text="card.name" class="list-card-title"></h3>
+              <!-- 你的卡片標籤 -->
+              <template x-if="isUserCard(card.id)">
+                <span class="list-user-card-label">你的卡片</span>
+              </template>
+            </div>
+            <p x-text="card.bank" class="list-card-bank"></p>
+          </div>
+          <!-- 下方：信用卡圖片 -->
+          <div class="list-card-image-container">
+            <img :src="card.image" :alt="card.name" class="list-card-image" x-show="card.image">
+          </div>
+        </div>
+
+        <!-- 右側：優惠條件列表 -->
+        <div class="list-card-right">
+          <template x-for="(reward, index) in card.rewards.slice(0, 4)" :key="index">
+            <div>
+              <!-- 項目名稱與數值 - 左右排列 -->
+              <div class="list-reward-row" :class="index === 0 && isMatchingReward(reward) ? 'list-reward-highlight' : ''">
+                <div class="list-reward-category" x-text="reward.category + ' - ' + reward.scope"></div>
+                <div class="list-reward-rate" x-text="reward.rate"></div>
+              </div>
+              <!-- 回饋類型 -->
+              <div class="list-reward-type" x-text="reward.reward_type" x-show="reward.reward_type"></div>
+              <!-- 分隔線（除了最後一項） -->
+              <div x-show="index < card.rewards.slice(0, 4).length - 1" class="list-reward-divider"></div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </template>
+
+    <!-- 載入更多指示器 -->
+    <div x-show="hasMoreCards()" class="text-center py-6">
+      <div x-show="!isLoadingMore" class="text-gray-500">
+        向下滾動載入更多卡片...
+      </div>
+      <div x-show="isLoadingMore" class="flex justify-center items-center space-x-2">
+        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+        <span class="text-gray-500">載入中...</span>
+      </div>
+    </div>
+
+    <!-- 沒有更多卡片時的提示 -->
+    <div x-show="!hasMoreCards() && allCards.length > 0" class="text-center py-6 text-gray-500">
+      已顯示所有相關卡片
+    </div>
+  </div>
+</section>
+
+</div>
+{% endblock %}
+
