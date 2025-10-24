@@ -1,0 +1,214 @@
+
+<!-- 攝影機模態框 -->
+<div x-show="showModal" 
+     x-transition:enter="transition-fade-in"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition-fade-out"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     class="fixed inset-0 z-[9999] bg-black/80"
+     @keydown.escape="closeCamera()"
+     @keydown.window.space.prevent="if(showModal) { captureAndRecognize(); }"
+     x-cloak>
+  
+  <!-- 背景遮罩 -->
+  <div class="card-camera-modal-backdrop"></div>
+  
+  <!-- 模態框內容 -->
+  <div class="flex min-h-full items-center justify-center p-2 sm:p-4">
+    <div class="relative bg-white rounded-lg shadow-2xl w-full max-w-sm sm:max-w-md max-h-[90vh] overflow-y-auto">
+      
+      <!-- 標題列 -->
+      <div class="flex items-center justify-between p-3 sm:p-6 border-b border-gray-200">
+        <h3 class="text-base sm:text-lg font-semibold text-gray-900 m-0">信用卡卡號識別</h3>
+        <button @click="closeCamera()" 
+                class="text-gray-400 bg-none border-none cursor-pointer p-1 hover:text-gray-600">
+          {% include 'components/icon.html' with name="close" size="w-6 h-6" %}
+        </button>
+      </div>
+      
+      <!-- 攝影機區域 -->
+      <div class="p-2 sm:p-4">
+        <div class="relative bg-gray-800 rounded-lg overflow-hidden w-full max-w-xs mx-auto">
+          
+          <!-- 攝影機預覽 -->
+          <div class="relative aspect-[1.55] bg-black w-full max-w-xs mx-auto overflow-hidden">
+            <video x-ref="video"
+                   autoplay
+                   muted
+                   playsinline
+                   webkit-playsinline
+                   class="w-full h-full object-cover">
+            </video>
+            
+            <!-- 取景框遮罩 -->
+            <div x-ref="overlay" class="absolute inset-0 pointer-events-none">
+              <!-- 上半部分遮罩 -->
+              <div class="absolute top-0 left-0 right-0 bg-black/50 h-[55%]"></div>
+              
+              <!-- 下半部分遮罩 -->
+              <div class="absolute bottom-0 left-0 right-0 bg-black/50 h-[25%]"></div>
+              
+              <!-- 左側遮罩 -->
+              <div class="absolute left-0 top-[65%] -translate-y-1/2 bg-black/50 w-[5%] h-[20%]"></div>
+              
+              <!-- 右側遮罩 -->
+              <div class="absolute right-0 top-[65%] -translate-y-1/2 bg-black/50 w-[5%] h-[20%]"></div>
+              
+              <!-- 取景框邊框 -->
+              <div x-ref="frame"
+                   class="absolute top-[65%] left-1/2 -translate-x-1/2 -translate-y-1/2 border-2 border-dashed border-white w-[90%] h-[20%]">
+              </div>
+              
+              <!-- 對齊指示器 -->
+              <div class="absolute top-[65%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-center">
+                <div class="text-sm mb-2">卡號對準此框並確保清晰</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 隱藏的 canvas 用於拍照 -->
+          <canvas x-ref="canvas" class="hidden"></canvas>
+        </div>
+        
+        <!-- 錯誤訊息 -->
+        <div x-show="error" 
+             x-transition
+             class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div class="flex">
+            {% include 'components/icon.html' with name="warning" size="w-5 h-5" class="text-red-400 mr-2" %}
+            <p class="text-sm text-red-700 m-0" x-text="error"></p>
+          </div>
+        </div>
+        
+        <!-- 控制按鈕 -->
+        <div class="mt-4 sm:mt-6 flex flex-row items-center justify-center gap-2 sm:gap-4">
+          
+          <!-- 拍照按鈕 -->
+          <button @click="captureAndRecognize()"
+                  :disabled="!cameraOpen || processing"
+                  class="inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-4 text-white border-none rounded-lg cursor-pointer font-medium text-xs sm:text-base disabled:bg-gray-400 disabled:cursor-not-allowed w-[120px]"
+                  :class="(!cameraOpen || processing) ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600'"
+                  x-text="processing ? '識別中...' : '拍照識別'">
+          </button>
+          
+          <!-- 手動輸入按鈕 -->
+          <button x-show="error && retries >= maxRetries"
+                  @click="openManualInput()"
+                  class="inline-flex items-center px-4 sm:px-10 py-2 sm:py-4 bg-gray-500 text-white border-none rounded-lg cursor-pointer font-medium text-xs sm:text-base"
+            {% include 'components/icon.html' with name="edit" size="w-4 h-4" class="mr-2" %}
+            手動輸入
+          </button>
+          
+          <!-- 取消按鈕 -->
+          <button @click="closeCamera()"
+                  class="inline-flex items-center justify-center px-4 sm:px-10 py-2 sm:py-4 bg-gray-500 border-none rounded-lg cursor-pointer font-medium text-xs sm:text-base w-[120px]" 
+                  style="background-color: #6b7280; color: white;">
+            取消
+          </button>
+        </div>
+        
+        <!-- 使用說明 -->
+        <div class="mt-4 text-center text-sm text-gray-500">
+          <p class="m-0">卡號對準白色虛線框並確保清晰後可點擊拍照或按空白鍵</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 卡號編輯模態框 -->
+<div x-show="showEdit"
+     x-transition:enter="transition-fade-in"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition-fade-out"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     class="fixed inset-0 z-[9999] bg-black/80"
+     @keydown.escape="cancelEdit()"
+     x-cloak>
+  
+  <!-- 模態框內容 -->
+  <div class="flex min-h-full items-center justify-center p-2 sm:p-4">
+    <div class="relative bg-white rounded-lg shadow-2xl w-full max-w-sm sm:max-w-md max-h-[90vh] overflow-y-auto">
+      
+      <!-- 標題列 -->
+      <div class="flex items-center justify-between p-3 sm:p-6 border-b border-gray-200">
+        <h3 class="text-base sm:text-lg font-semibold text-gray-900 m-0">請確認掃描後信用卡卡號</h3>
+        <button @click="cancelEdit()" 
+                class="text-gray-400 bg-none border-none cursor-pointer p-1 hover:text-gray-600">
+          {% include 'components/icon.html' with name="close" size="w-6 h-6" %}
+        </button>
+      </div>
+      
+      <!-- 內容區域 -->
+      <div class="p-3 sm:p-6">
+        
+        <!-- 識別結果顯示 -->
+        <div x-show="maskedNumber" class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            識別結果（遮蔽顯示）：
+          </label>
+          <div class="p-3 bg-gray-100 rounded font-mono text-base text-gray-500">
+            <span x-text="formatCardNumber(maskedNumber)"></span>
+          </div>
+        </div>
+        
+        <!-- 可編輯輸入框 -->
+        <div>
+          <label for="cardNumberInput" class="block text-sm font-medium text-gray-700 mb-2">
+            <span class="text-red-500">* </span>信用卡卡號：
+          </label>
+          <input type="text" 
+                 id="cardNumberInput"
+                 x-model="editNumber"
+                 placeholder="可手動輸入或修改您的信用卡卡號"
+                 maxlength="19"
+                 class="w-full p-3 border border-gray-300 rounded text-base font-mono focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                 @input="formatCardInput($event)"
+                 @keydown.backspace="formatCardInput($event)"
+                 @keydown.delete="formatCardInput($event)">
+          <p class="text-xs text-gray-500 mt-1 mb-0">
+            請輸入完整的16位卡號
+          </p>
+        </div>
+        
+        <!-- Luhn 驗證狀態 -->
+        <div x-show="luhnValid !== null" class="mt-4">
+          <div :class="luhnValid ? 'bg-green-50 border-green-200 text-green-800' : 'bg-yellow-50 border-yellow-200 text-yellow-800'"
+               class="p-3 rounded border">
+            <div class="flex items-center">
+              <div class="w-5 h-5 mr-2">
+                <div x-show="luhnValid">{% include 'components/icon.html' with name="check" size="w-5 h-5" class="text-green-500" %}</div>
+                <div x-show="!luhnValid">{% include 'components/icon.html' with name="warning" size="w-5 h-5" class="text-yellow-500" %}</div>
+              </div>
+              <span class="text-sm font-medium" 
+                    x-text="luhnValid ? '卡號格式驗證通過' : '掃描的結果可能不正確，請您務必檢查或手動修改'"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 按鈕區域 -->
+      <div class="px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200 flex flex-row gap-2 sm:gap-3 justify-end">
+        <button @click="cancelEdit()"
+                class="inline-flex items-center px-4 py-2 bg-gray-500 text-white border-none rounded cursor-pointer font-medium">
+          取消
+        </button>
+        <button @click="retryRecognition()"
+                class="inline-flex items-center px-3 py-2 bg-green-500 text-white border-none rounded cursor-pointer font-medium text-xs">
+          {% include 'components/icon.html' with name="retry" size="w-4 h-4" class="mr-2" %}
+          重新辨識
+        </button>
+        <button @click="confirmCardNumber()"
+                :disabled="!editNumber || editNumber.replace(/\D/g, '').length < 12"
+                class="inline-flex items-center px-3 py-2 text-white border-none rounded cursor-pointer font-medium text-xs disabled:bg-gray-400 disabled:cursor-not-allowed"
+                :class="(!editNumber || editNumber.replace(/\D/g, '').length < 12) ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600'">
+          確認使用
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

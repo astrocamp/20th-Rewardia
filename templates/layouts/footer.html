@@ -1,0 +1,71 @@
+<footer class="bg-gray-900 text-white py-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- 桌機：左一 320px / 左二 220px / 左三 吃滿剩餘 -->
+    <div class="grid grid-cols-1 lg:grid-cols-[320px_220px_minmax(0,1fr)] gap-12 items-start">
+
+      <!-- 左一：品牌（約 320px） -->
+      <div class="space-y-6">
+        <h3 class="text-4xl font-bold uppercase tracking-wider">Rewardia</h3>
+        <p class="text-gray-300 text-lg">一張卡，省下你的每一塊</p>
+        <div class="flex items-center gap-4">
+          <a href="https://github.com/astrocamp/20th-Rewardia" aria-label="GitHub" class="text-white hover:text-gray-300 transition-colors">
+            {% include 'components/icon.html' with name="github" size="w-6 h-6" %}
+          </a>
+        </div>
+        <p class="text-gray-400 text-sm">&copy; 2025</p>
+      </div>
+
+      <!-- 左二：聯絡（約 220px，置左對齊） -->
+      <div>
+        <h4 class="text-lg font-semibold mb-4">聯絡我們</h4>
+        <ul class="space-y-2 text-gray-300">
+          <li><a href="{%url 'pages:privacy'%}" class="hover:text-white transition-colors">隱私權政策</a></li>
+          <li><a href="{%url 'pages:tos'%}" class="hover:text-white transition-colors">服務條款</a></li>
+        </ul>
+      </div>
+
+      <!-- 左三：訂閱我們 -->
+      <div x-data="subscribe_form">
+        <h4 class="text-lg font-semibold mb-4">訂閱我們</h4>
+        <form class="space-y-3" @submit.prevent="submitForm()">
+          {% csrf_token %}
+          <label for="subscribe-email" class="sr-only">Email 訂閱</label>
+          <div class="flex items-stretch gap-0 flex-nowrap w-full">
+            <input
+              id="subscribe-email"
+              type="email"
+              x-model="email"
+              placeholder="輸入您的信箱，不錯過任何更新優惠通知"
+              class="flex-grow min-w-[250px] px-4 py-3 bg-gray-800 text-white placeholder-gray-400 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              :class="{ 'ring-red-500 ring-2': message && messageType === 'error' }"
+              aria-label="訂閱電子報 Email"
+              :disabled="isSubmitting"
+            />
+            <button
+              type="submit"
+              class="px-6 py-3 bg-white text-gray-900 font-medium rounded-r-lg hover:bg-gray-100 transition-colors shrink-0 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+              :disabled="isSubmitting"
+            >
+              <span x-show="!isSubmitting">訂閱</span>
+              <span x-show="isSubmitting">訂閱中...</span>
+            </button>
+          </div>
+
+          <!-- 訊息顯示區域 -->
+          <div x-show="message" x-transition class="mt-2">
+            <p
+              class="text-sm px-2"
+              :class="{
+                'text-green-400': messageType === 'success',
+                'text-red-400': messageType === 'error'
+              }"
+              x-text="message"
+            ></p>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</footer>
+

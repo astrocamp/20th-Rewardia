@@ -1,0 +1,10 @@
+{% if cards %}
+  <option value="" selected disabled class="text-[#949AA6]">選擇卡片</option>
+  {% for card in cards %}
+  <option value="{{ card.id }}">{{ card.name }}</option>
+  {% endfor %}
+{% else %}
+  <option value="" selected disabled class="text-[#949AA6]">
+    {% if message %}{{ message }}{% else %}該銀行暫無可選卡片{% endif %}
+  </option>
+{% endif %}

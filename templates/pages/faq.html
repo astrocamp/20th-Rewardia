@@ -1,0 +1,117 @@
+{% extends 'layouts/default.html' %}
+
+{% block title %}關於功能 - Rewardia{% endblock %}
+
+{% block content %}
+<!-- 主要橫幅區域 -->
+<section class="relative mx-4 sm:mx-6 lg:mx-10 mb-4 sm:mb-6 lg:mb-8 banner-spacing overflow-hidden"
+         x-bind:class="{
+           'banner-hidden': !$store.banner.visible,
+           'banner-transitioning': $store.banner.isTransitioning
+         }">
+  <!-- 頁面標題 - 在 banner 圖上方 -->
+  <div class="mb-4 sm:mb-6">
+    <h2 class="text-4xl font-bold text-black">關於功能</h2>
+  </div>
+
+  <!-- Banner 圖區域 -->
+  <div class="relative h-[300px] sm:h-[350px] lg:h-[400px] overflow-hidden rounded-lg">
+    <!-- 背景圖片 -->
+    <div class="absolute inset-0">
+      <img src="https://rewardia-web-pic.s3.ap-southeast-2.amazonaws.com/web-pic/about-index.webp"
+        alt="Rewardia Background"
+        loading="eager"
+        class="w-full h-full object-cover object-[75%_9%]">
+    </div>
+
+    <!-- 內容區域 - 限制在左半邊 -->
+    <div class="relative z-10 flex items-center h-full download-banner-content">
+      <div class="text-white px-4 sm:px-8 lg:px-12">
+        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 lg:mb-8 leading-tight tracking-wide max-w-md sm:max-w-[28rem] lg:max-w-none">
+          每次購物都能<br class="sm:inline md:inline lg:hidden">獲得現金回饋
+        </h1>
+        <div class="flex flex-col lg:flex-row gap-3 sm:gap-4 lg:gap-6 items-start">
+          <a href="{{ chrome_web_store_url }}" id="chrome-download" class="download-btn-secondary download-btn-banner" target="_blank" rel="noopener noreferrer">
+            免費新增至 Chrome
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 功能特色區塊 -->
+<section class="mx-4 sm:mx-6 lg:mx-10 my-8 sm:my-12 lg:my-16">
+  <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-8 sm:mb-12 lg:mb-16 text-center font-kulim-park leading-tight">
+    Rewardia 優惠計算回饋小幫手的 3 種方式
+  </h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 lg:gap-16 lg:px-16">
+    <!-- 功能卡片 1 -->
+    <div class="faq-feature-card">
+      <div class="faq-feature-bg">
+        <!-- 預留圖片空間 -->
+        <img src="https://rewardia-web-pic.s3.ap-southeast-2.amazonaws.com/web-pic/faq_01.webp" class="w-full h-full faq-feature-image-placeholder" alt="功能圖片">
+
+      </div>
+      <div class="faq-feature-content">
+
+        <div class="faq-feature-number">1</div>
+        <h3 class="faq-feature-title">
+          即時現金回饋通知
+        </h3>
+      </div>
+    </div>
+
+    <!-- 功能卡片 2 -->
+    <div class="faq-feature-card">
+      <div class="faq-feature-bg">
+        <!-- 預留圖片空間 -->
+        <img src="https://rewardia-web-pic.s3.ap-southeast-2.amazonaws.com/web-pic/faq_02.webp" class="w-full h-full faq-feature-image-placeholder" alt="功能圖片">
+      </div>
+      <div class="faq-feature-content">
+        <div class="faq-feature-number">2</div>
+        <h3 class="faq-feature-title">
+          即時現金回饋通知
+        </h3>
+      </div>
+    </div>
+
+    <!-- 功能卡片 3 -->
+    <div class="faq-feature-card">
+      <div class="faq-feature-bg">
+        <!-- 預留圖片空間 -->
+        <img src="https://rewardia-web-pic.s3.ap-southeast-2.amazonaws.com/web-pic/faq_03.webp" class="w-full h-full faq-feature-image-placeholder" alt="功能圖片">
+      </div>
+      <div class="faq-feature-content">
+        <div class="faq-feature-number">3</div>
+        <h3 class="faq-feature-title">
+          即時現金回饋通知
+        </h3>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Q&A 常見問題區塊 -->
+<section class="mx-4 sm:mx-6 lg:mx-10 my-8 sm:my-12 lg:my-16" x-data="faq_accordion()" x-cloak>
+  <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-8 sm:mb-12 text-left font-kulim-park leading-tight-custom">Q&A</h2>
+
+  <div class="bg-gray-50 rounded-lg p-5 sm:p-6 lg:p-8">
+    {% for category in faq_categories %}
+    <!-- {{ category.title }} 分類 -->
+    <div{% if not forloop.last %} class="mb-8"{% endif %}>
+      <div class="faq-category-title">
+        {{ category.title }}
+      </div>
+
+      <div class="faq-qa-list">
+        {% for item in category.items %}
+        {% include 'components/faq-item.html' with item_id=item.id question_text=item.question answer_text=item.answer %}
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

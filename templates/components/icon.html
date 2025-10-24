@@ -1,0 +1,115 @@
+<!-- 統一圖示組件庫 - 重構版本 -->
+<!-- 
+  支援的圖示：
+  - eye: 眼睛圖示 (密碼可見)
+  - eye-off: 眼睛圖示 (密碼隱藏)
+  - google: Google圖示 (Google登入)
+  - smart-recommend: 智慧推薦系統
+  - real-time-offer: 即時優惠提醒
+  - consumption-analysis: 消費分析報告
+  - chevron-down: 向下箭頭圖示
+  - chevron-up: 向上箭頭圖示
+  - close: 關閉按鈕 (X)
+  - warning: 警告圖示
+  - retry: 重試圖示
+  - edit: 編輯圖示
+  - check: 成功/勾選圖示
+  - menu: 選單圖示 (三條線)
+  - resize: 調整大小圖示
+  - user: 用戶圖示
+  - card: 卡片圖示
+  - image: 圖片/照片圖示
+  - chrome-extension: Chrome 擴充功能圖示
+  - github: GitHub 圖示
+  - document: 文件圖示
+  - camera: 相機圖示
+  - success: 成功圖示
+  - error: 錯誤圖示
+  - info: 資訊圖示
+  - email: 郵件圖示
+-->
+
+{% if name == "eye" %}
+  {% include 'components/svgs/eye.html' %}
+
+{% elif name == "eye-off" %}
+  {% include 'components/svgs/eye-off.html' %}
+
+{% elif name == "google" %}
+  {% include 'components/svgs/google.html' %}
+
+{% elif name == "smart-recommend" %}
+  {% include 'components/svgs/smart-recommend.html' %}
+
+{% elif name == "real-time-offer" %}
+  {% include 'components/svgs/real-time-offer.html' %}
+
+{% elif name == "consumption-analysis" %}
+  {% include 'components/svgs/consumption-analysis.html' %}
+
+{% elif name == "chevron-down" %}
+  {% include 'components/svgs/chevron-down.html' %}
+
+{% elif name == "chevron-up" %}
+  {% include 'components/svgs/chevron-up.html' %}
+
+{% elif name == "close" %}
+  {% include 'components/svgs/close.html' %}
+
+{% elif name == "warning" %}
+  {% include 'components/svgs/warning.html' %}
+
+{% elif name == "retry" %}
+  {% include 'components/svgs/retry.html' %}
+
+{% elif name == "edit" %}
+  {% include 'components/svgs/edit.html' %}
+
+{% elif name == "check" %}
+  {% include 'components/svgs/check.html' %}
+
+{% elif name == "menu" %}
+  {% include 'components/svgs/menu.html' %}
+
+{% elif name == "resize" %}
+  {% include 'components/svgs/resize.html' %}
+
+{% elif name == "user" %}
+  {% include 'components/svgs/user.html' %}
+
+{% elif name == "card" %}
+  {% include 'components/svgs/card.html' %}
+
+{% elif name == "image" %}
+  {% include 'components/svgs/image.html' %}
+
+{% elif name == "chrome-extension" %}
+  {% include 'components/svgs/chrome-extension.html' %}
+
+{% elif name == "github" %}
+  {% include 'components/svgs/github.html' %}
+
+{% elif name == "document" %}
+  {% include 'components/svgs/document.html' %}
+
+{% elif name == "camera" %}
+  {% include 'components/svgs/camera.html' %}
+
+{% elif name == "success" %}
+  {% include 'components/svgs/success.html' %}
+
+{% elif name == "error" %}
+  {% include 'components/svgs/error.html' %}
+
+{% elif name == "info" %}
+  {% include 'components/svgs/info.html' %}
+
+{% elif name == "email" %}
+  {% include 'components/svgs/email.html' %}
+
+{% else %}
+  <!-- 預設圖示或錯誤提示 -->
+  <div class="icon-placeholder {{ size|default:'w-6 h-6' }} {{ class|default:'' }} bg-gray-300 rounded flex items-center justify-center text-xs text-gray-600">
+    {{ name|default:'icon' }}
+  </div>
+{% endif %}

@@ -1,0 +1,51 @@
+from django import forms
+from django.contrib.auth import authenticate
+from django.core.exceptions import ValidationError
+
+
+class UserLoginForm(forms.Form):
+    """使用者登入表單"""
+    
+    username = forms.CharField(
+        max_length=150,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'input input-bordered w-full',
+            'placeholder': '請輸入您的帳號',
+            'id': 'username'
+        }),
+        label='帳號'
+    )
+    
+    password = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(attrs={
+            'class': 'input input-bordered w-full',
+            'placeholder': '請輸入您的密碼',
+            'id': 'password'
+        }),
+        label='密碼'
+    )
+    
+    def clean(self):
+        """驗證帳號和密碼"""
+        cleaned_data = super().clean()
+        username = cleaned_data.get('username')
+        password = cleaned_data.get('password')
+        
+        if username and password:
+            
+            user = authenticate(username=username, password=password)
+            if user is None:
+                raise ValidationError('Invalid login', code='invalid_login')
+            elif not user.is_active:
+                raise ValidationError('Inactive user', code='inactive_user')
+            
+            
+            cleaned_data['user'] = user
+        
+        return cleaned_data
+    
+    def get_user(self):
+        """取得驗證成功的用戶"""
+        return self.cleaned_data.get('user')

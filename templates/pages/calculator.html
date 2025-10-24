@@ -1,0 +1,152 @@
+{% extends 'layouts/default.html' %}
+{% load static %}
+
+
+{% block title %}calculator - Rewardia{% endblock %}
+
+{% block content %}
+<section class="calculator-page calculator-spacing"
+         x-bind:class="{
+           'banner-hidden': !$store.banner.visible,
+           'banner-transitioning': $store.banner.isTransitioning
+         }">
+  <div class="calculator-container">
+    <h2 class="calculator-title">優惠試算</h2>
+
+
+    <form id="calc_form" method="#" action="#">
+      {% csrf_token %}
+      <div class="form-card">
+        <div class="form-card-bg">
+
+          <div class="form-header">
+            <h3 class="form-title">優惠試算</h3>
+          </div>
+
+          <!-- 欄位群組 -->
+          <div class="form-fields">
+            <!-- 銀行 -->
+            <div class="field-group">
+              <label for="bank_select" class="field-label required">銀行</label>
+              <div class="select-wrapper">
+                <select id="bank_select" name="bank_select" class="ui-select" aria-label="選擇銀行" required
+                        hx-get="/get-cards-by-bank/"
+                        hx-target="#card_select"
+                        hx-trigger="change"
+                        hx-include="this"
+                        hx-on:htmx:after-request="resetDownstreamFields(['category_select', 'scope_select', 'result_value'])">
+                  <option value="" selected disabled>請選擇銀行</option>
+                  {% for bank_name in banks %}
+                  <option value="{{ bank_name }}">{{ bank_name }}</option>
+                  {% endfor %}
+                </select>
+
+
+                <div class="select-arrow" aria-hidden="true">
+                </div>
+              </div>
+            </div>
+
+            <!-- 卡片 -->
+            <div class="field-group">
+
+              <label for="card_select" name="card_select" class="field-label required">卡片</label>
+              <div class="select-wrapper">
+                <select id="card_select" name="card_select" class="ui-select" aria-label="選擇卡片" required
+                        hx-get="/get-categories-by-card/"
+                        hx-target="#category_select"
+                        hx-trigger="change"
+                        hx-include="this"
+                        hx-on:htmx:after-request="resetDownstreamFields(['scope_select', 'result_value'])">
+                  <option value="" selected disabled>請先選擇銀行，再選擇卡片</option>
+                </select>
+                <div class="select-arrow" aria-hidden="true">
+                </div>
+              </div>
+            </div>
+
+            <!-- 消費類別 -->
+            <div class="field-group">
+              <label for="category_select" class="field-label required">消費類別</label>
+              <div class="select-wrapper">
+                <select id="category_select" name="category_select" class="ui-select" aria-label="選擇消費類別" required
+                        hx-get="/get-scopes-by-category/"
+                        hx-target="#scope_select"
+                        hx-trigger="change"
+                        hx-include="#card_select,this"
+                        hx-on:htmx:after-request="resetDownstreamFields(['result_value'])">
+                  <option value="" selected disabled>請先選擇卡片</option>
+                </select>
+                <div class="select-arrow" aria-hidden="true">
+                </div>
+              </div>
+            </div>
+
+            <!-- 消費種類 -->
+            <div class="field-group">
+              <label for="scope_select" class="field-label required">消費種類</label>
+              <div class="select-wrapper">
+                <select id="scope_select" name="scope_select" class="ui-select" aria-label="選擇消費種類" required
+                        hx-trigger="change"
+                        hx-post="/calculate-reward/"
+                        hx-target="#result_value"
+                        hx-include="#calc_form"
+                        hx-indicator="#loading-indicator"
+                        hx-on:htmx:after-request="document.getElementById('amount_input').focus()">
+                  <option value="" selected disabled>請先選擇消費類別</option>
+                </select>
+                <div class="select-arrow" aria-hidden="true">
+                </div>
+              </div>
+            </div>
+
+            <!-- 消費金額 -->
+            <div class="field-group field-full">
+              <label for="amount_input" class="field-label required">消費金額</label>
+              <input id="amount_input" type="number" name="amount_input" inputmode="decimal" placeholder="請輸入消費金額" class="ui-input" aria-label="消費金額" required min="1" step="1"
+                     hx-trigger="input changed delay:200ms"
+                     hx-post="/calculate-reward/"
+                     hx-target="#result_value"
+                     hx-include="#calc_form"
+                     hx-indicator="#loading-indicator"
+                     onkeydown="if(event.key === 'Enter') event.preventDefault();" />
+
+            </div>
+          </div>
+
+          <div class="result-card">
+            <div class="result-card-bg">
+              <div class="result-content">
+                <p class="result-label">計算結果</p>
+                <p class="result-value" id="result_value"
+                   hx-on:htmx:after-swap="scrollToResult()">請選擇欄位進行計算</p>
+                <div id="loading-indicator" class="htmx-indicator" style="display: none;">計算中...</div>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- 動作按鈕 -->
+          <div class="action-buttons">
+          <button type="button" class="ui-btn ui-btn-secondary"
+                  onclick="clearForm()">清空填寫</button>
+          </div>
+
+
+
+
+          <div class="disclaimer-section">
+            <ul class="disclaimer-list">
+              <li>本站資料僅供參考，實際以各銀行、電子支付、商家官方為準，若因資料錯誤造成損失，本站不負任何責任</li>
+              <li>本服務提供擴充插件版本，提供優惠提醒，使用快速方便即時。</li>
+            </ul>
+           </div>
+
+
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,263 @@
+{% extends 'admins/default.html' %}
+
+{% block content %}
+<section class="relative mx-4 sm:mx-6 lg:mx-10 mb-4 sm:mb-6 lg:mb-8 mt-26 overflow-hidden" x-data="schedulerControl" x-cloak>
+  <div class="my-4 sm:mb-6">
+    <h2 class="text-2xl sm:text-2xl lg:text-2xl font-bold text-black">排程管理</h2>
+    <p class="mt-2 text-gray-600">管理爬蟲任務的執行排程和查看執行記錄</p>
+  </div>
+
+  <!-- Celery 服務狀態提示 -->
+  <div x-show="!schedule.celery_worker_active || !schedule.celery_beat_active"
+       class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm text-yellow-700">
+          <span class="font-medium">Celery 服務未完全啟動</span>
+        </p>
+        <div class="mt-2 text-xs text-yellow-600">
+          <div x-show="!schedule.celery_worker_active">
+            ❌ Celery Worker 未運行
+          </div>
+          <div x-show="!schedule.celery_beat_active">
+            ❌ Celery Beat 未運行
+          </div>
+          <div x-show="schedule.celery_worker_active">
+            ✅ Celery Worker 運行中
+          </div>
+          <div x-show="schedule.celery_beat_active">
+            ✅ Celery Beat 運行中
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 排程控制面板 -->
+  <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+    <h2 class="text-xl font-semibold text-gray-900 mb-6">排程設定</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+
+      <!-- 時間設定 -->
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-gray-700">執行時間</label>
+        <div class="flex space-x-2">
+          <input type="number"
+                 x-model="schedule.hour"
+                 @change="updateSchedule()"
+                 min="0"
+                 max="23"
+                 placeholder="時"
+                 class="ui-input flex-1 text-center">
+          <span class="flex items-center text-gray-500">:</span>
+          <input type="number"
+                 x-model="schedule.minute"
+                 @change="updateSchedule()"
+                 min="0"
+                 max="59"
+                 placeholder="分"
+                 class="ui-input flex-1 text-center">
+        </div>
+        <p class="text-xs text-gray-500">每日執行時間 (24小時制)</p>
+      </div>
+
+      <!-- 排程開關 -->
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-gray-700">排程狀態</label>
+        <div class="flex items-center">
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox"
+                   x-model="schedule.enabled"
+                   @change="toggleSchedule()"
+                   class="sr-only peer">
+            <div class="relative w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-600 transition-colors duration-200">
+              <div class="absolute top-[2px] left-[2px] bg-white w-5 h-5 rounded-full transition-transform duration-200"
+                   :class="schedule.enabled ? 'translate-x-5' : 'translate-x-0'">
+              </div>
+            </div>
+          </label>
+          <span class="ml-3 text-sm font-medium text-gray-700"
+                x-text="schedule.enabled ? '啟用' : '停用'">
+          </span>
+        </div>
+        <p class="text-xs text-gray-500">排程執行狀態</p>
+      </div>
+
+      <!-- 執行狀態 -->
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-gray-700">執行狀態</label>
+
+        <!-- 正在執行狀態 -->
+        <div x-show="schedule.is_running" class="flex items-center space-x-2">
+          <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <span class="text-sm text-green-600 font-medium">正在執行中</span>
+        </div>
+
+        <!-- 未執行狀態 -->
+        <div x-show="!schedule.is_running" class="flex items-center space-x-2">
+          <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
+          <span class="text-sm text-gray-600">待機中</span>
+        </div>
+
+        <!-- 執行詳情 -->
+        <div class="text-xs text-gray-500">
+          <div x-show="schedule.is_running">
+            正在執行任務中...
+          </div>
+          <div x-show="schedule.last_run_at && !schedule.is_running">
+            上次執行: <span x-text="schedule.last_run_at"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 立即執行按鈕 -->
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-gray-700">手動執行</label>
+        <button @click="runNow()"
+                :disabled="isLoading || schedule.is_running || !schedule.celery_worker_active"
+                class="ui-btn ui-btn-primary w-full"
+                :class="(isLoading || schedule.is_running || !schedule.celery_worker_active) ? 'opacity-50 cursor-not-allowed' : ''">
+          <span x-show="!isLoading && !schedule.is_running && schedule.celery_worker_active">立即執行</span>
+          <span x-show="isLoading && !schedule.is_running" class="flex items-center">
+            <i class="fas fa-spinner fa-spin mr-2"></i>
+            啟動中...
+          </span>
+          <span x-show="schedule.is_running" class="flex items-center">
+            <i class="fas fa-cog fa-spin mr-2"></i>
+            執行中...
+          </span>
+          <span x-show="!schedule.celery_worker_active" class="flex items-center">
+            <i class="fas fa-times mr-2"></i>
+            服務未啟動
+          </span>
+        </button>
+        <p class="text-xs text-gray-500">
+          <span x-show="schedule.celery_worker_active">立即觸發爬蟲任務</span>
+          <span x-show="!schedule.celery_worker_active" class="text-red-500">需要啟動 Celery Worker</span>
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 執行記錄 -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+    <!-- 左欄：爬蟲執行記錄 -->
+    <div class="bg-white rounded-lg shadow-md">
+      <div class="p-6 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900">爬蟲執行記錄</h3>
+        <p class="text-sm text-gray-600 mt-1">最近 20 次執行記錄</p>
+      </div>
+
+      <div class="h-96 overflow-y-auto">
+        <div class="space-y-3 p-6" x-show="crawledRecords.length > 0">
+          <template x-for="record in crawledRecords" :key="record.id">
+            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+
+              <!-- 記錄標題 -->
+              <div class="flex justify-between items-center mb-3">
+                <div class="font-medium text-gray-900" x-text="record.created_at"></div>
+                <span class="px-2 py-1 text-xs font-medium rounded-full"
+                      :class="record.has_errors ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'"
+                      x-text="record.has_errors ? '失敗' : '成功'">
+                </span>
+              </div>
+
+              <!-- 記錄詳情 -->
+              <div class="space-y-1 text-sm text-gray-600">
+                <div x-show="!record.has_errors">
+                  <span class="font-medium">卡片數量：</span>
+                  <span x-text="record.total_cards + ' 張'"></span>
+                </div>
+                <div x-show="!record.has_errors">
+                  <span class="font-medium">總耗時：</span>
+                  <span x-text="record.total_time + ' 秒'"></span>
+                </div>
+                <div x-show="!record.has_errors">
+                  <span class="font-medium">平均時間：</span>
+                  <span x-text="record.average_time + ' 秒'"></span>
+                </div>
+                <div x-show="record.has_errors" class="text-red-600">
+                  <span class="font-medium">錯誤：</span>
+                  <span x-text="record.errors"></span>
+                </div>
+              </div>
+
+            </div>
+          </template>
+        </div>
+
+        <!-- 空狀態 -->
+        <div x-show="crawledRecords.length === 0"
+             class="flex flex-col items-center justify-center h-full text-gray-500">
+          <i class="fas fa-database text-4xl mb-4"></i>
+          <p>暫無執行記錄</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 右欄：NLP分析記錄 -->
+    <div class="bg-white rounded-lg shadow-md">
+      <div class="p-6 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900">NLP分析記錄</h3>
+        <p class="text-sm text-gray-600 mt-1">最近 20 次分析記錄</p>
+      </div>
+
+      <div class="h-96 overflow-y-auto">
+        <div class="space-y-3 p-6" x-show="analysisRecords.length > 0">
+          <template x-for="record in analysisRecords" :key="record.id">
+            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+
+              <!-- 記錄標題 -->
+              <div class="flex justify-between items-center mb-3">
+                <div class="font-medium text-gray-900" x-text="record.created_at"></div>
+                <span class="px-2 py-1 text-xs font-medium rounded-full"
+                      :class="record.has_errors ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'"
+                      x-text="record.has_errors ? '失敗' : '成功'">
+                </span>
+              </div>
+
+              <!-- 記錄詳情 -->
+              <div class="space-y-1 text-sm text-gray-600">
+                <div x-show="!record.has_errors">
+                  <span class="font-medium">分析數量：</span>
+                  <span x-text="record.analyzed_count + ' 項'"></span>
+                </div>
+                <div x-show="!record.has_errors">
+                  <span class="font-medium">總耗時：</span>
+                  <span x-text="record.total_time + ' 秒'"></span>
+                </div>
+                <div x-show="!record.has_errors">
+                  <span class="font-medium">平均時間：</span>
+                  <span x-text="record.average_time + ' 秒'"></span>
+                </div>
+                <div x-show="record.has_errors" class="text-red-600">
+                  <span class="font-medium">錯誤：</span>
+                  <span x-text="record.errors"></span>
+                </div>
+              </div>
+
+            </div>
+          </template>
+        </div>
+
+        <!-- 空狀態 -->
+        <div x-show="analysisRecords.length === 0"
+             class="flex flex-col items-center justify-center h-full text-gray-500">
+          <i class="fas fa-chart-line text-4xl mb-4"></i>
+          <p>暫無分析記錄</p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</section>
+{% endblock %}

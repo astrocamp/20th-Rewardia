@@ -1,0 +1,168 @@
+{% extends 'admins/default.html' %}
+{% block title %}回饋規則管理 - Rewardia{% endblock %}
+
+{% block content %}
+
+<!-- Loading 覆蓋層 -->
+<div id="loading-overlay" class="loading-overlay">
+    <div class="loading-content">
+        <div class="loading-text">批量處理中<span class="dots"></span></div>
+        <div class="loading-subtitle">正在處理審核資料，請稍候</div>
+    </div>
+</div>
+
+<section class="relative mx-4 sm:mx-6 lg:mx-10 mb-4 sm:mb-6 lg:mb-8 mt-26 overflow-hidden pb-6">
+    <!-- 標題 -->
+    <div class="my-4 sm:mb-6">
+        <h2 class="text-2xl sm:text-2xl lg:text-2xl font-bold text-black mb-2">回饋規則管理</h2>
+        <p class="text-gray-600">管理信用卡回饋規則的審核與設定</p>
+    </div>
+
+    <!-- 狀態統計按鈕 -->
+    <div class="flex flex-wrap gap-3 mb-6">
+        <a href="{% url 'admins:rewards' %}?status=PENDING&page=1"
+           class="px-4 py-2 rounded-lg font-medium transition-all duration-200 {% if current_status == 'PENDING' %}!bg-blue-600 !text-white shadow-lg{% else %}bg-white text-gray-700 hover:bg-gray-50 border border-gray-200{% endif %}">
+            待審核 ({{ stats.pending_count }})
+        </a>
+        <a href="{% url 'admins:rewards' %}?status=REVIEWING&page=1"
+           class="px-4 py-2 rounded-lg font-medium transition-all duration-200 {% if current_status == 'REVIEWING' %}!bg-blue-600 !text-white shadow-lg{% else %}bg-white text-gray-700 hover:bg-gray-50 border border-gray-200{% endif %}">
+            審核中 ({{ stats.reviewing_count }})
+        </a>
+        <a href="{% url 'admins:rewards' %}?status=APPROVED&page=1"
+           class="px-4 py-2 rounded-lg font-medium transition-all duration-200 {% if current_status == 'APPROVED' %}!bg-blue-600 !text-white shadow-lg{% else %}bg-white text-gray-700 hover:bg-gray-50 border border-gray-200{% endif %}">
+            已通過 ({{ stats.approved_count }})
+        </a>
+        <a href="{% url 'admins:rewards' %}?status=REJECTED&page=1"
+           class="px-4 py-2 rounded-lg font-medium transition-all duration-200 {% if current_status == 'REJECTED' %}!bg-blue-600 !text-white shadow-lg{% else %}bg-white text-gray-700 hover:bg-gray-50 border border-gray-200{% endif %}">
+            已拒絕 ({{ stats.rejected_count }})
+        </a>
+        <a href="{% url 'admins:rewards' %}?status=ALL&page=1"
+           class="px-4 py-2 rounded-lg font-medium transition-all duration-200 {% if current_status == 'ALL' %}!bg-blue-600 !text-white shadow-lg{% else %}bg-white text-gray-700 hover:bg-gray-50 border border-gray-200{% endif %}">
+            全部 ({{ stats.total_count }})
+        </a>
+    </div>
+
+    <!-- 回饋描述顯示框 -->
+    <div class="bg-white p-4 rounded-lg shadow-sm mb-6 h-30">
+        <div class="text-sm text-gray-500 mb-2">回饋描述預覽</div>
+        <div id="description-display" class="text-gray-800 bg-gray-50 p-3 rounded h-16 overflow-y-auto break-words">
+            請點選下方列表查看回饋描述詳情...
+        </div>
+    </div>
+
+    <!-- 資料表格 -->
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        {% if page_obj %}
+        <!-- 通知訊息區域 -->
+        <div id="messages-container">
+            {% include 'layouts/messages.html' %}
+        </div>
+
+        {% if current_status == 'PENDING' %}
+        <div class="mb-4 flex gap-3">
+            <button
+                class="inline-block bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-bold border-0"
+                style="background-color: #059669 !important; color: white !important;"
+                onclick="showLoadingAndSubmit(this, '{% url 'admins:bulk_approve_rewards' %}?status={{ current_status }}&page={{ page_obj.number }}', '確定要通過本頁 {{ page_obj|length }} 個待審核項目嗎？')">
+                全部通過 ({{ page_obj|length }})
+            </button>
+            <button
+                class="inline-block bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-bold border-0"
+                style="background-color: #dc2626 !important; color: white !important;"
+                onclick="showLoadingAndSubmit(this, '{% url 'admins:bulk_reject_rewards' %}?status={{ current_status }}&page={{ page_obj.number }}', '確定要駁回本頁 {{ page_obj|length }} 個待審核項目嗎？')">
+                全部駁回 ({{ page_obj|length }})
+            </button>
+        </div>
+        {% endif %}
+
+
+        <div class="overflow-x-auto max-h-96 overflow-y-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50 sticky top-0 z-10">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32 bg-gray-50">操作</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40 bg-gray-50">信用卡</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24 bg-gray-50">分類</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32 bg-gray-50">範圍</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20 bg-gray-50">回饋率</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24 bg-gray-50">回饋類型</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20 bg-gray-50">信心度</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24 bg-gray-50">狀態</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32 bg-gray-50">建立時間</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for reward in page_obj %}
+                        {% include "admins/reward_row.html" %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 分頁導航 -->
+        {% if page_obj.paginator.num_pages > 1 %}
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <!-- 左側：顯示資料資訊 -->
+                <div class="text-sm text-gray-700 mb-4 sm:mb-0">
+                    顯示第 {{ page_obj.start_index }} - {{ page_obj.end_index }} 筆，
+                    共 {{ page_obj.paginator.count }} 筆資料
+                </div>
+
+                <!-- 右側：分頁按鈕 -->
+                <nav class="flex flex-wrap gap-1 sm:gap-2">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1&status={{ current_status }}"
+                           class="px-2 sm:px-3 py-2 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors">
+                            第一頁
+                        </a>
+                        <a href="?page={{ page_obj.previous_page_number }}&status={{ current_status }}"
+                           class="px-2 sm:px-3 py-2 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors">
+                            上一頁
+                        </a>
+                    {% endif %}
+
+                    <!-- 頁碼按鈕 -->
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <span class="px-2 sm:px-3 py-2 text-sm bg-blue-600 text-white border border-blue-600 rounded">
+                                {{ num }}
+                            </span>
+                        {% elif num == page_obj.paginator.ELLIPSIS %}
+                            <span class="px-2 sm:px-3 py-2 text-sm text-gray-500">...</span>
+                        {% else %}
+                            <a href="?page={{ num }}&status={{ current_status }}"
+                               class="px-2 sm:px-3 py-2 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors">
+                                {{ num }}
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}&status={{ current_status }}"
+                           class="px-2 sm:px-3 py-2 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors">
+                            下一頁
+                        </a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}&status={{ current_status }}"
+                           class="px-2 sm:px-3 py-2 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors">
+                            最後頁
+                        </a>
+                    {% endif %}
+                </nav>
+            </div>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-12 bg-white rounded-lg mt-6">
+            <div class="text-gray-400 text-lg mb-2">沒有找到符合條件的資料</div>
+            <div class="text-gray-500">請嘗試調整狀態篩選</div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+
+
+
+{% endblock %}

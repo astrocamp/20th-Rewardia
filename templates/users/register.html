@@ -1,0 +1,185 @@
+{% extends 'layouts/auth.html' %}
+
+{% block title %}註冊 - Rewardia{% endblock %}
+
+{% block content %}
+{% include 'components/auth-shared.html' with component="page-container" title="註冊" %}
+
+<!-- Django Messages 顯示區域 -->
+{% if messages %}
+  <div class="space-y-2 mb-4" x-data="toast_fadeout" x-show="show">
+    {% for message in messages %}
+      <div class="tw-toast {{ message.tags }}" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+        <span>{{ message }}</span>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<!-- 主要註冊表單 -->
+<form class="space-y-3" 
+      x-data="register_form" 
+      x-cloak
+      novalidate
+      method="post"
+      action="{% url 'users:register' %}"
+      @submit.prevent="submitForm($event)">
+  {% csrf_token %}
+  
+  <!-- 帳號欄位 -->
+  <div class="register-field-container">
+    <label for="username" class="register-label">帳號</label>
+    <div class="register-relative-container">
+      <input 
+        type="text"
+        id="username"
+        name="username"
+        x-ref="username"
+        placeholder="請輸入您的帳號"
+        class="register-input"
+        :class="{'input-error': errors.username}"
+        value="{{ form.username.value|default:'' }}"
+        x-model="formData.username"
+        @input="clearFieldError('username')"
+        @blur="validateField('username')"
+        autocomplete="username"
+        required>
+    </div>
+    <div x-show="errors.username" class="text-error text-sm mt-1" x-text="errors.username"></div>
+  </div>
+
+  <!-- 電子郵件欄位 -->
+  <div class="register-field-container">
+    <label for="email" class="register-label">電子郵件</label>
+    <div class="register-relative-container">
+      <input 
+        type="email"
+        id="email"
+        name="email"
+        x-ref="email"
+        placeholder="請輸入您的電子郵件"
+        class="register-input"
+        :class="{'input-error': errors.email}"
+        value="{{ form.email.value|default:'' }}"
+        x-model="formData.email"
+        @input="clearFieldError('email')"
+        @blur="validateField('email')"
+        autocomplete="email"
+        required>
+    </div>
+    <div x-show="errors.email" class="text-error text-sm mt-1" x-text="errors.email"></div>
+  </div>
+
+  <!-- 密碼欄位 -->
+  <div class="register-field-container">
+    <label for="password" class="register-label">密碼</label>
+    <div class="register-relative-container">
+      <input 
+        :type="showPassword ? 'text' : 'password'"
+        id="password"
+        name="password"
+        placeholder="輸入密碼(至少8碼，含英文大/小寫與數字)"
+        class="register-input pr-12"
+        :class="{'input-error': errors.password}"
+        x-model="formData.password"
+        @input="clearFieldError('password')"
+        @blur="validateField('password')"
+        autocomplete="new-password"
+        required>
+      <button 
+        type="button" 
+        class="password-toggle-btn"
+        @click="showPassword = !showPassword"
+        :aria-label="showPassword ? '隱藏密碼' : '顯示密碼'"
+      >
+        <div x-show="!showPassword">
+          {% include 'components/icon.html' with name="eye" class="w-6 h-6" %}
+        </div>
+        <div x-show="showPassword">
+          {% include 'components/icon.html' with name="eye-off" class="w-6 h-6" %}
+        </div>
+      </button>
+    </div>
+    <div x-show="errors.password" class="text-error text-sm mt-1" x-text="errors.password"></div>
+  </div>
+
+  <!-- 確認密碼欄位 -->
+  <div class="register-field-container">
+    <label for="confirm-password" class="register-label">確認密碼</label>
+    <div class="register-relative-container">
+      <input 
+        :type="showConfirmPassword ? 'text' : 'password'"
+        id="confirm-password"
+        name="confirm_password"
+        placeholder="請再次輸入您的密碼"
+        class="register-input pr-12"
+        :class="{'input-error': errors.confirm_password}"
+        x-model="formData.confirm_password"
+        @input="clearFieldError('confirm_password')"
+        @blur="validateField('confirm_password')"
+        autocomplete="new-password"
+        required>
+      <button 
+        type="button" 
+        class="password-toggle-btn"
+        @click="showConfirmPassword = !showConfirmPassword"
+        :aria-label="showConfirmPassword ? '隱藏確認密碼' : '顯示確認密碼'"
+      >
+        <div x-show="!showConfirmPassword">
+          {% include 'components/icon.html' with name="eye" class="w-6 h-6" %}
+        </div>
+        <div x-show="showConfirmPassword">
+          {% include 'components/icon.html' with name="eye-off" class="w-6 h-6" %}
+        </div>
+      </button>
+    </div>
+    <div x-show="errors.confirm_password" class="text-error text-sm mt-1" x-text="errors.confirm_password"></div>
+  </div>
+
+  <!-- 服務條款勾選框 -->
+  <div class="flex items-start space-x-3">
+    <input 
+      type="checkbox" 
+      id="agree_terms" 
+      name="agree_terms"
+      x-ref="agreeTerms"
+      class="register-checkbox"
+      :class="{'checkbox-error': errors.agree_terms}"
+      {% if form.agree_terms.value %}checked{% endif %}
+      x-model="formData.agree_terms"
+      @change="clearFieldError('agree_terms'); validateField('agree_terms')"
+      required
+    >
+    <label for="agree_terms" class="text-lg text-gray-700 font-normal leading-relaxed">
+      我同意網站
+      <a href="{% url 'pages:tos' %}" id="service-terms" class="register-link" target="_blank">
+        服務條款
+      </a>
+      及
+      <a href="{% url 'pages:privacy' %}" id="privacy-policy" class="register-link" target="_blank">
+        隱私權政策
+      </a>
+    </label>
+  </div>
+  <div x-show="errors.agree_terms" class="text-error text-sm mt-1" x-text="errors.agree_terms"></div>
+
+  <!-- 主要註冊按鈕 -->
+  <button 
+    type="submit" 
+    class="register-btn-primary"
+  >
+    建立帳號
+  </button>
+</form>
+
+<!-- 分隔線 -->
+{% include 'components/auth-shared.html' with component="divider" %}
+
+<!-- Google 註冊按鈕 -->
+{% include 'components/auth-shared.html' with component="google-button" action="註冊" button_id="google-register" aria_label="使用 Google 帳號註冊" %}
+
+<!-- 登入連結 -->
+{% include 'components/auth-shared.html' with component="bottom-link" prefix_text="已經有帳號？" link_text="登入" link_url="sessions:login" suffix_text="去" %}
+
+{% include 'components/auth-shared.html' with component="page-container-end" %}
+{% endblock %}
